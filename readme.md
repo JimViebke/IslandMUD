@@ -2,12 +2,21 @@ IslandMUD
 
 Jim Viebke, 2015
 
+IslandMUD is a free opensource Multi-User Dimension that takes place on an expansive procedurally generated island set in a medieval period. While your fellow players may be on your side in your efforts to colonize a world inhabited only by scattered pioneers, militants seek to purge this land of all trace of colonists.
+
+- Build huts, houses, outposts, or fortresses from the ground up with sandbox-esque freedom.
+- Cooperate with your friends to defend your fledgling colonies against coordinated attacks by NPCs.
+- Launch sneak attacks upon the enemys' structures.
+
+Features:
+
+- Two main types of NPCs (indifferent and hostile)
+- Invisible skill system
+- Freedom to build, trade, explore, defend, attack, or raid
+- Free, multiplayer, and opensource
+
+
 All files released under the [Boost Software License - Version 1.0](http://www.boost.org/LICENSE_1_0.txt) or a compatible license unless mentioned otherwise.
-
-
-
-IslandMUD is a multiplayer opensource MUD. The game takes place on an expansive procedurally generated island that you and your fellow players are . While your fellow 
-
 
 
 ```
