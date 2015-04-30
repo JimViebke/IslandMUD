@@ -7,14 +7,14 @@ IslandMUD is a free opensource Multi-User Dimension in active development that t
 Nothing is set in stone.
 
 - Every structure that is created whether by players or NPCs can be turned to rubble.
-- Tools and weapons will wear down, lose effectiveness, and break.
+- Tools and weapons wear down, lose effectiveness, and break.
 - NPCs barter based on (invisible) market prices as well as their current interests.
 
 Features:
 
 - 600,000 rooms of biome-based wilderness
 - Hostile NPCs as tough as any player
-- Indifferent NPCs scattering the world who will barter for the right price
+- Indifferent NPCs scattering the world who barter for the right price
 - Invisible classless skills system
 - Crafting of tools, weapons, and structures
 - Freedom to build, trade, explore, defend, attack, or raid
