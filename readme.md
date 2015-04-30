@@ -4,6 +4,12 @@ Jim Viebke, 2015
 
 All files released under the [Boost Software License - Version 1.0](http://www.boost.org/LICENSE_1_0.txt) or a compatible license unless mentioned otherwise.
 
+
+
+IslandMUD is a multiplayer opensource MUD. The game takes place on an expansive procedurally generated island that you and your fellow players are . While your fellow 
+
+
+
 ```
 Boost Software License - Version 1.0 - August 17th, 2003
 
