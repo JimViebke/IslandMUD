@@ -1,4 +1,4 @@
-IslandMUd
+IslandMUD
 
 Jim Viebke, 2015
 
