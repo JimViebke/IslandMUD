@@ -2,7 +2,7 @@ IslandMUD is a free opensource Multi-User Dimension in active development that t
 
 - Craft tools, weapons, huts, houses, outposts, or fortresses from the ground up with sandbox-esque freedom.
 - Cooperate with your friends to defend your fledgling colonies against coordinated attacks by NPCs.
-- Launch sneak attacks upon the enemys' structures.
+- Launch sneak attacks upon the enemies' structures.
 
 Nothing is set in stone.
 
