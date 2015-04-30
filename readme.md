@@ -4,7 +4,11 @@ IslandMUD is a free opensource Multi-User Dimension in active development that t
 - Cooperate with your friends to defend your fledgling colonies against coordinated attacks by NPCs.
 - Launch sneak attacks upon the enemys' structures.
 
-Nothing is set in stone. Every structure that is created whether by players or NPCs can be turned to rubble. Tools and weapons will wear down, lose effectiveness, and break. NPCs barter based on (invisible) market prices as well as their current interests.
+Nothing is set in stone.
+
+- Every structure that is created whether by players or NPCs can be turned to rubble.
+- Tools and weapons will wear down, lose effectiveness, and break.
+- NPCs barter based on (invisible) market prices as well as their current interests.
 
 Features:
 
