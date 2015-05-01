@@ -15,9 +15,10 @@
 - 600,000 rooms of biome-based wilderness
 - Hostile NPCs as tough as any player
 - Neutral NPCs scattering the world who barter for the right price
-- Invisible classless skills system
+- Invisible classless skills system with limited leveling to eliminate noobs+demigods phenomena
 - Crafting of tools, weapons, and structures
 - Freedom to build, trade, explore, defend, attack, or raid
+- Limited leveling eliminates 
 - Free, multiplayer, and open source
 
 **Bring your friends. You can't take on IslandMUD alone.**
