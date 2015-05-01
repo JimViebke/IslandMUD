@@ -1,4 +1,4 @@
-The Boost Softare License applies to all IslandMUD files unless stated otherwise.
+The [Boost Software License](http://www.boost.org/LICENSE_1_0.txt) applies to all IslandMUD files unless stated otherwise.
 
 ```
 Boost Software License - Version 1.0 - August 17th, 2003
