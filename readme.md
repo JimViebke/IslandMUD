@@ -2,7 +2,7 @@
 
 - Craft tools, weapons, huts, houses, outposts, or fortresses from the ground up with sandbox-esque freedom.
 - Cooperate with your friends to defend your colonies large or small against coordinated attacks by NPCs.
-- Turn the tables and attack the enemies' structures.
+- Turn the tables: amush partrols, capture outposts, and launch attacks on enemy fortresses.
 
 **Nothing is set in stone**
 
