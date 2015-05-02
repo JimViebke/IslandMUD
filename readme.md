@@ -18,7 +18,6 @@
 - Invisible classless skills system with limited leveling to reduce skill disparity
 - Crafting of tools, weapons, and structures
 - Freedom to build, trade, explore, defend, attack, or raid
-- Limited leveling eliminates 
 - Free, multiplayer, and open source
 
 **Bring your friends. You can't take on IslandMUD alone.**
