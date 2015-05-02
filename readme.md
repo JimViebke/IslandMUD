@@ -15,7 +15,7 @@
 - 600,000 rooms of biome-based wilderness
 - Hostile NPCs as tough as any player
 - Neutral NPCs scattering the world who barter for the right price
-- Invisible classless skills system with limited leveling to eliminate noobs+demigods phenomena
+- Invisible classless skills system with limited leveling to reduce skill disparity
 - Crafting of tools, weapons, and structures
 - Freedom to build, trade, explore, defend, attack, or raid
 - Limited leveling eliminates 
