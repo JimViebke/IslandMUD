@@ -9,10 +9,7 @@ There's no way to tell if a room is water or not. One could use distance from is
 
 Draw water as ~ just using the center tile
 
-Update movement rules regarding walls: to move northwest, I have to have no north wall AND no west wall AND destination has neither opposite wall.
-
-
-Add followers feature, so each character has follower_IDs and following_ID (a tree-like structure of players).
+Add followers feature, so each character has follower_IDs and following_ID, which are mutually exclusive.
 In player->move manually move all IDs when the leader moves.
 If a player is following an player who isn't signed in, clear following string
 If a player tries to move while following, block it.
@@ -30,7 +27,7 @@ Give certain hierarchies of items a quality. Basic items will be crude.
 The current return for crafting or aquiring is: "You now have a(n) " + craft_item_id
 If the item was yielded, it would be nice if it said "You now have a(n) branch from the tree."
 
-Also consider item wear. A sword wears with every strike, a bow with every fire, an axe with every strike.
+Item wear. A sword wears with every strike, a bow with every fire, an axe with every strike.
 	While fighing: "You notice your sword [shows use]/[has become mildly worn]/[has become worn]/[is slightly damaged]/[is damaged]/[is badly damaged]/[is damaged beyond use]."
 	While offering: "[name] presents/offers a sword that [is mildly worn]".
 	While equipping: "You draw a [mildy-worn] axe."
@@ -38,10 +35,10 @@ Also consider item wear. A sword wears with every strike, a bow with every fire,
 There could be an item_condition object that accepts items by constant reference and returns a string description based on its wear.
 	It could also accept an enum to represent the context (fighting, offering, equipping, unequipping)
 
-There need to be unaffilated NPCs. Random country folk who raise cattle or grow crops.
-Each farmer NPC could have between 1-3 occupations. Others would specialize (blacksmithing).
+Random country folk who craft tools or grow crops.
+Each NPC could have between 1-3 occupations. Others would specialize (blacksmithing).
 This would make development of AI easier - no need to balance NPC situational improvement with combat yet.
 
 When someone performs an action, everyone around/observing that individual would have to be notified of it.
 
-Security issue for later: How does the server know a user is who they say they are?
+Security issue for later: user validation / pw encryption
