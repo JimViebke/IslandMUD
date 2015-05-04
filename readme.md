@@ -21,5 +21,3 @@
 - Free, multiplayer, and open source
 
 **Bring your friends. You can't take on IslandMUD alone.**
-
-[this text is a test]
