@@ -5,3 +5,5 @@ IslandMUD/IslandMUD/IslandMUD.vcxproj.filters
 Debug/IslandMUD.pdb
 *.obj
 IslandMUD/Debug/IslandMUD.log
+*.suo
+IslandMUD.sdf
