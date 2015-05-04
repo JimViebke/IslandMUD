@@ -14,3 +14,4 @@ IslandMUD/IslandMUD.vcxproj
 *.tlog
 IslandMUD/Debug/vc120.idb
 *.pdb
+*.log
