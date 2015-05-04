@@ -1,6 +1,4 @@
-/*
-
-Jim Viebke
+/* Jim Viebke
 April 18, 2015
 
 Copyright (c) 2003-2015 Christopher M. Kohlhoff (chris at kohlhoff dot com)

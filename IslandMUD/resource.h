@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by JimMUD.rc
+// Used by IslandMUD.rc
 
 // Next default values for new objects
 // 

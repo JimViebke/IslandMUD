@@ -1,10 +1,9 @@
-﻿/*
-Jim Viebke
+﻿/* Jim Viebke
 Feb 14, 2015 */
 
 #include "constants.h"
 
-const string C::game_directory = "C:/JimMUD";
+const string C::game_directory = "C:/IslandMUD";
 const string C::room_directory = C::game_directory + "/rooms";
 const string C::world_terrain_file_location = C::game_directory + "/world_terrain.txt";
 const string world_biome_file_location = C::game_directory + "/biome_map.txt";

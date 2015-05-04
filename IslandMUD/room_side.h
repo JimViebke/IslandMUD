@@ -1,5 +1,4 @@
-/*
-Jim Viebke
+/* Jim Viebke
 Mar 19 2015
 
 Floors, walls, and ceilings. No doors yet. */

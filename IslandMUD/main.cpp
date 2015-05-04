@@ -1,5 +1,4 @@
-﻿/*
-Jim Viebke
+﻿/* Jim Viebke
 Feb 14, 2015 */
 
 #include <fstream>
@@ -18,9 +17,9 @@ int main()
 
 	// ensure .bat utilites are on the disk
 	R::to_file(C::game_directory + "\\" + "move game data to delete folder.bat.txt",
-		string("move C:\\JimMud\\rooms C:\\JimMud\\delete"));
+		string("move C:\\IslandMUD\\rooms C:\\IslandMUD\\delete"));
 	R::to_file(C::game_directory + "\\" + "wipe delete folder.bat",
-		string("del /f/s/q C:\\JimMUD\\delete > nul") + "\n" + "rmdir /s/q C:\\JimMUD\\delete");
+		string("del /f/s/q C:\\IslandMUD\\delete > nul") + "\n" + "rmdir /s/q C:\\IslandMUD\\delete");
 	
 	// create game object
 	Game game;

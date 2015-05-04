@@ -1,5 +1,4 @@
-﻿/*
-Jim Viebke
+﻿/* Jim Viebke
 April 1, 2014 */
 
 #ifndef WORLD_H

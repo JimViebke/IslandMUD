@@ -1,5 +1,4 @@
-/*
-Jim Viebke
+/* Jim Viebke
 Feb 14, 2015 */
 
 #ifndef CHARACTER_H
