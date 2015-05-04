@@ -11,3 +11,6 @@ IslandMUD.sdf
 *.filters
 IslandMUD/IslandMUD.vcxproj
 *.opensdf
+*.tlog
+IslandMUD/Debug/vc120.idb
+*.pdb
