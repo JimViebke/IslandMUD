@@ -100,11 +100,13 @@ map<string, unsigned> C::SURFACE_REQUIREMENTS =
 
 // box drawing
 
-// char test = char(188);
+/* Exploded view
 
-/* ╔═╗
-   ║ ║
-   ╚═╝ */
+╔ ═ ╗
+
+║   ║
+
+╚ ═ ╝ */
 
 const char C::NW_CORNER = char(201);
 const char C::NE_CORNER = char(187);
