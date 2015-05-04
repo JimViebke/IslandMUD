@@ -1,1 +1,7 @@
 IslandMUD/IslandMud.sdf
+IslandMUD/IslandMUD/IslandMUD.vcxproj
+IslandMUD/IslandMUD/IslandMUD.vcxproj.filters
+*.ilk
+Debug/IslandMUD.pdb
+*.obj
+IslandMUD/Debug/IslandMUD.log
