@@ -187,6 +187,7 @@ public:
 		{
 			return string(
 				"help:\n\nmove [compass direction]\n") +
+				"recipes\n" +
 				"take [item]\n" +
 				"drop [item]\n" +
 				"craft [item]\n" +
