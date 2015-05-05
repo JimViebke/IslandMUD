@@ -185,13 +185,14 @@ public:
 		// "help"
 		if (command.size() == 1 && command[0] == C::GET_HELP_COMMAND)
 		{
-			return string(
-				"help:\n\nmove [compass direction]\n") +
-				"take [item]\n" +
-				"drop [item]\n" +
-				"craft [item]\n" +
-				"construct [material] [ceiling/floor]\n" +
-				"construct [compass direction] [material] wall";
+			return string("help:\n") +
+				"\nrecipes" +
+				"\nmove [compass direction]" +
+				"\ntake [item]" +
+				"\ndrop [item]" +
+				"\ncraft [item]" +
+				"\nconstruct [material] [ceiling/floor]" +
+				"\nconstruct [compass direction] [material] wall";
 		}
 		// moving: "move northeast"
 		else if (command.size() == 2 && command[0] == C::MOVE_COMMAND)
