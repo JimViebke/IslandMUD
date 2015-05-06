@@ -72,7 +72,7 @@ public:
 	{
 		return contents.find(item_id) != contents.cend();
 	}
-	bool contains_item(const string & item_id, const unsigned & count)
+	bool contains_item(const string & item_id, const unsigned & count) const
 	{
 		// test if a room has a specified quantity for crafting
 

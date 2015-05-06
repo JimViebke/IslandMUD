@@ -36,7 +36,7 @@ class Material : public Item
 {
 public:
 	unsigned amount = 1;
-	Material(string cust_name) : Item(cust_name, true) {} // all materials are takable
+	Material(const string & cust_name) : Item(cust_name, true) {} // all materials are takable
 };
 
 class Rock : public Material

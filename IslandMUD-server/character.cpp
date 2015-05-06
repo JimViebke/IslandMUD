@@ -89,7 +89,7 @@ string Character::move(const string & direction_ID, World & world)
 	R::assign_movement_deltas(direction_ID, dx, dy, dz);
 
 	// validate movement deltas
-	if (!world.bounds_check(x + dx, y + dy, z + dz))
+	if (!R::bounds_check(x + dx, y + dy, z + dz))
 	{
 		return "You can't go there.";
 	}

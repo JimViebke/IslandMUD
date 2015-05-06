@@ -86,10 +86,10 @@ public:
 		// temporary scope to create player object
 		{
 			// create a player character
-			PC player;
+			PC player("dev");
 
-			// set the PC's username to "dev"
-			player.name = "dev";
+			// load the player's data
+			player.login();
 
 			// add the character to the actor registry
 			actors.insert(pair<string, shared_ptr<PC>>(player.name, make_shared<PC>(player)));
@@ -194,10 +194,11 @@ public:
 				"\nconstruct [material] [ceiling/floor]" +
 				"\nconstruct [compass direction] [material] wall";
 		}
-		// moving: "move northeast"
-		else if (command.size() == 2 && command[0] == C::MOVE_COMMAND)
+		// moving: "move northeast" OR "northeast"
+		else if ((command.size() == 2 && command[0] == C::MOVE_COMMAND)
+			|| command.size() == 1 && R::contains(R::direction_ids, command[0]))
 		{
-			return actors.find(actor_id)->second->move(command[1], world); // (direction, world)
+			return actors.find(actor_id)->second->move(command[command.size()-1], world); // passes direction (last element in command) and world
 		}
 		// take: "take branch"
 		else if (command.size() == 2 && command[0] == C::TAKE_COMMAND)
@@ -230,6 +231,10 @@ public:
 		else if (command.size() == 1 && command[0] == C::PRINT_RECIPES_COMMAND)
 		{
 			return Character::recipes.get_recipes(); // (item_id, world)
+		}
+		else if (command.size() == 1 && command[0] == C::LOGOUT_COMMAND)
+		{
+			return actors.find(actor_id)->second->logout();
 		}
 
 		return "Nothing happens.";

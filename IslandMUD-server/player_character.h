@@ -9,7 +9,7 @@ Feb 14, 2015 */
 class Player_Character : public Character
 {
 public:
-	Player_Character() : Character()
+	Player_Character(const string & name) : Character(name)
 	{
 
 	}

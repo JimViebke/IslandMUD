@@ -56,6 +56,23 @@ public:
 		return output.str();
 	}
 
+	// verify a set of coordinates against the dimensions of the world
+	static inline bool bounds_check(const int & x, const int & y)
+	{
+		// x, and y must be from 0 to dimension-1 inclusive
+		return (x >= 0 && y >= 0 &&
+			x < C::WORLD_X_DIMENSION &&
+			y < C::WORLD_Y_DIMENSION);	
+	}
+	static inline bool bounds_check(const int & x, const int & y, const int & z)
+	{
+		// ensure x, y, and z are from 0 to dimension-1 inclusive
+		return (x >= 0 && y >= 0 && z >= 0 &&
+			x < C::WORLD_X_DIMENSION &&
+			y < C::WORLD_Y_DIMENSION &&
+			z < C::WORLD_Z_DIMENSION);
+	}
+
 	// movement
 	void static inline assign_movement_deltas(const string & direction_ID, int & dx, int & dy, int & dz)
 	{

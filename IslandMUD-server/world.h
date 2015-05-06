@@ -65,7 +65,7 @@ public:
 				}
 			}
 		}
-		
+
 		if (!terrain_loaded_from_file_good) // if the terrain needs to regenerated
 		{
 			// create the world generator object
@@ -97,6 +97,17 @@ public:
 	{
 		// world terrain is only used to generate rooms that do not already exist on disk
 
+		cout << "\nCreating world object...";
+		 
+		{ // temporary scope to delete temp structure later
+			vector<vector<vector<shared_ptr<Room>>>> temp(C::WORLD_X_DIMENSION,
+				vector<vector<shared_ptr<Room>>>(C::WORLD_Y_DIMENSION,
+				vector<shared_ptr<Room>>(C::WORLD_Z_DIMENSION)));
+
+			cout << "\nSaving world object...";
+			world = temp;
+		}
+
 		cout << "\nCreating world...";
 
 		int previous_percent = 0;
@@ -115,17 +126,17 @@ public:
 					<< " minutes remaining...";
 			}
 
-			vector<vector<shared_ptr<Room>>> row; // create the empty row
+			// vector<vector<shared_ptr<Room>>> row; // create the empty row
 
 			for (int y = 0; y < C::WORLD_Y_DIMENSION; ++y) // for each vertical "stack" in the row
 			{
-				vector<shared_ptr<Room>> vertical_stack; // create an empty vertical "stack"
-				vertical_stack.reserve(C::WORLD_Z_DIMENSION); // size the stack
-				for (int z = 0; z < C::WORLD_Z_DIMENSION; ++z)
-				{
-					vertical_stack.push_back(shared_ptr<Room>(nullptr)); // add the correct number of "null" rooms to the vertical stack
-				}
-				row.push_back(vertical_stack); // add the empty vertical stack to the row
+				// vector<shared_ptr<Room>> vertical_stack; // create an empty vertical "stack"
+				// vertical_stack.reserve(C::WORLD_Z_DIMENSION); // size the stack
+				// for (int z = 0; z < C::WORLD_Z_DIMENSION; ++z)
+				// {
+				// 	vertical_stack.push_back(shared_ptr<Room>(nullptr)); // add the correct number of "null" rooms to the vertical stack
+				// }
+				// row.push_back(vertical_stack); // add the empty vertical stack to the row
 
 				// ensure the folder exists
 				string z_stack_path = C::room_directory + "\\" + R::to_string(x);
@@ -185,7 +196,7 @@ public:
 				}
 
 			}
-			world.push_back(row); // add the row to the world
+			// world.push_back(row); // add the row to the world
 		}
 
 	} // end load world
@@ -198,16 +209,6 @@ public:
 	shared_ptr<Room> & room_at(const int & x, const int & y, const int & z)
 	{
 		return world.at(x).at(y).at(z);
-	}
-
-	// verify a set of coordinates against the dimensions of the world
-	inline bool bounds_check(const int & x, const int & y, const int & z) const
-	{
-		// ensure x, y, and z are from 0 to dimension-1 inclusive
-		return (x >= 0 && y >= 0 && z >= 0 &&
-			x < C::WORLD_X_DIMENSION &&
-			y < C::WORLD_Y_DIMENSION &&
-			z < C::WORLD_Z_DIMENSION);
 	}
 
 	// debugging
@@ -245,7 +246,7 @@ public:
 			for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 			{
 				// if the coordinates are not within world bounds
-				if (!bounds_check(cx, cy))
+				if (!R::bounds_check(cx, cy))
 				{
 					continue; // go to next coordinate
 				}
@@ -266,7 +267,7 @@ public:
 	// loading and unloading rooms at the edge of vision
 	void remove_viewer_and_attempt_unload(const int & x, const int & y, const int & z, const string & viewer_ID)
 	{
-		if (!bounds_check(x, y, z) || room_at(x, y, z) == nullptr) // the reference room is out of bounds
+		if (!R::bounds_check(x, y, z) || room_at(x, y, z) == nullptr) // the reference room is out of bounds
 		{
 			return; // nothing to remove or unload
 		}
@@ -342,7 +343,7 @@ public:
 			int i = cx - (x - (C::VIEW_DISTANCE + 1));
 			for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 			{
-				if (bounds_check(cx, cy))
+				if (R::bounds_check(cx, cy))
 				{
 					forest_grid[i][cy - (y - (C::VIEW_DISTANCE + 1))] = room_at(cx, cy, C::GROUND_INDEX)->contains_item(C::TREE_ID);
 				}
@@ -357,9 +358,9 @@ public:
 			for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 			{
 				// if the room is out of bounds
-				if (!bounds_check(cx, cy, C::GROUND_INDEX))
+				if (!R::bounds_check(cx, cy, C::GROUND_INDEX))
 				{
-					// draw the room
+					// draw the "room"
 					a << "***";
 					b << "***";
 					c << "***";
@@ -454,15 +455,6 @@ public:
 
 
 private:
-
-	// verify a set of coordinates against the dimensions of the world
-	inline bool bounds_check(const int & x, const int & y) const
-	{
-		// x, and y must be from 0 to dimension-1 inclusive
-		return (x >= 0 && y >= 0 &&
-			x < C::WORLD_X_DIMENSION &&
-			y < C::WORLD_Y_DIMENSION);
-	}
 
 	// load in all rooms at x,y to an xml_document
 	void load_vertical_rooms_to_XML(const int & ix, const int & iy, xml_document & vertical_rooms)
@@ -583,7 +575,7 @@ private:
 	}
 
 	// add a room to a z_stack at a given index
-	void add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xml_document & z_stack)
+	void add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xml_document & z_stack) const
 	{
 		// delete the room node if it already exists
 		z_stack.remove_child(("room-" + R::to_string(z)).c_str());

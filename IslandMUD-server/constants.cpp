@@ -4,9 +4,10 @@ Feb 14, 2015 */
 #include "constants.h"
 
 const string C::game_directory = "C:/IslandMUD";
-const string C::room_directory = C::game_directory + "/rooms";
 const string C::world_terrain_file_location = C::game_directory + "/world_terrain.txt";
-const string world_biome_file_location = C::game_directory + "/biome_map.txt";
+const string C::world_biome_file_location = C::game_directory + "/biome_map.txt";
+const string C::room_directory = C::game_directory + "/rooms";
+const string C::user_data_directory = C::game_directory + "/user_data";
 
 const char C::WATER_CHAR = '~';
 const char C::LAND_CHAR = ' ';
@@ -53,6 +54,8 @@ const string C::TORCH_ID = "torch";
 // verb commands
 
 const string C::BAD_COMMAND = "unknown_command";
+const string C::LOGIN_COMMAND = "login";
+const string C::LOGOUT_COMMAND = "logout";
 const string C::GET_HELP_COMMAND = "help";
 const string C::TAKE_COMMAND = "take";
 const string C::CRAFT_COMMAND = "craft";
@@ -81,11 +84,20 @@ const string C::CEILING = "ceiling";
 const string C::UP = "up";
 const string C::DOWN = "down";
 
+// world room xml consts
+
 const string C::XML_ROOM = "room";
 const string C::XML_ITEM = "item";
 const string C::XML_SURFACE = "surface";
 const string C::XML_DIRECTION = "direction";
 const string C::XML_MATERIAL = "material";
+
+// user data xml consts
+
+const string C::XML_USER_LOCATION = "location";
+const string C::XML_USER_EQUIPMENT = "equipment";
+const string C::XML_USER_MATERIALS = "materials";
+const string C::XML_USER_MATERIAL_COUNT = "count";
 
 // surface material count requirements
 

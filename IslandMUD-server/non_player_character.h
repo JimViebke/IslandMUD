@@ -13,7 +13,7 @@ class Non_Player_Character : public Character
 public:
 	stack<string> objectives; // structure highly subject to change
 
-	Non_Player_Character() : Character()
+	Non_Player_Character(const string & name) : Character(name)
 	{
 
 	}

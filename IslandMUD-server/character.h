@@ -18,6 +18,7 @@ class Character
 public:
 	string name;
 	__int64 last_action_timestamp;
+	string leader_ID;
 	vector<string> follower_ids;
 
 	multimap<string, shared_ptr<Equipment>> equipment_inventory; // equipment doesn't stack
@@ -30,8 +31,100 @@ public:
 	int y = C::DEFAULT_SPAWN_Y;
 	int z = C::DEFAULT_SPAWN_Z;
 
-	Character() { }
+	Character(const string & name) : name(name) {}
 	virtual ~Character() {} // to make a polymorphic type
+
+	string login()
+	{
+		// create a document to load the player's data
+		xml_document user_data_xml;
+
+		// load the player's data to user_data_xml
+		user_data_xml.load_file((C::user_data_directory + "\\" + this->name + ".xml").c_str());
+
+		// create holder values to save the coordinates from the file
+		int load_x = -1, load_y = -1, load_z = -1;
+		// load the three values from the node
+
+		// if bounds checking passes, add the player to that location
+		// else
+		// add the player to the default spawn
+		/*if (bound check)
+		{
+			
+		}
+		else
+		{
+			this->x = C::DEFAULT_SPAWN_X;
+			this->y = C::DEFAULT_SPAWN_Y;
+			this->z = C::DEFAULT_SPAWN_Z;
+		}*/
+
+		// for each item node of the equipment node
+		for (const xml_node & equipment : user_data_xml.child(C::XML_USER_EQUIPMENT.c_str()).children())
+		{
+			// use the name of the node to create an equipment object and add it to the player's equipment inventory
+			equipment_inventory.insert(pair<string, shared_ptr<Equipment>>(
+				equipment.name(),
+				R::convert_to<Equipment>(Craft::make(equipment.name()))
+				));
+		}
+
+		// for each item in the material node
+		for (const xml_node & material : user_data_xml.child(C::XML_USER_MATERIALS.c_str()).children())
+		{
+			// use the name of the material node to create a new materail object
+			shared_ptr<Material> item = R::convert_to<Material>(Craft::make(material.name()));
+
+			// extract the amount from the item's attribute
+			item->amount = material.attribute(C::XML_USER_MATERIAL_COUNT.c_str()).as_uint();
+
+			// add the item to the material inventory
+			material_inventory.insert(pair<string, shared_ptr<Material>>(item->name, item));
+		}
+
+		return "You have logged in to IslandMUD!";
+	}
+	string logout()
+	{
+		// create a document to save the user's info
+		xml_document user_data_xml;
+
+		// create nodes to store user equipment and materials
+		xml_node location_node = user_data_xml.append_child(C::XML_USER_LOCATION.c_str());
+		xml_node equipment_node = user_data_xml.append_child(C::XML_USER_EQUIPMENT.c_str());
+		xml_node material_node = user_data_xml.append_child(C::XML_USER_MATERIALS.c_str());
+
+		// add x, y, and z attributes to the location node
+		location_node.append_attribute(string("x").c_str()).set_value(this->x);
+		location_node.append_attribute(string("y").c_str()).set_value(this->y);
+		location_node.append_attribute(string("z").c_str()).set_value(this->z);
+
+		// for each piece of equipment in the user's inventory
+		for (multimap<string, shared_ptr<Equipment>>::const_iterator it = equipment_inventory.cbegin();
+			it != equipment_inventory.cend(); ++it)
+		{
+			// save the equipment to a new node under the equipment node
+			xml_node equipment = equipment_node.append_child(it->first.c_str());
+		}
+
+		// for each material in the user's inventory
+		for (map<string, shared_ptr<Material>>::const_iterator it = material_inventory.cbegin();
+			it != material_inventory.cend(); ++it)
+		{
+			// save the material to a new node under the material node
+			xml_node material = material_node.append_child(it->first.c_str());
+
+			// add an attribute called "count" with a value of material->count
+			xml_attribute material_attribute = material.append_attribute(C::XML_USER_MATERIAL_COUNT.c_str());
+			material_attribute.set_value(it->second->amount);
+		}
+
+		// save the user_data to disk
+		user_data_xml.save_file((C::user_data_directory + "\\" + this->name + ".xml").c_str()); // returns an unused boolean
+
+		return "You have logged out.";
+	}
 
 	// inventory manipulation
 	void add(const shared_ptr<Item> & item);

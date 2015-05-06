@@ -14,6 +14,7 @@ int main()
 	// ensure game directories exist
 	R::create_path_if_not_exists(C::game_directory);
 	R::create_path_if_not_exists(C::room_directory);
+	R::create_path_if_not_exists(C::user_data_directory);
 
 	// ensure .bat utilites are on the disk
 	R::to_file(C::game_directory + "\\" + "move game data to delete folder.bat.txt",
