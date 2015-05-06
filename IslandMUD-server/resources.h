@@ -106,10 +106,10 @@ public:
 	}
 	static inline void to_file(const string & path, const string & contents)
 	{
-		ofstream myfile;
-		myfile.open(path);
-		myfile << contents;
-		myfile.close();
+		ofstream file;
+		file.open(path);
+		file << contents;
+		file.close();
 	}
 
 	// text formatting
