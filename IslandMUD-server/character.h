@@ -34,7 +34,7 @@ public:
 	Character(const string & name) : name(name) {}
 	virtual ~Character() {} // to make a polymorphic type
 
-	string login()
+	string login(World & world)
 	{
 		// create a document to load the player's data
 		xml_document user_data_xml;
@@ -44,21 +44,37 @@ public:
 
 		// create holder values to save the coordinates from the file
 		int load_x = -1, load_y = -1, load_z = -1;
-		// load the three values from the node
 
-		// if bounds checking passes, add the player to that location
-		// else
-		// add the player to the default spawn
-		/*if (bound check)
+		// load the three values from the node
+		xml_node location_node = user_data_xml.child(C::XML_USER_LOCATION.c_str());
+
+		// extract the attributes as well as the values for the attributes
+		xml_attribute x_attribute = location_node.attribute(string("x").c_str());
+		xml_attribute y_attribute = location_node.attribute(string("y").c_str());
+		xml_attribute z_attribute = location_node.attribute(string("z").c_str());
+		load_x = x_attribute.as_int();
+		load_y = y_attribute.as_int();
+		load_z = z_attribute.as_int();
+
+		// if any of the attributes are empty or the extracted values fail bounds-checking
+		if (x_attribute.empty() || y_attribute.empty() || z_attribute.empty() ||
+			!R::bounds_check(load_x, load_y, load_z))
 		{
-			
-		}
-		else
-		{
+			// set the player to the default spawn
 			this->x = C::DEFAULT_SPAWN_X;
 			this->y = C::DEFAULT_SPAWN_Y;
 			this->z = C::DEFAULT_SPAWN_Z;
-		}*/
+			world.load_view_radius_around(x, y, name);
+			world.room_at(x, y, z)->add_actor(this->name);
+		}
+		else // valid coordinates were loaded
+		{
+			this->x = load_x;
+			this->y = load_y;
+			this->z = load_z;
+			world.load_view_radius_around(x, y, name);
+			world.room_at(x, y, z)->add_actor(this->name);
+		}
 
 		// for each item node of the equipment node
 		for (const xml_node & equipment : user_data_xml.child(C::XML_USER_EQUIPMENT.c_str()).children())

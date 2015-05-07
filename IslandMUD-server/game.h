@@ -89,7 +89,7 @@ public:
 			PC player("dev");
 
 			// load the player's data
-			player.login();
+			player.login(world);
 
 			// add the character to the actor registry
 			actors.insert(pair<string, shared_ptr<PC>>(player.name, make_shared<PC>(player)));
@@ -104,7 +104,6 @@ public:
 		world.room_at(C::DEFAULT_SPAWN_X, C::DEFAULT_SPAWN_Y, C::DEFAULT_SPAWN_Z)->add_actor("dev"); // hard coded again
 
 		// create some objects and primites to help run the game
-		Parse parse; // this could be made to use static functions for a microscopic memory optimization
 		int auto_advance = 0; // debugging only
 		string input, output = ""; // I/O holders
 
@@ -136,14 +135,14 @@ public:
 			{
 				input = "wait"; // automatically set user input instead of getting it
 			}
-			else
+			else // most of the time
 			{
 				getline(cin, input);
 			}
 
 			// process input
-			cout << "\nDEBUG sending to parse.tokenize: " << input << endl;
-			vector<string> tokenized_input = parse.tokenize(input);
+			cout << "\nDEBUG sending to Parse::tokenize(): " << input << endl;
+			vector<string> tokenized_input = Parse::tokenize(input);
 			cout << "\nDEBUG parsed input: ";
 			R::print(tokenized_input);
 
