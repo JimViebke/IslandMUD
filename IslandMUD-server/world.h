@@ -488,8 +488,8 @@ private:
 		{
 			// construct a new surface to add to the room
 			room->add_surface(
-				surface.child(C::XML_DIRECTION.c_str()).child_value(),
-				surface.child(C::XML_MATERIAL.c_str()).child_value());
+				surface.child(C::XML_SURFACE_DIRECTION.c_str()).child_value(),
+				surface.child(C::XML_SURFACE_MATERIAL.c_str()).child_value());
 		}
 
 		// add room to world
@@ -603,9 +603,12 @@ private:
 			// create a node for a surface
 			xml_node surface_node = room_node.append_child(C::XML_SURFACE.c_str()); // duplicate or replace?
 
+			// add an attribute to the surface containing the health of the surface (example: health="90")
+			surface_node.append_attribute(C::XML_SURFACE_HEALTH.c_str()).set_value(surface_it->second.get_health());
+
 			// create nodes for surface direction and surface material
-			xml_node direction_node = surface_node.append_child(C::XML_DIRECTION.c_str()); // duplicate or replace?
-			xml_node material_node = surface_node.append_child(C::XML_MATERIAL.c_str()); // duplicate or replace?
+			xml_node direction_node = surface_node.append_child(C::XML_SURFACE_DIRECTION.c_str()); // duplicate or replace?
+			xml_node material_node = surface_node.append_child(C::XML_SURFACE_MATERIAL.c_str()); // duplicate or replace?
 
 			// append the surface direction and material
 			direction_node.append_child(node_pcdata).set_value(surface_it->first.c_str()); // direction ID

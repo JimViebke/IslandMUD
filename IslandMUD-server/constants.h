@@ -83,14 +83,15 @@ public:
 		UP,
 		DOWN,
 
-		// world
+		// room xml
 		XML_ROOM,
 		XML_ITEM,
 		XML_SURFACE,
-		XML_DIRECTION,
-		XML_MATERIAL,
+		XML_SURFACE_HEALTH,
+		XML_SURFACE_DIRECTION,
+		XML_SURFACE_MATERIAL,
 
-		// user
+		// user data xml
 		XML_USER_LOCATION,
 		XML_USER_EQUIPMENT,
 		XML_USER_MATERIALS,
@@ -109,6 +110,10 @@ public:
 		SE_CORNER,
 		NS_WALL,
 		WE_WALL;
+
+	const static int
+		MIN_SURFACE_HEALTH,
+		MAX_SURFACE_HEALTH;
 
 };
 

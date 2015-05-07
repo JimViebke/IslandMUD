@@ -89,8 +89,9 @@ const string C::DOWN = "down";
 const string C::XML_ROOM = "room";
 const string C::XML_ITEM = "item";
 const string C::XML_SURFACE = "surface";
-const string C::XML_DIRECTION = "direction";
-const string C::XML_MATERIAL = "material";
+const string C::XML_SURFACE_HEALTH = "health";
+const string C::XML_SURFACE_DIRECTION = "direction";
+const string C::XML_SURFACE_MATERIAL = "material";
 
 // user data xml consts
 
@@ -125,3 +126,8 @@ const char C::SW_CORNER = char(200);
 const char C::SE_CORNER = char(188);
 const char C::NS_WALL = char(186);
 const char C::WE_WALL = char(205);
+
+// walls, ceiling, and floor - min and max health
+
+const int C::MIN_SURFACE_HEALTH = 0;
+const int C::MAX_SURFACE_HEALTH = 100;
