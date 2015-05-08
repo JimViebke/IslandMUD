@@ -98,7 +98,7 @@ public:
 		// world terrain is only used to generate rooms that do not already exist on disk
 
 		cout << "\nCreating world object...";
-		 
+
 		{ // temporary scope to delete temp structure later
 			vector<vector<vector<shared_ptr<Room>>>> temp(C::WORLD_X_DIMENSION,
 				vector<vector<shared_ptr<Room>>>(C::WORLD_Y_DIMENSION,
@@ -486,14 +486,23 @@ private:
 		// for each surface in the room
 		for (const xml_node & surface : room_node.children(C::XML_SURFACE.c_str()))
 		{
+			// extract the attribute containing the health/integrity of the surface
+			xml_attribute health_attribute = surface.attribute(C::XML_SURFACE_HEALTH.c_str());
+
 			// construct a new surface to add to the room
 			room->add_surface(
 				surface.child(C::XML_SURFACE_DIRECTION.c_str()).child_value(),
-				surface.child(C::XML_SURFACE_MATERIAL.c_str()).child_value());
+				surface.child(C::XML_SURFACE_MATERIAL.c_str()).child_value(),
+
+				(!health_attribute.empty()) // if the health attribute exists
+				? health_attribute.as_int() // set the surface health to its value
+				: C::MAX_SURFACE_HEALTH // else set the room to full health
+
+				);
 		}
 
 		// add room to world
-		room_at(x, y, z) = room; // Nope. make_shared<>() doesn't work either.
+		room_at(x, y, z) = room;
 	}
 
 	// move specific room into memory

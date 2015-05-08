@@ -12,7 +12,7 @@ Floors, walls, and ceilings. No doors yet. */
 class Room_Side
 {
 private:
-	int integrity = 100;
+	int integrity = C::MAX_SURFACE_HEALTH;
 
 public:
 	string material_id;
@@ -27,12 +27,13 @@ public:
 	inline void set_health(const int & health)
 	{
 		// if the passed value is within acceptable bounds
-		if (health >= C::MIN_SURFACE_HEALTH &&
-			health <= C::MIN_SURFACE_HEALTH)
+		if (health <= C::MAX_SURFACE_HEALTH &&
+			health >= C::MIN_SURFACE_HEALTH)
 		{
 			// set the surface's integry to what was passed
 			integrity = health;
 		}
+		// else, integrity remains at default max health
 	}
 	inline void change_health(const int & change)
 	{

@@ -156,6 +156,7 @@ public:
 	string take(const string & item_id, World & world);
 	string drop(const string & drop_item_id, World & world);
 	string construct_surface(const string & material_id, const string & surface_id, World & world);
+	string attack_surface(const string & surface_ID, World & world);
 
 	// movement info
 	string validate_movement(const string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const

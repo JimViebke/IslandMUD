@@ -64,6 +64,7 @@ const string C::DROP_COMMAND = "drop";
 const string C::CONSTRUCT_COMMAND = "construct";
 const string C::WAIT_COMMAND = "wait"; // for debugging (see .h)
 const string C::PRINT_RECIPES_COMMAND = "recipes"; // for debugging (see .h)
+const string C::ATTACK_COMMAND = "attack"; // very likely to change
 
 // direction commands
 

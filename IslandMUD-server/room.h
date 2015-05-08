@@ -139,6 +139,22 @@ public:
 			updated = true;
 		}
 	}
+	void add_surface(const string & surface_ID, const string & material_ID, const int & surface_health)
+	{
+		// create a surface with a given health (used for loading rooms from disk that may be damaged)
+
+		// if the surface ID is valid
+		if (R::contains(R::surface_ids, surface_ID))
+		{
+			// create a new Room_Side and add it to room_sides
+			room_sides.insert(pair<string, Room_Side>(surface_ID, Room_Side(material_ID)));
+
+			// select the surface and set its health to the passed value
+			room_sides.find(surface_ID)->second.set_health(surface_health);
+
+			updated = true;
+		}
+	}
 
 	// add and remove actors
 	void add_actor(const string & actor_id)
