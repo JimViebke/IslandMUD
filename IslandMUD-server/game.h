@@ -89,19 +89,14 @@ public:
 			PC player("dev");
 
 			// load the player's data
+			cout << "\nLogging in player...";
 			player.login(world);
 
 			// add the character to the actor registry
 			actors.insert(pair<string, shared_ptr<PC>>(player.name, make_shared<PC>(player)));
 		}
 
-		// load the area around the player's spawn
-		cout << "\nLoading in world around player spawn...";
-		world.load_view_radius_around(C::DEFAULT_SPAWN_X, C::DEFAULT_SPAWN_Y, "dev"); // hard coded
 
-		// add the player to the world based on name
-		cout << "\nAdding player to spawn...";
-		world.room_at(C::DEFAULT_SPAWN_X, C::DEFAULT_SPAWN_Y, C::DEFAULT_SPAWN_Z)->add_actor("dev"); // hard coded again
 
 		// create some objects and primites to help run the game
 		int auto_advance = 0; // debugging only
@@ -197,7 +192,7 @@ public:
 		else if ((command.size() == 2 && command[0] == C::MOVE_COMMAND)
 			|| command.size() == 1 && R::contains(R::direction_ids, command[0]))
 		{
-			return actors.find(actor_id)->second->move(command[command.size()-1], world); // passes direction (last element in command) and world
+			return actors.find(actor_id)->second->move(command[command.size() - 1], world); // passes direction (last element in command) and world
 		}
 		// take: "take branch"
 		else if (command.size() == 2 && command[0] == C::TAKE_COMMAND)
