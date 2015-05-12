@@ -156,6 +156,48 @@ public:
 		}
 	}
 
+	// damage surface
+	string damage_surface(const string & surface_ID)
+	{
+		if (!this->has_surface(surface_ID))
+		{
+			if (surface_ID == C::UP)
+			{
+				return "There is no ceiling above you that you can damage.";
+			}
+			else if (surface_ID == C::DOWN)
+			{
+				return "There is no floor below you to damage.";
+			}
+			else
+			{
+				return "There is no wall to your " + surface_ID + " to damage.";
+			}
+		}
+
+		// surface exists, inflict damage
+		this->room_sides.find(surface_ID)->second.change_health(-1); // hard coded until we have damage tables
+
+		// if the surface has 0 health
+		if (room_sides.find(surface_ID)->second.is_rubble())
+		{
+			// remove the surface
+			room_sides.erase(surface_ID);
+
+			// the surface collapses
+			return (surface_ID == C::CEILING || surface_ID == C::FLOOR) ?
+				"The " + surface_ID + " collapses." :
+				"The wall collapses.";
+		}
+		else
+		{
+			// the surface holds
+			return "You damage the " +
+				((surface_ID == C::CEILING || surface_ID == C::FLOOR) ? surface_ID : "wall")
+				+ ".";
+		}
+	}
+
 	// add and remove actors
 	void add_actor(const string & actor_id)
 	{

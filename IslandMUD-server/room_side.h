@@ -53,6 +53,10 @@ public:
 			integrity = C::MAX_SURFACE_HEALTH;
 		}
 	}
+	inline bool is_rubble() const
+	{
+		return (integrity == 0);
+	}
 };
 
 #endif

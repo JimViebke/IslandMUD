@@ -48,6 +48,7 @@ const string C::TREE_ID = "tree";
 
 const string C::AXE_ID = "axe";
 const string C::STAFF_ID = "staff";
+const string C::SWORD_ID = "sword";
 const string C::BOW_ID = "bow";
 const string C::TORCH_ID = "torch";
 
@@ -58,13 +59,15 @@ const string C::LOGIN_COMMAND = "login";
 const string C::LOGOUT_COMMAND = "logout";
 const string C::GET_HELP_COMMAND = "help";
 const string C::TAKE_COMMAND = "take";
+const string C::EQUIP_COMMAND = "equip";
+const string C::DEQUIP_COMMAND = "dequip";
 const string C::CRAFT_COMMAND = "craft";
 const string C::MOVE_COMMAND = "move";
 const string C::DROP_COMMAND = "drop";
 const string C::CONSTRUCT_COMMAND = "construct";
 const string C::WAIT_COMMAND = "wait"; // for debugging (see .h)
 const string C::PRINT_RECIPES_COMMAND = "recipes"; // for debugging (see .h)
-const string C::ATTACK_COMMAND = "attack"; // very likely to change
+const string C::ATTACK_COMMAND = "attack";
 
 // direction commands
 
@@ -132,3 +135,36 @@ const char C::WE_WALL = char(205);
 
 const int C::MIN_SURFACE_HEALTH = 0;
 const int C::MAX_SURFACE_HEALTH = 100;
+
+/*
+Create a two-dimensional map to calculate damamge values.
+
+Assossiate each attacking implement with a map of target, value pairs.
+*/
+
+const map<string, map<string, int>> damage_tables =
+{
+	{ string(C::ATTACK_COMMAND), { // attack command is also used to represent an unarmed attack
+		{ C::STICK_ID, 6 },
+		{ C::WOOD_ID, 3 },
+		{ C::STONE_ID, 1 }
+	} },
+
+	{ string(C::STAFF_ID), {
+		{ C::STICK_ID, 10 },
+		{ C::WOOD_ID, 5 },
+		{ C::STONE_ID, 1 }
+	} },
+
+	{ string(C::AXE_ID), {
+		{ C::STICK_ID, 8 },
+		{ C::WOOD_ID, 10 },
+		{ C::STONE_ID, 5 }
+	} },
+
+	{ string(C::SWORD_ID), {
+		{ C::STICK_ID, 10 },
+		{ C::WOOD_ID, 5 },
+		{ C::STONE_ID, 1 }
+	} }
+};

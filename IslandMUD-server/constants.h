@@ -53,6 +53,7 @@ public:
 
 		AXE_ID,
 		STAFF_ID,
+		SWORD_ID,
 		BOW_ID,
 		TORCH_ID,
 
@@ -62,6 +63,8 @@ public:
 		GET_HELP_COMMAND,
 		CRAFT_COMMAND,
 		TAKE_COMMAND,
+		EQUIP_COMMAND,
+		DEQUIP_COMMAND,
 		MOVE_COMMAND,
 		DROP_COMMAND,
 		CONSTRUCT_COMMAND, // room sides
@@ -116,6 +119,7 @@ public:
 		MIN_SURFACE_HEALTH,
 		MAX_SURFACE_HEALTH;
 
+	const map<string, map<string, int>> damage_tables;
 };
 
 typedef Constants C;

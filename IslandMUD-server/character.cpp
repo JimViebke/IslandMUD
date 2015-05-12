@@ -8,6 +8,28 @@ Jeb 16 2015 */
 
 Recipes Character::recipes; // constructor calls populate()
 
+// inventory information
+bool Character::has(const string & item_name, const unsigned & item_count) const
+{
+	if (item_count == 1) // only one instance is required
+	{
+		return
+			equipment_inventory.find(item_name) != equipment_inventory.cend() ||
+			material_inventory.find(item_name) != material_inventory.cend();
+	}
+	else // more than one item is required
+	{
+		return (equipment_inventory.count(item_name) >= item_count) // the equipment inventory contains item_count of the required item
+			||
+			(material_inventory.find(item_name) != material_inventory.cend() && // the material invenory contains the required item
+			material_inventory.find(item_name)->second->amount >= item_count); // AND the material exists in sufficient quantity
+	}
+}
+bool Character::does_not_have(const string & item_name, const unsigned & item_count) const
+{
+	return !this->has(item_name, item_count);
+}
+
 // inventory manipulation
 void Character::add(const shared_ptr<Item> & item)
 {
@@ -57,27 +79,71 @@ void Character::remove(const string & item_id, const unsigned & count)
 		// The player does not have the item
 	}
 }
+string Character::equip(const string & item_ID)
+{
+	/*
+	You ready your [item_id].
+	You replace your [item_id] with a(n) [item_id];
+	*/
 
-// inventory information
-bool Character::has(const string & item_name, const unsigned & item_count) const
-{
-	if (item_count == 1) // only one instance is required
+	// if the player does not have the item specified
+	if (!this->has(item_ID))
 	{
-		return
-			equipment_inventory.find(item_name) != equipment_inventory.cend() ||
-			material_inventory.find(item_name) != material_inventory.cend();
+		return string("You do not have a(n) ") + item_ID + " to equip.";
 	}
-	else // more than one item is required
+
+	// create a stringstream to accumulate feedback
+	stringstream output;
+
+	// the player does have the item to equip, test if an item is already equipped
+	if (this->equipped_item != nullptr)
 	{
-		return (equipment_inventory.count(item_name) >= item_count) // the equipment inventory contains item_count of the required item
-			||
-			(material_inventory.find(item_name) != material_inventory.cend() && // the material invenory contains the required item
-			material_inventory.find(item_name)->second->amount >= item_count); // AND the material exists in sufficient quantity
+		// save the existin the item to the player's inventory
+		this->add(equipped_item);
+		output << "You replace your " << equipped_item->name << " with a ";
 	}
+
+	// set the equipped item to the specified item from whichever inventory we find it in
+	if (this->equipment_inventory.find(item_ID) != equipment_inventory.cend())
+	{
+		equipped_item = equipment_inventory.find(item_ID)->second;
+	}
+	else
+	{
+		equipped_item = material_inventory.find(item_ID)->second;
+	}
+
+	// remove or reduce the item in the player's inventory
+	this->remove(item_ID);
+
+	// if the stringstream is empty (no item was previously equipped)
+	if (output.str().length() == 0)
+	{
+		return "You equip your " + item_ID + ".";
+	}
+	else
+	{
+		// complete and return the stringstream
+		output << equipped_item->name << ".";
+		return output.str();
+	}
+
 }
-bool Character::does_not_have(const string & item_name, const unsigned & item_count) const
+string Character::unequip(const string & item_ID)
 {
-	return !this->has(item_name, item_count);
+	// test if no item is equipped
+	if (this->equipped_item == nullptr)
+	{
+		return "You aren't holding anything.";
+	}
+
+	// save the existing the item to the player's inventory
+	this->add(equipped_item);
+
+	// reset the currently equipped item
+	equipped_item == nullptr;
+
+	return "You put your " + item_ID + " away.";
 }
 
 // actions
@@ -398,7 +464,7 @@ string Character::construct_surface(const string & material_id, const string & s
 string Character::attack_surface(const string & surface_ID, World & world)
 {
 	// surface_ID is valid, but may not exist in this room
-	
+
 	// if the surface does not exist in this room
 	if (!world.room_at(x, y, z)->has_surface(surface_ID))
 	{
@@ -417,9 +483,9 @@ string Character::attack_surface(const string & surface_ID, World & world)
 	}
 
 	// the surface exists in this room, damage it
+	string result = world.room_at(x, y, z)->damage_surface(surface_ID);
 
 
 
-
-	return "[Character::attack_surface()]";
+	return result;
 }

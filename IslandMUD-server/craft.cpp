@@ -17,6 +17,7 @@ shared_ptr<Item> Craft::make(const string & item_id)
 	else if (item_id == C::STAFF_ID) { return make_shared<Staff>(); }
 	else if (item_id == C::STICK_ID) { return make_shared<Stick>(); }
 	else if (item_id == C::STONE_ID) { return make_shared<Rock>(); }
+	else if (item_id == C::SWORD_ID) { return make_shared<Sword>(); }
 	else if (item_id == C::TORCH_ID) { return make_shared<Torch>(); }
 	else if (item_id == C::TREE_ID) { return make_shared<Tree>(); }
 	else if (item_id == C::VINE_ID) { return make_shared<Vine>(); }

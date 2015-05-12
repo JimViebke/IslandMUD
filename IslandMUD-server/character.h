@@ -20,6 +20,7 @@ public:
 	__int64 last_action_timestamp;
 	string leader_ID;
 	vector<string> follower_ids;
+	shared_ptr<Item> equipped_item;
 
 	multimap<string, shared_ptr<Equipment>> equipment_inventory; // equipment doesn't stack
 	map<string, shared_ptr<Material>> material_inventory; // materials stack
@@ -43,7 +44,7 @@ public:
 		user_data_xml.load_file((C::user_data_directory + "\\" + this->name + ".xml").c_str());
 
 		// create holder values to save the coordinates from the file
-		int load_x = -1, load_y = -1, load_z = -1;
+		int loaded_x = -1, loaded_y = -1, loaded_z = -1;
 
 		// load the three values from the node
 		xml_node location_node = user_data_xml.child(C::XML_USER_LOCATION.c_str());
@@ -52,29 +53,32 @@ public:
 		xml_attribute x_attribute = location_node.attribute(string("x").c_str());
 		xml_attribute y_attribute = location_node.attribute(string("y").c_str());
 		xml_attribute z_attribute = location_node.attribute(string("z").c_str());
-		load_x = x_attribute.as_int();
-		load_y = y_attribute.as_int();
-		load_z = z_attribute.as_int();
+		loaded_x = x_attribute.as_int();
+		loaded_y = y_attribute.as_int();
+		loaded_z = z_attribute.as_int();
 
 		// if any of the attributes are empty or the extracted values fail bounds-checking
 		if (x_attribute.empty() || y_attribute.empty() || z_attribute.empty() ||
-			!R::bounds_check(load_x, load_y, load_z))
+			!R::bounds_check(loaded_x, loaded_y, loaded_z))
 		{
 			// set the player to the default spawn
 			this->x = C::DEFAULT_SPAWN_X;
 			this->y = C::DEFAULT_SPAWN_Y;
 			this->z = C::DEFAULT_SPAWN_Z;
-			world.load_view_radius_around(x, y, name);
-			world.room_at(x, y, z)->add_actor(this->name);
 		}
-		else // valid coordinates were loaded
+		else
 		{
-			this->x = load_x;
-			this->y = load_y;
-			this->z = load_z;
-			world.load_view_radius_around(x, y, name);
-			world.room_at(x, y, z)->add_actor(this->name);
+			// set the player to the valid loaded coordinates
+			this->x = loaded_x;
+			this->y = loaded_y;
+			this->z = loaded_z;
 		}
+
+		// load the rooms around the player's spawn
+		world.load_view_radius_around(x, y, name);
+
+		// spawn in the player
+		world.room_at(x, y, z)->add_actor(this->name);
 
 		// for each item node of the equipment node
 		for (const xml_node & equipment : user_data_xml.child(C::XML_USER_EQUIPMENT.c_str()).children())
@@ -142,13 +146,15 @@ public:
 		return "You have logged out.";
 	}
 
-	// inventory manipulation
-	void add(const shared_ptr<Item> & item);
-	void remove(const string & item_id, const unsigned & count = 1);
-
 	// inventory information
 	bool has(const string & item_name, const unsigned & item_count = 1) const;
 	bool does_not_have(const string & item_name, const unsigned & item_count = 1) const;
+
+	// inventory manipulation
+	void add(const shared_ptr<Item> & item);
+	void remove(const string & item_id, const unsigned & count = 1);
+	string equip(const string & item_ID);
+	string unequip(const string & item_ID);
 
 	// actions
 	string craft(const string & craft_item_id, World & world);

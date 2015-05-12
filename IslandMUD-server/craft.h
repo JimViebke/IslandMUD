@@ -47,14 +47,14 @@ public:
 	// generation
 	void populate()
 	{
-		// for documentation, refer to add()
+		// for documentation, refer to add() below
 
 		cout << "\nLoading crafting recipes...";
 
 		// add("recipe name", {}, {}, {}, {}, {});
 
 
-		// raw materials
+		// materials
 		add("stick", {}, {}, { { C::TREE_ID, 1 } }, {}, { { C::STICK_ID, 1 } });
 		add("branch", {}, {}, { { C::TREE_ID, 1 } }, {}, { { C::BRANCH_ID, 1 } });
 		add("vine", {}, {}, { { C::TREE_ID, 1 } }, {}, { { C::VINE_ID, 1 } });
@@ -64,6 +64,7 @@ public:
 		add("staff", { { C::AXE_ID, 1 } }, { { C::BRANCH_ID, 1 } }, {}, {}, { { C::STAFF_ID, 1 } });
 		add("axe", {}, { { C::BRANCH_ID, 1 }, { C::STONE_ID, 1 }, { C::VINE_ID, 1 } }, {}, {}, { { C::AXE_ID, 1 } }); // maybe need a sharp stone?
 		add("bow", {}, { { C::BRANCH_ID, 1 }, { C::VINE_ID, 1 } }, {}, {}, { { C::BOW_ID, 1 } }); // maybe need a sharp stone?
+		add("sword", {}, { { C::STONE_ID, 2 }, { C::STICK_ID, 1 } }, {}, {}, { { C::SWORD_ID, 1 } });
 	}
 	void add(const string & name,
 		const map<string, int> & inv_n, const map<string, int> & inv_r,

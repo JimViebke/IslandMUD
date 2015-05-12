@@ -19,9 +19,11 @@ void Parse::initialize()
 		// verbs
 		P::dict["help"] = P::dict["h"] = P::dict["q"] = P::dict["?"] = P::dict["assist"] = C::GET_HELP_COMMAND;
 		// P::dict["login"] = C::LOGIN_COMMAND; // not used yet
-		P::dict["logout"] = C::LOGOUT_COMMAND;
+		P::dict["logout"] = P::dict["quit"] = P::dict["leave"] = C::LOGOUT_COMMAND;
 		P::dict["move"] = P::dict["m"] = P::dict["walk"] = P::dict["run"] = P::dict["head"] = P::dict["go"] = P::dict["continue"] = C::MOVE_COMMAND;
 		P::dict["take"] = P::dict["get"] = P::dict["pick"] = P::dict["choose"] = P::dict["grab"] = P::dict["acquire"] = C::TAKE_COMMAND;
+		P::dict["equip"] = P::dict["weild"] = P::dict["wield"] = C::EQUIP_COMMAND;
+		P::dict["dequip"] = P::dict["deequip"] = P::dict["unequip"] = C::DEQUIP_COMMAND;
 		P::dict["craft"] = P::dict["forge"] = P::dict["make"] = P::dict["create"] = P::dict["fashion"] = C::CRAFT_COMMAND;
 		P::dict["drop"] = P::dict["release"] = P::dict["unhand"] = C::DROP_COMMAND;
 		P::dict["wait"] = P::dict["pause"] = P::dict["consider"] = P::dict["delay"] = C::WAIT_COMMAND;

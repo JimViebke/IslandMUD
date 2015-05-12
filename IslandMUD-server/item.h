@@ -115,4 +115,10 @@ public:
 	Bow() : Weapon(C::BOW_ID) {}
 };
 
+class Sword : public Weapon
+{
+public:
+	Sword() : Weapon(C::SWORD_ID) {}
+};
+
 #endif

@@ -229,7 +229,7 @@ public:
 		// the player is attacking a surface "bash floor" "smash west wall" (wall is ignored)
 		else if (command.size() >= 2 && command[0] == C::ATTACK_COMMAND && R::contains(R::surface_ids, command[1]))
 		{
-			actors.find(actor_id)->second->attack_surface(command[1], world);
+			return actors.find(actor_id)->second->attack_surface(command[1], world);
 		}
 		else if (command.size() == 1 && command[0] == C::LOGOUT_COMMAND)
 		{
