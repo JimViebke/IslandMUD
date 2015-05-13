@@ -165,11 +165,11 @@ public:
 		// if this room does not have the surface being attacked
 		if (!this->has_surface(surface_ID))
 		{
-			if (surface_ID == C::UP)
+			if (surface_ID == C::CEILING)
 			{
 				return "There is no ceiling above you that you can damage.";
 			}
-			else if (surface_ID == C::DOWN)
+			else if (surface_ID == C::FLOOR)
 			{
 				return "There is no floor below you to damage.";
 			}
