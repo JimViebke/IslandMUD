@@ -110,7 +110,7 @@ public:
 
 	// maps material IDs to the material count required to make a surface
 	// therefore also acts as the list of valid construction surfaces (see implementation) 
-	static map<string, unsigned> SURFACE_REQUIREMENTS;
+	const static map<string, unsigned> SURFACE_REQUIREMENTS;
 
 	// box drawing
 
@@ -126,7 +126,7 @@ public:
 		MIN_SURFACE_HEALTH,
 		MAX_SURFACE_HEALTH;
 
-	const map<string, map<string, int>> damage_tables;
+	const static map<string, map<string, int>> damage_tables;
 };
 
 typedef Constants C;

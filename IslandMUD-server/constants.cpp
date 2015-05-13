@@ -126,7 +126,7 @@ const map<string, string> C::opposite_surface_id = {
 
 // surface material count requirements
 
-map<string, unsigned> C::SURFACE_REQUIREMENTS =
+const map<string, unsigned> C::SURFACE_REQUIREMENTS =
 {
 	{ C::WOOD_ID, 5 }, // {material, count required}
 	{ C::STONE_ID, 5 },
@@ -162,12 +162,12 @@ Create a two-dimensional map to calculate damamge values.
 Assossiate each attacking implement with a map of target, value pairs.
 */
 
-const map<string, map<string, int>> damage_tables =
+const map<string, map<string, int>> C::damage_tables =
 {
 	{ string(C::ATTACK_COMMAND), { // attack command is also used to represent an unarmed attack
-		{ C::STICK_ID, 6 },
-		{ C::WOOD_ID, 3 },
-		{ C::STONE_ID, 1 }
+		{ C::STICK_ID, 49 }, // formerly 6
+		{ C::WOOD_ID, 49 }, // formerly 3
+		{ C::STONE_ID, 49 } // formerly 1
 	} },
 
 	{ string(C::STAFF_ID), {

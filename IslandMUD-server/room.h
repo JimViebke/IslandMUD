@@ -35,7 +35,7 @@ public:
 	{
 		return room_sides;
 	}
-	
+
 	// room information
 	bool has_wall() const // used to determine if a ceiling can be placed
 	{
@@ -160,8 +160,9 @@ public:
 	}
 
 	// damage surface
-	string damage_surface(const string & surface_ID)
+	string damage_surface(const string & surface_ID, const shared_ptr<Item> & equipped_item)
 	{
+		// if this room does not have the surface being attacked
 		if (!this->has_surface(surface_ID))
 		{
 			if (surface_ID == C::UP)
@@ -178,9 +179,33 @@ public:
 			}
 		}
 
-		// surface exists, inflict damage
-		this->room_sides.find(surface_ID)->second.change_health(-1); // hard coded until we have damage tables
+		// extract the ID of the attacking implement (ATTACK_COMMAND for bare-hands melee attack)
+		const string equipped_item_id = ((equipped_item != nullptr) ? equipped_item->name : C::ATTACK_COMMAND);
 
+		// check if the player's equipped weapon exists in the damage table
+		if (C::damage_tables.find(equipped_item_id) == C::damage_tables.cend())
+		{
+			return "Error occured: Damage lookup tables contain no info to attack using " + equipped_item_id + ".";
+		}
+
+		// the damage map for this implement exists, copy it here
+		const map<string, int> item_damage_table = C::damage_tables.find(equipped_item_id)->second;
+		const string surface_material_ID = this->room_sides.find(surface_ID)->second.material_id;
+
+		// check if the material of the wall being attacked exists in the damage table for the implement
+		if (item_damage_table.find(surface_material_ID) == item_damage_table.cend())
+		{
+			// ... contains to info to use staff to damage stone."
+			return "Error occured: Damage lookup tables contain no info to use "
+				+ equipped_item_id + " to damage "
+				+ surface_material_ID + ".";
+		}
+
+		// surface exists, inflict damage*-1
+		cout << "surface health before attack: " << room_sides.find(surface_ID)->second.get_health() << endl;
+		room_sides.find(surface_ID)->second.change_health(item_damage_table.find(surface_material_ID)->second*-1);
+		cout << "surface health after attack:  " << room_sides.find(surface_ID)->second.get_health() << endl;
+		
 		// if the surface has 0 health
 		if (room_sides.find(surface_ID)->second.is_rubble())
 		{
@@ -197,7 +222,9 @@ public:
 			// the surface holds
 			return "You damage the " +
 				((surface_ID == C::CEILING || surface_ID == C::FLOOR) ? surface_ID : "wall")
-				+ ".";
+				+ " using your " +
+				((equipped_item_id == C::ATTACK_COMMAND) ? "bare hands." : (equipped_item_id + "."));
+			// above: "using your sword" or "using your bare hands"
 		}
 	}
 

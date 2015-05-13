@@ -463,27 +463,7 @@ string Character::construct_surface(const string & material_id, const string & s
 }
 string Character::attack_surface(const string & surface_ID, World & world)
 {
-	// surface_ID is valid, but may not exist in this room
-
-	// if the surface does not exist in this room
-	if (!world.room_at(x, y, z)->has_surface(surface_ID))
-	{
-		if (surface_ID == C::UP)
-		{
-			return "There is no ceiling above you that you can damage.";
-		}
-		else if (surface_ID == C::DOWN)
-		{
-			return "There is no floor below you to damage.";
-		}
-		else
-		{
-			return "There is no wall to your " + surface_ID + " to damage.";
-		}
-	}
-
-	// the surface exists in this room, damage it
-	string result = world.room_at(x, y, z)->damage_surface(surface_ID);
+	string result = world.room_at(x, y, z)->damage_surface(surface_ID, this->equipped_item);
 
 
 
