@@ -84,8 +84,6 @@ public:
 			// saves the final terrain to disk
 			gen.save_terrain();
 
-			// pass the final terrain to create()
-
 			terrain = gen.get_terrain();
 		}
 
@@ -525,23 +523,6 @@ private:
 		add_room_to_world(vertical_rooms, x, y, z);
 	}
 
-	// load all rooms at x,y to memory
-	void load_vertical_rooms(const int & x, const int & y)
-	{
-		// create an XML document
-		xml_document vertical_rooms;
-
-		// populate it will all (z) rooms at x,y
-		load_vertical_rooms_to_XML(x, y, vertical_rooms);
-
-		// for each room in the stack
-		for (int z = 0; z < C::WORLD_Z_DIMENSION; ++z)
-		{
-			// add the room to the world
-			add_room_to_world(vertical_rooms, x, y, z);
-		}
-	}
-
 	// move a passed room to disk
 	void unload_room(const int & x, const int & y, const int & z, shared_ptr<Room> & room)
 	{
@@ -565,22 +546,6 @@ private:
 
 		// save the document
 		z_stack.save_file(room_path.c_str()); // returns an unused boolean
-	}
-
-	// what it says
-	void add_viewer_and_load_if_needed(const int & x, const int & y, const int & z, const string & observer_ID)
-	{
-		// when this is called, use ground level for z
-
-		// if the room is not already loaded
-		if (room_at(x, y, z) == nullptr)
-		{
-			// load the room into memory
-			load_room_to_world(x, y, z);
-		}
-
-		// add the observer to the room's list of observing players
-		room_at(x, y, z)->add_viewing_actor(observer_ID);
 	}
 
 	// add a room to a z_stack at a given index

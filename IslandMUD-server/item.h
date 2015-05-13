@@ -21,7 +21,7 @@ public:
 	int weight = 0;
 	bool is_takable = false; // items are untakable by default
 	
-	Item(string item_name = "BAD_ITEM_NAME", bool takable = false) : name(item_name), is_takable(takable) {}
+	Item(string item_name, bool takable = false) : name(item_name), is_takable(takable) {}
 	virtual ~Item() {}
 
 };

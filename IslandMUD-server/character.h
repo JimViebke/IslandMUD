@@ -170,7 +170,7 @@ public:
 		// determine if a character can move in a given direction (8 compass points, up, or down)
 
 		// validate direction
-		if (!R::contains(R::direction_ids, direction_ID)) { return direction_ID + " is not a direction."; }
+		if (!R::contains(C::direction_ids, direction_ID)) { return direction_ID + " is not a direction."; }
 
 		// if the player wants to move in a primary direction (n/e/s/w), condition is
 		// no wall OR wall with opening (currently the opening is not taken into account)
@@ -182,7 +182,7 @@ public:
 			// the destination room has an opposite wall in the way
 			if (world.room_at(x, y, z)->has_surface(direction_ID)
 				||
-				world.room_at(x + dx, y + dy, z)->has_surface(R::opposite_surface_id.find(direction_ID)->second))
+				world.room_at(x + dx, y + dy, z)->has_surface(C::opposite_surface_id.find(direction_ID)->second))
 			{
 				return "There is a wall in your way to the " + direction_ID + ".";
 			}

@@ -21,11 +21,12 @@ private:
 	multimap<string, shared_ptr<Item>> contents = {}; // the items in a room
 	vector<string> viewing_actor_ids = {}; // the PCs and NPCs who can see this room
 	vector<string> actor_ids = {}; // the PCs and NPCs in a room
+
 public:
 
 	Room() {}
 
-	// room information
+	// room contents
 	const multimap<string, shared_ptr<Item>> get_contents() const
 	{
 		return contents;
@@ -34,6 +35,8 @@ public:
 	{
 		return room_sides;
 	}
+	
+	// room information
 	bool has_wall() const // used to determine if a ceiling can be placed
 	{
 		// first do an easy check to see if there are any surfaces
@@ -132,7 +135,7 @@ public:
 	void add_surface(const string & surface_ID, const string & material_ID)
 	{
 		// if the surface ID is valid
-		if (R::contains(R::surface_ids, surface_ID))
+		if (R::contains(C::surface_ids, surface_ID))
 		{
 			// create a new Room_Side and add it to room_sides
 			room_sides.insert(pair<string, Room_Side>(surface_ID, Room_Side(material_ID)));
@@ -144,7 +147,7 @@ public:
 		// create a surface with a given health (used for loading rooms from disk that may be damaged)
 
 		// if the surface ID is valid
-		if (R::contains(R::surface_ids, surface_ID))
+		if (R::contains(C::surface_ids, surface_ID))
 		{
 			// create a new Room_Side and add it to room_sides
 			room_sides.insert(pair<string, Room_Side>(surface_ID, Room_Side(material_ID)));

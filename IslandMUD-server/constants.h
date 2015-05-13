@@ -6,6 +6,7 @@ Feb 14, 2015 */
 
 #include <string>
 #include <map>
+#include <vector>
 
 using namespace std;
 
@@ -60,7 +61,7 @@ public:
 		BAD_COMMAND,
 		LOGIN_COMMAND,
 		LOGOUT_COMMAND,
-		GET_HELP_COMMAND,
+		HELP_COMMAND,
 		CRAFT_COMMAND,
 		TAKE_COMMAND,
 		EQUIP_COMMAND,
@@ -100,6 +101,12 @@ public:
 		XML_USER_EQUIPMENT,
 		XML_USER_MATERIALS,
 		XML_USER_MATERIAL_COUNT;
+
+	// surface information
+
+	static const vector<string> surface_ids;
+	static const vector<string> direction_ids;
+	static const map<string, string> opposite_surface_id;
 
 	// maps material IDs to the material count required to make a surface
 	// therefore also acts as the list of valid construction surfaces (see implementation) 

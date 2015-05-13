@@ -26,10 +26,6 @@ class Resources
 {
 public:
 
-	static const vector<string> surface_ids;
-	static const vector<string> direction_ids;
-	static const map<string, string> opposite_surface_id;
-
 	// debugging output
 	template <typename T> static inline void print(const vector<T> & v)
 	{

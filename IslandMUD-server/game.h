@@ -177,7 +177,7 @@ public:
 	string execute_command(const string & actor_id, const vector<string> & command)
 	{
 		// "help"
-		if (command.size() == 1 && command[0] == C::GET_HELP_COMMAND)
+		if (command.size() == 1 && command[0] == C::HELP_COMMAND)
 		{
 			return string("help:\n") +
 				"\nrecipes" +
@@ -190,7 +190,7 @@ public:
 		}
 		// moving: "move northeast" OR "northeast"
 		else if ((command.size() == 2 && command[0] == C::MOVE_COMMAND)
-			|| command.size() == 1 && R::contains(R::direction_ids, command[0]))
+			|| command.size() == 1 && R::contains(C::direction_ids, command[0]))
 		{
 			return actors.find(actor_id)->second->move(command[command.size() - 1], world); // passes direction (last element in command) and world
 		}
@@ -227,7 +227,7 @@ public:
 			return Character::recipes.get_recipes(); // (item_id, world)
 		}
 		// the player is attacking a surface "bash floor" "smash west wall" (wall is ignored)
-		else if (command.size() >= 2 && command[0] == C::ATTACK_COMMAND && R::contains(R::surface_ids, command[1]))
+		else if (command.size() >= 2 && command[0] == C::ATTACK_COMMAND && R::contains(C::surface_ids, command[1]))
 		{
 			return actors.find(actor_id)->second->attack_surface(command[1], world);
 		}
@@ -238,8 +238,6 @@ public:
 
 		return "Nothing happens.";
 	}
-
-
 
 };
 

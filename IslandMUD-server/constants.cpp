@@ -30,7 +30,7 @@ const int C::DEFAULT_SPAWN_Z = C::GROUND_INDEX; // ground level spawn
 const string C::GOOD_SIGNAL = "good";
 const string C::BAD_SIGNAL = "bad";
 
-// item idsf
+// item ids
 
 const string C::BAD_ITEM_ID = "bad_item_id";
 
@@ -57,7 +57,7 @@ const string C::TORCH_ID = "torch";
 const string C::BAD_COMMAND = "unknown_command";
 const string C::LOGIN_COMMAND = "login";
 const string C::LOGOUT_COMMAND = "logout";
-const string C::GET_HELP_COMMAND = "help";
+const string C::HELP_COMMAND = "help";
 const string C::TAKE_COMMAND = "take";
 const string C::EQUIP_COMMAND = "equip";
 const string C::DEQUIP_COMMAND = "dequip";
@@ -103,6 +103,26 @@ const string C::XML_USER_LOCATION = "location";
 const string C::XML_USER_EQUIPMENT = "equipment";
 const string C::XML_USER_MATERIALS = "materials";
 const string C::XML_USER_MATERIAL_COUNT = "count";
+
+// store a vector of all valid surface ids
+const vector<string> C::surface_ids = { C::NORTH, C::EAST, C::SOUTH, C::WEST, C::FLOOR, C::CEILING };
+
+// store a vector of all valid movement directions
+const vector<string> C::direction_ids = {
+	C::NORTH, C::EAST, C::SOUTH, C::WEST,
+	C::NORTH_EAST, C::NORTH_WEST,
+	C::SOUTH_EAST, C::SOUTH_WEST,
+	C::UP, C::DOWN };
+
+// map surface ids to their opposite surface
+const map<string, string> C::opposite_surface_id = {
+	{ C::NORTH, C::SOUTH },
+	{ C::SOUTH, C::NORTH },
+	{ C::EAST, C::WEST },
+	{ C::WEST, C::EAST },
+	{ C::CEILING, C::FLOOR },
+	{ C::FLOOR, C::CEILING },
+};
 
 // surface material count requirements
 

@@ -417,7 +417,7 @@ string Character::construct_surface(const string & material_id, const string & s
 	}
 
 	// check that the surface to construct is a wall, ceiling, or floor
-	if (!R::contains(R::surface_ids, surface_id))
+	if (!R::contains(C::surface_ids, surface_id))
 	{
 		return "Construct a wall, ceiling or floor.";
 	}

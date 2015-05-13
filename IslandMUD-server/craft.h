@@ -74,8 +74,8 @@ public:
 		recipe name
 		map of item IDs that need to be in inventory
 		map of item IDs that need to be in inventory, are removed
-		map of item IDs that need to be in the node
-		map of item IDs that need to be in the node, are removed
+		map of item IDs that need to be in the room
+		map of item IDs that need to be in the room, are removed
 		map of item IDs to be yielded */
 
 		this->recipes.insert(pair<string, Recipe>(name, Recipe(inv_n, inv_r, loc_n, loc_r, yields)));
