@@ -6,7 +6,6 @@
 *.opensdf
 *.pdb
 *.sdf
-*.sln
 *.suo
 *.tlog
 *.vcxproj
