@@ -11,12 +11,9 @@ shared_ptr<Item> Craft::make(const string & item_id)
 	http://www.codeguru.com/cpp/cpp/cpp_mfc/article.php/c4067/Switch-on-Strings-in-C.htm */
 
 	// alphabetical based on ID, not object name
-	if (item_id == C::ANVIL_ID) { return make_shared<Anvil>(); }
-	else if (item_id == C::AXE_ID) { return make_shared<Axe>(); }
+	if (item_id == C::AXE_ID) { return make_shared<Axe>(); }
 	else if (item_id == C::BOW_ID) { return make_shared<Bow>(); }
 	else if (item_id == C::BRANCH_ID) { return make_shared<Branch>(); }
-	else if (item_id == C::FORGE_ID) { return make_shared<Forge>(); }
-	else if (item_id == C::HAMMER_ID) { return make_shared<Hammer>(); }
 	else if (item_id == C::STAFF_ID) { return make_shared<Staff>(); }
 	else if (item_id == C::STICK_ID) { return make_shared<Stick>(); }
 	else if (item_id == C::STONE_ID) { return make_shared<Rock>(); }

@@ -26,6 +26,12 @@ public:
 
 };
 
+class Craftable : public Item // this is useless
+{
+public:
+	Craftable(string cust_name) : Item(cust_name, true) {}
+};
+
 class Material : public Item
 {
 public:
@@ -69,26 +75,14 @@ public:
 	Tree() : Item(C::TREE_ID, false) {}
 };
 
-class Forge : public Item
-{
-public:
-	Forge() : Item(C::FORGE_ID, false) {}
-};
-
-class Anvil : public Item
-{
-public:
-	Anvil() : Item(C::ANVIL_ID, false) {}
-};
-
-class Equipment : public Item
+class Equipment : public Craftable
 {
 public:
 	string equipment_material; // stone, iron, wood, etc
 	string handle_material; // wood, etc
 	// other member represent quality, health
 
-	Equipment(string cust_name) : Item(cust_name) {}
+	Equipment(string cust_name) : Craftable(cust_name) {}
 };
 
 class Staff : public Equipment
@@ -103,28 +97,28 @@ public:
 	Torch() : Equipment(C::TORCH_ID) {}
 };
 
-class Axe : public Equipment
+class Weapon : public Equipment
 {
 public:
-	Axe() : Equipment(C::AXE_ID) {}
+	Weapon(string cust_name) : Equipment(cust_name) {}
 };
 
-class Bow : public Equipment
+class Axe : public Weapon
 {
 public:
-	Bow() : Equipment(C::BOW_ID) {}
+	Axe() : Weapon(C::AXE_ID) {}
 };
 
-class Sword : public Equipment
+class Bow : public Weapon
 {
 public:
-	Sword() : Equipment(C::SWORD_ID) {}
+	Bow() : Weapon(C::BOW_ID) {}
 };
 
-class Hammer : public Equipment
+class Sword : public Weapon
 {
 public:
-	Hammer() : Equipment(C::HAMMER_ID) {}
+	Sword() : Weapon(C::SWORD_ID) {}
 };
 
 #endif

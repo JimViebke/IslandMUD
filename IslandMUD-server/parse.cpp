@@ -30,23 +30,17 @@ void Parse::initialize()
 		P::dict["construct"] = P::dict["build"] = P::dict["erect"] = C::CONSTRUCT_COMMAND;
 		P::dict["smash"] = P::dict["strike"] = P::dict["bash"] = P::dict["break"] = P::dict["damage"] = P::dict["stab"] = P::dict["slash"] = C::ATTACK_COMMAND;
 
-		// items
-		P::dict["tree"] = C::TREE_ID;
-		P::dict["forge"] = C::FORGE_ID;
-		P::dict["anvil"] = C::ANVIL_ID;
-
-		// items -> materials
+		// items (materials)
 		P::dict["stone"] = P::dict["rock"] = C::STONE_ID;
+		P::dict["tree"] = C::TREE_ID;
 		P::dict["branch"] = P::dict["branches"] = C::BRANCH_ID;
 		P::dict["stick"] = C::STICK_ID;
 		P::dict["vine"] = C::VINE_ID;
 
-		// items -> tools
+		// items (tools)
 		P::dict["bow"] = C::BOW_ID;
 		P::dict["staff"] = C::STAFF_ID;
 		P::dict["axe"] = C::AXE_ID;
-		P::dict["sword"] = C::SWORD_ID;
-		P::dict["hammer"] = C::HAMMER_ID;
 
 		// directions
 		P::dict["n"] = P::dict["north"] = C::NORTH;

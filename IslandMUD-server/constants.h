@@ -57,9 +57,6 @@ public:
 		SWORD_ID,
 		BOW_ID,
 		TORCH_ID,
-		HAMMER_ID,
-		FORGE_ID,
-		ANVIL_ID,
 
 		BAD_COMMAND,
 		LOGIN_COMMAND,
