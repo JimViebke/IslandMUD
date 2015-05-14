@@ -1,4 +1,3 @@
-*.filters
 *.idb
 *.ilk
 *.log
@@ -8,4 +7,3 @@
 *.sdf
 *.suo
 *.tlog
-*.vcxproj
