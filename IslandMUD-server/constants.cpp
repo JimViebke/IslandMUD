@@ -51,6 +51,9 @@ const string C::STAFF_ID = "staff";
 const string C::SWORD_ID = "sword";
 const string C::BOW_ID = "bow";
 const string C::TORCH_ID = "torch";
+const string C::HAMMER_ID = "hammer";
+const string C::FORGE_ID = "forge";
+const string C::ANVIL_ID = "anvil";
 
 // verb commands
 
