@@ -21,6 +21,7 @@ public:
 	static const string user_data_directory;
 
 	const static char
+		PLAYER_CHAR,
 		WATER_CHAR,
 		LAND_CHAR,
 		FOREST_CHAR,
@@ -93,6 +94,7 @@ public:
 
 		// room xml
 		XML_ROOM,
+		XML_IS_WATER,
 		XML_ITEM,
 		XML_SURFACE,
 		XML_SURFACE_HEALTH,

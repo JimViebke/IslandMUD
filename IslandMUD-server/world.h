@@ -406,8 +406,17 @@ public:
 
 					// conditionally draw a tree or an empty space in the corners, other five are always draw as trees
 					a << ((f_n || f_nw || f_w) ? C::FOREST_CHAR : C::LAND_CHAR) << C::FOREST_CHAR << ((f_n || f_ne || f_e) ? C::FOREST_CHAR : C::LAND_CHAR);
-					b << C::FOREST_CHAR << ((cx == x && cy == y) ? '@' : C::FOREST_CHAR) << C::FOREST_CHAR;
+					b << C::FOREST_CHAR << ((cx == x && cy == y) ? C::PLAYER_CHAR : C::FOREST_CHAR) << C::FOREST_CHAR;
 					c << ((f_s || f_sw || f_w) ? C::FOREST_CHAR : C::LAND_CHAR) << C::FOREST_CHAR << ((f_s || f_se || f_e) ? C::FOREST_CHAR : C::LAND_CHAR);
+				}
+				// if the room is water
+				else if (room_at(cx, cy, C::GROUND_INDEX)->is_water())
+				{
+					// Either draw a 3x3 grid with a "wave", or a 3x3 grid with the player's icon.
+
+					a << "   ";
+					b << " " << ((cx == x && cy == y) ? C::PLAYER_CHAR : C::WATER_CHAR) << " ";
+					c << "   ";
 				}
 				// there is no tree, so there may be a structure
 				else
@@ -420,24 +429,19 @@ public:
 
 					// time for glorious nested ternary statements to do this cheap
 					a
-						<< ((n && w) ? C::NW_CORNER : (n) ? C::WE_WALL : (w) ? C::NS_WALL : ' ')
-						<< ((n) ? C::WE_WALL : ' ')
-						<< ((n && e) ? C::NE_CORNER : (n) ? C::WE_WALL : (e) ? C::NS_WALL : ' ');
+						<< ((n && w) ? C::NW_CORNER : (n) ? C::WE_WALL : (w) ? C::NS_WALL : C::LAND_CHAR)
+						<< ((n) ? C::WE_WALL : C::LAND_CHAR)
+						<< ((n && e) ? C::NE_CORNER : (n) ? C::WE_WALL : (e) ? C::NS_WALL : C::LAND_CHAR);
 					b
-						<< ((w) ? C::NS_WALL : ' ')
-						<< ((cx == x && cy == y) ? '@' : ((room_at(cx, cy, C::GROUND_INDEX)->contains_no_items()) ? ' ' : C::ITEM_CHAR)) // if the current coordinates are the player's, draw an @ icon, else a period
-						<< ((e) ? C::NS_WALL : ' ');
+						<< ((w) ? C::NS_WALL : C::LAND_CHAR)
+						// if the current coordinates are the player's, draw an @ icon, else if there is an item, draw an item char, else empty
+						<< ((cx == x && cy == y) ? C::PLAYER_CHAR : ((room_at(cx, cy, C::GROUND_INDEX)->contains_no_items()) ? C::LAND_CHAR : C::ITEM_CHAR))
+						<< ((e) ? C::NS_WALL : C::LAND_CHAR);
 					c
-						<< ((s && w) ? C::SW_CORNER : (s) ? C::WE_WALL : (w) ? C::NS_WALL : ' ')
-						<< ((s) ? C::WE_WALL : ' ')
-						<< ((s && e) ? C::SE_CORNER : (s) ? C::WE_WALL : (e) ? C::NS_WALL : ' ');
+						<< ((s && w) ? C::SW_CORNER : (s) ? C::WE_WALL : (w) ? C::NS_WALL : C::LAND_CHAR)
+						<< ((s) ? C::WE_WALL : C::LAND_CHAR)
+						<< ((s && e) ? C::SE_CORNER : (s) ? C::WE_WALL : (e) ? C::NS_WALL : C::LAND_CHAR);
 				}
-				/*else // room is water. No way to tell if a room is water at this time. Distance to radius may be subject to off-by-one errors
-				{
-				a << "   ";
-				b << " " << ((cx == x && cy == y) ? '@' : '~') << " ";
-				c << "   ";
-				}*/
 			} // end for each room in row
 
 			// each iteration, push the three stringstreams representing the row into the user's map
@@ -473,6 +477,12 @@ private:
 
 		// select the specific room
 		xml_node room_node = z_stack.child(("room-" + R::to_string(z)).c_str());
+
+		// set whether or not the room is water (off-island or river/lake)
+		room->set_water_status(room_node.attribute(C::XML_IS_WATER.c_str()).as_bool());
+
+		// add a boolean representing if the room is water (off-island or a lake/river)
+		room_node.append_attribute(C::XML_IS_WATER.c_str()).as_bool(room->is_water());
 
 		// for each item in the room
 		for (const xml_node & item : room_node.children(C::XML_ITEM.c_str()))
@@ -556,6 +566,9 @@ private:
 
 		// create a new node for the room
 		xml_node room_node = z_stack.append_child(("room-" + R::to_string(z)).c_str());
+		
+		// add a boolean representing if the room is water (off-island or a lake/river)
+		room_node.append_attribute(C::XML_IS_WATER.c_str()).set_value(room->is_water());
 
 		// for each item in the room
 		multimap<string, shared_ptr<Item>> room_item_contents = room->get_contents();
@@ -599,6 +612,11 @@ private:
 		if (z == C::GROUND_INDEX && world_terrain[x][y] == C::FOREST_CHAR)
 		{
 			room->add_item(Craft::make(C::TREE_ID)); // add a tree
+		}
+		// else, check if the room is water (off land or a lake/river)
+		else if (z == C::GROUND_INDEX && world_terrain[x][y] == C::WATER_CHAR)
+		{
+			room->set_water_status(true);
 		}
 
 		return room;

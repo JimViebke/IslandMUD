@@ -17,6 +17,7 @@ class Room
 {
 private:
 	bool updated = false; // has the room been updated since it was loaded?
+	bool water = false; // is this dry land or water
 	map<string, Room_Side> room_sides = {}; // the floor, walls, and ceiling in the room (no key for absent surfaces)
 	multimap<string, shared_ptr<Item>> contents = {}; // the items in a room
 	vector<string> viewing_actor_ids = {}; // the PCs and NPCs who can see this room
@@ -108,6 +109,15 @@ public:
 
 		// there is not a sufficient count of items in the room
 		return false;
+	}
+
+	inline void set_water_status(const bool & is_water)
+	{
+		water = is_water;
+	}
+	inline bool is_water() const
+	{
+		return water;
 	}
 
 	// add and remove items
@@ -205,7 +215,7 @@ public:
 		cout << "surface health before attack: " << room_sides.find(surface_ID)->second.get_health() << endl;
 		room_sides.find(surface_ID)->second.change_health(item_damage_table.find(surface_material_ID)->second*-1);
 		cout << "surface health after attack:  " << room_sides.find(surface_ID)->second.get_health() << endl;
-		
+
 		// if the surface has 0 health
 		if (room_sides.find(surface_ID)->second.is_rubble())
 		{

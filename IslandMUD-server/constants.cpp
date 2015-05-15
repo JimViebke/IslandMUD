@@ -9,6 +9,7 @@ const string C::world_biome_file_location = C::game_directory + "/biome_map.txt"
 const string C::room_directory = C::game_directory + "/rooms";
 const string C::user_data_directory = C::game_directory + "/user_data";
 
+const char C::PLAYER_CHAR = '@';
 const char C::WATER_CHAR = '~';
 const char C::LAND_CHAR = ' ';
 const char C::FOREST_CHAR = '%';
@@ -94,6 +95,7 @@ const string C::DOWN = "down";
 // world room xml consts
 
 const string C::XML_ROOM = "room";
+const string C::XML_IS_WATER = "is_water";
 const string C::XML_ITEM = "item";
 const string C::XML_SURFACE = "surface";
 const string C::XML_SURFACE_HEALTH = "health";
