@@ -63,7 +63,10 @@ void Character::remove(const string & item_id, const unsigned & count)
 	{
 		for (unsigned i = 0; i < count; ++i)
 		{
-			equipment_inventory.erase(item_id);
+			// this deals with erase([key]) erroneously removing all instances of the item
+			// multimap<string, shared_ptr<Equipment>>::iterator equipment_it = equipment_inventory.find(item_id);
+
+			equipment_inventory.erase(equipment_inventory.find(item_id));
 		}
 	}
 	else if (material_inventory.find(item_id) != material_inventory.cend()) // the item is present in the material inventory
@@ -98,9 +101,12 @@ string Character::equip(const string & item_ID)
 	// the player does have the item to equip, test if an item is already equipped
 	if (this->equipped_item != nullptr)
 	{
-		// save the existin the item to the player's inventory
+		output << "You replace your " << equipped_item->name << " with a(n) ";
+
+		// save the existing the item to the player's inventory
 		this->add(equipped_item);
-		output << "You replace your " << equipped_item->name << " with a ";
+		// erase the existing item
+		this->equipped_item = nullptr;
 	}
 
 	// set the equipped item to the specified item from whichever inventory we find it in
@@ -141,7 +147,7 @@ string Character::unequip(const string & item_ID)
 	this->add(equipped_item);
 
 	// reset the currently equipped item
-	equipped_item == nullptr;
+	equipped_item = nullptr;
 
 	return "You put your " + item_ID + " away.";
 }
@@ -325,59 +331,24 @@ string Character::craft(const string & craft_item_id, World & world)
 }
 string Character::take(const string & take_item_id, World & world)
 {
-	if (world.room_at(x, y, z)->contains_item(take_item_id)) // if the item is in the player's vicinity
+	// check if the item is not in the player's vicinity
+	if (!world.room_at(x, y, z)->contains_item(take_item_id))
 	{
-		// if the item is not takable
-		if (!world.room_at(x, y, z)->get_contents().find(take_item_id)->second->is_takable)
-		{
-			// return failure
-			return "You can't take the " + take_item_id + ".";
-		}
-
-		// the item is takable
-		this->add(world.room_at(x, y, z)->get_contents().find(take_item_id)->second); // copy the item to the player
-		world.room_at(x, y, z)->remove_item(take_item_id); // remove the item from the world
-		return "You take the " + take_item_id + ".";
+		return "There is no " + take_item_id + " here.";
 	}
 
-	if (!Character::recipes.has_recipe_for(take_item_id)) // if the recipe does not exist
+	// check if the item is not takable
+	if (!world.room_at(x, y, z)->get_contents().find(take_item_id)->second->is_takable)
 	{
-		return "There is no " + take_item_id + " nearby."; // report with a message
+		// return failure
+		return "You can't take the " + take_item_id + ".";
 	}
 
-	// get the recipe
-	const Recipe recipe = Character::recipes.get_recipe(take_item_id);
+	// the item is takable
+	this->add(world.room_at(x, y, z)->get_contents().find(take_item_id)->second); // copy the item to the player
+	world.room_at(x, y, z)->remove_item(take_item_id); // remove the item from the world
 
-	// verify the conditions for taking an item are present (yielding, required tools, etc)
-	for (map<string, int>::const_iterator it = recipe.inventory_need.cbegin(); it != recipe.inventory_need.cend(); ++it)
-	{
-		if (it->first != "" && this->does_not_have(it->first, it->second)) { return "To take a(n) " + take_item_id + " you need " + ((it->second == 1) ? "a(n)" : R::to_string(it->second)) + " " + it->first + "."; }
-	}
-	for (map<string, int>::const_iterator it = recipe.inventory_remove.cbegin(); it != recipe.inventory_remove.cend(); ++it)
-	{
-		if (it->first != "" && this->does_not_have(it->first, it->second)) { return "To take a(n) " + take_item_id + " you need " + ((it->second == 1) ? "a(n)" : R::to_string(it->second)) + " " + it->first + "."; }
-	}
-	for (map<string, int>::const_iterator it = recipe.local_need.cbegin(); it != recipe.local_need.cend(); ++it)
-	{
-		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first, it->second)) { return "To take a(n) " + take_item_id + " you need " + ((it->second == 1) ? "a" : R::to_string(it->second)) + " nearby " + it->first + "."; }
-	}
-	for (map<string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
-	{
-		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first, it->second)) { return "To take a(n) " + take_item_id + " you need " + ((it->second == 1) ? "a" : R::to_string(it->second)) + " nearby " + it->first + "."; }
-	}
-
-	// "take" conditions met, remove items
-	for (map<string, int>::const_iterator it = recipe.inventory_remove.cbegin(); it != recipe.inventory_remove.cend(); ++it)
-	{
-		this->remove(it->first, it->second);
-	}
-	for (map<string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
-	{
-		world.room_at(x, y, z)->remove_item(it->first, it->second);
-	}
-
-	this->add(Craft::make(take_item_id)); // create the specified item and give it to the player
-	return "You now have a(n) " + take_item_id + ".";
+	return "You take the " + take_item_id + ".";
 }
 string Character::drop(const string & drop_item_id, World & world)
 {

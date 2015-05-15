@@ -185,6 +185,7 @@ public:
 				"\ntake [item]" +
 				"\ndrop [item]" +
 				"\ncraft [item]" +
+				"\nattack [compass direction]" +
 				"\nconstruct [material] [ceiling/floor]" +
 				"\nconstruct [compass direction] [material] wall";
 		}
@@ -234,6 +235,15 @@ public:
 		else if (command.size() == 1 && command[0] == C::LOGOUT_COMMAND)
 		{
 			return actors.find(actor_id)->second->logout();
+		}
+		// equip and dequip are still buggy
+		else if (command.size() == 2 && command[0] == C::EQUIP_COMMAND)
+		{
+			return actors.find(actor_id)->second->equip(command[1]);
+		}
+		else if (command.size() == 2 && command[0] == C::DEQUIP_COMMAND)
+		{
+			return actors.find(actor_id)->second->unequip(command[1]);
 		}
 
 		return "Nothing happens.";

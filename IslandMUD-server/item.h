@@ -88,7 +88,7 @@ public:
 	string handle_material; // wood, etc
 	// other member represent quality, health
 
-	Equipment(string cust_name) : Item(cust_name) {}
+	Equipment(string cust_name) : Item(cust_name, true) {} // all equipment is takable
 };
 
 class Staff : public Equipment
