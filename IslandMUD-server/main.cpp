@@ -21,7 +21,7 @@ int main()
 		string("move C:\\IslandMUD\\rooms C:\\IslandMUD\\delete"));
 	R::to_file(C::game_directory + "\\" + "wipe delete folder.bat",
 		string("del /f/s/q C:\\IslandMUD\\delete > nul") + "\n" + "rmdir /s/q C:\\IslandMUD\\delete");
-	
+
 	// create game object
 	Game game;
 
@@ -31,6 +31,5 @@ int main()
 	// For playing using the server as the sole client, call main_test_loop().
 	// Execution stays here until the game ends.
 	game.main_test_loop();
-
 
 }

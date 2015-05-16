@@ -4,19 +4,13 @@ For some reason, downsizing the world dimensions then restarting the server resu
 	I suspect this is because world.load() attempts to load the terrain file and correctly fails when it can't, but it
 	makes no attempt to load the biome_map. Try perform the same load-then-verify then save-or-recreate as we do for the world_terrain file.
 
-There's no way to tell if a room is water or not. One could use distance from island radius, but this is
-	highly subject to off-by-one errors. A room needs to have `bool water;` which is loaded and unloaded from disk
-
-Draw water as ~ just using the center tile
-
 Add followers feature, so each character has follower_IDs and following_ID, which are mutually exclusive.
 In player->move manually move all IDs when the leader moves.
 If a player is following an player who isn't signed in, clear following string
 If a player tries to move while following, block it.
 	follow [name]
 	unfollow (2nd arg is optional and ignored)
-
-
+	
 taking a second branch: "you now have a branch" (need a smarter message)
 
 Implement ladders/stairs/ramp

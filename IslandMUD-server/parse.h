@@ -1,7 +1,7 @@
 /* Jim Viebke
 Feb 14, 2015
 
-input utilities */
+user input parsing */
 
 #ifndef PARSE_H
 #define PARSE_H
@@ -13,6 +13,10 @@ input utilities */
 
 #include "resources.h"
 #include "constants.h"
+
+class Parse; // forward declaring
+
+typedef Parse P;
 
 class Parse
 {
@@ -26,7 +30,5 @@ public:
 	static vector<string> tokenize(const string & s);
 
 };
-
-typedef Parse P;
 
 #endif

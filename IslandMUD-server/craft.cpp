@@ -1,8 +1,6 @@
 /* Jim Viebke
 Feb 16 2014 */
 
-#include <memory>
-
 #include "craft.h"
 
 shared_ptr<Item> Craft::make(const string & item_id)

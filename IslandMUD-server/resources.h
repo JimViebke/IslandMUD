@@ -22,6 +22,10 @@ Feb 14, 2015 */
 
 using namespace std;
 
+class Resources; // forward declaring
+
+typedef Resources R;
+
 class Resources
 {
 public:
@@ -147,8 +151,8 @@ public:
 	static int distance_between(const int & x1, const int & y1, const int & x2, const int & y2)
 	{
 		return static_cast<int>(sqrt( // use Pythagoras's theorem
-				(difference(x1, x2) * difference(x1, x2)) +
-				(difference(y1, y2) * difference(y1, y2))
+				(R::difference(x1, x2) * R::difference(x1, x2)) +
+				(R::difference(y1, y2) * R::difference(y1, y2))
 				));
 	}
 	static int difference(const int & a, const int & b)
@@ -173,18 +177,16 @@ public:
 	}
 	template <typename Derived_Type, typename Parent_Type> static inline bool is_not(const Parent_Type * object)
 	{
-		return !Resources::is<Derived_Type>(object);
+		return !R::is<Derived_Type>(object);
 	}
 	template <typename Derived_Type, typename Parent_Type> static inline bool is_not(const Parent_Type & object)
 	{
-		return !Resources::is<Derived_Type>(object);
+		return !R::is<Derived_Type>(object);
 	}
 	template <typename Derived_Type, typename Parent_Type> static inline typename shared_ptr<Derived_Type> convert_to(shared_ptr<Parent_Type> const & object)
 	{
 		return dynamic_pointer_cast<Derived_Type>(object);
 	}
 };
-
-typedef Resources R;
 
 #endif

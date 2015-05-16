@@ -87,9 +87,12 @@
     <ClCompile Include="craft.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parse.cpp" />
+    <ClCompile Include="player_character.cpp" />
     <ClCompile Include="pugixml.cpp" />
+    <ClCompile Include="recipes.cpp" />
     <ClCompile Include="resources.cpp" />
     <ClCompile Include="room.cpp" />
+    <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="character.h" />
@@ -104,6 +107,8 @@
     <ClInclude Include="player_character.h" />
     <ClInclude Include="pugiconfig.hpp" />
     <ClInclude Include="pugixml.hpp" />
+    <ClInclude Include="recipe.h" />
+    <ClInclude Include="recipes.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resources.h" />
     <ClInclude Include="room.h" />

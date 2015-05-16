@@ -8,17 +8,16 @@ Feb 14, 2015 */
 
 #include "character.h"
 
+class Non_Player_Character; // forward-declaring...
+
+typedef Non_Player_Character NPC; // ...in order to put this here
+
 class Non_Player_Character : public Character
 {
 public:
 	stack<string> objectives; // structure highly subject to change
 
-	Non_Player_Character(const string & name) : Character(name)
-	{
-
-	}
+	Non_Player_Character(const string & name) : Character(name) {}
 };
-
-typedef Non_Player_Character NPC;
 
 #endif

@@ -10,6 +10,10 @@ Feb 14, 2015 */
 
 using namespace std;
 
+class Constants; // forward declaring...
+
+typedef Constants C; // ...in order to put this up here
+
 class Constants
 {
 public:
@@ -133,7 +137,5 @@ public:
 
 	const static map<string, map<string, int>> damage_tables;
 };
-
-typedef Constants C;
 
 #endif
