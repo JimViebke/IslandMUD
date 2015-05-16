@@ -85,6 +85,8 @@
     <ClCompile Include="character.cpp" />
     <ClCompile Include="constants.cpp" />
     <ClCompile Include="craft.cpp" />
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="generator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="parse.cpp" />
     <ClCompile Include="player_character.cpp" />
