@@ -62,7 +62,7 @@ public:
 		// x, and y must be from 0 to dimension-1 inclusive
 		return (x >= 0 && y >= 0 &&
 			x < C::WORLD_X_DIMENSION &&
-			y < C::WORLD_Y_DIMENSION);	
+			y < C::WORLD_Y_DIMENSION);
 	}
 	static inline bool bounds_check(const int & x, const int & y, const int & z)
 	{
@@ -80,13 +80,13 @@ public:
 		// If direction_ID is invalid, output arguments will not be modified.
 
 		if (direction_ID == C::NORTH) { --dx; }
-		else if (direction_ID == C::NORTH_EAST) { --dx; ++dy; }
-		else if (direction_ID == C::EAST) { ++dy; }
-		else if (direction_ID == C::SOUTH_EAST) { ++dx; ++dy; }
 		else if (direction_ID == C::SOUTH) { ++dx; }
-		else if (direction_ID == C::SOUTH_WEST) { ++dx; --dy; }
 		else if (direction_ID == C::WEST) { --dy; }
+		else if (direction_ID == C::EAST) { ++dy; }
 		else if (direction_ID == C::NORTH_WEST) { --dx; --dy; }
+		else if (direction_ID == C::NORTH_EAST) { --dx; ++dy; }
+		else if (direction_ID == C::SOUTH_EAST) { ++dx; ++dy; }
+		else if (direction_ID == C::SOUTH_WEST) { ++dx; --dy; }
 		else if (direction_ID == C::UP) { ++dz; }
 		else if (direction_ID == C::DOWN) { --dz; }
 
@@ -151,9 +151,9 @@ public:
 	static int distance_between(const int & x1, const int & y1, const int & x2, const int & y2)
 	{
 		return static_cast<int>(sqrt( // use Pythagoras's theorem
-				(R::difference(x1, x2) * R::difference(x1, x2)) +
-				(R::difference(y1, y2) * R::difference(y1, y2))
-				));
+			(R::difference(x1, x2) * R::difference(x1, x2)) +
+			(R::difference(y1, y2) * R::difference(y1, y2))
+			));
 	}
 	static int difference(const int & a, const int & b)
 	{
