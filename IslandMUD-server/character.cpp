@@ -624,49 +624,41 @@ string Character::attack_surface(const string & surface_ID, World & world)
 	{
 		return "Only n/s/e/w surfaces can be damaged at this time.";
 	}
-	
-	// if the room has a surface with a door in it
-	if (world.room_at(x, y, z)->has_surface(surface_ID) &&
-		world.room_at(x, y, z)->get_room_sides().find(surface_ID)->second.has_intact_door())
+
+	// if the current room has an intact surface
+	if (world.room_at(x, y, z)->is_standing_wall(surface_ID))
 	{
-		// apply damage to the target door
-		return world.room_at(x, y, z)->damage_door(surface_ID, this->equipped_item);
+		// apply damage to the surface
+		return world.room_at(x, y, z)->damage_surface(surface_ID, this->equipped_item);
 	}
 
-	// this room does not have a door, the neighboring room might
-	
-	// find coordinates of target room
+	// this room does not have an intact surface, the neighboring room might
+
+	// find coordinates of neighboring room
 	int new_x = x, new_y = y;
 	{
 		int new_z = 0;
 		R::assign_movement_deltas(surface_ID, new_x, new_y, new_z);
 	} // dz falls out of scope to prevent accidental use - we're only working in two dimensions right now
 
-	// if the player is attacking a surface that does not exist in this room,
-	// see if the opposite surface exists in the room in the direction of the attack.
-	// Attacking the west wall when this room doesn't have an intact west wall will attempt to damage
-	// the east wall in the room to the west.
-
-	// if the neighboring room has the opposite surface intact
+	// if the neighboring room has the opposite surface intact (our west wall borders next room's east wall)
 	if (world.room_at(new_x, new_y, z)->is_standing_wall(C::opposite_surface_id.find(surface_ID)->second)) // deliberately using just "z" throughout this block
 	{
 		// inflict damage upon the surface
 		return world.room_at(new_x, new_y, z)->damage_surface(C::opposite_surface_id.find(surface_ID)->second, this->equipped_item);
 	}
 
-	// iaf 
+	// neither room has an intact surfaec
 
-
-
-	// test if neither wall exists
+	// test if both walls do not exist
 	if (!world.room_at(x, y, z)->has_surface(surface_ID) &&
 		!world.room_at(new_x, new_y, z)->has_surface(C::opposite_surface_id.find(surface_ID)->second))
 	{
 		return "There is no " + surface_ID + " wall here.";
 	}
-	// any surface that does exist is rubble, and at least one surface exists
 	else
 	{
+		// any surface that does exist is rubble, and at least one surface exists
 		return "There is only rubble where a wall once was.";
 	}
 }
@@ -685,12 +677,15 @@ string Character::attack_door(const string & surface_ID, World & world)
 		return "Only doors in n/s/e/w surfaces can be damaged at this time.";
 	}
 
-	// if the room has an intact surface
+	// if the current room has an intact surface with an intact door in it
 	if (world.room_at(x, y, z)->has_surface(surface_ID) && world.room_at(x, y, z)->get_room_sides().find(surface_ID)->second.has_intact_door())
 	{
-		// applied damage to the target door
+		// applied damage to the door
 		return world.room_at(x, y, z)->damage_door(surface_ID, this->equipped_item);
 	}
+
+	// the current room does not have an intact door in the specified direction,
+	// test if the next room has an intact door facing us.
 
 	// find coordinates of target room
 	int new_x = x, new_y = y;
@@ -698,11 +693,6 @@ string Character::attack_door(const string & surface_ID, World & world)
 		int new_z = 0;
 		R::assign_movement_deltas(surface_ID, new_x, new_y, new_z);
 	} // new_z falls out of scope to prevent accidental use - we're only working in two dimensions right now
-
-	// if the player is attacking a surface that does not exist in this room,
-	// see if the opposite surface exists in the room in the direction of the attack.
-	// Attacking the west wall when this room doesn't have an intact west wall will attempt to damage
-	// the east wall in the room to the west.
 
 	// if the neighboring room has the opposite surface intact
 	if (world.room_at(new_x, new_y, z)->is_standing_wall(C::opposite_surface_id.find(surface_ID)->second)) // deliberately using just "z" throughout this block
