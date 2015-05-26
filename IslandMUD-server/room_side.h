@@ -8,23 +8,25 @@ Floors, walls, and ceilings. No doors yet. */
 
 #include "item.h"
 #include "craft.h"
+#include "door.h"
 
 class Room_Side
 {
 private:
 	int integrity = C::MAX_SURFACE_HEALTH;
+	string material_id;
+	shared_ptr<Door> door = nullptr;
 
 public:
-	string material_id;
 
 	Room_Side(const string & material_id) : material_id(material_id) {}
 
 	// health retrieval and modification
-	inline int get_health() const
+	int get_health() const
 	{
 		return integrity;
 	}
-	inline void set_health(const int & health)
+	void set_health(const int & health)
 	{
 		// if the passed value is within acceptable bounds
 		if (health <= C::MAX_SURFACE_HEALTH &&
@@ -33,9 +35,9 @@ public:
 			// set the surface's integry to what was passed
 			integrity = health;
 		}
-		// else, integrity remains at default max health
+		// else, integrity remains unchanged
 	}
-	inline void change_health(const int & change)
+	void change_health(const int & change)
 	{
 		// modify this surface's integrity
 		integrity += change;
@@ -53,10 +55,72 @@ public:
 			integrity = C::MAX_SURFACE_HEALTH;
 		}
 	}
-	inline bool is_rubble() const
+
+	string get_material_id() const
+	{
+		return material_id;
+	}
+
+	// surface information
+	bool is_intact() const
+	{
+		return integrity > 0;
+	}
+	bool is_rubble() const
 	{
 		return (integrity == 0);
 	}
+	bool has_door() const
+	{
+		return (door != nullptr);
+	}
+	bool has_intact_door() const
+	{
+		return this->has_door() && !door->is_rubble();
+	}
+
+	string can_move_through_wall(const string & player_faction_ID) const
+	{
+		// if the surface has a door
+		if (this->has_door())
+		{
+			// the character can move through the door if it is rubble, or owned by the player's faction
+			if (door->is_rubble())
+			{
+				return C::GOOD_SIGNAL;
+			}
+
+			if (door->get_faction_ID() == player_faction_ID)
+			{
+				return C::GOOD_SIGNAL;
+			}
+			else
+			{
+				return "This door has an unfamiliar lock.";
+			}
+		}
+		else // this is a wall without a door
+		{
+			// the player cannot move through
+			return "There is a wall in your way.";
+		}
+	}
+
+	shared_ptr<Door> get_door() const
+	{
+		return door;
+	}
+
+	void add_door(const int & health, const string & material_ID, const string & faction_ID)
+	{
+		this->door = make_shared<Door>(faction_ID, material_ID, health);
+	}
+	void remove_door()
+	{
+		// removes reference to a door if one exists
+		this->door = nullptr;
+	}
+
 };
 
 #endif

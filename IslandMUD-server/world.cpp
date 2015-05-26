@@ -278,11 +278,16 @@ string World::generate_area_map_for(const int & x, const int & y, const int & z)
 
 	bool
 		// is a wall present in a given direction?
-		n, e, s, w,
+		n, e, s, w, // "north"
+
+		// is there a door present in a given location?
+		nd, ed, sd, wd, // "north door?"
+
+		// is a wall rubble in a given direction?
+		nr, er, sr, wr, // "north rubble?"
 
 		// is a forest area in a given direction from a coordinate? (f_n == forest_north)
 		f_n, f_ne, f_e, f_se, f_s, f_sw, f_w, f_nw;
-
 
 	stringstream user_map, a, b, c; // three stringstreams feed into one master stringstream
 
@@ -394,25 +399,58 @@ string World::generate_area_map_for(const int & x, const int & y, const int & z)
 			// there is no tree, so there may be a structure
 			else
 			{
-				// use a boolean value to indicate the presence or absence of any given wall
+				// use a boolean value to indicate the presence or absence of a wall
 				n = room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::NORTH);
 				e = room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::EAST);
 				s = room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::SOUTH);
 				w = room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::WEST);
 
+				nd = ed = sd = wd = nr = er = sr = wr = false; // set all door and rubble flags to false
+
+				/*
+				if a north wall is present
+				-- north_has_door = room_at(x, y, z)...(surface_ID)...has_door();
+				-- north_is_rubble = (the wall is rubble OR
+				-- -- (a door exists AND the door is rubble)
+				*/
+				if (n)
+				{
+					nd = room_at(cx, cy, C::GROUND_INDEX)->get_room_sides().find(C::NORTH)->second.has_door();
+					nr = (!room_at(cx, cy, C::GROUND_INDEX)->is_standing_wall(C::NORTH) ||
+						(nd && room_at(cx, cy, C::GROUND_INDEX)->get_room_sides().find(C::NORTH)->second.get_door()->is_rubble()));
+				}
+				if (e)
+				{
+					ed = room_at(cx, cy, C::GROUND_INDEX)->get_room_sides().find(C::EAST)->second.has_door();
+					er = (!room_at(cx, cy, C::GROUND_INDEX)->is_standing_wall(C::EAST) ||
+						(ed && room_at(cx, cy, C::GROUND_INDEX)->get_room_sides().find(C::EAST)->second.get_door()->is_rubble()));
+				}
+				if (s)
+				{
+					sd = room_at(cx, cy, C::GROUND_INDEX)->get_room_sides().find(C::SOUTH)->second.has_door();
+					sr = (!room_at(cx, cy, C::GROUND_INDEX)->is_standing_wall(C::SOUTH) ||
+						(sd && room_at(cx, cy, C::GROUND_INDEX)->get_room_sides().find(C::SOUTH)->second.get_door()->is_rubble()));
+				}
+				if (w)
+				{
+					wd = room_at(cx, cy, C::GROUND_INDEX)->get_room_sides().find(C::WEST)->second.has_door();
+					wr = (!room_at(cx, cy, C::GROUND_INDEX)->is_standing_wall(C::WEST) ||
+						(wd && room_at(cx, cy, C::GROUND_INDEX)->get_room_sides().find(C::WEST)->second.get_door()->is_rubble()));
+				}
+
 				// time for glorious nested ternary statements to do this cheap
 				a
 					<< ((n && w) ? C::NW_CORNER : (n) ? C::WE_WALL : (w) ? C::NS_WALL : C::LAND_CHAR)
-					<< ((n) ? C::WE_WALL : C::LAND_CHAR)
+					<< ((nr) ? C::RUBBLE_CHAR : ((nd) ? C::WE_DOOR : ((n) ? C::WE_WALL : C::LAND_CHAR)))
 					<< ((n && e) ? C::NE_CORNER : (n) ? C::WE_WALL : (e) ? C::NS_WALL : C::LAND_CHAR);
 				b
-					<< ((w) ? C::NS_WALL : C::LAND_CHAR)
+					<< ((wr) ? C::RUBBLE_CHAR : ((wd) ? C::NS_DOOR : ((w) ? C::NS_WALL : C::LAND_CHAR)))
 					// if the current coordinates are the player's, draw an @ icon, else if there is an item, draw an item char, else empty
 					<< ((cx == x && cy == y) ? C::PLAYER_CHAR : ((room_at(cx, cy, C::GROUND_INDEX)->contains_no_items()) ? C::LAND_CHAR : C::ITEM_CHAR))
-					<< ((e) ? C::NS_WALL : C::LAND_CHAR);
+					<< ((er) ? C::RUBBLE_CHAR : ((ed) ? C::NS_DOOR : ((e) ? C::NS_WALL : C::LAND_CHAR)));
 				c
 					<< ((s && w) ? C::SW_CORNER : (s) ? C::WE_WALL : (w) ? C::NS_WALL : C::LAND_CHAR)
-					<< ((s) ? C::WE_WALL : C::LAND_CHAR)
+					<< ((sr) ? C::RUBBLE_CHAR : ((sd) ? C::WE_DOOR : ((s) ? C::WE_WALL : C::LAND_CHAR)))
 					<< ((s && e) ? C::SE_CORNER : (s) ? C::WE_WALL : (e) ? C::NS_WALL : C::LAND_CHAR);
 			}
 		} // end for each room in row
@@ -478,10 +516,26 @@ void World::add_room_to_world(const xml_document & z_stack, const int & x, const
 			surface.child(C::XML_SURFACE_MATERIAL.c_str()).child_value(),
 
 			(!health_attribute.empty()) // if the health attribute exists
-			? health_attribute.as_int() // set the surface health to its value
+			? health_attribute.as_int() // set the surface health to the attribute's value
 			: C::MAX_SURFACE_HEALTH // else set the room to full health
 
 			);
+
+		// select the door node
+		xml_node door_node = surface.child(C::XML_DOOR.c_str());
+
+		// if the door node exists
+		if (!door_node.empty())
+		{
+			// extract values
+			int health = door_node.attribute(C::XML_DOOR_HEALTH.c_str()).as_int();
+			string material_ID = door_node.attribute(C::XML_DOOR_MATERIAL.c_str()).value();
+			string faction_ID = door_node.attribute(C::XML_DOOR_FACTION.c_str()).value();
+
+			// add a door to the surface
+			room->add_door(surface.child(C::XML_SURFACE_DIRECTION.c_str()).child_value(),
+				health, material_ID, faction_ID);
+		}
 	}
 
 	// add room to world
@@ -563,18 +617,37 @@ void World::add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xm
 		surface_it != room_sides.cend(); ++surface_it)
 	{
 		// create a node for a surface
-		xml_node surface_node = room_node.append_child(C::XML_SURFACE.c_str()); // duplicate or replace?
+		xml_node surface_node = room_node.append_child(C::XML_SURFACE.c_str());
 
 		// add an attribute to the surface containing the health of the surface (example: health="90")
 		surface_node.append_attribute(C::XML_SURFACE_HEALTH.c_str()).set_value(surface_it->second.get_health());
 
 		// create nodes for surface direction and surface material
-		xml_node direction_node = surface_node.append_child(C::XML_SURFACE_DIRECTION.c_str()); // duplicate or replace?
-		xml_node material_node = surface_node.append_child(C::XML_SURFACE_MATERIAL.c_str()); // duplicate or replace?
+		xml_node direction_node = surface_node.append_child(C::XML_SURFACE_DIRECTION.c_str());
+		xml_node material_node = surface_node.append_child(C::XML_SURFACE_MATERIAL.c_str());
 
 		// append the surface direction and material
 		direction_node.append_child(node_pcdata).set_value(surface_it->first.c_str()); // direction ID
-		material_node.append_child(node_pcdata).set_value(surface_it->second.material_id.c_str()); // material ID
+		material_node.append_child(node_pcdata).set_value(surface_it->second.get_material_id().c_str()); // material ID
+
+		// conditionally create a node for a door
+		if (surface_it->second.has_door())
+		{
+			// create a node to hold the door
+			xml_node door_node = surface_node.append_child(C::XML_DOOR.c_str());
+
+			// retrive the door
+			shared_ptr<Door> door = surface_it->second.get_door();
+
+			// add three attributes for health, material, and faction
+
+			// health="55"
+			door_node.append_attribute(C::XML_DOOR_HEALTH.c_str()).set_value(door->get_health());
+			// material="wood"
+			door_node.append_attribute(C::XML_DOOR_MATERIAL.c_str()).set_value(door->get_material_ID().c_str());
+			// faction="hostile_NPC"
+			door_node.append_attribute(C::XML_DOOR_FACTION.c_str()).set_value(door->get_faction_ID().c_str());
+		}
 	}
 }
 

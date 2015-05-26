@@ -63,6 +63,10 @@ void Parse::initialize()
 		// surfaces not already in directions
 		P::dict["floor"] = P::dict["ground"] = C::FLOOR;
 		P::dict["ceiling"] = C::CEILING;
+
+		// Look Mr. Frodo! A
+		P::dict["door"] = C::DOOR;
+		P::dict["wall"] = P::dict["surface"] = C::WALL;
 	}
 }
 

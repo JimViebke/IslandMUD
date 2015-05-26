@@ -8,7 +8,7 @@ void Game::main_test_loop() // debugging
 	// temporary scope to create player object
 	{
 		// create a player character
-		PC player("dev");
+		PC player("dev", C::PC_FACTION_ID);
 
 		// load the player's data
 		cout << "\nLogging in player...";
@@ -20,8 +20,8 @@ void Game::main_test_loop() // debugging
 
 
 
-	// create some objects and primites to help run the game
-	int auto_advance = 0; // debugging only
+	// create some holders to support the main debug loop
+	int auto_advance = 0; // debugging only - idling is default in the final game
 	string input, output = ""; // I/O holders
 
 	while (true) // play indefinitely
@@ -104,10 +104,10 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 		return string("help:\n") +
 			"\nrecipes" +
 			"\nmove [compass direction]" +
-			"\ntake/drop/craft/equip/dequip [item]" +
-			"\nattack [compass direction]" +
-			"\nconstruct [material] [ceiling/floor]" +
-			"\nconstruct [compass direction] [material] wall";
+			"\ntake / drop / craft / equip / dequip [item]" +
+			"\nattack [compass direction] wall / door" +
+			"\nconstruct [material] ceiling / floor" +
+			"\nconstruct [compass direction] [material] wall / door";
 	}
 	// moving: "move northeast" OR "northeast"
 	else if ((command.size() == 2 && command[0] == C::MOVE_COMMAND)
@@ -130,12 +130,20 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 	{
 		return actors.find(actor_id)->second->craft(command[1], world); // (item_id, world)
 	}
-	// making room surfaces: "construct stone floor/ceiling" or "construct north/east/south/west stone wall"
-	else if ((command.size() == 3 || command.size() == 4) && command[0] == C::CONSTRUCT_COMMAND)
+	// making ceiling/floor: "construct stone floor/ceiling"
+	else if (command.size() == 3 && command[0] == C::CONSTRUCT_COMMAND)
 	{
-		// Arg 1: material is always the second-last word
-		// Arg 2: 3 commands, surface_id is the 3rd. 4 commands, surface is the 2nd.
-		return actors.find(actor_id)->second->construct_surface(command[command.size() - 2], (command.size() == 3) ? command[2] : command[1], world);
+		return actors.find(actor_id)->second->construct_surface(command[1], command[2], world); // material, direction, world
+	}
+	// making walls: "construct west stone wall"
+	else if (command.size() == 4 && command[0] == C::CONSTRUCT_COMMAND && command[3] == C::WALL)
+	{
+		return actors.find(actor_id)->second->construct_surface(command[2], command[1], world); // material, direction, world
+	}
+	// "construct west stone door"
+	else if (command.size() == 4 && command[0] == C::CONSTRUCT_COMMAND && command[3] == C::DOOR)
+	{
+		return actors.find(actor_id)->second->construct_door(command[2], command[1], world); // material, direction, world
 	}
 	// waiting: "wait"
 	else if (command.size() == 1 && command[0] == C::WAIT_COMMAND)
@@ -147,10 +155,17 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 	{
 		return Character::recipes.get_recipes(); // (item_id, world)
 	}
-	// the player is attacking a surface "bash floor" "smash west wall" (wall is ignored)
-	else if (command.size() >= 2 && command[0] == C::ATTACK_COMMAND && R::contains(C::surface_ids, command[1]))
+	// the player is attacking a wall "smash west wall"
+	else if (command.size() >= 3 && command[0] == C::ATTACK_COMMAND && R::contains(C::surface_ids, command[1])
+		&& command[2] == C::WALL)
 	{
 		return actors.find(actor_id)->second->attack_surface(command[1], world);
+	}
+	// the player is attacking a door "smash west door"
+	else if (command.size() >= 3 && command[0] == C::ATTACK_COMMAND && R::contains(C::surface_ids, command[1])
+		&& command[2] == C::DOOR)
+	{
+		return actors.find(actor_id)->second->attack_door(command[1], world);
 	}
 	else if (command.size() == 1 && command[0] == C::LOGOUT_COMMAND)
 	{

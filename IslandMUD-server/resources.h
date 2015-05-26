@@ -40,15 +40,6 @@ public:
 	}
 
 	// string construction
-	template <typename T> static inline string to_string(const vector<T> & v)
-	{
-		stringstream output;
-		for (const T & element : v)
-		{
-			output << element << " ";
-		}
-		return output.str();
-	}
 	template <typename T> static inline string to_string(const T & val)
 	{
 		stringstream output;
@@ -163,7 +154,8 @@ public:
 	// time
 	static inline __int64 current_time_in_ms()
 	{
-		return chrono::system_clock::to_time_t(chrono::system_clock::now());
+		// return chrono::system_clock::to_time_t(chrono::system_clock::now());
+		return chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
 	}
 
 	// polymorphic testing and conversion

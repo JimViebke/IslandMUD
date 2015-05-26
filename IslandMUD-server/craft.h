@@ -15,7 +15,7 @@ public:
 
 	Craft()	{ }
 
-	static shared_ptr<Item> make(const string & item_id);
+	static shared_ptr<Item> make(const string & item_ID);
 };
 
 #endif

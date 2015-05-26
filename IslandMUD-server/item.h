@@ -127,4 +127,10 @@ public:
 	Hammer() : Equipment(C::HAMMER_ID) {}
 };
 
+class Debris : public Item
+{
+public:
+	Debris() : Item(C::DEBRIS_ID) {}
+};
+
 #endif

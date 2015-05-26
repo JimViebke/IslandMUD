@@ -1,8 +1,6 @@
 /* Jim Viebke
 Jeb 16 2015 */
 
-#include <assert.h>
-
 #include "character.h"
 #include "world.h"
 
@@ -493,9 +491,17 @@ string Character::construct_surface(const string & material_id, const string & s
 	// check if the surface already exists
 	if (world.room_at(x, y, z)->has_surface(surface_id)) // bounds checking not necissary because the player is standing here
 	{
-		return ((surface_id == C::CEILING || surface_id == C::FLOOR) ?
-			"A " + surface_id + " already exists here." : // ceiling or floor
-			"A(n) " + surface_id + " wall already exists here."); // any wall
+		// test if construction is prevented by an intact wall or a pile of rubble
+		if (world.room_at(x, y, z)->get_room_sides().find(surface_id)->second.is_rubble())
+		{
+			return "A pile of rubble prevents construction.";
+		}
+		else // the surface is intact
+		{
+			return ((surface_id == C::CEILING || surface_id == C::FLOOR) ?
+				"A " + surface_id + " already exists here." : // ceiling or floor
+				"A(n) " + surface_id + " wall already exists here."); // any wall
+		}
 	}
 
 	// check that the surface to construct is a wall, ceiling, or floor
@@ -504,11 +510,11 @@ string Character::construct_surface(const string & material_id, const string & s
 		return "Construct a wall, ceiling or floor.";
 	}
 
-	// if the surface is a cailing, check that any wall exists
+	// if the surface is a ceiling, check that any intact wall exists
 	if (surface_id == C::CEILING && // the user is construction a ceiling
-		!world.room_at(x, y, z)->has_wall()) // the room does not have a wall
+		!world.room_at(x, y, z)->has_standing_wall()) // the room does not have a wall
 	{
-		return "You need at least one wall to support a ceiling.";
+		return "You need at least one standing wall to support a ceiling.";
 	}
 
 	// check that the player has the item
@@ -543,13 +549,170 @@ string Character::construct_surface(const string & material_id, const string & s
 		" wall to your " + surface_id : // wall to your [direction]
 		" " + surface_id); // ceiling/floor
 }
+string Character::construct_door(const string & material_ID, const string & surface_ID, World & world)
+{
+	// check that the surface is valid
+	if (!R::contains(C::surface_ids, surface_ID))
+	{
+		return surface_ID + " is not a surface.";
+	}
+
+	// check that this room has the surface specified
+	if (!world.room_at(x, y, z)->has_surface(surface_ID))
+	{
+		//  no ceiling here / no west wall here
+		return "There is no " + surface_ID + ((surface_ID == C::CEILING || surface_ID == C::FLOOR) ? "" : " wall") + " here to have a door.";
+	}
+
+	// check if the wall is standing
+	if (!world.room_at(x, y, z)->is_standing_wall(surface_ID))
+	{
+		return "A pile of rubble prevents construction.";
+	}
+
+	// check if a door already exists
+	if (world.room_at(x, y, z)->get_room_sides().find(surface_ID)->second.has_door())
+	{
+		// test if the door is rubble or intact
+		if (world.room_at(x, y, z)->get_room_sides().find(surface_ID)->second.get_door()->is_rubble())
+		{
+			return "A pile of rubble in the doorway prevents construction.";
+		}
+		else // the door is intact
+		{
+			// ...in the ceiling / ...in the east wall
+			return "There is already a door in the " + surface_ID + ((surface_ID == C::CEILING || surface_ID == C::FLOOR) ? "." : " wall.");
+		}
+	}
+
+	// check that there exist requirements for making a door of the specified type
+	if (C::DOOR_REQUIREMENTS.find(material_ID) == C::DOOR_REQUIREMENTS.cend())
+	{
+		return "ERROR: No material requirements available to construct door using " + material_ID;
+	}
+
+	// extract the amount of materials required to make a door of the specified type
+	const unsigned MATERIAL_COUNT_REQUIRED = C::DOOR_REQUIREMENTS.find(material_ID)->second;
+
+	// check that the player has the required materials
+	if (!this->has(material_ID, MATERIAL_COUNT_REQUIRED))
+	{
+		// "A stone door requires 5 stone."
+		return "A " + material_ID + " door requires " + R::to_string(MATERIAL_COUNT_REQUIRED) + " " + material_ID + ".";
+	}
+
+	// add a door to the surface in the room
+	world.room_at(x, y, z)->add_door(surface_ID, C::MAX_SURFACE_HEALTH, material_ID, this->faction_ID);
+
+	// remove the consumed materials from the actor's inventory
+	this->remove(material_ID, MATERIAL_COUNT_REQUIRED);
+
+	// "...door in the ceiling." or "...door in the west wall."
+	return "You construct a " + material_ID + " door in the " + surface_ID + ((surface_ID == C::CEILING || surface_ID == C::FLOOR) ? "." : " wall.");
+}
 string Character::attack_surface(const string & surface_ID, World & world)
 {
-	string result = world.room_at(x, y, z)->damage_surface(surface_ID, this->equipped_item);
+	// get this check out of the way
+	if (surface_ID == C::CEILING || surface_ID == C::FLOOR)
+	{
+		return "Damaging a surface in a room above or below you is not supported yet.";
+	}
+
+	// verify we are working with a primary compass point
+	if (surface_ID != C::NORTH && surface_ID != C::EAST &&
+		surface_ID != C::SOUTH && surface_ID != C::WEST)
+	{
+		return "Only n/s/e/w surfaces can be damaged at this time.";
+	}
+	
+	// if the room has a surface with a door in it
+	if (world.room_at(x, y, z)->has_surface(surface_ID) &&
+		world.room_at(x, y, z)->get_room_sides().find(surface_ID)->second.has_intact_door())
+	{
+		// apply damage to the target door
+		return world.room_at(x, y, z)->damage_door(surface_ID, this->equipped_item);
+	}
+
+	// this room does not have a door, the neighboring room might
+	
+	// find coordinates of target room
+	int new_x = x, new_y = y;
+	{
+		int new_z = 0;
+		R::assign_movement_deltas(surface_ID, new_x, new_y, new_z);
+	} // dz falls out of scope to prevent accidental use - we're only working in two dimensions right now
+
+	// if the player is attacking a surface that does not exist in this room,
+	// see if the opposite surface exists in the room in the direction of the attack.
+	// Attacking the west wall when this room doesn't have an intact west wall will attempt to damage
+	// the east wall in the room to the west.
+
+	// if the neighboring room has the opposite surface intact
+	if (world.room_at(new_x, new_y, z)->is_standing_wall(C::opposite_surface_id.find(surface_ID)->second)) // deliberately using just "z" throughout this block
+	{
+		// inflict damage upon the surface
+		return world.room_at(new_x, new_y, z)->damage_surface(C::opposite_surface_id.find(surface_ID)->second, this->equipped_item);
+	}
+
+	// iaf 
 
 
 
-	return result;
+	// test if neither wall exists
+	if (!world.room_at(x, y, z)->has_surface(surface_ID) &&
+		!world.room_at(new_x, new_y, z)->has_surface(C::opposite_surface_id.find(surface_ID)->second))
+	{
+		return "There is no " + surface_ID + " wall here.";
+	}
+	// any surface that does exist is rubble, and at least one surface exists
+	else
+	{
+		return "There is only rubble where a wall once was.";
+	}
+}
+string Character::attack_door(const string & surface_ID, World & world)
+{
+	// get this check out of the way
+	if (surface_ID == C::CEILING || surface_ID == C::FLOOR)
+	{
+		return "Damaging above or below you is not supported yet.";
+	}
+
+	// verify we are working with a primary compass point
+	if (surface_ID != C::NORTH && surface_ID != C::EAST &&
+		surface_ID != C::SOUTH && surface_ID != C::WEST)
+	{
+		return "Only doors in n/s/e/w surfaces can be damaged at this time.";
+	}
+
+	// if the room has an intact surface
+	if (world.room_at(x, y, z)->has_surface(surface_ID) && world.room_at(x, y, z)->get_room_sides().find(surface_ID)->second.has_intact_door())
+	{
+		// applied damage to the target door
+		return world.room_at(x, y, z)->damage_door(surface_ID, this->equipped_item);
+	}
+
+	// find coordinates of target room
+	int new_x = x, new_y = y;
+	{
+		int new_z = 0;
+		R::assign_movement_deltas(surface_ID, new_x, new_y, new_z);
+	} // new_z falls out of scope to prevent accidental use - we're only working in two dimensions right now
+
+	// if the player is attacking a surface that does not exist in this room,
+	// see if the opposite surface exists in the room in the direction of the attack.
+	// Attacking the west wall when this room doesn't have an intact west wall will attempt to damage
+	// the east wall in the room to the west.
+
+	// if the neighboring room has the opposite surface intact
+	if (world.room_at(new_x, new_y, z)->is_standing_wall(C::opposite_surface_id.find(surface_ID)->second)) // deliberately using just "z" throughout this block
+	{
+		// inflict damaage upon the surface or door
+		return world.room_at(new_x, new_y, z)->damage_door(C::opposite_surface_id.find(surface_ID)->second, this->equipped_item);
+	}
+
+	// this feedback might not be correct for all cases
+	return "There is no door to your " + surface_ID;
 }
 
 // movement info
@@ -560,19 +723,26 @@ string Character::validate_movement(const string & direction_ID, const int & dx,
 	// validate direction
 	if (!R::contains(C::direction_ids, direction_ID)) { return direction_ID + " is not a direction."; }
 
-	// if the player wants to move in a primary direction (n/e/s/w), condition is
-	// no wall OR wall with opening (currently the opening is not taken into account)
+	// if the player wants to move in a primary direction (n/e/s/w)
 	if (direction_ID == C::NORTH || direction_ID == C::EAST ||
 		direction_ID == C::SOUTH || direction_ID == C::WEST)
 	{
-		// if the current room has a wall in the way
-		// OR
-		// the destination room has an opposite wall in the way
-		if (world.room_at(x, y, z)->has_surface(direction_ID)
-			||
-			world.room_at(x + dx, y + dy, z)->has_surface(C::opposite_surface_id.find(direction_ID)->second))
+		// save the value of an attempt to move out of the current room
+		string move_attempt = world.room_at(x, y, z)->can_move_in_direction(direction_ID, faction_ID);
+
+		if (move_attempt != C::GOOD_SIGNAL)
 		{
-			return "There is a wall in your way to the " + direction_ID + ".";
+			// the player can't move out of the current room
+			return move_attempt;
+		}
+
+		// save the value of an attempt to move into the destination room
+		move_attempt = world.room_at(x + dx, y + dy, z)->can_move_in_direction(C::opposite_surface_id.find(direction_ID)->second, faction_ID);
+
+		if (move_attempt != C::GOOD_SIGNAL)
+		{
+			// the player can't move into the destination
+			return move_attempt;
 		}
 	}
 	// if the player wants to move in a secondary direction (nw/ne/se/sw), condition is
@@ -620,7 +790,6 @@ string Character::validate_movement(const string & direction_ID, const int & dx,
 	// condition for up is (opening AND ladder/stair/ramp)
 	/*else if (direction_ID == C::UP || )
 	{
-	// HERE
 	if ()
 	{
 	return "You [walk]/[climb] up to the [...]." //... ground level, second level, ...
@@ -629,7 +798,6 @@ string Character::validate_movement(const string & direction_ID, const int & dx,
 	// condition for down is (ceiling) AND (ceiling has opening)
 	else if (direction_ID == C::DOWN)
 	{
-	// HERE
 	if ()
 	{
 	return "You drop down."; // ... to [ground level]/[the second level]

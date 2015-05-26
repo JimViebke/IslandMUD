@@ -3,6 +3,8 @@ Mar 19 2015 */
 
 #include "room.h"
 
+using std::cout; // fix VS ambiguity bug
+
 // room information
 bool Room::has_wall() const // used to determine if a ceiling can be placed
 {
@@ -23,8 +25,51 @@ bool Room::has_wall() const // used to determine if a ceiling can be placed
 			return true;
 		}
 	}
+
 	// the room does not have a wall
 	return false;
+}
+bool Room::has_standing_wall() const
+{
+	// first do an easy check to see if there are any surfaces
+	if (room_sides.size() == 0)
+	{
+		return false;
+	}
+
+	// for each surface
+	for (map<string, Room_Side>::const_iterator it = room_sides.begin();
+		it != room_sides.cend(); ++it)
+	{
+		// if the surface is an intact wall
+		if (it->second.is_intact() && (
+			it->first == C::NORTH || it->first == C::EAST ||
+			it->first == C::SOUTH || it->first == C::WEST))
+		{
+			return true;
+		}
+	}
+
+	// the room does not have a wall
+	return false;
+}
+bool Room::is_standing_wall(const string & surface_ID) const
+{
+	// check if there are no sides OR surface_ID is not a room side
+	if (room_sides.size() == 0 ||
+		!(surface_ID == C::NORTH || surface_ID == C::SOUTH || surface_ID == C::WEST || surface_ID == C::EAST))
+	{
+		return false;
+	}
+
+	// check if the surface exists
+	if (!this->has_surface(surface_ID))
+	{
+		return false;
+	}
+
+	// return "is the surface intact?"
+	return (room_sides.find(surface_ID)->second.is_intact());
 }
 bool Room::contains_item(const string & item_id, const unsigned & count) const
 {
@@ -61,7 +106,6 @@ bool Room::contains_item(const string & item_id, const unsigned & count) const
 	return false;
 }
 
-
 // add and remove items
 void Room::add_item(const shared_ptr<Item> item) // pass a copy rather than a reference
 {
@@ -83,7 +127,7 @@ void Room::remove_item(const string & item_id, const int & count)
 	updated = true;
 }
 
-// add surfaces
+// add surfaces and doors
 void Room::add_surface(const string & surface_ID, const string & material_ID)
 {
 	// if the surface ID is valid
@@ -110,24 +154,141 @@ void Room::add_surface(const string & surface_ID, const string & material_ID, co
 		updated = true;
 	}
 }
+void Room::add_door(const string & directon_ID, const int & health, const string & material_ID, const string & faction_ID)
+{
+	if (!this->has_surface(directon_ID))
+	{
+		cout << "\nAttempted to add a door to a surface that doesn't exist.";
+		cout << "\ndirection_ID=" << directon_ID
+			<< " health=" << health
+			<< " material_ID=" << material_ID
+			<< " faction_ID=" << faction_ID << endl;
+		return;
+	}
+
+	if (room_sides.find(directon_ID)->second.get_door() != nullptr)
+	{
+		cout << "\nAttempted to add a door to a surface that already has a door.";
+		cout << "\ndirection_ID=" << directon_ID
+			<< " health=" << health
+			<< " material_ID=" << material_ID
+			<< " faction_ID=" << faction_ID << endl;
+		return;
+	}
+
+	// delegate the work to the room's surface
+	room_sides.find(directon_ID)->second.add_door(health, material_ID, faction_ID);
+
+	updated = true;
+}
 
 // damage surface
 string Room::damage_surface(const string & surface_ID, const shared_ptr<Item> & equipped_item)
 {
-	// if this room does not have the surface being attacked
+	// test if the surface is valid
+	if (!R::contains(C::surface_ids, surface_ID))
+	{
+		return surface_ID + " is not a valid surface.";
+	}
+
+	// test if this room has the surface
 	if (!this->has_surface(surface_ID))
 	{
-		if (surface_ID == C::CEILING)
+		if (surface_ID == C::CEILING || surface_ID == C::FLOOR)
 		{
-			return "There is no ceiling above you that you can damage.";
-		}
-		else if (surface_ID == C::FLOOR)
-		{
-			return "There is no floor below you to damage.";
+			return "There is no " + surface_ID + ".";
 		}
 		else
 		{
-			return "There is no wall to your " + surface_ID + " to damage.";
+			return "There is no " + surface_ID + " wall here.";
+		}
+	}
+
+	// the surface exists, test if the surface is rubble
+	if (room_sides.find(surface_ID)->second.is_rubble())
+	{
+		return "There is only rubble where a wall once was.";
+	}
+
+	// extract the ID of the attacking implement (ATTACK_COMMAND for bare-hands melee attack)
+	const string equipped_item_id = ((equipped_item != nullptr) ? equipped_item->name : C::ATTACK_COMMAND);
+
+	// check if the player's equipped weapon exists in the damage table
+	if (C::damage_tables.find(equipped_item_id) == C::damage_tables.cend())
+	{
+		return "Error occured: Damage lookup tables contain no info to attack using " + equipped_item_id + ".";
+	}
+
+	// the damage map for this implement exists, copy it here
+	const map<string, int> item_damage_table = C::damage_tables.find(equipped_item_id)->second;
+
+	// copy the surface's material_ID
+	const string surface_material_ID = this->room_sides.find(surface_ID)->second.get_material_id();
+
+	// check if the material of the wall being attacked exists in the damage table for the implement
+	if (item_damage_table.find(surface_material_ID) == item_damage_table.cend())
+	{
+		// ... contains no info to use staff to damage stone."
+		return "Error occured: Damage lookup tables contain no info to use "
+			+ equipped_item_id + " to damage "
+			+ surface_material_ID + " wall.";
+	}
+
+	// surface exists, inflict damage*-1
+	cout << "surface health before attack: " << room_sides.find(surface_ID)->second.get_health() << endl;
+	room_sides.find(surface_ID)->second.change_health(item_damage_table.find(surface_material_ID)->second*-1);
+	cout << "surface health after attack:  " << room_sides.find(surface_ID)->second.get_health() << endl;
+
+	updated = true; // the room has been modified since it was loaded
+
+	// after applying damage, test again to see if the surface is rubble
+	if (room_sides.find(surface_ID)->second.is_rubble())
+	{
+		// the surface collapses, ensure it no longer has a door
+		room_sides.find(surface_ID)->second.remove_door();
+
+		// if the collapsing surface is a ceiling
+		if (surface_ID == C::CEILING)
+		{
+			// remove the ceiling object completely
+			room_sides.erase(surface_ID);
+
+			// add a debris object to the room
+			this->add_item(Craft::make(C::DEBRIS_ID));
+		}
+
+		return (surface_ID == C::CEILING || surface_ID == C::FLOOR) ?
+			"The " + surface_ID + " collapses." :
+			"The wall collapses.";
+	}
+	else // the surface holds
+	{
+		return "You damage the " +
+			((surface_ID == C::CEILING || surface_ID == C::FLOOR) ? surface_ID : "wall")
+			// "...using your sword" or "...using your bare hands"
+			+ " using your " +
+			((equipped_item_id == C::ATTACK_COMMAND) ? "bare hands." : (equipped_item_id + "."));
+	}
+
+}
+string Room::damage_door(const string & surface_ID, const shared_ptr<Item> & equipped_item)
+{
+	// test if the surface is valid
+	if (!R::contains(C::surface_ids, surface_ID))
+	{
+		return surface_ID + " is not a valid surface.";
+	}
+
+	// test if this room has the surface
+	if (!this->has_surface(surface_ID))
+	{
+		if (surface_ID == C::CEILING || surface_ID == C::FLOOR)
+		{
+			return "There is no " + surface_ID + ".";
+		}
+		else
+		{
+			return "There is no " + surface_ID + " wall here.";
 		}
 	}
 
@@ -142,42 +303,53 @@ string Room::damage_surface(const string & surface_ID, const shared_ptr<Item> & 
 
 	// the damage map for this implement exists, copy it here
 	const map<string, int> item_damage_table = C::damage_tables.find(equipped_item_id)->second;
-	const string surface_material_ID = this->room_sides.find(surface_ID)->second.material_id;
 
-	// check if the material of the wall being attacked exists in the damage table for the implement
-	if (item_damage_table.find(surface_material_ID) == item_damage_table.cend())
+	if (!this->room_sides.find(surface_ID)->second.has_door())
 	{
-		// ... contains to info to use staff to damage stone."
-		return "Error occured: Damage lookup tables contain no info to use "
-			+ equipped_item_id + " to damage "
-			+ surface_material_ID + ".";
+		return "There is no door here.";
 	}
 
-	// surface exists, inflict damage*-1
-	cout << "surface health before attack: " << room_sides.find(surface_ID)->second.get_health() << endl;
-	room_sides.find(surface_ID)->second.change_health(item_damage_table.find(surface_material_ID)->second*-1);
-	cout << "surface health after attack:  " << room_sides.find(surface_ID)->second.get_health() << endl;
-
-	// if the surface has 0 health
-	if (room_sides.find(surface_ID)->second.is_rubble())
+	// a wall exists; check if the wall has an intact door
+	if (this->room_sides.find(surface_ID)->second.has_intact_door())
 	{
-		// remove the surface
-		room_sides.erase(surface_ID);
+		// copy the material of the door
+		const string door_material_ID = this->room_sides.find(surface_ID)->second.get_door()->get_material_ID();
 
-		// the surface collapses
-		return (surface_ID == C::CEILING || surface_ID == C::FLOOR) ?
-			"The " + surface_ID + " collapses." :
-			"The wall collapses.";
+		// check if the material of the door being attacked exists in the damage table for the attacking implement
+		if (item_damage_table.find(door_material_ID) == item_damage_table.cend())
+		{
+			// ... contains no info to use staff to damage stone."
+			return "Error occured: Damage lookup tables contain no info to use "
+				+ equipped_item_id + " to damage "
+				+ door_material_ID + " door.";
+		}
+
+		// door and damage table entry exist, inflict damage*-1
+		cout << "door health before attack: " << room_sides.find(surface_ID)->second.get_door()->get_health() << endl; // debugging
+		room_sides.find(surface_ID)->second.get_door()->update_health_by(item_damage_table.find(door_material_ID)->second * -1);
+		cout << "door health after attack:  " << room_sides.find(surface_ID)->second.get_door()->get_health() << endl; // debugging
+
+		updated = true; // the room has now been modified since it was loaded
+
+		// if the door has 0 health
+		if (room_sides.find(surface_ID)->second.get_door()->is_rubble())
+		{
+			// the door collapses
+			return "The door breaks and collapses.";
+		}
+		else
+		{
+			// the door holds
+			// "using your sword" or "using your bare hands"
+			return "You damage the door using your " +
+				((equipped_item_id == C::ATTACK_COMMAND) ? "bare hands." : (equipped_item_id + "."));
+		}
 	}
-	else
+	else // a door exists AND it is not intact
 	{
-		// the surface holds
-		return "You damage the " +
-			((surface_ID == C::CEILING || surface_ID == C::FLOOR) ? surface_ID : "wall")
-			+ " using your " +
-			((equipped_item_id == C::ATTACK_COMMAND) ? "bare hands." : (equipped_item_id + "."));
-		// above: "using your sword" or "using your bare hands"
+		return "There is only a pile of rubble where a door once was.";
 	}
+	
 }
 
 // add and remove actors
@@ -206,6 +378,9 @@ void Room::add_viewing_actor(const string & actor_id)
 }
 void Room::remove_viewing_actor(const string & actor_id)
 {
+	// A room is unloaded when no player can see the room.
+	// To this end, a list of PCs and NPCs who can see this room is maintained.
+
 	if (R::contains(viewing_actor_ids, actor_id)) // if the character can see this room
 	{
 		R::erase_element_from_vector(viewing_actor_ids, actor_id); // remove the character
@@ -236,9 +411,38 @@ string Room::summary() const
 				summary_stream << " and";
 			}
 
-			summary_stream << " a(n) " << it->second.material_id // a stone
-				<< ((it->first == C::CEILING || it->first == C::FLOOR) ? " " : " wall to the ") // conditionally " wall to the " 
-				<< it->first; // direction ID
+			// if the surface is not rubble
+			if (!it->second.is_rubble())
+			{
+				// "a(n) stone ceiling" or "a stone wall to the west"
+				summary_stream << " a(n) " << it->second.get_material_id()
+					<< ((it->first == C::CEILING || it->first == C::FLOOR) ? " " : " wall to the ")
+					<< it->first; // direction_ID
+			}
+			else // the surface is rubble
+			{
+				summary_stream << " a pile of rubble"
+					// "on the floor" or " to your north"
+					<< ((it->first == C::CEILING || it->first == C::FLOOR) ? " on the " : " to your ")
+					<< it->first;
+			}
+
+			// add text to the surface's description if it has a door
+			if (it->second.has_door())
+			{
+				// test if the door is rubble
+				if (it->second.get_door()->is_rubble())
+				{
+					// "a stone wall to the west..."
+					summary_stream << " with a pile of rubble where a door once was";
+				}
+				else // the door is at least partially intact
+				{
+					// "a stone wall to the west" becomes
+					// "a stone wall to the west with a wood door"
+					summary_stream << " with a " << it->second.get_door()->get_material_ID() << " door";
+				}
+			}
 
 			// if the current surface is not the last AND there are more than 2 sides, append a comma
 			if (it != last_side_it && room_sides.size() > 2)
@@ -247,9 +451,10 @@ string Room::summary() const
 			}
 		}
 
-		summary_stream << "." << endl; // always end with a period
+		summary_stream << "." << endl; // end with a period
 	}
 
+	// report on the items in the room
 	if (contents.size() > 0) // if there are items present
 	{
 		summary_stream << "\nYou look around and notice ";
@@ -261,7 +466,9 @@ string Room::summary() const
 			summary_stream << it->first << " ";
 		}
 	}
-	else // empty room
+
+	// if there are no items or surfaces
+	if (summary_stream.str().length() == 0)
 	{
 		summary_stream << "\nThere is nothing of interest here.";
 	}

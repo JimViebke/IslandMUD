@@ -16,6 +16,8 @@ using namespace std;
 
 class Character
 {
+private:
+	string faction_ID;
 public:
 	string name;
 	__int64 last_action_timestamp;
@@ -33,7 +35,22 @@ public:
 	int y = C::DEFAULT_SPAWN_Y;
 	int z = C::DEFAULT_SPAWN_Z;
 
-	Character(const string & name) : name(name) {}
+	Character(const string & name, const string & set_faction_ID) : name(name)
+	{
+		// if the faction is valid
+		if (set_faction_ID == C::PC_FACTION_ID ||
+			set_faction_ID == C::NPC_NEUTRAL_FACTION_ID ||
+			set_faction_ID == C::NPC_HOSTILE_FACTION_ID)
+		{
+			// set the actor's faction
+			this->faction_ID = set_faction_ID;
+		}
+		else // the faction is not valid
+		{
+			// Raise an error in the console
+			cout << "ERROR: attempted to create character with invalid faction: [" << set_faction_ID << "]\n";
+		}
+	}
 	virtual ~Character() {} // to make a polymorphic type
 
 	string login(World & world);
@@ -55,7 +72,9 @@ public:
 	string take(const string & item_id, World & world);
 	string drop(const string & drop_item_id, World & world);
 	string construct_surface(const string & material_id, const string & surface_id, World & world);
+	string construct_door(const string & material_ID, const string & surface_ID, World & world);
 	string attack_surface(const string & surface_ID, World & world);
+	string attack_door(const string & surface_ID, World & world);
 
 	// movement info
 	string validate_movement(const string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const;

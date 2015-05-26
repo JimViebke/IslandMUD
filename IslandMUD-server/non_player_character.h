@@ -17,7 +17,7 @@ class Non_Player_Character : public Character
 public:
 	stack<string> objectives; // structure highly subject to change
 
-	Non_Player_Character(const string & name) : Character(name) {}
+	Non_Player_Character(const string & name, const string & faction_ID) : Character(name, faction_ID) {}
 };
 
 #endif

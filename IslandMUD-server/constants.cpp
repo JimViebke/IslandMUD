@@ -9,11 +9,16 @@ const string C::world_biome_file_location = C::game_directory + "/biome_map.txt"
 const string C::room_directory = C::game_directory + "/rooms";
 const string C::user_data_directory = C::game_directory + "/user_data";
 
+const string C::PC_FACTION_ID = "player";
+const string C::NPC_NEUTRAL_FACTION_ID = "neutral_NPC";
+const string C::NPC_HOSTILE_FACTION_ID = "hostile_NPC";
+
 const char C::PLAYER_CHAR = '@';
 const char C::WATER_CHAR = '~';
 const char C::LAND_CHAR = ' ';
 const char C::FOREST_CHAR = '%';
 const char C::ITEM_CHAR = '?';
+const char C::RUBBLE_CHAR = '#';
 
 const int C::GROUND_INDEX = 3; // there are three levels below this
 const int C::VIEW_DISTANCE = 5; // 5+1+5 to a side == 11*11 total area
@@ -55,6 +60,7 @@ const string C::TORCH_ID = "torch";
 const string C::HAMMER_ID = "hammer";
 const string C::FORGE_ID = "forge";
 const string C::ANVIL_ID = "anvil";
+const string C::DEBRIS_ID = "debris";
 
 // verb commands
 
@@ -92,6 +98,12 @@ const string C::CEILING = "ceiling";
 const string C::UP = "up";
 const string C::DOWN = "down";
 
+// doors and walls
+
+const string C::SURFACE = "surface";
+const string C::WALL = "wall";
+const string C::DOOR = "door";
+
 // world room xml consts
 
 const string C::XML_ROOM = "room";
@@ -101,6 +113,10 @@ const string C::XML_SURFACE = "surface";
 const string C::XML_SURFACE_HEALTH = "health";
 const string C::XML_SURFACE_DIRECTION = "direction";
 const string C::XML_SURFACE_MATERIAL = "material";
+const string C::XML_DOOR = "door";
+const string C::XML_DOOR_HEALTH = "health";
+const string C::XML_DOOR_MATERIAL = "material";
+const string C::XML_DOOR_FACTION = "faction";
 
 // user data xml consts
 
@@ -129,9 +145,17 @@ const map<string, string> C::opposite_surface_id = {
 	{ C::FLOOR, C::CEILING },
 };
 
-// surface material count requirements
-
+// Amount of a resource required to construct a surface (wall/ceiling/floor) of that type
 const map<string, unsigned> C::SURFACE_REQUIREMENTS =
+{
+	{ C::WOOD_ID, 5 }, // {material, count required}
+	{ C::STONE_ID, 5 },
+	{ C::STICK_ID, 5 },
+	{ C::BRANCH_ID, 5 }
+};
+
+// Amount of a resource required to construct a door of that type
+const map<string, unsigned> C::DOOR_REQUIREMENTS = 
 {
 	{ C::WOOD_ID, 5 }, // {material, count required}
 	{ C::STONE_ID, 5 },
@@ -145,7 +169,7 @@ const map<string, unsigned> C::SURFACE_REQUIREMENTS =
 
 ╔ ═ ╗
 
-║   ║
+║   ║            also  179=│   196=─
 
 ╚ ═ ╝ */
 
@@ -155,11 +179,14 @@ const char C::SW_CORNER = char(200);
 const char C::SE_CORNER = char(188);
 const char C::NS_WALL = char(186);
 const char C::WE_WALL = char(205);
+const char C::NS_DOOR = char(179);
+const char C::WE_DOOR = char(196);
 
 // walls, ceiling, and floor - min and max health
 
 const int C::MIN_SURFACE_HEALTH = 0;
 const int C::MAX_SURFACE_HEALTH = 100;
+const int C::MAX_DOOR_HEALTH = 100;
 
 /*
 Create a two-dimensional map to calculate damamge values.
@@ -172,7 +199,8 @@ const map<string, map<string, int>> C::damage_tables =
 	{ string(C::ATTACK_COMMAND), { // attack command is also used to represent an unarmed attack
 		{ C::STICK_ID, 49 }, // formerly 6
 		{ C::WOOD_ID, 49 }, // formerly 3
-		{ C::STONE_ID, 49 } // formerly 1
+		{ C::STONE_ID, 49, }, // formerly 1
+		{ C::BRANCH_ID, 49 }
 	} },
 
 	{ string(C::STAFF_ID), {

@@ -27,40 +27,62 @@ public:
 	Room() {}
 
 	// room contents
-	inline const multimap<string, shared_ptr<Item>> Room::get_contents() const
+	const multimap<string, shared_ptr<Item>> Room::get_contents() const
 	{
 		return contents;
 	}
-	inline const map<string, Room_Side> Room::get_room_sides() const
+	const map<string, Room_Side> Room::get_room_sides() const
 	{
 		return room_sides;
 	}
 
 	// room information
 	bool has_wall() const;
-	inline bool has_surface(const string & direction_id) const
+	bool has_standing_wall() const;
+	bool is_standing_wall(const string & surface_ID) const;
+	bool has_surface(const string & direction_id) const
 	{
 		return room_sides.find(direction_id) != room_sides.cend();
 	}
-	inline bool contains_no_items() const
+	string can_move_in_direction(const string & direction_ID, const string & faction_ID)
+	{
+		// if a surface is present
+		if (has_surface(direction_ID))
+		{
+			// a player can move through the surface if it is rubble
+
+			if (room_sides.find(direction_ID)->second.is_rubble())
+			{
+				return C::GOOD_SIGNAL;
+			}
+
+			return room_sides.find(direction_ID)->second.can_move_through_wall(faction_ID);
+		}
+		else // a surface does not exist...
+		{
+			// ...so the player is free to move
+			return C::GOOD_SIGNAL;
+		}
+	}
+	bool contains_no_items() const
 	{
 		return contents.size() == 0;
 	}
-	inline bool is_unloadable() const
+	bool is_unloadable() const
 	{
 		return actor_ids.size() == 0 && viewing_actor_ids.size() == 0;
 	}
-	inline bool contains_item(const string & item_id) const
+	bool contains_item(const string & item_id) const
 	{
 		return contents.find(item_id) != contents.cend();
 	}
 	bool contains_item(const string & item_id, const unsigned & count) const;
 
-	inline void set_water_status(const bool & is_water)
+	void set_water_status(const bool & is_water)
 	{
 		water = is_water;
 	}
-	inline bool is_water() const
+	bool is_water() const
 	{
 		return water;
 	}
@@ -69,12 +91,14 @@ public:
 	void add_item(const shared_ptr<Item> item);
 	void remove_item(const string & item_id, const int & count = 1);
 
-	// add surfaces
+	// add surfaces and doors
 	void add_surface(const string & surface_ID, const string & material_ID);
 	void add_surface(const string & surface_ID, const string & material_ID, const int & surface_health);
+	void add_door(const string & directon_ID, const int & health, const string & material_ID, const string & faction_ID);
 
 	// damage surface
 	string damage_surface(const string & surface_ID, const shared_ptr<Item> & equipped_item);
+	string damage_door(const string & surface_ID, const shared_ptr<Item> & equipped_item);
 
 	// add and remove actors
 	void add_actor(const string & actor_id);

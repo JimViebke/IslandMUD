@@ -24,12 +24,18 @@ public:
 	static const string room_directory;
 	static const string user_data_directory;
 
+	// faction IDs
+	const static string PC_FACTION_ID; // players ("PCs")
+	const static string NPC_NEUTRAL_FACTION_ID; // neutral islanders
+	const static string NPC_HOSTILE_FACTION_ID; // antagonists
+
 	const static char
 		PLAYER_CHAR,
 		WATER_CHAR,
 		LAND_CHAR,
 		FOREST_CHAR,
-		ITEM_CHAR;
+		ITEM_CHAR,
+		RUBBLE_CHAR;
 
 	const static int
 		GROUND_INDEX,
@@ -65,6 +71,7 @@ public:
 		HAMMER_ID,
 		FORGE_ID,
 		ANVIL_ID,
+		DEBRIS_ID, // collapsed ceilings
 
 		BAD_COMMAND,
 		LOGIN_COMMAND,
@@ -96,6 +103,10 @@ public:
 		UP,
 		DOWN,
 
+		SURFACE,
+		WALL,
+		DOOR,
+
 		// room xml
 		XML_ROOM,
 		XML_IS_WATER,
@@ -104,6 +115,10 @@ public:
 		XML_SURFACE_HEALTH,
 		XML_SURFACE_DIRECTION,
 		XML_SURFACE_MATERIAL,
+		XML_DOOR,
+		XML_DOOR_HEALTH,
+		XML_DOOR_MATERIAL,
+		XML_DOOR_FACTION,
 
 		// user data xml
 		XML_USER_LOCATION,
@@ -118,8 +133,9 @@ public:
 	static const map<string, string> opposite_surface_id;
 
 	// maps material IDs to the material count required to make a surface
-	// therefore also acts as the list of valid construction surfaces (see implementation) 
+	// therefore also acts as the list of valid construction surfaces (see implementation)
 	const static map<string, unsigned> SURFACE_REQUIREMENTS;
+	const static map<string, unsigned> DOOR_REQUIREMENTS;
 
 	// box drawing
 
@@ -129,11 +145,14 @@ public:
 		SW_CORNER,
 		SE_CORNER,
 		NS_WALL,
-		WE_WALL;
+		WE_WALL,
+		NS_DOOR,
+		WE_DOOR;
 
 	const static int
 		MIN_SURFACE_HEALTH,
-		MAX_SURFACE_HEALTH;
+		MAX_SURFACE_HEALTH,
+		MAX_DOOR_HEALTH;
 
 	const static map<string, map<string, int>> damage_tables;
 };
