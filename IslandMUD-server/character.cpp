@@ -425,8 +425,20 @@ string Character::craft(const string & craft_item_id, World & world)
 		// for as many times as the item is to be given to the player
 		for (int i = 0; i < it->second; ++i)
 		{
-			// give the player a new instance of the item
-			this->add(Craft::make(it->first));
+			// craft the item
+			shared_ptr<Item> item = Craft::make(it->first);
+
+			// if the item can be carried
+			if (item->is_takable())
+			{
+				// add the item to the player's inventory
+				this->add(item);
+			}
+			else // the item can not be taken
+			{
+				// add the item to the room
+				world.room_at(x, y, z)->add_item(item);
+			}
 		}
 
 		// "You now have a(n) sword. " OR "You now have a(n) sword (x5). "
@@ -447,7 +459,7 @@ string Character::take(const string & take_item_id, World & world)
 	}
 
 	// check if the item is not takable
-	if (!world.room_at(x, y, z)->get_contents().find(take_item_id)->second->is_takable)
+	if (!world.room_at(x, y, z)->get_contents().find(take_item_id)->second->is_takable())
 	{
 		// return failure
 		return "You can't take the " + take_item_id + ".";
@@ -648,7 +660,7 @@ string Character::attack_surface(const string & surface_ID, World & world)
 		return world.room_at(new_x, new_y, z)->damage_surface(C::opposite_surface_id.find(surface_ID)->second, this->equipped_item);
 	}
 
-	// neither room has an intact surfaec
+	// neither room has an intact surface
 
 	// test if both walls do not exist
 	if (!world.room_at(x, y, z)->has_surface(surface_ID) &&

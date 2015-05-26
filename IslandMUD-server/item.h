@@ -16,13 +16,16 @@ using namespace std;
 
 class Item
 {
+private:
+	bool takable = false; // items are untakable by default
 public:
 	string name;
 	int weight = 0;
-	bool is_takable = false; // items are untakable by default
 	
-	Item(string item_name, bool takable = false) : name(item_name), is_takable(takable) {}
+	Item(string item_name, bool takable = false) : name(item_name), takable(takable) {}
 	virtual ~Item() {}
+
+	bool is_takable() const { return takable; }
 
 };
 
