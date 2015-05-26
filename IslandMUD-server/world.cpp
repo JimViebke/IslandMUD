@@ -1,6 +1,8 @@
 /* Jim Viebke
 May 15 2015 */
 
+#include <iomanip>
+
 #include "world.h"
 
 void World::load()
@@ -82,7 +84,7 @@ void World::create(const vector<vector<char>> & world_terrain)
 	cout << "\nCreating world...";
 
 	int previous_percent = 0;
-	const double start_time = (double)R::current_time_in_ms();
+	const double start_time = (double)R::current_time_in_ms() / 1000.0;
 
 	for (int x = 0; x < C::WORLD_X_DIMENSION; ++x) // for each row
 	{
@@ -91,10 +93,12 @@ void World::create(const vector<vector<char>> & world_terrain)
 		if (percent_processed != previous_percent)
 		{
 			previous_percent = percent_processed;
-			cout << "\nProcessing rooms: " << percent_processed << "% (" << ((double)R::current_time_in_ms() - start_time) << " sec elapsed, ~"
+
+			cout << fixed << setprecision(1)
+				<< "\nProcessing rooms: " << percent_processed << "% (" << (((double)R::current_time_in_ms()/1000.0) - start_time) << " sec elapsed, ~"
 				<<
-				((((R::current_time_in_ms() - start_time)) / (double)previous_percent) * (100.0 - (double)previous_percent)) / 60.0
-				<< " minutes remaining...";
+				(((((R::current_time_in_ms() / 1000.0) - start_time)) / (double)previous_percent) * (100.0 - (double)previous_percent)) / 60.0
+				<< " minutes remaining)";
 		}
 
 		// vector<vector<shared_ptr<Room>>> row; // create the empty row
