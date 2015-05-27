@@ -242,7 +242,14 @@ void World::load_view_radius_around(const int & x, const int & y, const string &
 // loading and unloading rooms at the edge of vision
 void World::remove_viewer_and_attempt_unload(const int & x, const int & y, const int & z, const string & viewer_ID)
 {
-	if (!R::bounds_check(x, y, z) || room_at(x, y, z) == nullptr) // the reference room is out of bounds
+	// if the referenced room is out of bounds
+	if (!R::bounds_check(x, y, z))
+	{
+		return; // nothing to remove or unload
+	}
+
+	// if the referenced room is not loaded
+	if (room_at(x, y, z) == nullptr)
 	{
 		return; // nothing to remove or unload
 	}
