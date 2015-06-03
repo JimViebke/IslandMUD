@@ -18,6 +18,8 @@ public:
 	stack<string> objectives; // structure highly subject to change
 
 	Non_Player_Character(const string & name, const string & faction_ID) : Character(name, faction_ID) {}
+
+	void update(World & world);
 };
 
 #endif

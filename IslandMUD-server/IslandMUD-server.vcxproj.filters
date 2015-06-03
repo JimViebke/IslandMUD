@@ -57,6 +57,9 @@
     <ClCompile Include="door.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="non_player_character.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="message.h">

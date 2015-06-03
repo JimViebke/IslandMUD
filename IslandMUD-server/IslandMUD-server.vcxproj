@@ -89,6 +89,7 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="generator.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="non_player_character.cpp" />
     <ClCompile Include="parse.cpp" />
     <ClCompile Include="player_character.cpp" />
     <ClCompile Include="pugixml.cpp" />
