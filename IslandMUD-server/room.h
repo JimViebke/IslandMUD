@@ -27,14 +27,9 @@ public:
 	Room() {}
 
 	// room contents
-	const multimap<string, shared_ptr<Item>> Room::get_contents() const
-	{
-		return contents;
-	}
-	const map<string, Room_Side> Room::get_room_sides() const
-	{
-		return room_sides;
-	}
+	const multimap<string, shared_ptr<Item>> get_contents() const { return contents; }
+	const map<string, Room_Side> get_room_sides() const { return room_sides; }
+	const vector<string> get_actor_ids() const { return actor_ids; }
 
 	// room information
 	bool has_wall() const;
