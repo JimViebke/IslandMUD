@@ -90,6 +90,8 @@
     <ClCompile Include="generator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="non_player_character.cpp" />
+    <ClCompile Include="npc_enemy.cpp" />
+    <ClCompile Include="npc_unaffiliated.cpp" />
     <ClCompile Include="parse.cpp" />
     <ClCompile Include="player_character.cpp" />
     <ClCompile Include="pugixml.cpp" />
@@ -108,6 +110,8 @@
     <ClInclude Include="item.h" />
     <ClInclude Include="message.h" />
     <ClInclude Include="non_player_character.h" />
+    <ClInclude Include="npc_enemy.h" />
+    <ClInclude Include="npc_unaffiliated.h" />
     <ClInclude Include="parse.h" />
     <ClInclude Include="player_character.h" />
     <ClInclude Include="pugiconfig.hpp" />

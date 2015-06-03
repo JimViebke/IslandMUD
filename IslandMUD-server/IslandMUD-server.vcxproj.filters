@@ -60,6 +60,12 @@
     <ClCompile Include="non_player_character.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="npc_enemy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="npc_unaffiliated.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="message.h">
@@ -120,6 +126,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="door.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="npc_unaffiliated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="npc_enemy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
