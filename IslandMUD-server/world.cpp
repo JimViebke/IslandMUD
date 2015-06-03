@@ -283,10 +283,6 @@ void World::unload_room(const int & x, const int & y, const int & z)
 // Build and return a top-down area map around a given coordinate
 string World::generate_area_map_for(const int & x, const int & y, const int & z) const
 {
-	// this algorithm unfortunately does not take doors into account
-	// We could just take out the wall piece to indicate a door. Whatever is in the corners will still indicate a wall.
-	// What this doesn't do is show whether the door is open or closed.
-
 	bool
 		// is a wall present in a given direction?
 		n, e, s, w, // "north"
