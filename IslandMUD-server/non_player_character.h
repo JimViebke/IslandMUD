@@ -23,7 +23,7 @@ protected:
 	// this can only be instantiaed by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
 	Non_Player_Character(const string & name, const string & faction_ID) : Character(name, faction_ID) {}
 
-	// used to count friends & foes
+	// used to count friends & foes:   count<Enemy_NPC>(world, actors);
 	template <typename ACTOR_TYPE> unsigned count(World & world, map<string, shared_ptr<Character>> & actors) const
 	{
 		unsigned players_in_range = 0;
