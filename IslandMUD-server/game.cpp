@@ -5,7 +5,6 @@ May 15 2015 */
 
 void Game::main_test_loop() // debugging
 {
-	// temporary scope to create player object
 	{
 		// create a player character
 		PC player("dev", C::PC_FACTION_ID);
@@ -13,10 +12,21 @@ void Game::main_test_loop() // debugging
 		player.login(world);
 		// add the character to the actor registry
 		actors.insert(pair<string, shared_ptr<PC>>(player.name, make_shared<PC>(player)));
+	}
 
+	{
 		Hostile_NPC jeb("Jeb", C::NPC_HOSTILE_FACTION_ID);
 		jeb.login(world);
 		actors.insert(make_pair(jeb.name, make_shared<Hostile_NPC>(jeb)));
+	}
+
+	{
+		Neutral_NPC bill("Bill", C::NPC_NEUTRAL_FACTION_ID);
+		bill.login(world);
+		bill.move(C::WEST, world); // no idea if this will work
+		bill.move(C::WEST, world);
+		bill.move(C::NORTH, world);
+		actors.insert(make_pair(bill.name, make_shared<Neutral_NPC>(bill)));
 	}
 
 

@@ -14,6 +14,7 @@ const string C::NPC_NEUTRAL_FACTION_ID = "neutral_NPC";
 const string C::NPC_HOSTILE_FACTION_ID = "hostile_NPC";
 
 const char C::PLAYER_CHAR = '@';
+const char C::NPC_NEUTRAL_CHAR = '+';
 const char C::WATER_CHAR = '~';
 const char C::LAND_CHAR = ' ';
 const char C::FOREST_CHAR = '%';
@@ -169,7 +170,7 @@ const map<string, unsigned> C::DOOR_REQUIREMENTS =
 
 ╔ ═ ╗
 
-║   ║            also  179=│   196=─
+║   ║           for doors:   179: │   196: ─
 
 ╚ ═ ╝ */
 

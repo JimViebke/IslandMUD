@@ -31,6 +31,7 @@ public:
 
 	const static char
 		PLAYER_CHAR,
+		NPC_NEUTRAL_CHAR,
 		WATER_CHAR,
 		LAND_CHAR,
 		FOREST_CHAR,

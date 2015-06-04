@@ -3,6 +3,7 @@ May 15 2015 */
 
 #include "player_character.h"
 #include "npc_enemy.h"
+#include "npc_unaffiliated.h"
 
 string PC::print() const
 {
@@ -199,7 +200,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				}
 
 				// count the enemies standing at a coordinate
-				unsigned enemy_count = 0;
+				unsigned enemy_count = 0, neutral_count = 0;
 				// for each actor in the room
 				for (const string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
 				{
@@ -208,12 +209,17 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 					{
 						++enemy_count; // count one more enemy in the room
 					}
+					else if (R::is<Neutral_NPC>(actors.find(actor_ID)->second))
+					{
+						++neutral_count;
+					}
 				}
-
 				// reduce enemy count to a single-digit number
 				enemy_count = ((enemy_count > 9) ? 9 : enemy_count);
 
-				cout << "At " << cx << "," << cy << " there are " << enemy_count << " enemies.\n";
+				// debugging only
+				if (enemy_count > 0) { cout << "\nAt " << cx << "," << cy << " there are " << enemy_count << " enemies."; }
+				if (neutral_count > 0) { cout << "\nAt " << cx << "," << cy << " there are " << neutral_count << " neutrals."; }
 
 				// time for glorious nested ternary statements to do this cheap
 				a
@@ -223,7 +229,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				b
 					<< ((wr) ? C::RUBBLE_CHAR : ((wd) ? C::NS_DOOR : ((w) ? C::NS_WALL : C::LAND_CHAR)))
 					// if the current coordinates are the player's, draw an @ icon, else if there is an enemy, draw enemy count, else if there is an item, draw an item char, else empty
-					<< ((cx == x && cy == y) ? C::PLAYER_CHAR : ((enemy_count > 0) ? R::to_char(enemy_count) : ((world.room_at(cx, cy, C::GROUND_INDEX)->contains_no_items()) ? C::LAND_CHAR : C::ITEM_CHAR)))
+					<< ((cx == x && cy == y) ? C::PLAYER_CHAR : ((enemy_count > 0) ? R::to_char(enemy_count) : ((neutral_count > 0) ? C::NPC_NEUTRAL_CHAR : ((world.room_at(cx, cy, C::GROUND_INDEX)->contains_no_items()) ? C::LAND_CHAR : C::ITEM_CHAR))))
 					<< ((er) ? C::RUBBLE_CHAR : ((ed) ? C::NS_DOOR : ((e) ? C::NS_WALL : C::LAND_CHAR)));
 				c
 					<< ((s && w) ? C::SW_CORNER : (s) ? C::WE_WALL : (w) ? C::NS_WALL : C::LAND_CHAR)
