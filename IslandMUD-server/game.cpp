@@ -9,13 +9,14 @@ void Game::main_test_loop() // debugging
 	{
 		// create a player character
 		PC player("dev", C::PC_FACTION_ID);
-
-		// load the player's data
-		cout << "\nLogging in player...";
+		// the the player's data
 		player.login(world);
-
 		// add the character to the actor registry
 		actors.insert(pair<string, shared_ptr<PC>>(player.name, make_shared<PC>(player)));
+
+		Hostile_NPC jeb("Jeb", C::NPC_HOSTILE_FACTION_ID);
+		jeb.login(world);
+		actors.insert(make_pair(jeb.name, make_shared<Hostile_NPC>(jeb)));
 	}
 
 
@@ -33,7 +34,7 @@ void Game::main_test_loop() // debugging
 
 			cout << endl
 				<< endl
-				<< world.generate_area_map_for(dev->x, dev->y, dev->z) << endl // a top down map
+				<< dev->generate_area_map(world, actors) << endl // a top down map
 				<< "Your coordinates are " << dev->x << ", " << dev->y << " (index " << dev->z << ")" << endl
 				<< world.room_at(dev->x, dev->y, dev->z)->summary() << endl // "You look around and notice..."
 				<< endl

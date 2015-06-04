@@ -12,6 +12,7 @@ Feb 14, 2015 */
 #include "character.h"
 #include "player_character.h"
 #include "non_player_character.h"
+#include "npc_enemy.h"
 #include "parse.h"
 #include "world.h"
 
