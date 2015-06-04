@@ -17,7 +17,7 @@
 **Features**
 - 600,000 rooms of biome-based wilderness
 - Hostile NPCs as tough as any player
-- Neutral NPCs scattering the world who barter for the right price
+- Neutral NPCs scattering the world who barter for the right price and provide quests
 - Allied PCs
 - Crafting of tools, weapons, and structures
 - Freedom to build, trade, explore, defend, attack, or raid
