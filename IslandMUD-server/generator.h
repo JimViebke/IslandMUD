@@ -1,5 +1,5 @@
 /* Jim Viebke
-Tuesday 14, 2015 */
+April 14, 2015 */
 
 #ifndef GENERATOR_H
 #define GENERATOR_H
