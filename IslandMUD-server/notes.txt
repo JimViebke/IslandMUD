@@ -15,9 +15,6 @@ taking a second branch: "you now have a branch" (need a smarter message)
 
 Implement ladders/stairs/ramp
 
-Give certain hierarchies of items a quality. Basic items will be crude.
--- How will this work? "craft crude bow", "craft nice bow", "craft great bow". "Crude" works, "nice" and "great" don't.
-
 The current return for crafting or aquiring is: "You now have a(n) " + craft_item_id
 If the item was yielded, it would be nice if it said "You now have a(n) branch from the tree."
 
@@ -26,13 +23,5 @@ Item wear. A sword wears with every strike, a bow with every fire, an axe with e
 	While offering: "[name] presents/offers a sword that [is mildly worn]".
 	While equipping: "You draw a [mildy-worn] axe."
 	While returning to inventory: "You sheath your [well-worn] sword."
-There could be an item_condition object that accepts items by constant reference and returns a string description based on its wear.
-	It could also accept an enum to represent the context (fighting, offering, equipping, unequipping)
 
-Random country folk who craft tools or grow crops.
-Each NPC could have between 1-3 occupations. Others would specialize (blacksmithing).
-This would make development of AI easier - no need to balance NPC situational improvement with combat yet.
-
-When someone performs an action, everyone around/observing that individual would have to be notified of it.
-
-Security issue for later: user validation / pw encryption
+Security issue for when multiplayer is introduced: user validation / pw encryption
