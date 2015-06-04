@@ -12,6 +12,7 @@ April 1, 2014 */
 
 #include "room.h"
 #include "generator.h"
+// #include "character.h"
 
 using namespace std;
 using namespace pugi;
@@ -48,9 +49,6 @@ public:
 
 	// move a room from world to disk
 	void unload_room(const int & x, const int & y, const int & z);
-
-	// Build and return a top-down area map around a given coordinate
-	string generate_area_map_for(const int & x, const int & y, const int & z) const;
 
 
 
