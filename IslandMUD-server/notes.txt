@@ -1,5 +1,9 @@
 
 
+Pathfinding resources:
+- http://www.redblobgames.com/pathfinding/a-star/introduction.html
+- http://www.redblobgames.com/pathfinding/a-star/implementation.html
+
 For some reason, downsizing the world dimensions then restarting the server results in an empty world. (?!)
 	I suspect this is because world.load() attempts to load the terrain file and correctly fails when it can't, but it
 	makes no attempt to load the biome_map. Try perform the same load-then-verify then save-or-recreate as we do for the world_terrain file.
