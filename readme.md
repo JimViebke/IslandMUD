@@ -2,7 +2,7 @@
 
 - Craft tools, weapons, huts, houses, outposts, or fortresses with sandbox-esque freedom.
 - Defend your settlements against coordinated attacks by NPCs.
-- Ambush patrols, capture outposts, and take over fortresses.
+- Ambush patrols, capture outposts, and invade fortresses.
 
 **Nothing is permanent**
 - Any structure created by players or NPCs can trade hands, or be turned to rubble.
