@@ -1,11 +1,11 @@
-**IslandMUD** is a free open source Multi-User Dimension set on an expansive procedurally-generated island in a medieval period. While your fellow players are on your side in your efforts to colonize a world inhabited by scattered pioneers, militants seek to purge this land of all colonists.
+**IslandMUD** is a free open source Multi-User Dimension set on an expansive island in a medieval period. While your fellow players are on your side in your efforts to colonize a world inhabited by scattered pioneers, militants seek to purge this land of all colonists.
 
 - Craft tools, weapons, huts, houses, outposts, or fortresses with sandbox-esque freedom.
 - Defend your settlements against coordinated attacks by NPCs.
 - Ambush patrols, capture outposts, and invade fortresses.
 
 **Nothing is permanent**
-- Any structure created by players or NPCs can trade hands or be turned to rubble.
+- Players and NPCs can capture any structure or turn it to rubble.
 - Tools and weapons wear down, lose effectiveness, and break.
 - Neutral NPCs barter based on market prices and their own interests.
 
