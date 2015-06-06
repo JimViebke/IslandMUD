@@ -5,7 +5,7 @@
 - Ambush patrols, capture outposts, and invade fortresses.
 
 **Nothing is permanent**
-- Any structure created by players or NPCs can trade hands, or be turned to rubble.
+- Any structure created by players or NPCs can trade hands or be turned to rubble.
 - Tools and weapons wear down, lose effectiveness, and break.
 - Neutral NPCs barter based on market prices and their own interests.
 
