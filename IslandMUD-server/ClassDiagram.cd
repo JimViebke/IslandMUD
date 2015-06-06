@@ -1,143 +1,157 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="Character" Collapsed="true">
-    <Position X="1.75" Y="3.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>BAAAAAJAAAAAgACkEAARAAAAAAAGACACgIBgIQADugA=</HashCode>
-      <FileName>character.h</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Item" Collapsed="true">
-    <Position X="16.5" Y="0.75" Width="1.5" />
+    <Position X="16.25" Y="0.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAACAAAAAAAAAACAAEAAAEAAAgAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAACAAAAAAAAAACAAEAAAEAAAgAAAAAAAACAA=</HashCode>
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Axe" Collapsed="true">
-    <Position X="13" Y="3.5" Width="1.5" />
+    <Position X="12.75" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Bow" Collapsed="true">
-    <Position X="15.25" Y="3.5" Width="1.5" />
+    <Position X="15" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Sword" Collapsed="true">
-    <Position X="17.5" Y="3.5" Width="1.5" />
+    <Position X="17.25" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Non_Player_Character" Collapsed="true">
-    <Position X="0.5" Y="5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAgAAAAAAAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
-      <FileName>non_player_character.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Player_Character" Collapsed="true">
-    <Position X="2.75" Y="5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAQBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>player_character.h</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Torch" Collapsed="true">
-    <Position X="10.75" Y="3.5" Width="1.5" />
+    <Position X="10.5" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAA=</HashCode>
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Staff" Collapsed="true">
-    <Position X="8.5" Y="3.5" Width="1.5" />
+    <Position X="8.25" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Equipment" Collapsed="true">
-    <Position X="14.25" Y="2" Width="1.5" />
+    <Position X="14" Y="2" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAEAAAAAAAQAAAAAAAAAAAAAAAgAAAA=</HashCode>
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Tree" Collapsed="true">
-    <Position X="1.75" Y="2" Width="1.5" />
+    <Position X="1.5" Y="2" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Wood" Collapsed="true">
-    <Position X="31" Y="3.5" Width="1.5" />
+    <Position X="30.75" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Vine" Collapsed="true">
-    <Position X="28.75" Y="3.5" Width="1.5" />
+    <Position X="28.5" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Branch" Collapsed="true">
-    <Position X="26.5" Y="3.5" Width="1.5" />
+    <Position X="26.25" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAA=</HashCode>
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Stick" Collapsed="true">
-    <Position X="24.25" Y="3.5" Width="1.5" />
+    <Position X="24" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Rock" Collapsed="true">
-    <Position X="22" Y="3.5" Width="1.5" />
+    <Position X="21.75" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Material" Collapsed="true">
-    <Position X="26.5" Y="2" Width="1.5" />
+    <Position X="26.25" Y="2" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AEAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAA=</HashCode>
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Forge" Collapsed="true">
-    <Position X="6.25" Y="2" Width="1.5" />
+    <Position X="6" Y="2" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAA=</HashCode>
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Anvil" Collapsed="true">
-    <Position X="4" Y="2" Width="1.5" />
+    <Position X="3.75" Y="2" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hammer" Collapsed="true">
-    <Position X="19.75" Y="3.5" Width="1.5" />
+    <Position X="19.5" Y="3.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Non_Player_Character" Collapsed="true">
+    <Position X="3.75" Y="5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAABAAAAAAAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>non_player_character.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NPC_Enemy" Collapsed="true">
+    <Position X="2.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>npc_enemy.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NPC_Unaffiliated" Collapsed="true">
+    <Position X="5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>npc_unaffiliated.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Character" Collapsed="true">
+    <Position X="2.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>hAAAAAJAAAAAggCkEAARAAAAAAAGACACgIDgIQADugA=</HashCode>
+      <FileName>character.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Player_Character" Collapsed="true">
+    <Position X="0.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAQBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>player_character.h</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />
