@@ -109,10 +109,10 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 			// if the coordinates are valid but the room is not loaded (this would be an error)
 			if (world.room_at(cx, cy, C::GROUND_INDEX) == nullptr)
 			{
-				// draw the room as an exclaimation mark
-				a << "   ";
-				b << " ! ";
-				c << "   ";
+				// draw the room with "err"
+				a << "! !";
+				b << "err";
+				c << "! !";
 
 				// skip to next room
 				continue;
