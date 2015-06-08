@@ -23,9 +23,10 @@ void Game::main_test_loop() // debugging
 	{
 		Neutral_NPC bill("Bill", C::NPC_NEUTRAL_FACTION_ID);
 		bill.login(world);
-		bill.move(C::WEST, world); // no idea if this will work
-		bill.move(C::WEST, world);
-		bill.move(C::NORTH, world);
+		for (unsigned i = 0; i < 20; ++i)
+		{
+			bill.move(C::WEST, world);
+		}
 		actors.insert(make_pair(bill.name, make_shared<Neutral_NPC>(bill)));
 	}
 
