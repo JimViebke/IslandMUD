@@ -131,7 +131,9 @@ public:
 
 	static const vector<string> surface_ids;
 	static const vector<string> direction_ids;
+	static const vector<string> primary_direction_ids; // NESW
 	static const map<string, string> opposite_surface_id;
+	static const map<string, string> opposite_direction_id;
 
 	// maps material IDs to the material count required to make a surface
 	// therefore also acts as the list of valid construction surfaces (see implementation)
@@ -156,6 +158,14 @@ public:
 		MAX_DOOR_HEALTH;
 
 	const static map<string, map<string, int>> damage_tables;
+	
+	// AI movement costs
+
+	const static int
+		AI_MOVEMENT_COST,
+		AI_MOVEMENT_COST_DIAGONAL,
+		AI_MOVEMENT_COST_FOREST,
+		AI_MOVEMENT_COST_FOREST_DIAGONAL;
 };
 
 #endif

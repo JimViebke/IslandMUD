@@ -22,7 +22,7 @@ const char C::ITEM_CHAR = '?';
 const char C::RUBBLE_CHAR = '#';
 
 const int C::GROUND_INDEX = 3; // there are three levels below this
-const int C::VIEW_DISTANCE = 5; // 5+1+5 to a side == 11*11 total area
+const int C::VIEW_DISTANCE = 2; // 5+1+5 to a side == 11*11 total area
 
 const int C::WORLD_X_DIMENSION = 100;
 const int C::WORLD_Y_DIMENSION = 100;
@@ -136,6 +136,9 @@ const vector<string> C::direction_ids = {
 	C::SOUTH_EAST, C::SOUTH_WEST,
 	C::UP, C::DOWN };
 
+const vector<string> C::primary_direction_ids = {
+	C::NORTH, C::EAST, C::SOUTH, C::WEST };
+
 // map surface ids to their opposite surface
 const map<string, string> C::opposite_surface_id = {
 	{ C::NORTH, C::SOUTH },
@@ -144,6 +147,17 @@ const map<string, string> C::opposite_surface_id = {
 	{ C::WEST, C::EAST },
 	{ C::CEILING, C::FLOOR },
 	{ C::FLOOR, C::CEILING },
+};
+
+const map<string, string> C::opposite_direction_id = {
+	{ C::NORTH, C::SOUTH },
+	{ C::SOUTH, C::NORTH },
+	{ C::EAST, C::WEST },
+	{ C::WEST, C::EAST },
+	{ C::NORTH_EAST, C::SOUTH_WEST },
+	{ C::NORTH_WEST, C::SOUTH_EAST },
+	{ C::SOUTH_EAST, C::NORTH_WEST },
+	{ C::SOUTH_WEST, C::NORTH_EAST }
 };
 
 // Amount of a resource required to construct a surface (wall/ceiling/floor) of that type
@@ -156,7 +170,7 @@ const map<string, unsigned> C::SURFACE_REQUIREMENTS =
 };
 
 // Amount of a resource required to construct a door of that type
-const map<string, unsigned> C::DOOR_REQUIREMENTS = 
+const map<string, unsigned> C::DOOR_REQUIREMENTS =
 {
 	{ C::WOOD_ID, 5 }, // {material, count required}
 	{ C::STONE_ID, 5 },
@@ -222,3 +236,10 @@ const map<string, map<string, int>> C::damage_tables =
 		{ C::STONE_ID, 1 }
 	} }
 };
+
+// AI movement costs
+
+const int C::AI_MOVEMENT_COST = 10; // 1 * 10
+const int C::AI_MOVEMENT_COST_DIAGONAL = 14; // sqrt(2) * 10
+const int C::AI_MOVEMENT_COST_FOREST = C::AI_MOVEMENT_COST * 2;
+const int C::AI_MOVEMENT_COST_FOREST_DIAGONAL = C::AI_MOVEMENT_COST_DIAGONAL * 2;

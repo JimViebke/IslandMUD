@@ -72,6 +72,7 @@ public:
 		return contents.find(item_id) != contents.cend();
 	}
 	bool contains_item(const string & item_id, const unsigned & count) const;
+	bool is_observed_by(const string & actor_id) const { return R::contains(viewing_actor_ids, actor_id); }
 
 	void set_water_status(const bool & is_water)
 	{

@@ -279,7 +279,7 @@ string Character::move(const string & direction_ID, World & world)
 	// world.load_room_to_world(x + dx, y + dy, z + dz);
 
 	// test if the environment (structures) allow the player to move in a given direction
-	string validate_movement = this->validate_movement(direction_ID, dx, dy, dz, world);
+	string validate_movement = this->validate_movement(x, y, z, direction_ID, dx, dy, dz, world);
 
 	// if the validation failed for any reason
 	if (validate_movement != C::GOOD_SIGNAL)
@@ -718,7 +718,7 @@ string Character::attack_door(const string & surface_ID, World & world)
 }
 
 // movement info
-string Character::validate_movement(const string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const
+string Character::validate_movement(const int & cx, const int & cy, const int & cz, const string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const
 {
 	// determine if a character can move in a given direction (8 compass points, up, or down)
 
@@ -730,7 +730,7 @@ string Character::validate_movement(const string & direction_ID, const int & dx,
 		direction_ID == C::SOUTH || direction_ID == C::WEST)
 	{
 		// save the value of an attempt to move out of the current room
-		string move_attempt = world.room_at(x, y, z)->can_move_in_direction(direction_ID, faction_ID);
+		string move_attempt = world.room_at(cx, cy, cz)->can_move_in_direction(direction_ID, faction_ID);
 
 		if (move_attempt != C::GOOD_SIGNAL)
 		{
@@ -739,7 +739,7 @@ string Character::validate_movement(const string & direction_ID, const int & dx,
 		}
 
 		// save the value of an attempt to move into the destination room
-		move_attempt = world.room_at(x + dx, y + dy, z)->can_move_in_direction(C::opposite_surface_id.find(direction_ID)->second, faction_ID);
+		move_attempt = world.room_at(cx + dx, cy + dy, cz)->can_move_in_direction(C::opposite_surface_id.find(direction_ID)->second, faction_ID);
 
 		if (move_attempt != C::GOOD_SIGNAL)
 		{
@@ -753,8 +753,8 @@ string Character::validate_movement(const string & direction_ID, const int & dx,
 		direction_ID == C::NORTH_WEST || direction_ID == C::NORTH_EAST ||
 		direction_ID == C::SOUTH_EAST || direction_ID == C::SOUTH_WEST)
 	{
-		const shared_ptr<Room> current_room = world.room_at(x, y, z);
-		const shared_ptr<Room> destination_room = world.room_at(x + dx, y + dy, z);
+		const shared_ptr<Room> current_room = world.room_at(cx, cy, cz);
+		const shared_ptr<Room> destination_room = world.room_at(cx + dx, cy + dy, cz);
 
 		if (direction_ID == C::NORTH_WEST)
 		{
