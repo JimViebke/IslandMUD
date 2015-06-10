@@ -121,7 +121,7 @@ private:
 		// return the lowest f-cost node
 		return lowest_f_cost_node;
 	}
-	bool room_in_node_list(const int & find_x, const int & find_y, vector<Node> & node_list)
+	bool room_in_node_list(const int & find_x, const int & find_y, const vector<Node> & node_list) const
 	{
 		// test if a given room node exists in a given node list
 
@@ -139,7 +139,7 @@ private:
 		// the node is not in the list
 		return false;
 	}
-	Node get_node_at(const int & find_x, const int & find_y, vector<Node> & node_list)
+	Node get_node_at(const int & find_x, const int & find_y, const vector<Node> & node_list) const
 	{
 		// for each node
 		for (const Node & node : node_list)

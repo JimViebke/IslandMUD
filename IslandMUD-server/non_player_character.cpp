@@ -7,17 +7,31 @@ void NPC::a_star_pathfind(const int & x_dest, const int & y_dest, World & world)
 {
 	cout << "\nSearching for path from " << x << "," << y << " to " << x_dest << "," << y_dest << ".\n";
 
+	/* F = G + H
+
+	G: actual cost to reach a certain room
+	H: estimated cost to reach destination from a certain room
+
+	f-cost = g + h */
+
 	vector<Node> open_list, closed_list;
 
 	// Add current room to open list.
 	open_list.push_back(Node(this->x, this->y, ""));
+	// calculate current room's costs. G cost starts at 0.
+	open_list[0].set_g_h_f(0, R::diagonal_distance(x_dest, y_dest, this->x, this->y));
 
 	// Do
 	do
 	{
-		// -- Find lowest f-cost room on open list		
+		/*// -- Find lowest f-cost room on open list
 		// -- Move it to closed list
-		Node current_room = move_and_get_lowest_f_cost(open_list, closed_list);
+		Node current_room = move_and_get_lowest_f_cost(open_list, closed_list); */
+
+		// work through every open room
+		Node current_room = open_list[0]; // copy
+		closed_list.push_back(current_room); // move to closed
+		open_list.erase(open_list.begin()); // erase original
 
 		// -- For each adjacent room to current
 		for (const string & direction : C::direction_ids)
@@ -47,15 +61,13 @@ void NPC::a_star_pathfind(const int & x_dest, const int & y_dest, World & world)
 			// -- -- if room is not on open list
 			if (!room_in_node_list(adjacent_room.x, adjacent_room.y, open_list))
 			{
-				// -- -- -- Make current room its parent
+				// -- -- -- Make current room the parent of adjacent
 				adjacent_room.parent_x = current_room.x;
 				adjacent_room.parent_y = current_room.y;
 				// -- -- -- Record F, G, H costs of room
 				adjacent_room.set_g_h_f(
 					current_room.g + (R::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL), // check if the movement is non-diagonal or diagonal
 					R::diagonal_distance(x_dest, y_dest, adjacent_room.x, adjacent_room.y));
-				// -- -- -- Add room to open list
-				open_list.push_back(adjacent_room);
 			}
 			// -- -- (else room is on open list)
 			else
@@ -72,7 +84,7 @@ void NPC::a_star_pathfind(const int & x_dest, const int & y_dest, World & world)
 				}
 
 				// -- -- if this g-cost to room is less than current g-cost to room
-				if (adjacent_room.g > current_room.g + (R::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
+				if (current_room.g + (R::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL) < adjacent_room.g)
 				{
 					// -- -- -- update current room to new parent of room
 					adjacent_room.parent_x = current_room.x;
@@ -83,6 +95,9 @@ void NPC::a_star_pathfind(const int & x_dest, const int & y_dest, World & world)
 						R::diagonal_distance(x_dest, y_dest, adjacent_room.x, adjacent_room.y));
 				}
 			}
+
+			// -- -- -- Add room to open list
+			open_list.push_back(adjacent_room);
 
 		} // end for each adjacent room
 
@@ -103,11 +118,14 @@ void NPC::a_star_pathfind(const int & x_dest, const int & y_dest, World & world)
 		// get the parent room
 		Node parent_room = get_node_at(current_room.parent_x, current_room.parent_y, closed_list);
 
+		cout << "\nI can get to " << current_room.x << "," << current_room.y << " from " << parent_room.x << "," << parent_room.y << ".";
+
 		// if the parent of current_room is our location, move to current_room
 		if (parent_room.x == this->x && parent_room.y == this->y)
 		{
 			// move to current
-			this->move(C::opposite_direction_id.find(current_room.direction_from_parent)->second, world);
+			//this->move(C::opposite_direction_id.find(current_room.direction_from_parent)->second, world);
+			move(current_room.direction_from_parent, world);
 
 			// debugging
 			cout << endl;
