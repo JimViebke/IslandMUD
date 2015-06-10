@@ -150,3 +150,80 @@ void NPC::a_star_pathfind(const int & x_dest, const int & y_dest, World & world)
 
 	} while (true);
 }
+
+// Node member setter
+void NPC::Node::set_g_h_f(const int & set_g, const int & set_h)
+{
+	g = set_g;
+	h = set_h;
+	f = g + h;
+}
+
+// pathfinding node utilities
+NPC::Node NPC::move_and_get_lowest_f_cost(vector<Node> & open, vector<Node> & closed)
+{
+	// save the f cost of the first node
+	int lowest_f_cost = open[0].f;
+
+	// save the index of the first node
+	unsigned lowest_f_cost_index = 0;
+
+	// for each node
+	for (unsigned i = 0; i < open.size(); ++i)
+	{
+		// if the node has a lower f cost than found so far
+		if (open[i].f < lowest_f_cost)
+		{
+			// save the f cost
+			lowest_f_cost = open[i].f;
+			// save the index
+			lowest_f_cost_index = i;
+		}
+	}
+
+	// save the lowest f-cost node
+	Node lowest_f_cost_node = open[lowest_f_cost_index];
+
+	// add the lowest f-cost node to closed
+	closed.push_back(lowest_f_cost_node);
+
+	// remove the lowest f-cost node from open
+	open.erase(open.begin() + lowest_f_cost_index);
+
+	// return the lowest f-cost node
+	return lowest_f_cost_node;
+}
+bool NPC::room_in_node_list(const int & find_x, const int & find_y, const vector<Node> & node_list) const
+{
+	// test if a given room node exists in a given node list
+
+	// for each node
+	for (const Node & node : node_list)
+	{
+		// if the node is the current room
+		if (node.x == find_x && node.y == find_y)
+		{
+			// the node is already in the list
+			return true;
+		}
+	}
+
+	// the node is not in the list
+	return false;
+}
+NPC::Node NPC::get_node_at(const int & find_x, const int & find_y, const vector<Node> & node_list) const
+{
+	// for each node
+	for (const Node & node : node_list)
+	{
+		// if the node is the node we're searching for
+		if (node.x == find_x && node.y == find_y)
+		{
+			// return it
+			return node;
+		}
+	}
+
+	// the node could not be found
+	return Node();
+}

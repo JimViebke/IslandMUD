@@ -26,6 +26,9 @@ public:
 
 	Room() {}
 
+	// configuration
+	void set_water_status(const bool & is_water) { water = is_water; }
+
 	// room contents
 	const multimap<string, shared_ptr<Item>> get_contents() const { return contents; }
 	const map<string, Room_Side> get_room_sides() const { return room_sides; }
@@ -35,53 +38,14 @@ public:
 	bool has_wall() const;
 	bool has_standing_wall() const;
 	bool is_standing_wall(const string & surface_ID) const;
-	bool has_surface(const string & direction_id) const
-	{
-		return room_sides.find(direction_id) != room_sides.cend();
-	}
-	string can_move_in_direction(const string & direction_ID, const string & faction_ID)
-	{
-		// if a surface is present
-		if (has_surface(direction_ID))
-		{
-			// a player can move through the surface if it is rubble
-
-			if (room_sides.find(direction_ID)->second.is_rubble())
-			{
-				return C::GOOD_SIGNAL;
-			}
-
-			return room_sides.find(direction_ID)->second.can_move_through_wall(faction_ID);
-		}
-		else // a surface does not exist...
-		{
-			// ...so the player is free to move
-			return C::GOOD_SIGNAL;
-		}
-	}
-	bool contains_no_items() const
-	{
-		return contents.size() == 0;
-	}
-	bool is_unloadable() const
-	{
-		return actor_ids.size() == 0 && viewing_actor_ids.size() == 0;
-	}
-	bool contains_item(const string & item_id) const
-	{
-		return contents.find(item_id) != contents.cend();
-	}
+	bool has_surface(const string & direction_id) const;
+	string can_move_in_direction(const string & direction_ID, const string & faction_ID);
+	bool contains_no_items() const;
+	bool is_unloadable() const;
+	bool contains_item(const string & item_id) const;
 	bool contains_item(const string & item_id, const unsigned & count) const;
-	bool is_observed_by(const string & actor_id) const { return R::contains(viewing_actor_ids, actor_id); }
-
-	void set_water_status(const bool & is_water)
-	{
-		water = is_water;
-	}
-	bool is_water() const
-	{
-		return water;
-	}
+	bool is_observed_by(const string & actor_id) const;
+	bool is_water() const;
 
 	// add and remove items
 	void add_item(const shared_ptr<Item> item);
@@ -103,7 +67,7 @@ public:
 	void remove_viewing_actor(const string & actor_id);
 
 	// printing
-	string summary() const;
+	string summary(const string & player_ID) const;
 
 };
 

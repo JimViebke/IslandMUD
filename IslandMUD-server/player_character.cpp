@@ -29,9 +29,10 @@ string PC::print() const
 		}
 	}
 
-	return (output.str().size() > 0) ? // if there is anything to print
+	return "\n\n" + // leave an empt line
+		((output.str().size() > 0) ? // if there is anything to print
 		"You have " + output.str() : // return the output
-		"You aren't carrying anything."; // return generic "no items" message
+		"You aren't carrying anything."); // return generic "no items" message
 }
 
 // Build and return a top-down area map around a given coordinate

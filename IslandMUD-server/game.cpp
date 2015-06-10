@@ -55,9 +55,8 @@ void Game::main_test_loop() // debugging
 			cout << endl
 				<< endl
 				<< dev->generate_area_map(world, actors) << endl // a top down map
-				<< "Your coordinates are " << dev->x << ", " << dev->y << " (index " << dev->z << ")" << endl
-				<< world.room_at(dev->x, dev->y, dev->z)->summary() << endl // "You look around and notice..."
-				<< endl
+				<< "Your coordinates are " << dev->x << ", " << dev->y << " (index " << dev->z << ")"
+				<< world.room_at(dev->x, dev->y, dev->z)->summary(dev->name) // "You look around and notice..."
 				<< dev->print(); // prepend "You have..."
 		}
 
