@@ -10,4 +10,5 @@ void Neutral_NPC::update(World & world, map<string, shared_ptr<Character>> & act
 
 	cout << "I am " << name << " and I see " << count<PC>(world, actors) << " player(s) and "
 		<< count<Neutral_NPC>(world, actors) << " neutral(s).\n";
+
 }

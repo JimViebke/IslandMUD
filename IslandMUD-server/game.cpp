@@ -8,7 +8,7 @@ void Game::main_test_loop() // debugging
 	{
 		// create a player character
 		PC player("dev", C::PC_FACTION_ID);
-		// the the player's data
+		// load the player's data and place the player in the world
 		player.login(world);
 		// add the character to the actor registry
 		actors.insert(pair<string, shared_ptr<PC>>(player.name, make_shared<PC>(player)));
@@ -17,6 +17,15 @@ void Game::main_test_loop() // debugging
 	{
 		Hostile_NPC jeb("Jeb", C::NPC_HOSTILE_FACTION_ID);
 		jeb.login(world);
+
+		jeb.move(C::WEST, world); // trust me
+		jeb.move(C::SOUTH, world);
+		jeb.move(C::SOUTH, world);
+		jeb.move(C::EAST, world);
+		jeb.move(C::EAST, world);
+		jeb.move(C::EAST, world);
+		jeb.move(C::EAST, world);
+
 		actors.insert(make_pair(jeb.name, make_shared<Hostile_NPC>(jeb)));
 	}
 
@@ -46,9 +55,8 @@ void Game::main_test_loop() // debugging
 			cout << endl
 				<< endl
 				<< dev->generate_area_map(world, actors) << endl // a top down map
-				<< "Your coordinates are " << dev->x << ", " << dev->y << " (index " << dev->z << ")" << endl
-				<< world.room_at(dev->x, dev->y, dev->z)->summary() << endl // "You look around and notice..."
-				<< endl
+				<< "Your coordinates are " << dev->x << ", " << dev->y << " (index " << dev->z << ")"
+				<< world.room_at(dev->x, dev->y, dev->z)->summary(dev->name) // "You look around and notice..."
 				<< dev->print(); // prepend "You have..."
 		}
 
@@ -79,6 +87,19 @@ void Game::main_test_loop() // debugging
 		cout << "\nDEBUG Entering execute_command(), rooms loaded: " << world.count_loaded_rooms() << "...";
 		output = execute_command("dev", tokenized_input);
 		cout << "\nDEBUG Exited execute_command(), rooms loaded: " << world.count_loaded_rooms() << "...";
+
+		// now execute updates for all NPCs
+		for (pair<const string, shared_ptr<Character>> & actor : actors)
+		{
+			if (R::is<NPC>(actor.second))
+			{
+				shared_ptr<NPC> npc = R::convert_to<NPC>(actor.second);
+
+				npc->update(world, actors);
+
+				actor.second = npc; // make sure to saev back
+			}
+		}
 	}
 }
 

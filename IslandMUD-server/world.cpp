@@ -54,11 +54,11 @@ void World::load()
 		gen.game_of_life(5);
 		gen.fill(2);
 		gen.clean(3);
-		gen.fill(4);
+		gen.fill(4); // this is the same as fill(12), but each call has a seperate printout this way
 		gen.fill(4);
 		gen.fill(4);
 
-		// saves the final terrain to disk
+		// save the final terrain to disk
 		gen.save_terrain();
 
 		terrain = gen.get_terrain();
@@ -72,9 +72,9 @@ void World::create(const vector<vector<char>> & world_terrain)
 {
 	// world terrain is only used to generate rooms that do not already exist on disk
 
-	cout << "\nCreating world object...";
-
 	{ // temporary scope to delete temp structure later
+		cout << "\nCreating world object...";
+
 		vector<vector<vector<shared_ptr<Room>>>> temp(C::WORLD_X_DIMENSION,
 			vector<vector<shared_ptr<Room>>>(C::WORLD_Y_DIMENSION,
 			vector<shared_ptr<Room>>(C::WORLD_Z_DIMENSION)));
@@ -97,7 +97,7 @@ void World::create(const vector<vector<char>> & world_terrain)
 			previous_percent = percent_processed;
 
 			cout << fixed << setprecision(1)
-				<< "\nProcessing rooms: " << percent_processed << "% (" << (((double)R::current_time_in_ms()/1000.0) - start_time) << " sec elapsed, ~"
+				<< "\nProcessing rooms: " << percent_processed << "% (" << (((double)R::current_time_in_ms() / 1000.0) - start_time) << " sec elapsed, ~"
 				<<
 				(((((R::current_time_in_ms() / 1000.0) - start_time)) / (double)previous_percent) * (100.0 - (double)previous_percent)) / 60.0
 				<< " minutes remaining)";

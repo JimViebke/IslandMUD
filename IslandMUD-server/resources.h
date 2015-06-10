@@ -144,12 +144,21 @@ public:
 	}
 
 	// math
-	static int distance_between(const int & x1, const int & y1, const int & x2, const int & y2)
+	static int euclidean_distance(const int & x1, const int & y1, const int & x2, const int & y2)
 	{
+		int x_diff = R::difference(x1, x2);
+		int y_diff = R::difference(y1, y2);
 		return static_cast<int>(sqrt( // use Pythagoras's theorem
-			(R::difference(x1, x2) * R::difference(x1, x2)) +
-			(R::difference(y1, y2) * R::difference(y1, y2))
+			(x_diff * x_diff) +
+			(y_diff * y_diff)
 			));
+	}
+	static int diagonal_distance(const int & x1, const int & y1, const int & x2, const int & y2)
+	{
+		// a diagonal move = (sqrt(2) * straight move)
+		int dx = abs(x1 - x2);
+		int dy = abs(y1 - y2);
+		return C::AI_MOVEMENT_COST * (dx + dy) + (C::AI_MOVEMENT_COST_DIAGONAL - 2 * C::AI_MOVEMENT_COST) * min(dx, dy);
 	}
 	static int difference(const int & a, const int & b)
 	{

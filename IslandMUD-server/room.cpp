@@ -71,6 +71,42 @@ bool Room::is_standing_wall(const string & surface_ID) const
 	// return "is the surface intact?"
 	return (room_sides.find(surface_ID)->second.is_intact());
 }
+bool Room::has_surface(const string & direction_id) const
+{
+	return room_sides.find(direction_id) != room_sides.cend();
+}
+string Room::can_move_in_direction(const string & direction_ID, const string & faction_ID)
+{
+	// if a surface is present
+	if (has_surface(direction_ID))
+	{
+		// a player can move through the surface if it is rubble
+
+		if (room_sides.find(direction_ID)->second.is_rubble())
+		{
+			return C::GOOD_SIGNAL;
+		}
+
+		return room_sides.find(direction_ID)->second.can_move_through_wall(faction_ID);
+	}
+	else // a surface does not exist...
+	{
+		// ...so the player is free to move
+		return C::GOOD_SIGNAL;
+	}
+}
+bool Room::contains_no_items() const
+{
+	return contents.size() == 0;
+}
+bool Room::is_unloadable() const
+{
+	return actor_ids.size() == 0 && viewing_actor_ids.size() == 0;
+}
+bool Room::contains_item(const string & item_id) const
+{
+	return contents.find(item_id) != contents.cend();
+}
 bool Room::contains_item(const string & item_id, const unsigned & count) const
 {
 	// test if a room has a specified quantity for crafting
@@ -104,6 +140,11 @@ bool Room::contains_item(const string & item_id, const unsigned & count) const
 
 	// there is not a sufficient count of items in the room
 	return false;
+}
+bool Room::is_observed_by(const string & actor_id) const { return R::contains(viewing_actor_ids, actor_id); }
+bool Room::is_water() const
+{
+	return water;
 }
 
 // add and remove items
@@ -389,14 +430,14 @@ void Room::remove_viewing_actor(const string & actor_id)
 }
 
 // printing
-string Room::summary() const
+string Room::summary(const string & player_ID) const
 {
 	stringstream summary_stream;
 
 	// report on the sides of the room (walls, ceiling, floor)
 	if (room_sides.size() > 0)
 	{
-		summary_stream << "\nThis room consists of";
+		summary_stream << "\n\nThis room consists of";
 
 		// create a pointer pointing to the last side in the room
 		map<string, Room_Side>::const_iterator last_side_it = room_sides.cend(); // one past the actual last item
@@ -452,13 +493,13 @@ string Room::summary() const
 			}
 		}
 
-		summary_stream << "." << endl; // end with a period
+		summary_stream << "."; // end with a period
 	}
 
 	// report on the items in the room
 	if (contents.size() > 0) // if there are items present
 	{
-		summary_stream << "\nYou look around and notice ";
+		summary_stream << "\n\nYou look around and notice ";
 		// for each item
 		for (multimap<string, shared_ptr<Item>>::const_iterator it = contents.cbegin();
 			it != contents.cend(); ++it)
@@ -468,10 +509,20 @@ string Room::summary() const
 		}
 	}
 
+	if (actor_ids.size() > 1)
+	{
+		summary_stream << "\n\n";
+		for (const string & actor_ID : actor_ids)
+		{
+			if (actor_ID == player_ID) { continue; } // skip the player themself.
+			summary_stream << actor_ID << " is here.";
+		}
+	}
+
 	// if there are no items or surfaces
 	if (summary_stream.str().length() == 0)
 	{
-		summary_stream << "\nThere is nothing of interest here.";
+		summary_stream << "\n\nThere is nothing of interest here.";
 	}
 
 	return summary_stream.str();

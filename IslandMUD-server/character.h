@@ -77,7 +77,7 @@ public:
 	string attack_door(const string & surface_ID, World & world);
 
 	// movement info
-	string validate_movement(const string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const;
+	string validate_movement(const int & cx, const int & cy, const int & cz, const string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const;
 
 };
 

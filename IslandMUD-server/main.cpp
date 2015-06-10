@@ -28,7 +28,7 @@ int main()
 	// initialize and load everything
 	game.load();
 
-	// For playing using the server as the sole client, call main_test_loop().
+	// For playing using the server as the sole client (development), call main_test_loop().
 	// Execution stays here until the game ends.
 	game.main_test_loop();
 

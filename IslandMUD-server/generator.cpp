@@ -29,7 +29,7 @@ void Generator::generate_static_using_biome_map()
 		for (unsigned y = 0; y < v2[0].size(); ++y)
 		{
 			// if the coordinates are not within the islands radius
-			if (R::distance_between(x, y, x_center, y_center) > island_radius)
+			if (R::euclidean_distance(x, y, x_center, y_center) > island_radius)
 			{
 				v2[x][y] = water;
 			}
