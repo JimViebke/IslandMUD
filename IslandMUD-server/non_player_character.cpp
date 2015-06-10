@@ -107,7 +107,7 @@ void NPC::a_star_pathfind(const int & x_dest, const int & y_dest, World & world)
 		if (parent_room.x == this->x && parent_room.y == this->y)
 		{
 			// move to current
-			this->move(C::opposite_surface_id.find(current_room.direction_from_parent)->second, world);
+			this->move(C::opposite_direction_id.find(current_room.direction_from_parent)->second, world);
 
 			// debugging
 			cout << endl;
