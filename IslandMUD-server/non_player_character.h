@@ -63,10 +63,9 @@ private:
 
 	/* F = G + H
 
-	G: actual cost to reach a certain room
-	H: estimated cost to reach destination from a certain room
-
-	f-cost = g + h */
+	G : actual cost to reach a certain room
+	H : estimated cost to reach destination from a certain room
+	F-cost = G + H */
 
 	class Node
 	{
