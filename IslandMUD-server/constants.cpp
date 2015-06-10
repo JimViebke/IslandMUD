@@ -22,7 +22,7 @@ const char C::ITEM_CHAR = '?';
 const char C::RUBBLE_CHAR = '#';
 
 const int C::GROUND_INDEX = 3; // there are three levels below this
-const int C::VIEW_DISTANCE = 2; // 5+1+5 to a side == 11*11 total area
+const int C::VIEW_DISTANCE = 5; // 5+1+5 to a side == 11*11 total area
 
 const int C::WORLD_X_DIMENSION = 100;
 const int C::WORLD_Y_DIMENSION = 100;
