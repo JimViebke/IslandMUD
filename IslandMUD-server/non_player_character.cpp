@@ -5,7 +5,8 @@ Jun 3 2015 */
 
 void NPC::a_star_pathfind(const int & x_dest, const int & y_dest, World & world)
 {
-	cout << "\nSearching for path from " << x << "," << y << " to " << x_dest << "," << y_dest << ".\n";
+	// leave this for debugging
+	// cout << "\nSearching for path from " << x << "," << y << " to " << x_dest << "," << y_dest << ".\n";
 
 	/* F = G + H
 
@@ -102,7 +103,7 @@ void NPC::a_star_pathfind(const int & x_dest, const int & y_dest, World & world)
 		} // end for each adjacent room
 
 		// keep searching if we have not reached the destination OR there are still rooms to search
-	} while (!room_in_node_list(x_dest, y_dest, closed_list) || open_list.size() > 0);
+	} while (/*!room_in_node_list(x_dest, y_dest, closed_list) ||*/ open_list.size() > 0);
 
 	// Starting from target room, continue finding parent until the current room is found
 	// (this represents the path in reverse)
@@ -118,7 +119,8 @@ void NPC::a_star_pathfind(const int & x_dest, const int & y_dest, World & world)
 		// get the parent room
 		Node parent_room = get_node_at(current_room.parent_x, current_room.parent_y, closed_list);
 
-		cout << "\nI can get to " << current_room.x << "," << current_room.y << " from " << parent_room.x << "," << parent_room.y << ".";
+		// leave this here for debugging
+		// cout << "\nI can get to " << current_room.x << "," << current_room.y << " from " << parent_room.x << "," << parent_room.y << ".";
 
 		// if the parent of current_room is our location, move to current_room
 		if (parent_room.x == this->x && parent_room.y == this->y)
@@ -127,13 +129,13 @@ void NPC::a_star_pathfind(const int & x_dest, const int & y_dest, World & world)
 			//this->move(C::opposite_direction_id.find(current_room.direction_from_parent)->second, world);
 			move(current_room.direction_from_parent, world);
 
-			// debugging
+			/* leave this here for debugging
 			cout << endl;
 			for (const Node & node : closed_list)
 			{
 				cout << "Parent of " << node.x << "," << node.y << " is " << node.parent_x << "," << node.parent_y << endl <<
 					"Actual cost to reach this node: " << node.g << ". Estimated cost to target: " << node.h << endl << endl;
-			}
+			}*/
 
 			return; // we're done here
 		}
