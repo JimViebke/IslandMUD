@@ -28,12 +28,13 @@ private:
 	const char land = C::LAND_CHAR;
 	const char forest = C::FOREST_CHAR;
 
-	stringstream generator_pattern;
+	stringstream generator_pattern; // reflects the steps used to reach a generated terrain
 
-	string generated_terrain_dir;
+	string generated_terrain_dir; // the path to place the terrain
+
+	vector<vector<char>> v1, v2, biome_map;
 
 public:
-	vector<vector<char>> v1, v2, biome_map;
 
 	Generator()
 	{
