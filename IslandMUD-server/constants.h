@@ -158,7 +158,7 @@ public:
 		MAX_DOOR_HEALTH;
 
 	const static map<string, map<string, int>> damage_tables;
-	
+
 	// AI movement costs
 
 	const static int
