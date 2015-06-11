@@ -58,9 +58,10 @@ public:
 		WOOD_ID,
 		STONE_ID,
 		VINE_ID,
-
 		STICK_ID,
 		BRANCH_ID,
+		ARROW_ID,
+		ARROWHEAD_ID,
 
 		TREE_ID,
 

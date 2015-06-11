@@ -66,6 +66,18 @@ public:
 	Wood() : Material(C::WOOD_ID) {}
 };
 
+class Arrow : public Material
+{
+public:
+	Arrow() : Material(C::ARROW_ID) {}
+};
+
+class Arrowhead : public Material
+{
+public:
+	Arrowhead() : Material(C::ARROWHEAD_ID) {}
+};
+
 class Tree : public Item
 {
 public:

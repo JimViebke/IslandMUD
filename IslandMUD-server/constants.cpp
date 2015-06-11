@@ -48,6 +48,8 @@ const string C::STONE_ID = "stone";
 const string C::VINE_ID = "vine";
 const string C::STICK_ID = "stick";
 const string C::BRANCH_ID = "branch";
+const string C::ARROW_ID = "arrow";
+const string C::ARROWHEAD_ID = "arrowhead";
 
 const string C::TREE_ID = "tree";
 

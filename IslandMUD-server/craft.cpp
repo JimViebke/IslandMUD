@@ -10,6 +10,8 @@ shared_ptr<Item> Craft::make(const string & item_ID)
 
 	// alphabetical based on ID, not object name
 	if (item_ID == C::ANVIL_ID) { return make_shared<Anvil>(); }
+	else if (item_ID == C::ARROW_ID) { return make_shared<Arrow>(); }
+	else if (item_ID == C::ARROWHEAD_ID) { return make_shared<Arrowhead>(); }
 	else if (item_ID == C::AXE_ID) { return make_shared<Axe>(); }
 	else if (item_ID == C::BOW_ID) { return make_shared<Bow>(); }
 	else if (item_ID == C::BRANCH_ID) { return make_shared<Branch>(); }

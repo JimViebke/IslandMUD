@@ -442,9 +442,9 @@ string Character::craft(const string & craft_item_id, World & world)
 		}
 
 		// "You now have a(n) sword. " OR "You now have a(n) sword (x5). "
-		response += "You now have a(n) " + it->first + string((it->second > 1)
-			? (" (x " + it->second + string(")"))
-			: "")
+		response += "You now have a(n) " + it->first
+			+ string((it->second > 1)
+			? (" (x" + R::to_string(it->second) + ")") : "")
 			+ ". ";
 	}
 
