@@ -40,6 +40,8 @@ void Parse::initialize()
 		P::dict["branch"] = P::dict["branches"] = C::BRANCH_ID;
 		P::dict["stick"] = C::STICK_ID;
 		P::dict["vine"] = C::VINE_ID;
+		P::dict["arrow"] = C::ARROW_ID;
+		P::dict["arrowhead"] = C::ARROWHEAD_ID;
 
 		// items -> tools
 		P::dict["bow"] = C::BOW_ID;

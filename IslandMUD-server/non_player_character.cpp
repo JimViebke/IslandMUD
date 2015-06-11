@@ -8,12 +8,17 @@ void NPC::a_star_pathfind(const int & x_dest, const int & y_dest, World & world)
 	// leave this for debugging
 	// cout << "\nSearching for path from " << x << "," << y << " to " << x_dest << "," << y_dest << ".\n";
 
-	/* F = G + H
+	/* 	Pathfinding resources:
+	http://www.redblobgames.com/pathfinding/a-star/introduction.html
+	http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#S7
 
-	G: actual cost to reach a certain room
-	H: estimated cost to reach destination from a certain room
+	F = G + H
 
-	f-cost = g + h */
+	G : actual cost to reach a certain room
+	H : estimated cost to reach destination from a certain room
+	F-cost = G + H */
+
+
 
 	vector<Node> open_list, closed_list;
 
@@ -25,7 +30,7 @@ void NPC::a_star_pathfind(const int & x_dest, const int & y_dest, World & world)
 	// Do
 	do
 	{
-		/*// -- Find lowest f-cost room on open list
+		/*/ / --Find lowest f - cost room on open list
 		// -- Move it to closed list
 		Node current_room = move_and_get_lowest_f_cost(open_list, closed_list); */
 
@@ -133,8 +138,8 @@ void NPC::a_star_pathfind(const int & x_dest, const int & y_dest, World & world)
 			cout << endl;
 			for (const Node & node : closed_list)
 			{
-				cout << "Parent of " << node.x << "," << node.y << " is " << node.parent_x << "," << node.parent_y << endl <<
-					"Actual cost to reach this node: " << node.g << ". Estimated cost to target: " << node.h << endl << endl;
+			cout << "Parent of " << node.x << "," << node.y << " is " << node.parent_x << "," << node.parent_y << endl <<
+			"Actual cost to reach this node: " << node.g << ". Estimated cost to target: " << node.h << endl << endl;
 			}*/
 
 			return; // we're done here
