@@ -14,6 +14,8 @@ string Character::login(World & world)
 	// load the player's data to user_data_xml
 	user_data_xml.load_file((C::user_data_directory + "\\" + this->name + ".xml").c_str());
 
+
+
 	// create holder values to save the coordinates from the file
 	int loaded_x = -1, loaded_y = -1, loaded_z = -1;
 
@@ -51,6 +53,32 @@ string Character::login(World & world)
 	// spawn in the player
 	world.room_at(x, y, z)->add_actor(this->name);
 
+
+
+	// select the skill node
+	xml_node skill_node = user_data_xml.child(C::XML_USER_SKILLS.c_str());
+
+	// select each skill attribute
+	xml_attribute swordsmanship_skill_attribute = skill_node.attribute(C::XML_SKILL_SWORDSMANSHIP.c_str());
+	xml_attribute archery_skill_attribute = skill_node.attribute(C::XML_SKILL_ARCHERY.c_str());
+	xml_attribute forest_visibility_skill_attribute = skill_node.attribute(C::XML_SKILL_FOREST_VISIBILITY.c_str());
+
+	// if an attribute is non-empty, load its skill value
+	if (!swordsmanship_skill_attribute.empty())
+	{
+		this->set_swordsmanship_skill(swordsmanship_skill_attribute.as_int());
+	}
+	if (!archery_skill_attribute.empty())
+	{
+		this->set_archery_skill(archery_skill_attribute.as_int());
+	}
+	if (!forest_visibility_skill_attribute.empty())
+	{
+		this->set_forest_visibilty_skill(forest_visibility_skill_attribute.as_int());
+	}
+
+
+
 	// for each item node of the equipment node
 	for (const xml_node & equipment : user_data_xml.child(C::XML_USER_EQUIPMENT.c_str()).children())
 	{
@@ -60,6 +88,8 @@ string Character::login(World & world)
 			R::convert_to<Equipment>(Craft::make(equipment.name()))
 			));
 	}
+
+
 
 	// for each item in the material node
 	for (const xml_node & material : user_data_xml.child(C::XML_USER_MATERIALS.c_str()).children())
@@ -74,6 +104,9 @@ string Character::login(World & world)
 		material_inventory.insert(pair<string, shared_ptr<Material>>(item->name, item));
 	}
 
+
+
+	// notify success
 	return "You have logged in to IslandMUD!";
 }
 string Character::logout()
@@ -83,6 +116,7 @@ string Character::logout()
 
 	// create nodes to store user equipment and materials
 	xml_node location_node = user_data_xml.append_child(C::XML_USER_LOCATION.c_str());
+	xml_node skill_node = user_data_xml.append_child(C::XML_USER_SKILLS.c_str());
 	xml_node equipment_node = user_data_xml.append_child(C::XML_USER_EQUIPMENT.c_str());
 	xml_node material_node = user_data_xml.append_child(C::XML_USER_MATERIALS.c_str());
 
@@ -90,6 +124,11 @@ string Character::logout()
 	location_node.append_attribute(string("x").c_str()).set_value(this->x);
 	location_node.append_attribute(string("y").c_str()).set_value(this->y);
 	location_node.append_attribute(string("z").c_str()).set_value(this->z);
+
+	// add each skill to the location node
+	skill_node.append_attribute(C::XML_SKILL_SWORDSMANSHIP.c_str()).set_value(this->swordsmanship_skill);
+	skill_node.append_attribute(C::XML_SKILL_ARCHERY.c_str()).set_value(this->archery_skill);
+	skill_node.append_attribute(C::XML_SKILL_FOREST_VISIBILITY.c_str()).set_value(this->forest_visibility_skill);
 
 	// for each piece of equipment in the user's inventory
 	for (multimap<string, shared_ptr<Equipment>>::const_iterator it = equipment_inventory.cbegin();
@@ -115,6 +154,53 @@ string Character::logout()
 	user_data_xml.save_file((C::user_data_directory + "\\" + this->name + ".xml").c_str()); // returns an unused boolean
 
 	return "You have logged out.";
+}
+
+// skills
+void Character::set_swordsmanship_skill(const int & skill_value)
+{
+	if (skill_value > C::SWORDSMANSHIP_SKILL_MAX)
+	{
+		swordsmanship_skill = C::SWORDSMANSHIP_SKILL_MAX;
+	}
+	else if (skill_value < C::SWORDSMANSHIP_SKILL_MIN)
+	{
+		swordsmanship_skill = C::SWORDSMANSHIP_SKILL_MIN;
+	}
+	else
+	{
+		swordsmanship_skill = skill_value;
+	}
+}
+void Character::set_archery_skill(const int & skill_value)
+{
+	if (skill_value > C::ARCHERY_SKILL_MAX)
+	{
+		archery_skill = C::ARCHERY_SKILL_MAX;
+	}
+	else if (skill_value < C::ARCHERY_SKILL_MIN)
+	{
+		archery_skill = C::ARCHERY_SKILL_MIN;
+	}
+	else
+	{
+		archery_skill = skill_value;
+	}
+}
+void Character::set_forest_visibilty_skill(const int & skill_value)
+{
+	if (skill_value > C::FOREST_VISIBILITY_SKILL_MAX)
+	{
+		forest_visibility_skill = C::FOREST_VISIBILITY_SKILL_MAX;
+	}
+	else if (skill_value < C::FOREST_VISIBILITY_SKILL_MIN)
+	{
+		forest_visibility_skill = C::FOREST_VISIBILITY_SKILL_MIN;
+	}
+	else
+	{
+		forest_visibility_skill = skill_value;
+	}
 }
 
 // inventory information
