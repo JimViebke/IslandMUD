@@ -124,9 +124,16 @@ const string C::XML_DOOR_FACTION = "faction";
 // user data xml consts
 
 const string C::XML_USER_LOCATION = "location";
+const string C::XML_USER_SKILLS = "skills";
 const string C::XML_USER_EQUIPMENT = "equipment";
 const string C::XML_USER_MATERIALS = "materials";
 const string C::XML_USER_MATERIAL_COUNT = "count";
+
+// user skill xml consts
+
+const string C::XML_SKILL_SWORDSMANSHIP = "swordsmanship";
+const string C::XML_SKILL_ARCHERY = "archery";
+const string C::XML_SKILL_FOREST_VISIBILITY = "forest_visibility";
 
 // store a vector of all valid surface ids
 const vector<string> C::surface_ids = { C::NORTH, C::EAST, C::SOUTH, C::WEST, C::FLOOR, C::CEILING };
@@ -245,3 +252,12 @@ const int C::AI_MOVEMENT_COST = 10; // 1 * 10
 const int C::AI_MOVEMENT_COST_DIAGONAL = 14; // sqrt(2) * 10
 const int C::AI_MOVEMENT_COST_FOREST = C::AI_MOVEMENT_COST * 2;
 const int C::AI_MOVEMENT_COST_FOREST_DIAGONAL = C::AI_MOVEMENT_COST_DIAGONAL * 2;
+
+// skills
+
+const int C::SWORDSMANSHIP_SKILL_MIN = 10; // damage inflicted per strike
+const int C::SWORDSMANSHIP_SKILL_MAX = 50;
+const int C::ARCHERY_SKILL_MIN = 50; // odds of a shot making contact
+const int C::ARCHERY_SKILL_MAX = 90;
+const int C::FOREST_VISIBILITY_SKILL_MIN = 10; // odds of seeing a hostile that is in a forest room (redrawn for every move of either player
+const int C::FOREST_VISIBILITY_SKILL_MAX = 90;

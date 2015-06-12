@@ -18,9 +18,19 @@ class Character
 {
 private:
 	string faction_ID;
+
+	int swordsmanship_skill = C::SWORDSMANSHIP_SKILL_MIN;
+	int archery_skill = C::ARCHERY_SKILL_MIN;
+	int forest_visibility_skill = C::FOREST_VISIBILITY_SKILL_MIN;
+
 public:
-	string name;
 	__int64 last_action_timestamp;
+
+	int x = C::DEFAULT_SPAWN_X; // location coordinates
+	int y = C::DEFAULT_SPAWN_Y;
+	int z = C::DEFAULT_SPAWN_Z;
+
+	string name;
 	string leader_ID;
 	vector<string> follower_ids;
 	shared_ptr<Item> equipped_item;
@@ -30,10 +40,6 @@ public:
 
 	// Item dragging_item; // a character can drag an item if they don't want to carry it.
 	static Recipes recipes; // exists in memory once for all PCs and NPCs
-
-	int x = C::DEFAULT_SPAWN_X; // location coordinates
-	int y = C::DEFAULT_SPAWN_Y;
-	int z = C::DEFAULT_SPAWN_Z;
 
 	Character(const string & name, const string & set_faction_ID) : name(name)
 	{
@@ -55,6 +61,11 @@ public:
 
 	string login(World & world);
 	string logout();
+
+	// skills
+	void set_swordsmanship_skill(const int & skill_value);
+	void set_archery_skill(const int & skill_value);
+	void set_forest_visibilty_skill(const int & skill_value);
 
 	// inventory information
 	bool has(const string & item_name, const unsigned & item_count = 1) const;
