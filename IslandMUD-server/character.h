@@ -17,26 +17,28 @@ using namespace std;
 class Character
 {
 private:
-	string faction_ID;
+	__int64 last_action_timestamp;
 
 	int swordsmanship_skill = C::SWORDSMANSHIP_SKILL_MIN;
 	int archery_skill = C::ARCHERY_SKILL_MIN;
 	int forest_visibility_skill = C::FOREST_VISIBILITY_SKILL_MIN;
 
 public:
-	__int64 last_action_timestamp;
-
 	int x = C::DEFAULT_SPAWN_X; // location coordinates
 	int y = C::DEFAULT_SPAWN_Y;
 	int z = C::DEFAULT_SPAWN_Z;
-
 	string name;
+
+protected:
+	string faction_ID;
 	string leader_ID;
 	vector<string> follower_ids;
 	shared_ptr<Item> equipped_item;
 
 	multimap<string, shared_ptr<Equipment>> equipment_inventory; // equipment doesn't stack
 	map<string, shared_ptr<Material>> material_inventory; // materials stack
+
+public:
 
 	// Item dragging_item; // a character can drag an item if they don't want to carry it.
 	static Recipes recipes; // exists in memory once for all PCs and NPCs
