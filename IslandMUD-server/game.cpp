@@ -108,9 +108,6 @@ void Game::load()
 	// load the parse dictionary
 	Parse::initialize();
 
-	// load the recipe lookup
-	Character::recipes = Recipes();
-
 	// load and create the world. All rooms will be on disk.
 	world.load();
 
