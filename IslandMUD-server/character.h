@@ -19,9 +19,9 @@ class Character
 private:
 	__int64 last_action_timestamp;
 
-	int swordsmanship_skill = C::SWORDSMANSHIP_SKILL_MIN;
-	int archery_skill = C::ARCHERY_SKILL_MIN;
-	int forest_visibility_skill = C::FOREST_VISIBILITY_SKILL_MIN;
+	int swordsmanship_level = C::SWORDSMANSHIP_LEVEL_MIN;
+	int archery_level = C::ARCHERY_LEVEL_MIN;
+	int forest_visibility_level = C::FOREST_VISIBILITY_LEVEL_MIN;
 
 public:
 	int x = C::DEFAULT_SPAWN_X; // location coordinates
@@ -64,10 +64,10 @@ public:
 	string login(World & world);
 	string logout();
 
-	// skills
-	void set_swordsmanship_skill(const int & skill_value);
-	void set_archery_skill(const int & skill_value);
-	void set_forest_visibilty_skill(const int & skill_value);
+	// levels
+	void set_swordsmanship_level(const int & level_value);
+	void set_archery_level(const int & level_value);
+	void set_forest_visibilty_level(const int & level_value);
 
 	// inventory information
 	bool has(const string & item_name, const unsigned & item_count = 1) const;
