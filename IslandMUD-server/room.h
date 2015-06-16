@@ -46,6 +46,7 @@ public:
 	bool contains_item(const string & item_id, const unsigned & count) const;
 	bool is_observed_by(const string & actor_id) const;
 	bool is_water() const;
+	bool is_forest() const;
 
 	// add and remove items
 	void add_item(const shared_ptr<Item> item);
