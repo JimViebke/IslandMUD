@@ -55,26 +55,26 @@ string Character::login(World & world)
 
 
 
-	// select the skill node
-	xml_node skill_node = user_data_xml.child(C::XML_USER_SKILLS.c_str());
+	// select the level node
+	xml_node level_node = user_data_xml.child(C::XML_USER_LEVELS.c_str());
 
-	// select each skill attribute
-	xml_attribute swordsmanship_skill_attribute = skill_node.attribute(C::XML_SKILL_SWORDSMANSHIP.c_str());
-	xml_attribute archery_skill_attribute = skill_node.attribute(C::XML_SKILL_ARCHERY.c_str());
-	xml_attribute forest_visibility_skill_attribute = skill_node.attribute(C::XML_SKILL_FOREST_VISIBILITY.c_str());
+	// select each level attribute
+	xml_attribute swordsmanship_level_attribute = level_node.attribute(C::XML_LEVEL_SWORDSMANSHIP.c_str());
+	xml_attribute archery_level_attribute = level_node.attribute(C::XML_LEVEL_ARCHERY.c_str());
+	xml_attribute forest_visibility_level_attribute = level_node.attribute(C::XML_LEVEL_FOREST_VISIBILITY.c_str());
 
-	// if an attribute is non-empty, load its skill value
-	if (!swordsmanship_skill_attribute.empty())
+	// if an attribute is non-empty, load its level value
+	if (!swordsmanship_level_attribute.empty())
 	{
-		this->set_swordsmanship_skill(swordsmanship_skill_attribute.as_int());
+		this->set_swordsmanship_level(swordsmanship_level_attribute.as_int());
 	}
-	if (!archery_skill_attribute.empty())
+	if (!archery_level_attribute.empty())
 	{
-		this->set_archery_skill(archery_skill_attribute.as_int());
+		this->set_archery_level(archery_level_attribute.as_int());
 	}
-	if (!forest_visibility_skill_attribute.empty())
+	if (!forest_visibility_level_attribute.empty())
 	{
-		this->set_forest_visibilty_skill(forest_visibility_skill_attribute.as_int());
+		this->set_forest_visibilty_level(forest_visibility_level_attribute.as_int());
 	}
 
 
@@ -116,7 +116,7 @@ string Character::logout()
 
 	// create nodes to store user equipment and materials
 	xml_node location_node = user_data_xml.append_child(C::XML_USER_LOCATION.c_str());
-	xml_node skill_node = user_data_xml.append_child(C::XML_USER_SKILLS.c_str());
+	xml_node level_node = user_data_xml.append_child(C::XML_USER_LEVELS.c_str());
 	xml_node equipment_node = user_data_xml.append_child(C::XML_USER_EQUIPMENT.c_str());
 	xml_node material_node = user_data_xml.append_child(C::XML_USER_MATERIALS.c_str());
 
@@ -125,10 +125,10 @@ string Character::logout()
 	location_node.append_attribute(string("y").c_str()).set_value(this->y);
 	location_node.append_attribute(string("z").c_str()).set_value(this->z);
 
-	// add each skill to the location node
-	skill_node.append_attribute(C::XML_SKILL_SWORDSMANSHIP.c_str()).set_value(this->swordsmanship_skill);
-	skill_node.append_attribute(C::XML_SKILL_ARCHERY.c_str()).set_value(this->archery_skill);
-	skill_node.append_attribute(C::XML_SKILL_FOREST_VISIBILITY.c_str()).set_value(this->forest_visibility_skill);
+	// add each level to the location node
+	level_node.append_attribute(C::XML_LEVEL_SWORDSMANSHIP.c_str()).set_value(this->swordsmanship_level);
+	level_node.append_attribute(C::XML_LEVEL_ARCHERY.c_str()).set_value(this->archery_level);
+	level_node.append_attribute(C::XML_LEVEL_FOREST_VISIBILITY.c_str()).set_value(this->forest_visibility_level);
 
 	// for each piece of equipment in the user's inventory
 	for (multimap<string, shared_ptr<Equipment>>::const_iterator it = equipment_inventory.cbegin();
@@ -156,50 +156,50 @@ string Character::logout()
 	return "You have logged out.";
 }
 
-// skills
-void Character::set_swordsmanship_skill(const int & skill_value)
+// levels
+void Character::set_swordsmanship_level(const int & level_value)
 {
-	if (skill_value > C::SWORDSMANSHIP_SKILL_MAX)
+	if (level_value > C::SWORDSMANSHIP_LEVEL_MAX)
 	{
-		swordsmanship_skill = C::SWORDSMANSHIP_SKILL_MAX;
+		swordsmanship_level = C::SWORDSMANSHIP_LEVEL_MAX;
 	}
-	else if (skill_value < C::SWORDSMANSHIP_SKILL_MIN)
+	else if (level_value < C::SWORDSMANSHIP_LEVEL_MIN)
 	{
-		swordsmanship_skill = C::SWORDSMANSHIP_SKILL_MIN;
+		swordsmanship_level = C::SWORDSMANSHIP_LEVEL_MIN;
 	}
 	else
 	{
-		swordsmanship_skill = skill_value;
+		swordsmanship_level = level_value;
 	}
 }
-void Character::set_archery_skill(const int & skill_value)
+void Character::set_archery_level(const int & level_value)
 {
-	if (skill_value > C::ARCHERY_SKILL_MAX)
+	if (level_value > C::ARCHERY_LEVEL_MAX)
 	{
-		archery_skill = C::ARCHERY_SKILL_MAX;
+		archery_level = C::ARCHERY_LEVEL_MAX;
 	}
-	else if (skill_value < C::ARCHERY_SKILL_MIN)
+	else if (level_value < C::ARCHERY_LEVEL_MIN)
 	{
-		archery_skill = C::ARCHERY_SKILL_MIN;
+		archery_level = C::ARCHERY_LEVEL_MIN;
 	}
 	else
 	{
-		archery_skill = skill_value;
+		archery_level = level_value;
 	}
 }
-void Character::set_forest_visibilty_skill(const int & skill_value)
+void Character::set_forest_visibilty_level(const int & level_value)
 {
-	if (skill_value > C::FOREST_VISIBILITY_SKILL_MAX)
+	if (level_value > C::FOREST_VISIBILITY_LEVEL_MAX)
 	{
-		forest_visibility_skill = C::FOREST_VISIBILITY_SKILL_MAX;
+		forest_visibility_level = C::FOREST_VISIBILITY_LEVEL_MAX;
 	}
-	else if (skill_value < C::FOREST_VISIBILITY_SKILL_MIN)
+	else if (level_value < C::FOREST_VISIBILITY_LEVEL_MIN)
 	{
-		forest_visibility_skill = C::FOREST_VISIBILITY_SKILL_MIN;
+		forest_visibility_level = C::FOREST_VISIBILITY_LEVEL_MIN;
 	}
 	else
 	{
-		forest_visibility_skill = skill_value;
+		forest_visibility_level = level_value;
 	}
 }
 

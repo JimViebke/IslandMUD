@@ -10,8 +10,7 @@ Recipes::Recipes()
 	cout << "\nLoading crafting recipes...";
 
 	// add_recipe("recipe name", {}, {}, {}, {}, {});
-
-
+	
 	// materials
 	add_recipe("stick", {}, {}, { { C::TREE_ID, 1 } }, {}, { { C::STICK_ID, 1 } });
 	add_recipe("branch", {}, {}, { { C::TREE_ID, 1 } }, {}, { { C::BRANCH_ID, 1 } });

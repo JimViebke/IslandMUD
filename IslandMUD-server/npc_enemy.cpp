@@ -8,8 +8,8 @@ void Hostile_NPC::update(World & world, map<string, shared_ptr<Character>> & act
 	// every time this is called, the NPC executes one action against the world
 	// any number of internal plans may be created, updated, or deleted
 
-	cout << "I am " << name << " and I see " << count<PC>(world, actors) << " enemy player(s) and "
-		<< count<Hostile_NPC>(world, actors) << " allied hostile(s).\n";
+	// cout << "I am " << name << " and I see " << count<PC>(world, actors) << " enemy player(s) and "
+	// 	<< count<Hostile_NPC>(world, actors) << " allied hostile(s).\n";
 
 	// the next block: the NPC runs to the first player it finds
 
@@ -28,9 +28,9 @@ void Hostile_NPC::update(World & world, map<string, shared_ptr<Character>> & act
 				// if the character is the type of character we're looking for
 				if (R::is<PC>(actors.find(actor_ID)->second))
 				{
-					cout << endl << actor_ID << " is a player character at " << cx << "," << cy << ". [exterminate! exterminate!]\n";
+					// cout << endl << actor_ID << " is a player character at " << cx << "," << cy << ". [exterminate! exterminate!]\n";
 					// [target acquired]
-					a_star_pathfind(cx, cy, world);
+					pathfind(cx, cy, world);
 					return;
 				}
 			}

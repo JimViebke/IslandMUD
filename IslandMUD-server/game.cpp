@@ -40,6 +40,21 @@ void Game::main_test_loop() // debugging
 	}
 
 
+	// Uncomment the below block to add a hostile NPC for each char in the string below.
+	// The char will be the name of the character.
+	// Not a great idea for debug builds.
+	/*{
+		string temp = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		for (unsigned i = 0; i < temp.size(); ++i)
+		{
+		string s(1, temp[i]);
+		Hostile_NPC h_npc(s, C::NPC_HOSTILE_FACTION_ID);
+		h_npc.login(world);
+		actors.insert(make_pair(h_npc.name, make_shared<Hostile_NPC>(h_npc)));
+		}
+		} */
+
+
 
 	// create some holders to support the main debug loop
 	int auto_advance = 0; // debugging only - idling is default in the final game
@@ -107,9 +122,6 @@ void Game::load()
 {
 	// load the parse dictionary
 	Parse::initialize();
-
-	// load the recipe lookup
-	Character::recipes = Recipes();
 
 	// load and create the world. All rooms will be on disk.
 	world.load();

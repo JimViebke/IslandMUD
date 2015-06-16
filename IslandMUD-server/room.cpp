@@ -515,7 +515,7 @@ string Room::summary(const string & player_ID) const
 		for (const string & actor_ID : actor_ids)
 		{
 			if (actor_ID == player_ID) { continue; } // skip the player themself.
-			summary_stream << actor_ID << " is here.";
+			summary_stream << actor_ID << " is here. ";
 		}
 	}
 
