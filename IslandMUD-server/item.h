@@ -9,7 +9,6 @@ Feb 14, 2015 */
 #include <map>
 
 #include "resources.h"
-#include "constants.h"
 #include "parse.h"
 
 using namespace std;

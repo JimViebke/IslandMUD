@@ -19,7 +19,9 @@ class Recipes
 public:
 	map<string, Recipe> recipes; // name, recipe object
 
-	Recipes(); // constructor is nontrival; defined in source file
+	Recipes() {} // constructor is nontrival; defined in source file
+
+	void load();
 
 	// recipe population
 	void add_recipe(const string & name,
