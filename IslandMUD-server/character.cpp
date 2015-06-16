@@ -639,6 +639,11 @@ string Character::drop(const string & drop_item_id, World & world)
 }
 string Character::construct_surface(const string & material_id, const string & surface_id, World & world)
 {
+	if (world.room_at(x, y, z)->is_forest())
+	{
+		return "You are in a forest and cannot build a structure here.";
+	}
+
 	// make sure the material can be used to construct a surface
 	if (C::SURFACE_REQUIREMENTS.find(material_id) == C::SURFACE_REQUIREMENTS.end())
 	{

@@ -146,6 +146,10 @@ bool Room::is_water() const
 {
 	return water;
 }
+bool Room::is_forest() const
+{
+	return this->contains_item(C::TREE_ID);
+}
 
 // add and remove items
 void Room::add_item(const shared_ptr<Item> item) // pass a copy rather than a reference
