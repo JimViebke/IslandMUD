@@ -218,9 +218,9 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				// reduce enemy count to a single-digit number
 				enemy_count = ((enemy_count > 9) ? 9 : enemy_count);
 
-				// debugging only
-				if (enemy_count > 0) { cout << "\nAt " << cx << "," << cy << " there are " << enemy_count << " enemies."; }
-				if (neutral_count > 0) { cout << "\nAt " << cx << "," << cy << " there are " << neutral_count << " neutrals."; }
+				// keep these for debugging
+				// if (enemy_count > 0) { cout << "\nAt " << cx << "," << cy << " there are " << enemy_count << " enemies."; }
+				// if (neutral_count > 0) { cout << "\nAt " << cx << "," << cy << " there are " << neutral_count << " neutrals."; }
 
 				// time for glorious nested ternary statements to do this cheap
 				a

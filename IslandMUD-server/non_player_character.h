@@ -26,7 +26,7 @@ protected:
 	// this can only be instantiaed by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
 	Non_Player_Character(const string & name, const string & faction_ID) : Character(name, faction_ID) {}
 
-	// used to count friends & foes:   count<Enemy_NPC>(world, actors);
+	// used to count friends or foes:   count<Enemy_NPC>(world, actors);
 	template <typename ACTOR_TYPE> unsigned count(World & world, map<string, shared_ptr<Character>> & actors) const
 	{
 		unsigned players_in_range = 0;
@@ -57,7 +57,7 @@ protected:
 		return players_in_range;
 	}
 
-	void a_star_pathfind(const int & x_dest, const int & y_dest, World & world);
+	void pathfind(const int & x_dest, const int & y_dest, World & world);
 
 private:
 
@@ -83,6 +83,7 @@ private:
 
 	// pathfinding node utilities
 	Node move_and_get_lowest_f_cost(vector<Node> & open, vector<Node> & closed);
+	Node move_and_get_lowest_g_cost(vector<Node> & open, vector<Node> & closed);
 	bool room_in_node_list(const int & find_x, const int & find_y, const vector<Node> & node_list) const;
 	Node get_node_at(const int & find_x, const int & find_y, const vector<Node> & node_list) const;
 };
