@@ -1,10 +1,11 @@
 /* Jim Viebke
 Jeb 16 2015 */
 
+#include "constants.h"
 #include "character.h"
 #include "world.h"
 
-Recipes Character::recipes; // constructor calls populate()
+Recipes Character::recipes;
 
 string Character::login(World & world)
 {
@@ -62,6 +63,7 @@ string Character::login(World & world)
 	xml_attribute swordsmanship_level_attribute = level_node.attribute(C::XML_LEVEL_SWORDSMANSHIP.c_str());
 	xml_attribute archery_level_attribute = level_node.attribute(C::XML_LEVEL_ARCHERY.c_str());
 	xml_attribute forest_visibility_level_attribute = level_node.attribute(C::XML_LEVEL_FOREST_VISIBILITY.c_str());
+	xml_attribute full_health_level_attribute = level_node.attribute(C::XML_LEVEL_HEALTH_MAX.c_str());
 
 	// if an attribute is non-empty, load its level value
 	if (!swordsmanship_level_attribute.empty())
@@ -76,8 +78,25 @@ string Character::login(World & world)
 	{
 		this->set_forest_visibilty_level(forest_visibility_level_attribute.as_int());
 	}
+	if (!full_health_level_attribute.empty())
+	{
+		this->set_health_max(full_health_level_attribute.as_int());
+	}
 
+	// select status node (just holds current_health at this time)
+	xml_node status_node = user_data_xml.child(C::XML_USER_STATUS.c_str());
 
+	// if current_health is non-empty, set current health
+	xml_attribute current_health_attribute = status_node.attribute(C::XML_USER_STATUS_CURRENT_HEALTH.c_str());
+	if (!current_health_attribute.empty())
+	{
+		this->set_current_health(current_health_attribute.as_int());
+	}
+	else // if current_health is empty, explicitly set current health to base maximum
+	{
+		this->set_current_health(C::FULL_HEALTH_MIN);
+	}
+	
 
 	// for each item node of the equipment node
 	for (const xml_node & equipment : user_data_xml.child(C::XML_USER_EQUIPMENT.c_str()).children())
@@ -115,10 +134,14 @@ string Character::logout()
 	xml_document user_data_xml;
 
 	// create nodes to store user equipment and materials
+	xml_node status_node = user_data_xml.append_child(C::XML_USER_STATUS.c_str());
 	xml_node location_node = user_data_xml.append_child(C::XML_USER_LOCATION.c_str());
 	xml_node level_node = user_data_xml.append_child(C::XML_USER_LEVELS.c_str());
 	xml_node equipment_node = user_data_xml.append_child(C::XML_USER_EQUIPMENT.c_str());
 	xml_node material_node = user_data_xml.append_child(C::XML_USER_MATERIALS.c_str());
+
+	/// add health attribute to status node
+	status_node.append_attribute(C::XML_USER_STATUS_CURRENT_HEALTH.c_str()).set_value(this->current_health);
 
 	// add x, y, and z attributes to the location node
 	location_node.append_attribute(string("x").c_str()).set_value(this->x);
@@ -129,6 +152,7 @@ string Character::logout()
 	level_node.append_attribute(C::XML_LEVEL_SWORDSMANSHIP.c_str()).set_value(this->swordsmanship_level);
 	level_node.append_attribute(C::XML_LEVEL_ARCHERY.c_str()).set_value(this->archery_level);
 	level_node.append_attribute(C::XML_LEVEL_FOREST_VISIBILITY.c_str()).set_value(this->forest_visibility_level);
+	level_node.append_attribute(C::XML_LEVEL_HEALTH_MAX.c_str()).set_value(this->max_health);
 
 	// for each piece of equipment in the user's inventory
 	for (multimap<string, shared_ptr<Equipment>>::const_iterator it = equipment_inventory.cbegin();
@@ -200,6 +224,41 @@ void Character::set_forest_visibilty_level(const int & level_value)
 	else
 	{
 		forest_visibility_level = level_value;
+	}
+}
+void Character::set_health_max(const int & level_value)
+{
+	if (level_value > C::FULL_HEALTH_MAX)
+	{
+		max_health = C::FULL_HEALTH_MAX;
+	}
+	else if (level_value < C::FULL_HEALTH_MIN)
+	{
+		max_health = C::FULL_HEALTH_MIN;
+	}
+	else
+	{
+		max_health = level_value;
+	}
+}
+
+// setters
+void Character::set_current_health(const int & health_value)
+{
+	// don't call this until after the player's max_health has been set
+	// otherwise the max_health field will still be at the default game constant
+
+	if (health_value > max_health)
+	{
+		current_health = max_health;
+	}
+	else if (health_value <= C::HEALTH_MIN) // we can't set the user's health level to "die", so just use max
+	{
+		current_health = max_health;
+	}
+	else
+	{
+		current_health = health_value;
 	}
 }
 

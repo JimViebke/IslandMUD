@@ -123,6 +123,8 @@ const string C::XML_DOOR_FACTION = "faction";
 
 // user data xml consts
 
+const string C::XML_USER_STATUS = "status";
+const string C::XML_USER_STATUS_CURRENT_HEALTH = "current_health";
 const string C::XML_USER_LOCATION = "location";
 const string C::XML_USER_LEVELS = "levels";
 const string C::XML_USER_EQUIPMENT = "equipment";
@@ -134,6 +136,11 @@ const string C::XML_USER_MATERIAL_COUNT = "count";
 const string C::XML_LEVEL_SWORDSMANSHIP = "swordsmanship";
 const string C::XML_LEVEL_ARCHERY = "archery";
 const string C::XML_LEVEL_FOREST_VISIBILITY = "forest_visibility";
+const string C::XML_LEVEL_HEALTH_MAX = "max_health";
+
+// user health
+
+const string C::XML_CURRENT_HEALTH = "current_health";
 
 // store a vector of all valid surface ids
 const vector<string> C::surface_ids = { C::NORTH, C::EAST, C::SOUTH, C::WEST, C::FLOOR, C::CEILING };
@@ -261,3 +268,6 @@ const int C::ARCHERY_LEVEL_MIN = 50; // odds of a shot making contact
 const int C::ARCHERY_LEVEL_MAX = 90;
 const int C::FOREST_VISIBILITY_LEVEL_MIN = 10; // odds of seeing a hostile that is in a forest room (redrawn for every move of either player
 const int C::FOREST_VISIBILITY_LEVEL_MAX = 90;
+const int C::HEALTH_MIN = 0;
+const int C::FULL_HEALTH_MIN = 100; // this is full health for new players
+const int C::FULL_HEALTH_MAX = 200; // this is full health for fully leveled health
