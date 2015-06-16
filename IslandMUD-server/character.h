@@ -19,9 +19,14 @@ class Character
 private:
 	__int64 last_action_timestamp;
 
+	// these are levels/skills/abilities
 	int swordsmanship_level = C::SWORDSMANSHIP_LEVEL_MIN;
 	int archery_level = C::ARCHERY_LEVEL_MIN;
 	int forest_visibility_level = C::FOREST_VISIBILITY_LEVEL_MIN;
+	int max_health = C::FULL_HEALTH_MIN; // the player's full health, which increases combat experience
+
+	// this is not a skill/ability, it is the current status
+	int current_health = C::FULL_HEALTH_MIN; // the player's current health
 
 public:
 	int x = C::DEFAULT_SPAWN_X; // location coordinates
@@ -30,6 +35,7 @@ public:
 	string name;
 
 protected:
+
 	string faction_ID;
 	string leader_ID;
 	vector<string> follower_ids;
@@ -68,6 +74,10 @@ public:
 	void set_swordsmanship_level(const int & level_value);
 	void set_archery_level(const int & level_value);
 	void set_forest_visibilty_level(const int & level_value);
+	void set_health_max(const int & level_value);
+
+	// setters
+	void set_current_health(const int & current_health);
 
 	// inventory information
 	bool has(const string & item_name, const unsigned & item_count = 1) const;

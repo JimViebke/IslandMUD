@@ -120,6 +120,9 @@ void Game::main_test_loop() // debugging
 
 void Game::load()
 {
+	// load crafting recipes lookup
+	Character::recipes.load();
+
 	// load the parse dictionary
 	Parse::initialize();
 

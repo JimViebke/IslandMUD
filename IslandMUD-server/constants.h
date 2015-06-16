@@ -26,7 +26,7 @@ public:
 
 	// faction IDs
 	const static string PC_FACTION_ID; // players ("PCs")
-	const static string NPC_NEUTRAL_FACTION_ID; // neutral islanders
+	const static string NPC_NEUTRAL_FACTION_ID; // neutral island inhabitants
 	const static string NPC_HOSTILE_FACTION_ID; // antagonists
 
 	const static char
@@ -123,6 +123,8 @@ public:
 		XML_DOOR_FACTION,
 
 		// user data xml
+		XML_USER_STATUS,
+		XML_USER_STATUS_CURRENT_HEALTH,
 		XML_USER_LOCATION,
 		XML_USER_LEVELS,
 		XML_USER_EQUIPMENT,
@@ -132,7 +134,11 @@ public:
 		// user level xml consts
 		XML_LEVEL_SWORDSMANSHIP,
 		XML_LEVEL_ARCHERY,
-		XML_LEVEL_FOREST_VISIBILITY;
+		XML_LEVEL_FOREST_VISIBILITY,
+		XML_LEVEL_HEALTH_MAX,
+
+		// user health
+		XML_CURRENT_HEALTH;
 
 	// surface information
 
@@ -182,7 +188,10 @@ public:
 		ARCHERY_LEVEL_MIN,
 		ARCHERY_LEVEL_MAX,
 		FOREST_VISIBILITY_LEVEL_MIN,
-		FOREST_VISIBILITY_LEVEL_MAX;
+		FOREST_VISIBILITY_LEVEL_MAX,
+		HEALTH_MIN, // explaination in source
+		FULL_HEALTH_MIN, 
+		FULL_HEALTH_MAX;
 };
 
 #endif

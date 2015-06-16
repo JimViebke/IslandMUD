@@ -3,14 +3,14 @@ May 15 2015 */
 
 #include "recipes.h"
 
-Recipes::Recipes()
+void Recipes::load()
 {
-	// for documentation, refer to add() below
+	// for documentation, refer to add_recipe() below
 
 	cout << "\nLoading crafting recipes...";
-
+		
 	// add_recipe("recipe name", {}, {}, {}, {}, {});
-	
+
 	// materials
 	add_recipe("stick", {}, {}, { { C::TREE_ID, 1 } }, {}, { { C::STICK_ID, 1 } });
 	add_recipe("branch", {}, {}, { { C::TREE_ID, 1 } }, {}, { { C::BRANCH_ID, 1 } });
@@ -18,7 +18,7 @@ Recipes::Recipes()
 	add_recipe("stone", {}, {}, {}, {}, { { C::STONE_ID, 1 } }); // you can always get a stone
 	add_recipe("arrow", {}, { { C::ARROWHEAD_ID, 1 }, { C::STICK_ID, 1 } }, {}, {}, { { C::ARROW_ID, 1 } }); // a stick and an arrowhead
 	add_recipe("arrowhead", { { C::STONE_ID, 2 } }, { { C::STONE_ID, 1 } }, {}, {}, { { C::ARROWHEAD_ID, 3 } }); // requires two stones but only one is made into arrowheads
-
+	
 	// equipment
 	add_recipe("staff", { { C::AXE_ID, 1 } }, { { C::BRANCH_ID, 1 } }, {}, {}, { { C::STAFF_ID, 1 } });
 	add_recipe("axe", {}, { { C::BRANCH_ID, 1 }, { C::STONE_ID, 1 }, { C::VINE_ID, 1 } }, {}, {}, { { C::AXE_ID, 1 } }); // maybe need a sharp stone?
