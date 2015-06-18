@@ -38,20 +38,7 @@ string PC::print() const
 // Build and return a top-down area map around a given coordinate
 string PC::generate_area_map(const World & world, const map<string, shared_ptr<Character>> & actors) const
 {
-	bool
-		// is a wall present in a given direction?
-		n, e, s, w, // "north"
-
-		// is there a door present in a given location?
-		nd, ed, sd, wd, // "north door?"
-
-		// is a wall rubble in a given direction?
-		nr, er, sr, wr, // "north rubble?"
-
-		// is a forest area in a given direction from a coordinate? (f_n == forest_north)
-		f_n, f_ne, f_e, f_se, f_s, f_sw, f_w, f_nw;
-
-	stringstream user_map, a, b, c; // three stringstreams feed into one master stringstream
+	stringstream user_map; // three stringstreams feed into one master stringstream
 
 	// create a 2D vector to represent whether or not a tree is at a location
 	vector<vector<bool>> forest_grid;
@@ -93,6 +80,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 	set n, e, s, w to(room contains surface ? ); */
 	for (int cx = x - (int)C::VIEW_DISTANCE; cx <= x + (int)C::VIEW_DISTANCE; ++cx)
 	{
+		stringstream a, b, c;
 		for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 		{
 			// if the room is out of bounds
@@ -135,14 +123,14 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 			if (forest_grid[fga_x][fga_y]) // if there is a tree here, determine how the tile should be drawn
 			{
 				// is a forest area at the neighbouring coordinates? f_n == forest_north
-				f_n = forest_grid[fga_x - 1][fga_y];
-				f_ne = forest_grid[fga_x - 1][fga_y + 1];
-				f_e = forest_grid[fga_x][fga_y + 1];
-				f_se = forest_grid[fga_x + 1][fga_y + 1];
-				f_s = forest_grid[fga_x + 1][fga_y];
-				f_sw = forest_grid[fga_x + 1][fga_y - 1];
-				f_w = forest_grid[fga_x][fga_y - 1];
-				f_nw = forest_grid[fga_x - 1][fga_y - 1];
+				bool f_n = forest_grid[fga_x - 1][fga_y];
+				bool f_ne = forest_grid[fga_x - 1][fga_y + 1];
+				bool f_e = forest_grid[fga_x][fga_y + 1];
+				bool f_se = forest_grid[fga_x + 1][fga_y + 1];
+				bool f_s = forest_grid[fga_x + 1][fga_y];
+				bool f_sw = forest_grid[fga_x + 1][fga_y - 1];
+				bool f_w = forest_grid[fga_x][fga_y - 1];
+				bool f_nw = forest_grid[fga_x - 1][fga_y - 1];
 
 				// conditionally draw a tree or an empty space in the corners, other five are always draw as trees
 				a << ((f_n || f_nw || f_w) ? C::FOREST_CHAR : C::LAND_CHAR) << C::FOREST_CHAR << ((f_n || f_ne || f_e) ? C::FOREST_CHAR : C::LAND_CHAR);
@@ -161,13 +149,18 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 			// there is no tree, so there may be a structure
 			else
 			{
-				// use a boolean value to indicate the presence or absence of a wall
-				n = world.room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::NORTH);
-				e = world.room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::EAST);
-				s = world.room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::SOUTH);
-				w = world.room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::WEST);
+				// use a boolean value to indicate the presence or absence of a wall in this room
+				bool n = world.room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::NORTH);
+				bool e = world.room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::EAST);
+				bool s = world.room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::SOUTH);
+				bool w = world.room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::WEST);
 
-				nd = ed = sd = wd = nr = er = sr = wr = false; // set all door and rubble flags to false
+				bool
+					// is there a door present in a given location?
+					nd = false, ed = false, sd = false, wd = false, // "north door?"
+
+					// is a wall rubble in a given direction?
+					nr = false, er = false, sr = false, wr = false; // "north rubble?"
 
 				/*
 				if a north wall is present
@@ -241,9 +234,6 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 
 		// each iteration, push the three stringstreams representing the row into the user's map
 		user_map << a.str() << endl << b.str() << endl << c.str() << endl;
-
-		// reset the stringstreams for the next row of rooms
-		a.str(std::string()); b.str(std::string()); c.str(std::string());
 	} // end for each row
 
 	return user_map.str(); // this now contains the client's entire visible area. No formatting is required, just dump this to console.
