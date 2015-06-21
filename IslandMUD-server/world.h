@@ -50,6 +50,18 @@ public:
 	// move a room from world to disk
 	void unload_room(const int & x, const int & y, const int & z);
 
+	// room information
+	bool room_has_surface(const int & x, const int & y, const int & z, const string & direction_ID) const
+	{
+		// if the room is outside of bounds
+		if (!R::bounds_check(x, y, z)) { return false; }
+		
+		// if the room is not loaded
+		if (room_at(x, y, z) == nullptr) { return false; }
+
+		// test if the passed direction_ID exists as a wall
+		return room_at(x, y, z)->has_surface(direction_ID);
+	}
 
 
 private:

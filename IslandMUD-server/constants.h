@@ -153,17 +153,28 @@ public:
 	const static map<string, unsigned> SURFACE_REQUIREMENTS;
 	const static map<string, unsigned> DOOR_REQUIREMENTS;
 
-	// box drawing
+	// box drawing (more explaination at implementation
 
 	const static char
 		NW_CORNER,
 		NE_CORNER,
 		SW_CORNER,
 		SE_CORNER,
+
+		NES_CORNER,
+		ESW_CORNER,
+		NSW_CORNER,
+		NEW_CORNER,
+
+		NESW,
+
 		NS_WALL,
 		WE_WALL,
+
 		NS_DOOR,
 		WE_DOOR;
+
+	const static vector<char> CORNERS;
 
 	const static int
 		MIN_SURFACE_HEALTH,
@@ -190,7 +201,7 @@ public:
 		FOREST_VISIBILITY_LEVEL_MIN,
 		FOREST_VISIBILITY_LEVEL_MAX,
 		HEALTH_MIN, // explaination in source
-		FULL_HEALTH_MIN, 
+		FULL_HEALTH_MIN,
 		FULL_HEALTH_MAX;
 };
 
