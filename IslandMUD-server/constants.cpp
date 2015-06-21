@@ -196,22 +196,76 @@ const map<string, unsigned> C::DOOR_REQUIREMENTS =
 
 // box drawing
 
-/* Exploded view
+const char C::NW_CORNER = char(201); // ╔
+const char C::NE_CORNER = char(187); // ╗
+const char C::SW_CORNER = char(200); // ╚
+const char C::SE_CORNER = char(188); // ╝
 
-╔ ═ ╗
+const char C::NES_CORNER = char(204); // ╠
+const char C::ESW_CORNER = char(203); // ­╦
+const char C::NSW_CORNER = char(185); // ╣
+const char C::NEW_CORNER = char(202); // ╩
 
-║   ║           for doors:   179: │   196: ─
+const char C::NESW = char(206); // ╬
 
-╚ ═ ╝ */
+const char C::NS_WALL = char(186); // ║
+const char C::WE_WALL = char(205); // ═
 
-const char C::NW_CORNER = char(201);
-const char C::NE_CORNER = char(187);
-const char C::SW_CORNER = char(200);
-const char C::SE_CORNER = char(188);
-const char C::NS_WALL = char(186);
-const char C::WE_WALL = char(205);
-const char C::NS_DOOR = char(179);
-const char C::WE_DOOR = char(196);
+const char C::NS_DOOR = char(179); // │
+const char C::WE_DOOR = char(196); // ─
+
+// more box drawing
+
+const vector<char> C::CORNERS = {
+	// wsen
+	// 0000 land_char
+	C::LAND_CHAR,
+
+	// 0001 ns_wall
+	C::NS_WALL,
+
+	// 0010 we_wall
+	C::WE_WALL,
+
+	// 0011 sw_corner
+	C::SW_CORNER,
+
+	// 0100 ns_wall
+	C::NS_WALL,
+
+	// 0101 ns_wall
+	C::NS_WALL,
+
+	// 0110 nw_corner
+	C::NW_CORNER,
+
+	// 0111 nes_corner
+	C::NES_CORNER,
+
+	// 1000 we_wall
+	C::WE_WALL,
+
+	// 1001 se_corner
+	C::SE_CORNER,
+
+	// 1010 we_wall
+	C::WE_WALL,
+
+	// 1011 new_corner
+	C::NEW_CORNER,
+
+	// 1100 ne_corner
+	C::NE_CORNER,
+
+	// 1101 nsw_corner
+	C::NSW_CORNER,
+
+	// 1110 esw_corner
+	C::ESW_CORNER,
+
+	// 1111 nesw
+	C::NESW
+};
 
 // walls, ceiling, and floor - min and max health
 

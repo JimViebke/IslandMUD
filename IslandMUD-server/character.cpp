@@ -96,7 +96,7 @@ string Character::login(World & world)
 	{
 		this->set_current_health(C::FULL_HEALTH_MIN);
 	}
-	
+
 
 	// for each item node of the equipment node
 	for (const xml_node & equipment : user_data_xml.child(C::XML_USER_EQUIPMENT.c_str()).children())
@@ -898,7 +898,7 @@ string Character::validate_movement(const int & cx, const int & cy, const int & 
 		}
 	}
 	// if the player wants to move in a secondary direction (nw/ne/se/sw), condition is
-	// one of two direction walls absent AND one of two result room opposite walls absent
+	// none of four possible walls obstruct path AND an obstructing corner is not formed by adjacent rooms
 	else if (
 		direction_ID == C::NORTH_WEST || direction_ID == C::NORTH_EAST ||
 		direction_ID == C::SOUTH_EAST || direction_ID == C::SOUTH_WEST)
@@ -909,7 +909,9 @@ string Character::validate_movement(const int & cx, const int & cy, const int & 
 		if (direction_ID == C::NORTH_WEST)
 		{
 			if (current_room->has_surface(C::NORTH) || current_room->has_surface(C::WEST) ||
-				destination_room->has_surface(C::SOUTH) || destination_room->has_surface(C::EAST))
+				destination_room->has_surface(C::SOUTH) || destination_room->has_surface(C::EAST) ||
+				(world.room_has_surface(cx - 1, cy, cz, C::WEST) && world.room_has_surface(cx, cy - 1, cz, C::NORTH)) ||
+				(world.room_has_surface(cx - 1, cy, cz, C::SOUTH) && world.room_has_surface(cx, cy - 1, cz, C::EAST)))
 			{
 				return "There are walls in your way to the " + direction_ID + ".";
 			}
@@ -917,7 +919,9 @@ string Character::validate_movement(const int & cx, const int & cy, const int & 
 		else if (direction_ID == C::NORTH_EAST)
 		{
 			if (current_room->has_surface(C::NORTH) || current_room->has_surface(C::EAST) ||
-				destination_room->has_surface(C::SOUTH) || destination_room->has_surface(C::WEST))
+				destination_room->has_surface(C::SOUTH) || destination_room->has_surface(C::WEST) ||
+				(world.room_has_surface(cx - 1, cy, cz, C::EAST) && world.room_has_surface(cx, cy + 1, cz, C::NORTH)) ||
+				(world.room_has_surface(cx - 1, cy, cz, C::SOUTH) && world.room_has_surface(cx, cy + 1, cz, C::WEST)))
 			{
 				return "There are walls in your way to the " + direction_ID + ".";
 			}
@@ -925,7 +929,9 @@ string Character::validate_movement(const int & cx, const int & cy, const int & 
 		else if (direction_ID == C::SOUTH_EAST)
 		{
 			if (current_room->has_surface(C::SOUTH) || current_room->has_surface(C::EAST) ||
-				destination_room->has_surface(C::NORTH) || destination_room->has_surface(C::WEST))
+				destination_room->has_surface(C::NORTH) || destination_room->has_surface(C::WEST) ||
+				(world.room_has_surface(cx + 1, cy, cz, C::EAST) && world.room_has_surface(cx, cy + 1, cz, C::SOUTH)) ||
+				(world.room_has_surface(cx + 1, cy, cz, C::NORTH) && world.room_has_surface(cx, cy + 1, cz, C::WEST)))
 			{
 				return "There are walls in your way to the " + direction_ID + ".";
 			}
@@ -933,7 +939,9 @@ string Character::validate_movement(const int & cx, const int & cy, const int & 
 		else if (direction_ID == C::SOUTH_WEST)
 		{
 			if (current_room->has_surface(C::SOUTH) || current_room->has_surface(C::WEST) ||
-				destination_room->has_surface(C::NORTH) || destination_room->has_surface(C::EAST))
+				destination_room->has_surface(C::NORTH) || destination_room->has_surface(C::EAST) ||
+				(world.room_has_surface(cx + 1, cy, cz, C::WEST) && world.room_has_surface(cx, cy - 1, cz, C::SOUTH)) ||
+				(world.room_has_surface(cx + 1, cy, cz, C::NORTH) && world.room_has_surface(cx, cy - 1, cz, C::EAST)))
 			{
 				return "There are walls in your way to the " + direction_ID + ".";
 			}

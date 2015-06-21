@@ -215,20 +215,72 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				// if (enemy_count > 0) { cout << "\nAt " << cx << "," << cy << " there are " << enemy_count << " enemies."; }
 				// if (neutral_count > 0) { cout << "\nAt " << cx << "," << cy << " there are " << neutral_count << " neutrals."; }
 
+				char nw_corner = C::LAND_CHAR, ne_corner = C::LAND_CHAR, se_corner = C::LAND_CHAR, sw_corner = C::LAND_CHAR;
+				{
+					// relative to the north west corner of the room, is there a wall to the n/e/s/w
+					bool wtn = world.room_has_surface(cx - 1, cy, C::GROUND_INDEX, C::WEST);
+					bool wte = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::NORTH);
+					bool wts = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::WEST);
+					bool wtw = world.room_has_surface(cx, cy - 1, C::GROUND_INDEX, C::NORTH);
+
+					// in order for this corner to render, there must be one adjacent local wall OR two adjacent remote walls
+					if (wte || wts || (wtn && wtw))
+					{
+						nw_corner = R::corner_char(wtn, wte, wts, wtw);
+					}
+				}
+				{
+					// relative to the north east corner of the room, is there a wall to the n/e/s/w
+					bool wtn = world.room_has_surface(cx - 1, cy, C::GROUND_INDEX, C::EAST);
+					bool wte = world.room_has_surface(cx, cy + 1, C::GROUND_INDEX, C::NORTH);
+					bool wts = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::EAST);
+					bool wtw = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::NORTH);
+
+					if (wtw || wts || (wtn && wte))
+					{
+						ne_corner = R::corner_char(wtn, wte, wts, wtw);
+					}
+				}
+				{
+					// relative to the south east corner of the room, is there a wall to the n/e/s/w
+					bool wtn = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::EAST);
+					bool wte = world.room_has_surface(cx, cy + 1, C::GROUND_INDEX, C::SOUTH);
+					bool wts = world.room_has_surface(cx + 1, cy, C::GROUND_INDEX, C::EAST);
+					bool wtw = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::SOUTH);
+
+					if (wtn || wtw || (wts && wte))
+					{
+						se_corner = R::corner_char(wtn, wte, wts, wtw);
+					}
+				}
+				{
+					// relative to the south west corner of the room, is there a wall to the n/e/s/w
+					bool wtn = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::WEST);
+					bool wte = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::SOUTH);
+					bool wts = world.room_has_surface(cx + 1, cy, C::GROUND_INDEX, C::WEST);
+					bool wtw = world.room_has_surface(cx, cy - 1, C::GROUND_INDEX, C::SOUTH);
+
+					if (wtn || wte || (wts && wtw))
+					{
+						sw_corner = R::corner_char(wtn, wte, wts, wtw);
+					}
+				}
+
+
 				// time for glorious nested ternary statements to do this cheap
 				a
-					<< ((n && w) ? C::NW_CORNER : (n) ? C::WE_WALL : (w) ? C::NS_WALL : C::LAND_CHAR)
+					<< nw_corner
 					<< ((nr) ? C::RUBBLE_CHAR : ((nd) ? C::WE_DOOR : ((n) ? C::WE_WALL : C::LAND_CHAR)))
-					<< ((n && e) ? C::NE_CORNER : (n) ? C::WE_WALL : (e) ? C::NS_WALL : C::LAND_CHAR);
+					<< ne_corner;
 				b
 					<< ((wr) ? C::RUBBLE_CHAR : ((wd) ? C::NS_DOOR : ((w) ? C::NS_WALL : C::LAND_CHAR)))
 					// if the current coordinates are the player's, draw an @ icon, else if there is an enemy, draw enemy count, else if there is an item, draw an item char, else empty
 					<< ((cx == x && cy == y) ? C::PLAYER_CHAR : ((enemy_count > 0) ? R::to_char(enemy_count) : ((neutral_count > 0) ? C::NPC_NEUTRAL_CHAR : ((world.room_at(cx, cy, C::GROUND_INDEX)->contains_no_items()) ? C::LAND_CHAR : C::ITEM_CHAR))))
 					<< ((er) ? C::RUBBLE_CHAR : ((ed) ? C::NS_DOOR : ((e) ? C::NS_WALL : C::LAND_CHAR)));
 				c
-					<< ((s && w) ? C::SW_CORNER : (s) ? C::WE_WALL : (w) ? C::NS_WALL : C::LAND_CHAR)
+					<< sw_corner
 					<< ((sr) ? C::RUBBLE_CHAR : ((sd) ? C::WE_DOOR : ((s) ? C::WE_WALL : C::LAND_CHAR)))
-					<< ((s && e) ? C::SE_CORNER : (s) ? C::WE_WALL : (e) ? C::NS_WALL : C::LAND_CHAR);
+					<< se_corner;
 			}
 		} // end for each room in row
 
