@@ -60,10 +60,10 @@ void Generator::game_of_life(const int & iterations)
 	for (int pass = 0; pass < iterations; ++pass)
 	{
 		// for each row (excluding a 1-thick border)
-		for (int i = 1; i < WORLD_X_DIMENSION - 1; ++i)
+		for (int i = 1; i < C::WORLD_X_DIMENSION - 1; ++i)
 		{
 			// for each room in the room (excluding a 1-thick border
-			for (int j = 0; j < WORLD_Y_DIMENSION - 1; ++j)
+			for (int j = 0; j < C::WORLD_Y_DIMENSION - 1; ++j)
 			{
 				// if the current cell/room is water, skip it
 				if (v2[i][j] == water)
@@ -120,10 +120,10 @@ void Generator::clean(const int & iterations)
 	for (int pass = 0; pass < iterations; ++pass)
 	{
 		// for each row (excluding a 1-thick border)
-		for (int i = 1; i < WORLD_X_DIMENSION - 1; ++i)
+		for (int i = 1; i < C::WORLD_X_DIMENSION - 1; ++i)
 		{
 			// for each room in the room (excluding a 1-thick border
-			for (int j = 0; j < WORLD_Y_DIMENSION - 1; ++j)
+			for (int j = 0; j < C::WORLD_Y_DIMENSION - 1; ++j)
 			{
 				// if the current cell/room is water, skip it
 				if (v2[i][j] == water)
@@ -165,10 +165,10 @@ void Generator::fill(const int & iterations)
 	for (int pass = 0; pass < iterations; ++pass)
 	{
 		// for each row (excluding a 1-thick border)
-		for (int i = 1; i < WORLD_X_DIMENSION - 1; ++i)
+		for (int i = 1; i < C::WORLD_X_DIMENSION - 1; ++i)
 		{
 			// for each room in the room (excluding a 1-thick border
-			for (int j = 0; j < WORLD_Y_DIMENSION - 1; ++j)
+			for (int j = 0; j < C::WORLD_Y_DIMENSION - 1; ++j)
 			{
 				// if the current cell/room is water, skip it
 				if (v2[i][j] == water)
