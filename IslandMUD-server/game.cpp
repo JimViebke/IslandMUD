@@ -99,9 +99,10 @@ void Game::main_test_loop() // debugging
 		R::print(tokenized_input);
 
 		// execute processed command against game world
-		cout << "\nDEBUG Entering execute_command(), rooms loaded: " << world.count_loaded_rooms() << "...";
+		// only count loaded rooms if total room count is less than or equal to 100K (100*100*10)
+		cout << "\nDEBUG Entering execute_command(), rooms loaded: " << ((C::WORLD_X_DIMENSION*C::WORLD_Y_DIMENSION*C::WORLD_Z_DIMENSION <= 100000) ? R::to_string(world.count_loaded_rooms()) : "(too large to count)") << "...";
 		output = execute_command("dev", tokenized_input);
-		cout << "\nDEBUG Exited execute_command(), rooms loaded: " << world.count_loaded_rooms() << "...";
+		cout << "\nDEBUG Exited execute_command(), rooms loaded: " << ((C::WORLD_X_DIMENSION*C::WORLD_Y_DIMENSION*C::WORLD_Z_DIMENSION <= 100000) ? R::to_string(world.count_loaded_rooms()) : "(too large to count)") << "...";
 
 		// now execute updates for all NPCs
 		for (pair<const string, shared_ptr<Character>> & actor : actors)
