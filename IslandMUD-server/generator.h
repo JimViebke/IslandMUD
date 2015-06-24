@@ -16,12 +16,9 @@ using namespace std;
 class Generator
 {
 private:
-	const int WORLD_X_DIMENSION = C::WORLD_X_DIMENSION;
-	const int WORLD_Y_DIMENSION = C::WORLD_Y_DIMENSION;
-
-	const int island_radius = (int)((double)WORLD_X_DIMENSION * .45); // assumes full map is square
-	const unsigned x_center = WORLD_X_DIMENSION / 2;
-	const unsigned y_center = WORLD_Y_DIMENSION / 2;
+	const int island_radius = (int)((double)C::WORLD_X_DIMENSION * .45); // assumes full map is square
+	const unsigned x_center = C::WORLD_X_DIMENSION / 2;
+	const unsigned y_center = C::WORLD_Y_DIMENSION / 2;
 	const int biome_size = 25;
 
 	const char water = C::WATER_CHAR;
@@ -38,6 +35,8 @@ public:
 
 	Generator()
 	{
+		cout << "\nGenerating new world terrain map...";
+
 		srand((unsigned)time(NULL)); // seed rand
 		
 		// create the timestamped directory
@@ -45,8 +44,8 @@ public:
 		R::create_path_if_not_exists(generated_terrain_dir);
 
 		// fill both working vectors with empty space
-		size_vector(v1, WORLD_X_DIMENSION, WORLD_Y_DIMENSION);
-		size_vector(v2, WORLD_X_DIMENSION, WORLD_Y_DIMENSION);
+		size_vector(v1, C::WORLD_X_DIMENSION, C::WORLD_Y_DIMENSION);
+		size_vector(v2, C::WORLD_X_DIMENSION, C::WORLD_Y_DIMENSION);
 	}
 
 	void generate_biome_map();

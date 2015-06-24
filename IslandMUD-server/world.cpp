@@ -9,174 +9,9 @@ May 15 2015 */
 
 void World::load()
 {
-	cout << "\nLoading world terrain...";
-
-	vector<vector<char>> terrain;
-
-	// load the contents of the terrain file, it it exists
-	if (R::file_exists(C::world_terrain_file_location))
-	{
-		fstream terrain_file;
-		terrain_file.open(C::world_terrain_file_location);
-		string row;
-		while (getline(terrain_file, row)) // for each row
-		{
-			if (row.length() > 1) // if the row is not empty
-			{
-				terrain.push_back(vector<char>(row.begin(), row.end())); // copy the contents of the row into an anonymous vector
-			}
-		}
-	}
-
-	// test if the loaded terrain is the correct dimensions
-	bool terrain_loaded_from_file_good = false;
-	if (terrain.size() == C::WORLD_X_DIMENSION)
-	{
-		terrain_loaded_from_file_good = true;
-		for (unsigned i = 0; i < terrain.size(); ++i)
-		{
-			if (terrain[i].size() != C::WORLD_Y_DIMENSION)
-			{
-				terrain_loaded_from_file_good = false;
-				break;
-			}
-		}
-	}
-
-	if (!terrain_loaded_from_file_good) // if the terrain needs to regenerated
-	{
-		// create the world generator object
-		Generator gen;
-
-		gen.generate_biome_map();
-		gen.generate_static_using_biome_map();
-
-		gen.game_of_life(5);
-		gen.fill(2);
-		gen.clean(3);
-		gen.fill(4); // this is the same as fill(12), but each call has a seperate printout this way
-		gen.fill(4);
-		gen.fill(4);
-
-		// save the final terrain to disk
-		gen.save_terrain();
-
-		terrain = gen.get_terrain();
-	}
-
-	// create/load the world's rooms using terrain
-	create(terrain);
+	load_world_container();
+	load_terrain_map();
 }
-
-void World::create(const vector<vector<char>> & world_terrain)
-{
-	// world terrain is only used to generate rooms that do not already exist on disk
-
-	{ // temporary scope to delete temp structure later
-		cout << "\nCreating world object...";
-
-		vector<vector<vector<shared_ptr<Room>>>> temp(C::WORLD_X_DIMENSION,
-			vector<vector<shared_ptr<Room>>>(C::WORLD_Y_DIMENSION,
-			vector<shared_ptr<Room>>(C::WORLD_Z_DIMENSION)));
-
-		cout << "\nSaving world object...";
-		world = temp;
-	}
-
-	cout << "\nCreating world...";
-
-	int previous_percent = 0;
-	const double start_time = (double)R::current_time_in_ms() / 1000.0;
-
-	for (int x = 0; x < C::WORLD_X_DIMENSION; ++x) // for each row
-	{
-		// print completion percent and timing statistics
-		int percent_processed = (x * 100 / C::WORLD_X_DIMENSION);
-		if (percent_processed != previous_percent)
-		{
-			previous_percent = percent_processed;
-
-			cout << fixed << setprecision(1)
-				<< "\nProcessing rooms: " << percent_processed << "% (" << (((double)R::current_time_in_ms() / 1000.0) - start_time) << " sec elapsed, ~"
-				<<
-				(((((R::current_time_in_ms() / 1000.0) - start_time)) / (double)previous_percent) * (100.0 - (double)previous_percent)) / 60.0
-				<< " minutes remaining)";
-		}
-
-		// vector<vector<shared_ptr<Room>>> row; // create the empty row
-
-		for (int y = 0; y < C::WORLD_Y_DIMENSION; ++y) // for each vertical "stack" in the row
-		{
-			// vector<shared_ptr<Room>> vertical_stack; // create an empty vertical "stack"
-			// vertical_stack.reserve(C::WORLD_Z_DIMENSION); // size the stack
-			// for (int z = 0; z < C::WORLD_Z_DIMENSION; ++z)
-			// {
-			// 	vertical_stack.push_back(shared_ptr<Room>(nullptr)); // add the correct number of "null" rooms to the vertical stack
-			// }
-			// row.push_back(vertical_stack); // add the empty vertical stack to the row
-
-			// ensure the folder exists
-			string z_stack_path = C::room_directory + "\\" + R::to_string(x);
-			R::create_path_if_not_exists(z_stack_path);
-
-			// extend the path to include the file
-			z_stack_path += "\\" + R::to_string(x) + "-" + R::to_string(y) + ".xml";
-
-			// if the file exists, make sure each room is in it
-			if (R::file_exists(z_stack_path))
-			{
-				// create a flag to indicate if the z_stack was modified and has to be written back to disk
-				bool z_stack_modified = false;
-
-				// create an XML document to store the Z stack
-				xml_document z_stack;
-
-				// load the z-stack to the document
-				load_vertical_rooms_to_XML(x, y, z_stack);
-
-				// create and add rooms that don't exist
-				// for (int z = 0; z < C::WORLD_Z_DIMENSION; ++z) // for each vertically-stacked room
-				// {
-				// select the specific room from the stack
-				xml_node room_node = z_stack.child(("room-" + R::to_string(C::GROUND_INDEX)).c_str());
-
-				// if the room is not in the stack
-				if (!room_node)
-				{
-					// indicate that the stack will be changed and needs to be written to the disk
-					z_stack_modified = true;
-
-					// add the room to the z-stack
-					this->add_room_to_z_stack(C::GROUND_INDEX, create_room(x, y, C::GROUND_INDEX, world_terrain), z_stack);
-				}
-				// }
-
-				// if the stack was modified (rooms were not on disk, so were recently created)
-				if (z_stack_modified)
-				{
-					// save the stack to disk
-					z_stack.save_file(z_stack_path.c_str());
-				}
-			}
-			else
-			{
-				// the file/z-stack does not exist, create ground level room to add to it
-
-				// create an XML document to store the Z stack
-				xml_document z_stack;
-
-				// create and add ground level room
-				this->add_room_to_z_stack(C::GROUND_INDEX, create_room(x, y, C::GROUND_INDEX, world_terrain), z_stack);
-
-				// save the stack to disk
-				z_stack.save_file(z_stack_path.c_str());
-			}
-
-		}
-		// world.push_back(row); // add the row to the world
-	}
-
-} // end load world
 
 // return shared_ptr to a room at a location
 shared_ptr<Room> World::room_at(const int & x, const int & y, const int & z) const
@@ -282,11 +117,152 @@ void World::unload_room(const int & x, const int & y, const int & z)
 	room_at(x, y, z) = nullptr;
 }
 
+bool World::room_has_surface(const int & x, const int & y, const int & z, const string & direction_ID) const
+{
+	// if the room is outside of bounds
+	if (!R::bounds_check(x, y, z)) { return false; }
+
+	// if the room is not loaded
+	if (room_at(x, y, z) == nullptr) { return false; }
+
+	// test if the passed direction_ID exists as a wall
+	return room_at(x, y, z)->has_surface(direction_ID);
+}
+
 
 
 /* Private member functions */
 
 
+
+void World::load_world_container()
+{
+	cout << "\nCreating world container...";
+
+	world = vector<vector<vector<shared_ptr<Room>>>>(C::WORLD_X_DIMENSION,
+		vector<vector<shared_ptr<Room>>>(C::WORLD_Y_DIMENSION,
+		vector<shared_ptr<Room>>(C::WORLD_Z_DIMENSION)));
+}
+
+void World::load_terrain_map()
+{
+	// world terrain is only used to generate rooms that do not already exist on disk
+
+	cout << "\nLoading world terrain map...";
+
+	// load the contents of the terrain file, if it exists
+	{
+		vector<vector<char>> temp_terrain;
+		if (R::file_exists(C::world_terrain_file_location))
+		{
+			fstream terrain_file;
+			terrain_file.open(C::world_terrain_file_location);
+			string row;
+			while (getline(terrain_file, row)) // for each row
+			{
+				if (row.length() > 1) // if the row is not empty
+				{
+					temp_terrain.push_back(vector<char>(row.begin(), row.end())); // copy the contents of the row into an anonymous vector
+				}
+			}
+		}
+
+		this->terrain = make_shared<vector<vector<char>>>(temp_terrain);
+	}
+
+	// test if the loaded terrain is the correct dimensions
+	bool terrain_loaded_from_file_good = false;
+	if (terrain->size() == C::WORLD_X_DIMENSION)
+	{
+		terrain_loaded_from_file_good = true;
+		for (unsigned i = 0; i < terrain->size(); ++i)
+		{
+			if (terrain->operator[](i).size() != C::WORLD_Y_DIMENSION)
+			{
+				terrain_loaded_from_file_good = false;
+				break;
+			}
+		}
+	}
+
+	if (!terrain_loaded_from_file_good) // if the terrain needs to regenerated
+	{
+		// create the world generator object
+		Generator gen;
+
+		gen.generate_biome_map();
+		gen.generate_static_using_biome_map();
+
+		gen.game_of_life(5);
+		gen.fill(2);
+		gen.clean(3);
+		gen.fill(4); // this is the same as fill(12), but each call has a seperate printout this way
+		gen.fill(4);
+		gen.fill(4);
+
+		// save the final terrain to disk
+		gen.save_terrain();
+
+		terrain = make_unique<vector<vector<char>>>(gen.get_terrain());
+	}
+}
+
+// a room at x,y,z does not exist on the disk; create it and add it to the world
+void World::generate_room_at(const int & x, const int & y, const int & z)
+{
+	// ensure the folder exists
+	string z_stack_path = C::room_directory + "\\" + R::to_string(x);
+	R::create_path_if_not_exists(z_stack_path);
+
+	// extend the path to include the file
+	z_stack_path += "\\" + R::to_string(x) + "-" + R::to_string(y) + ".xml";
+
+	// create an XML document to store the Z stack
+	xml_document z_stack;
+
+	// if the file exists
+	if (R::file_exists(z_stack_path))
+	{
+		// load the z-stack to the document
+		load_vertical_rooms_to_XML(x, y, z_stack);
+
+		// attempt to extract the specified room
+		xml_node room_node = z_stack.child(("room-" + R::to_string(z)).c_str());
+
+		// if the specified room is not in the stack
+		if (!room_node)
+		{
+			// create the room
+			shared_ptr<Room> room = create_room(x, y, z);
+
+			// add it to the world...
+			this->room_at(x, y, z) = room;
+
+			// ...and the z-stack
+			this->add_room_to_z_stack(z, room, z_stack);
+		}
+	}
+	else
+	{
+		// the entire z-stack does not exist on the disk
+		// create specified room and add it to it
+
+		// create the room
+		shared_ptr<Room> room = create_room(x, y, z);
+
+		// add it to the world...
+		this->room_at(x, y, z) = room;
+
+		// ...and the z-stack
+		this->add_room_to_z_stack(z, room, z_stack);
+
+		// save the stack to disk
+		z_stack.save_file(z_stack_path.c_str());
+	}
+
+	// save the stack to disk
+	z_stack.save_file(z_stack_path.c_str());
+}
 
 // load in all rooms at x,y to an xml_document
 void World::load_vertical_rooms_to_XML(const int & ix, const int & iy, xml_document & vertical_rooms)
@@ -299,14 +275,11 @@ void World::load_vertical_rooms_to_XML(const int & ix, const int & iy, xml_docum
 	vertical_rooms.load_file((C::room_directory + "\\" + x + "\\" + x + "-" + y + ".xml").c_str());
 }
 
-// build a room from XML at location z, add to world at x,y,z
-void World::add_room_to_world(const xml_document & z_stack, const int & x, const int & y, const int & z)
+// build a room given an XML node, add to world at x,y,z
+void World::add_room_to_world(xml_node & room_node, const int & x, const int & y, const int & z)
 {
 	// create an empty room
 	shared_ptr<Room> room = make_shared<Room>();
-
-	// select the specific room
-	xml_node room_node = z_stack.child(("room-" + R::to_string(z)).c_str());
 
 	// set whether or not the room is water (off-island or river/lake)
 	room->set_water_status(room_node.attribute(C::XML_IS_WATER.c_str()).as_bool());
@@ -372,11 +345,36 @@ void World::load_room_to_world(const int & x, const int & y, const int & z)
 	// create an XML document to hold the vertical stack of rooms
 	xml_document vertical_rooms;
 
-	// load all rooms at x,y
-	load_vertical_rooms_to_XML(x, y, vertical_rooms);
+	// get the path to the z_stack
+	const string str_x = R::to_string(x);
+	const string str_y = R::to_string(y);
+	const string z_stack_path = C::room_directory + "\\" + str_x + "\\" + str_x + "-" + str_y + ".xml";
 
-	// extract the room at z, add the room at x,y,z
-	add_room_to_world(vertical_rooms, x, y, z);
+	// if the z_stack does not exist
+	if (!R::file_exists(z_stack_path))
+	{
+		// generate the room (adds it to disk and the world)
+		generate_room_at(x, y, z);
+		return; // we're done
+	}
+
+	// the file exists, load it
+	vertical_rooms.load_file(z_stack_path.c_str());
+
+	// attempt to extract the room from the file
+	xml_node room_node = vertical_rooms.child(("room-" + R::to_string(z)).c_str());
+
+	// if the room nodes exists in the file
+	if (room_node)
+	{
+		// add it to the world
+		add_room_to_world(room_node, x, y, z);
+	}
+	else // the node does not exist on the disk
+	{
+		// create the room and add it to disk and the world
+		generate_room_at(x, y, z);
+	}
 }
 
 // move a passed room to disk
@@ -469,17 +467,17 @@ void World::add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xm
 }
 
 // create a new empty room given its coordinates and the world terrain
-shared_ptr<Room> World::create_room(const int & x, const int & y, const int & z, const vector<vector<char>> world_terrain) const
+shared_ptr<Room> World::create_room(const int & x, const int & y, const int & z) const
 {
 	shared_ptr<Room> room = make_shared<Room>();
 
 	// if the room is ground level and the terrain map indicates the room is forest
-	if (z == C::GROUND_INDEX && world_terrain[x][y] == C::FOREST_CHAR)
+	if (z == C::GROUND_INDEX && terrain->operator[](x)[y] == C::FOREST_CHAR)
 	{
 		room->add_item(Craft::make(C::TREE_ID)); // add a tree
 	}
 	// else, check if the room is water (off land or a lake/river)
-	else if (z == C::GROUND_INDEX && world_terrain[x][y] == C::WATER_CHAR)
+	else if (z == C::GROUND_INDEX && terrain->operator[](x)[y] == C::WATER_CHAR)
 	{
 		room->set_water_status(true);
 	}

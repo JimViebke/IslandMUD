@@ -3,15 +3,32 @@ Feb 14, 2015 */
 
 #include "constants.h"
 
+const int C::GROUND_INDEX = 3; // there are three levels below this
+const int C::VIEW_DISTANCE = 5; // 5+1+5 to a side == 11*11 total area
+
+const int C::WORLD_X_DIMENSION = 1000;
+const int C::WORLD_Y_DIMENSION = 1000;
+const int C::WORLD_Z_DIMENSION = 10;
+
+const int C::DEFAULT_SPAWN_X = C::WORLD_X_DIMENSION / 2; // N/S center
+const int C::DEFAULT_SPAWN_Y = C::WORLD_Y_DIMENSION / 2; // E/W center
+const int C::DEFAULT_SPAWN_Z = C::GROUND_INDEX; // ground level spawn
+
+// game data locations
+
 const string C::game_directory = "C:/IslandMUD";
 const string C::world_terrain_file_location = C::game_directory + "/world_terrain.txt";
 const string C::world_biome_file_location = C::game_directory + "/biome_map.txt";
 const string C::room_directory = C::game_directory + "/rooms";
 const string C::user_data_directory = C::game_directory + "/user_data";
 
+// faction IDs
+
 const string C::PC_FACTION_ID = "player";
 const string C::NPC_NEUTRAL_FACTION_ID = "neutral_NPC";
 const string C::NPC_HOSTILE_FACTION_ID = "hostile_NPC";
+
+// map symbols
 
 const char C::PLAYER_CHAR = '@';
 const char C::NPC_NEUTRAL_CHAR = '+';
@@ -20,17 +37,6 @@ const char C::LAND_CHAR = ' ';
 const char C::FOREST_CHAR = '%';
 const char C::ITEM_CHAR = '?';
 const char C::RUBBLE_CHAR = '#';
-
-const int C::GROUND_INDEX = 3; // there are three levels below this
-const int C::VIEW_DISTANCE = 5; // 5+1+5 to a side == 11*11 total area
-
-const int C::WORLD_X_DIMENSION = 100;
-const int C::WORLD_Y_DIMENSION = 100;
-const int C::WORLD_Z_DIMENSION = 10;
-
-const int C::DEFAULT_SPAWN_X = C::WORLD_X_DIMENSION / 2; // N/S center
-const int C::DEFAULT_SPAWN_Y = C::WORLD_Y_DIMENSION / 2; // E/W center
-const int C::DEFAULT_SPAWN_Z = C::GROUND_INDEX; // ground level spawn
 
 // engine signals
 
@@ -276,11 +282,13 @@ const int C::MAX_DOOR_HEALTH = 100;
 /*
 Create a two-dimensional map to calculate damamge values.
 
-Assossiate each attacking implement with a map of target, value pairs.
+Associate each attacking implement with a map of target, value pairs.
 */
 
 const map<string, map<string, int>> C::damage_tables =
 {
+	// unarmed attacks are deliberately set high for testing
+
 	{ string(C::ATTACK_COMMAND), { // attack command is also used to represent an unarmed attack
 		{ C::STICK_ID, 49 }, // formerly 6
 		{ C::WOOD_ID, 49 }, // formerly 3
@@ -289,21 +297,21 @@ const map<string, map<string, int>> C::damage_tables =
 	} },
 
 	{ string(C::STAFF_ID), {
-		{ C::STICK_ID, 10 },
+		{ C::STICK_ID, 8 },
 		{ C::WOOD_ID, 5 },
 		{ C::STONE_ID, 1 }
 	} },
 
 	{ string(C::AXE_ID), {
-		{ C::STICK_ID, 8 },
+		{ C::STICK_ID, 10 },
 		{ C::WOOD_ID, 10 },
 		{ C::STONE_ID, 5 }
 	} },
 
 	{ string(C::SWORD_ID), {
-		{ C::STICK_ID, 10 },
-		{ C::WOOD_ID, 5 },
-		{ C::STONE_ID, 1 }
+		{ C::STICK_ID, 8 },
+		{ C::WOOD_ID, 7 },
+		{ C::STONE_ID, 2 }
 	} }
 };
 
