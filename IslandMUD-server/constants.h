@@ -17,26 +17,6 @@ typedef Constants C; // ...in order to put this up here
 class Constants
 {
 public:
-	// game data locations
-	static const string game_directory;
-	static const string world_terrain_file_location;
-	static const string world_biome_file_location;
-	static const string room_directory;
-	static const string user_data_directory;
-
-	// faction IDs
-	const static string PC_FACTION_ID; // players ("PCs")
-	const static string NPC_NEUTRAL_FACTION_ID; // neutral island inhabitants
-	const static string NPC_HOSTILE_FACTION_ID; // antagonists
-
-	const static char
-		PLAYER_CHAR,
-		NPC_NEUTRAL_CHAR,
-		WATER_CHAR,
-		LAND_CHAR,
-		FOREST_CHAR,
-		ITEM_CHAR,
-		RUBBLE_CHAR;
 
 	const static int
 		GROUND_INDEX,
@@ -49,6 +29,31 @@ public:
 		DEFAULT_SPAWN_X,
 		DEFAULT_SPAWN_Y,
 		DEFAULT_SPAWN_Z;
+
+	// game data locations
+
+	static const string game_directory;
+	static const string world_terrain_file_location;
+	static const string world_biome_file_location;
+	static const string room_directory;
+	static const string user_data_directory;
+
+	// faction IDs
+
+	const static string PC_FACTION_ID; // players ("PCs")
+	const static string NPC_NEUTRAL_FACTION_ID; // neutral island inhabitants
+	const static string NPC_HOSTILE_FACTION_ID; // antagonists
+	
+	// map symbols
+	
+	const static char
+		PLAYER_CHAR,
+		NPC_NEUTRAL_CHAR,
+		WATER_CHAR,
+		LAND_CHAR,
+		FOREST_CHAR,
+		ITEM_CHAR,
+		RUBBLE_CHAR;
 
 	const static string
 		GOOD_SIGNAL,
@@ -153,7 +158,7 @@ public:
 	const static map<string, unsigned> SURFACE_REQUIREMENTS;
 	const static map<string, unsigned> DOOR_REQUIREMENTS;
 
-	// box drawing (more explaination at implementation
+	// box drawing (more explaination at implementation)
 
 	const static char
 		NW_CORNER,
@@ -189,7 +194,7 @@ public:
 		AI_MOVEMENT_COST,
 		AI_MOVEMENT_COST_DIAGONAL,
 		AI_MOVEMENT_COST_FOREST,
-		AI_MOVEMENT_COST_FOREST_DIAGONAL;
+		AI_MOVEMENT_COST_FOREST_DIAGONAL; 
 
 	// levels
 
