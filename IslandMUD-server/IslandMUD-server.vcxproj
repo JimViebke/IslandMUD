@@ -98,6 +98,7 @@
     <ClCompile Include="recipes.cpp" />
     <ClCompile Include="resources.cpp" />
     <ClCompile Include="room.cpp" />
+    <ClCompile Include="room_side.cpp" />
     <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
