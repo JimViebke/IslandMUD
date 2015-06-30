@@ -283,6 +283,21 @@ bool Character::does_not_have(const string & item_name, const unsigned & item_co
 {
 	return !this->has(item_name, item_count);
 }
+string Character::get_inventory() const // debugging
+{
+	stringstream contents;
+	for (multimap<string, shared_ptr<Equipment>>::const_iterator it = equipment_inventory.begin();
+		it != equipment_inventory.end(); ++it)
+	{
+		contents << it->second->name << " ";
+	}
+	for (map<string, shared_ptr<Material>>::const_iterator it = material_inventory.begin();
+		it != material_inventory.end(); ++it)
+	{
+		contents << it->second->name << ":" << it->second->amount << " ";
+	}
+	return contents.str();
+}
 
 // inventory manipulation
 void Character::add(const shared_ptr<Item> & item)

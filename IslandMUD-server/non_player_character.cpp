@@ -3,6 +3,125 @@ Jun 3 2015 */
 
 #include "non_player_character.h"
 
+// objective debugging
+string NPC::get_objectives() const
+{
+	stringstream result;
+	result << name << "'s objectives:\n";
+	for (unsigned i = 0; i < objectives.size(); ++i)
+	{
+		// verb, direction, material, noun;
+		// objective_x, objective_y, objective_z;
+
+		result << "[" << objectives[i].verb
+			<< "][" << objectives[i].direction
+			<< "][" << objectives[i].material
+			<< "][" << objectives[i].noun
+			<< "][" << objectives[i].purpose
+			<< "][" << ((objectives[i].already_planning_to_craft) ? string("true") : string("false"))
+			<< "] ("
+			<< objectives[i].objective_x << ","
+			<< objectives[i].objective_y << ","
+			<< objectives[i].objective_z << ")" << endl;
+	}
+
+	return result.str();
+}
+
+// objective creating and deletion
+void Non_Player_Character::add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const string & purpose)
+{
+	(priority == high_priority) ?
+		objectives.push_front(Objective(verb, noun, purpose)) :
+		objectives.push_back(Objective(verb, noun, purpose));
+}
+void Non_Player_Character::add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z)
+{
+	(priority == high_priority) ?
+		objectives.push_front(Objective(verb, noun, x, y, z)) :
+		objectives.push_back(Objective(verb, noun, x, y, z));
+}
+void Non_Player_Character::erase_objective(const deque<Objective>::iterator & objective_iterator)
+{
+	objectives.erase(objective_iterator);
+}
+void Non_Player_Character::erase_objectives_matching_purpose(const string purpose)
+{
+	// arguement must be passed by value! Reference will change as the underlying structure is modified
+
+	for (unsigned i = 0; i < objectives.size();)
+	{
+		if (objectives[i].purpose == purpose)
+		{
+			objectives.erase(objectives.begin() + i);
+		}
+		else
+		{
+			++i;
+		}
+	}
+}
+
+// objective information
+string Non_Player_Character::the_item_im_looking_for() const
+{
+	return objectives.front().noun;
+}
+bool Non_Player_Character::one_can_craft(const string & item_id) const
+{
+	return recipes.has_recipe_for(item_id);
+}
+bool Non_Player_Character::i_have(const string & item_id) const
+{
+	return this->has(item_id);
+}
+bool Non_Player_Character::i_dont_have(const string & item_id) const
+{
+	return !this->has(item_id);
+}
+bool Non_Player_Character::im_planning_to_acquire(const string & item_ID) const
+{
+	for (const Objective objective : objectives)
+	{
+		if (objective.verb == C::AI_OBJECTIVE_ACQUIRE &&
+			objective.noun == item_ID)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+// objective planning
+void Non_Player_Character::plan_to_get(const string & item_id)
+{
+	add_objective(high_priority, C::AI_OBJECTIVE_ACQUIRE, item_id, item_id);
+}
+void Non_Player_Character::plan_to_craft(const string & item_id)
+{
+	// assumes item_id is craftable
+
+	// The following loops deliberately do not take into account what the NPC already has.
+	// If the NPC has 3 wood and needs 8, it will add 8 vine-finding objectives.
+	// Rational is: don't count materials that are assumed to be present for another objective.
+
+	for (const pair<string, int> & requirement : recipes.get_recipe(item_id).inventory_need)
+	{
+		for (int i = 0; i < requirement.second; ++i)
+		{
+			add_objective(high_priority, C::AI_OBJECTIVE_ACQUIRE, requirement.first, item_id);
+		}
+	}
+	for (const pair<string, int> & requirement : recipes.get_recipe(item_id).inventory_remove)
+	{
+		for (int i = 0; i < requirement.second; ++i)
+		{
+			add_objective(high_priority, C::AI_OBJECTIVE_ACQUIRE, requirement.first, item_id);
+		}
+	}
+}
+
+// returns true if successful
 bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world)
 {
 	// leave this for debugging

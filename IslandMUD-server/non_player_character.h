@@ -18,32 +18,11 @@ typedef Non_Player_Character NPC; // ...in order to put this here
 class Non_Player_Character : public Character
 {
 public:
+	// hostile and neutral NPCs override this in their respective classes
 	virtual void update(World & world, map<string, shared_ptr<Character>> & actors) = 0;
 
 	// objective debugging
-	string get_objectives() const
-	{
-		stringstream result;
-		result << name << "'s objectives:\n";
-		for (unsigned i = 0; i < objectives.size(); ++i)
-		{
-			// verb, direction, material, noun;
-			// objective_x, objective_y, objective_z;
-
-			result << "[" << objectives[i].verb
-				<< "][" << objectives[i].direction
-				<< "][" << objectives[i].material
-				<< "][" << objectives[i].noun
-				<< "][" << objectives[i].purpose
-				<< "][" << ((objectives[i].already_planning_to_craft) ? string("true") : string("false"))
-				<< "] ("
-				<< objectives[i].objective_x << ","
-				<< objectives[i].objective_y << ","
-				<< objectives[i].objective_z << ")" << endl;
-		}
-
-		return result.str();
-	}
+	string get_objectives() const;
 
 protected:
 	class Objective
@@ -67,112 +46,21 @@ protected:
 	Non_Player_Character(const string & name, const string & faction_ID) : Character(name, faction_ID) {}
 
 	// objective creating and deletion
-	void add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const string & purpose)
-	{
-		(priority == high_priority) ?
-			objectives.push_front(Objective(verb, noun, purpose)) :
-			objectives.push_back(Objective(verb, noun, purpose));
-	}
-	void add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z)
-	{
-		(priority == high_priority) ?
-			objectives.push_front(Objective(verb, noun, x, y, z)) :
-			objectives.push_back(Objective(verb, noun, x, y, z));
-	}
-	void erase_objective(const deque<Objective>::iterator & objective_iterator)
-	{
-		objectives.erase(objective_iterator);
-	}
-	void erase_objectives_matching_purpose(const string purpose) 
-	{
-		// arguement must be passed by value! Reference will change as the underlying structure is modified
-
-		for (unsigned i = 0; i < objectives.size();)
-		{
-			if (objectives[i].purpose == purpose)
-			{
-				objectives.erase(objectives.begin() + i);
-			}
-			else
-			{
-				++i;
-			}
-		}
-	}
-	/*void erase_objectives_matching_noun_and_purpose(const string & noun, const string & purpose)
-	{
-		for (unsigned i = 0; i < objectives.size();)
-		{
-			if (objectives[i].noun == noun &&
-				objectives[i].purpose == purpose)
-			{
-				objectives.erase(objectives.begin() + i);
-			}
-			else
-			{
-				++i;
-			}
-		}
-	}*/
+	void add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const string & purpose);
+	void add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z);
+	void erase_objective(const deque<Objective>::iterator & objective_iterator);
+	void erase_objectives_matching_purpose(const string purpose);
 
 	// objective information
-	string the_item_im_looking_for() const
-	{
-		return objectives.front().noun;
-	}
-	bool one_can_craft(const string & item_id) const
-	{
-		return recipes.has_recipe_for(item_id);
-	}
-	bool i_have(const string & item_id) const
-	{
-		return this->has(item_id);
-	}
-	bool i_dont_have(const string & item_id) const
-	{
-		return !this->has(item_id);
-	}
-	bool im_planning_to_acquire(const string & item_ID) const
-	{
-		for (const Objective objective : objectives)
-		{
-			if (objective.verb == C::AI_OBJECTIVE_ACQUIRE &&
-				objective.noun == item_ID)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
+	string the_item_im_looking_for() const;
+	bool one_can_craft(const string & item_id) const;
+	bool i_have(const string & item_id) const;
+	bool i_dont_have(const string & item_id) const;
+	bool im_planning_to_acquire(const string & item_ID) const;
 
 	// objective planning
-	void plan_to_get(const string & item_id)
-	{
-		add_objective(high_priority, C::AI_OBJECTIVE_ACQUIRE, item_id, item_id);
-	}
-	void plan_to_craft(const string & item_id)
-	{
-		// assumes item_id is craftable
-
-		// The following loops deliberately do not take into account what the NPC already has.
-		// If the NPC has 3 wood and needs 8, it will add 8 vine-finding objectives.
-		// Rational is: don't count materials that are assumed to be present for another objective.
-
-		for (const pair<string, int> & requirement : recipes.get_recipe(item_id).inventory_need)
-		{
-			for (int i = 0; i < requirement.second; ++i)
-			{
-				add_objective(high_priority, C::AI_OBJECTIVE_ACQUIRE, requirement.first, item_id);
-			}
-		}
-		for (const pair<string, int> & requirement : recipes.get_recipe(item_id).inventory_remove)
-		{
-			for (int i = 0; i < requirement.second; ++i)
-			{
-				add_objective(high_priority, C::AI_OBJECTIVE_ACQUIRE, requirement.first, item_id);
-			}
-		}
-	}
+	void plan_to_get(const string & item_id);
+	void plan_to_craft(const string & item_id);
 
 	// used to count friends or foes:   count<Enemy_NPC>(world, actors);
 	template <typename ACTOR_TYPE> unsigned count(World & world, map<string, shared_ptr<Character>> & actors) const
@@ -227,6 +115,7 @@ private:
 		Node() {}
 		Node(const int & x, const int & y, const string & dir) : x(x), y(y), direction_from_parent(dir) {}
 
+		// Node member setter
 		void set_g_h_f(const int & set_g, const int & set_h);
 	};
 
