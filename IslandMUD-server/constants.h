@@ -208,6 +208,12 @@ public:
 		HEALTH_MIN, // explaination in source
 		FULL_HEALTH_MIN,
 		FULL_HEALTH_MAX;
+
+	// AI objective keywords
+
+	const static string
+		AI_OBJECTIVE_ACQUIRE,
+		AI_OBJECTIVE_GOTO;
 };
 
 #endif

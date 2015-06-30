@@ -111,9 +111,13 @@ void Game::main_test_loop() // debugging
 			{
 				shared_ptr<NPC> npc = R::convert_to<NPC>(actor.second);
 
+				cout << npc->get_objectives() << endl; // before
+				cout << npc->get_inventory() << endl; // before
 				npc->update(world, actors);
+				cout << npc->get_objectives() << endl; // after
+				cout << npc->get_inventory() << endl; // after
 
-				actor.second = npc; // make sure to saev back
+				actor.second = npc; // make sure to save back
 			}
 		}
 	}

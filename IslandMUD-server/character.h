@@ -82,6 +82,21 @@ public:
 	// inventory information
 	bool has(const string & item_name, const unsigned & item_count = 1) const;
 	bool does_not_have(const string & item_name, const unsigned & item_count = 1) const;
+	string get_inventory() const
+	{
+		stringstream contents;
+		for (multimap<string, shared_ptr<Equipment>>::const_iterator it = equipment_inventory.begin();
+			it != equipment_inventory.end(); ++it)
+		{
+			contents << it->second->name << " ";
+		}
+		for (map<string, shared_ptr<Material>>::const_iterator it = material_inventory.begin();
+			it != material_inventory.end(); ++it)
+		{
+			contents << it->second->name << ":" << it->second->amount << " ";
+		}
+		return contents.str();
+	}
 
 	// inventory manipulation
 	void add(const shared_ptr<Item> & item);

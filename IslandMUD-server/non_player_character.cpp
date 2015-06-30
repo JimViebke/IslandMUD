@@ -3,7 +3,7 @@ Jun 3 2015 */
 
 #include "non_player_character.h"
 
-void NPC::pathfind(const int & x_dest, const int & y_dest, World & world)
+bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world)
 {
 	// leave this for debugging
 	// cout << "\nSearching for path from " << x << "," << y << " to " << x_dest << "," << y_dest << ".\n";
@@ -137,7 +137,7 @@ void NPC::pathfind(const int & x_dest, const int & y_dest, World & world)
 	Node current_room = get_node_at(x_dest, y_dest, closed_list);
 
 	// if the target room is not in the closed list, a path could not be found
-	if (current_room.x == -1 || current_room.y == -1) { return; }
+	if (current_room.x == -1 || current_room.y == -1) { return false; }
 
 	// Starting from the target room, continue finding the parent room until the current room is found
 	// (this represents the path in reverse)
@@ -162,12 +162,12 @@ void NPC::pathfind(const int & x_dest, const int & y_dest, World & world)
 			cout << "Parent of " << node.x << "," << node.y << " is " << node.parent_x << "," << node.parent_y << ". Actual cost to node: " << node.g << ". Estimated cost to target: " << node.h << endl;
 			} */
 
-			return; // we're done here
+			return true; // we're done here
 		}
 		// if there is no parent room in the closed list (?!)
 		else if (parent_room.x == -1 || parent_room.y == -1)
 		{
-			return; // something went horribly wrong
+			return false; // something went horribly wrong
 		}
 
 		// move up the path by one room
