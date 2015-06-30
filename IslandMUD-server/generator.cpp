@@ -12,10 +12,10 @@ void Generator::generate_biome_map()
 	{
 		for (int j = 0; j < (C::WORLD_Y_DIMENSION / biome_size); ++j)
 		{
-			biome_map[i][j] = ((rand() % 3 == 1) ? land : forest); // 1/3 land biome, 2/3 forest biome
+			biome_map[i][j] = ((rand() % 3 == 1) ? C::LAND_CHAR : C::FOREST_CHAR); // 1/3 land biome, 2/3 forest biome
 		}
 	}
-
+	
 	// update the pattern
 	generator_pattern << "B.66"; // Biomes are ~66% forest
 
@@ -31,18 +31,18 @@ void Generator::generate_static_using_biome_map()
 			// if the coordinates are not within the islands radius
 			if (R::euclidean_distance(x, y, x_center, y_center) > island_radius)
 			{
-				v2[x][y] = water;
+				v2[x][y] = C::WATER_CHAR;
 			}
 			// if the biome map contains a land char
-			else if (biome_map[x / biome_size][y / biome_size] == land)
+			else if (biome_map[x / biome_size][y / biome_size] == C::LAND_CHAR)
 			{
-				v2[x][y] = land;
+				v2[x][y] = C::LAND_CHAR;
 			}
 			// the biome map contains a forest char, generate forest/land
 			else
 			{
 				// push back forest or land
-				v2[x][y] = (rand() % 4) ? land : forest;
+				v2[x][y] = (rand() % 4) ? C::LAND_CHAR : C::FOREST_CHAR;
 			}
 		}
 	}
@@ -66,7 +66,7 @@ void Generator::game_of_life(const int & iterations)
 			for (int j = 0; j < C::WORLD_Y_DIMENSION - 1; ++j)
 			{
 				// if the current cell/room is water, skip it
-				if (v2[i][j] == water)
+				if (v2[i][j] == C::WATER_CHAR)
 				{
 					continue;
 				}
@@ -74,16 +74,16 @@ void Generator::game_of_life(const int & iterations)
 				// for every land cell, count its forest neighours (sp?)
 				int live_neighbors = 0;
 				// count the row above
-				if (v1[i - 1][j - 1] == forest) { ++live_neighbors; }
-				if (v1[i - 1][j] == forest) { ++live_neighbors; }
-				if (v1[i - 1][j + 1] == forest) { ++live_neighbors; }
+				if (v1[i - 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (v1[i - 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (v1[i - 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 				// count the left and right neighers
-				if (v1[i][j - 1] == forest) { ++live_neighbors; }
-				if (v1[i][j + 1] == forest) { ++live_neighbors; }
+				if (v1[i][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (v1[i][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 				// count the row below
-				if (v1[i + 1][j - 1] == forest) { ++live_neighbors; }
-				if (v1[i + 1][j] == forest) { ++live_neighbors; }
-				if (v1[i + 1][j + 1] == forest) { ++live_neighbors; }
+				if (v1[i + 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (v1[i + 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (v1[i + 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 
 				/* Wikipedia:
 				Any live cell with fewer than two live neighbours dies, as if caused by under-population.
@@ -92,16 +92,16 @@ void Generator::game_of_life(const int & iterations)
 				Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 				*/
 
-				if (v2[i][j] == forest) // any living cell...
+				if (v2[i][j] == C::FOREST_CHAR) // any living cell...
 				{
 					if (live_neighbors < 2 || live_neighbors > 3) // ...with <2 or >3 neighbors...
 					{
-						v2[i][j] = land; // ...dies
+						v2[i][j] = C::LAND_CHAR; // ...dies
 					}
 				}
 				else if (live_neighbors == 3) // a dead cell with 3 neighbors...
 				{
-					v2[i][j] = forest; // ...is born
+					v2[i][j] = C::FOREST_CHAR; // ...is born
 				}
 			}
 		}
@@ -126,7 +126,7 @@ void Generator::clean(const int & iterations)
 			for (int j = 0; j < C::WORLD_Y_DIMENSION - 1; ++j)
 			{
 				// if the current cell/room is water, skip it
-				if (v2[i][j] == water)
+				if (v2[i][j] == C::WATER_CHAR)
 				{
 					continue;
 				}
@@ -134,20 +134,20 @@ void Generator::clean(const int & iterations)
 				// for every land cell, count its forest neighours (sp?)
 				int live_neighbors = 0;
 				// count the row above
-				if (v1[i - 1][j - 1] == forest) { ++live_neighbors; }
-				if (v1[i - 1][j] == forest) { ++live_neighbors; }
-				if (v1[i - 1][j + 1] == forest) { ++live_neighbors; }
+				if (v1[i - 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (v1[i - 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (v1[i - 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 				// count the left and right neighers
-				if (v1[i][j - 1] == forest) { ++live_neighbors; }
-				if (v1[i][j + 1] == forest) { ++live_neighbors; }
+				if (v1[i][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (v1[i][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 				// count the row below
-				if (v1[i + 1][j - 1] == forest) { ++live_neighbors; }
-				if (v1[i + 1][j] == forest) { ++live_neighbors; }
-				if (v1[i + 1][j + 1] == forest) { ++live_neighbors; }
+				if (v1[i + 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (v1[i + 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (v1[i + 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 
 				if (live_neighbors < 2)
 				{
-					v2[i][j] = land; // dies
+					v2[i][j] = C::LAND_CHAR; // dies
 				}
 			}
 		}
@@ -171,7 +171,7 @@ void Generator::fill(const int & iterations)
 			for (int j = 0; j < C::WORLD_Y_DIMENSION - 1; ++j)
 			{
 				// if the current cell/room is water, skip it
-				if (v2[i][j] == water)
+				if (v2[i][j] == C::WATER_CHAR)
 				{
 					continue;
 				}
@@ -179,20 +179,20 @@ void Generator::fill(const int & iterations)
 				// for every land cell, count its forest neighours (sp?)
 				int live_neighbors = 0;
 				// count the row above
-				if (v1[i - 1][j - 1] == forest) { ++live_neighbors; }
-				if (v1[i - 1][j] == forest) { ++live_neighbors; }
-				if (v1[i - 1][j + 1] == forest) { ++live_neighbors; }
+				if (v1[i - 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (v1[i - 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (v1[i - 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 				// count the left and right neighers
-				if (v1[i][j - 1] == forest) { ++live_neighbors; }
-				if (v1[i][j + 1] == forest) { ++live_neighbors; }
+				if (v1[i][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (v1[i][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 				// count the row below
-				if (v1[i + 1][j - 1] == forest) { ++live_neighbors; }
-				if (v1[i + 1][j] == forest) { ++live_neighbors; }
-				if (v1[i + 1][j + 1] == forest) { ++live_neighbors; }
+				if (v1[i + 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (v1[i + 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (v1[i + 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 
 				if (live_neighbors > 3)
 				{
-					v2[i][j] = forest; // birth or survival
+					v2[i][j] = C::FOREST_CHAR; // birth or survival
 				}
 			}
 		}
