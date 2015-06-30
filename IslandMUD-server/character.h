@@ -82,7 +82,7 @@ public:
 	// inventory information
 	bool has(const string & item_name, const unsigned & item_count = 1) const;
 	bool does_not_have(const string & item_name, const unsigned & item_count = 1) const;
-	string get_inventory() const
+	string get_inventory() const // debugging
 	{
 		stringstream contents;
 		for (multimap<string, shared_ptr<Equipment>>::const_iterator it = equipment_inventory.begin();
