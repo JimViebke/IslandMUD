@@ -28,7 +28,7 @@ void Parse::initialize()
 		P::dict["drop"] = P::dict["release"] = P::dict["unhand"] = C::DROP_COMMAND;
 		P::dict["wait"] = P::dict["pause"] = P::dict["consider"] = P::dict["delay"] = C::WAIT_COMMAND;
 		P::dict["construct"] = P::dict["build"] = P::dict["erect"] = C::CONSTRUCT_COMMAND;
-		P::dict["smash"] = P::dict["strike"] = P::dict["bash"] = P::dict["break"] = P::dict["damage"] = P::dict["stab"] = P::dict["slash"] = C::ATTACK_COMMAND;
+		P::dict["attack"] = P::dict["smash"] = P::dict["strike"] = P::dict["bash"] = P::dict["break"] = P::dict["damage"] = P::dict["stab"] = P::dict["slash"] = C::ATTACK_COMMAND;
 		
 		// items
 		P::dict["tree"] = C::TREE_ID;

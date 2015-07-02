@@ -18,13 +18,49 @@ typedef Non_Player_Character NPC; // ...in order to put this here
 class Non_Player_Character : public Character
 {
 public:
+	// hostile and neutral NPCs override this in their respective classes
 	virtual void update(World & world, map<string, shared_ptr<Character>> & actors) = 0;
 
-protected:
-	stack<string> objectives; // structure highly subject to change
+	// objective debugging
+	string get_objectives() const;
 
-	// this can only be instantiaed by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
+protected:
+	class Objective
+	{
+	public:
+		// "get [] [] axe", "construct north stone surface", "construct north stone door"
+		string verb, direction, material, noun;
+		int objective_x, objective_y, objective_z;
+		string purpose; // "sword" (the reason this objective was added
+		bool already_planning_to_craft = false;
+		Objective(const string & verb, const string & noun, const string & purpose) :
+			verb(verb), noun(noun), purpose(purpose) {}
+		Objective(const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z) :
+			verb(verb), noun(noun), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z) {}
+	};
+	enum Objective_Priority { low_priority, high_priority };
+
+	deque<Objective> objectives;
+
+	// this can only be instantiated by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
 	Non_Player_Character(const string & name, const string & faction_ID) : Character(name, faction_ID) {}
+
+	// objective creating and deletion
+	void add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const string & purpose);
+	void add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z);
+	void erase_objective(const deque<Objective>::iterator & objective_iterator);
+	void erase_objectives_matching_purpose(const string purpose);
+
+	// objective information
+	string the_item_im_looking_for() const;
+	bool one_can_craft(const string & item_id) const;
+	bool i_have(const string & item_id) const;
+	bool i_dont_have(const string & item_id) const;
+	bool im_planning_to_acquire(const string & item_ID) const;
+
+	// objective planning
+	void plan_to_get(const string & item_id);
+	void plan_to_craft(const string & item_id);
 
 	// used to count friends or foes:   count<Enemy_NPC>(world, actors);
 	template <typename ACTOR_TYPE> unsigned count(World & world, map<string, shared_ptr<Character>> & actors) const
@@ -57,7 +93,8 @@ protected:
 		return players_in_range;
 	}
 
-	void pathfind(const int & x_dest, const int & y_dest, World & world);
+	// returns true if successful
+	bool pathfind(const int & x_dest, const int & y_dest, World & world);
 
 private:
 
@@ -78,6 +115,7 @@ private:
 		Node() {}
 		Node(const int & x, const int & y, const string & dir) : x(x), y(y), direction_from_parent(dir) {}
 
+		// Node member setter
 		void set_g_h_f(const int & set_g, const int & set_h);
 	};
 

@@ -333,3 +333,8 @@ const int C::FOREST_VISIBILITY_LEVEL_MAX = 90;
 const int C::HEALTH_MIN = 0;
 const int C::FULL_HEALTH_MIN = 100; // this is full health for new players
 const int C::FULL_HEALTH_MAX = 200; // this is full health for fully leveled health
+
+// AI objective keywords
+
+const string C::AI_OBJECTIVE_ACQUIRE = "acquire";
+const string C::AI_OBJECTIVE_GOTO = "goto";
