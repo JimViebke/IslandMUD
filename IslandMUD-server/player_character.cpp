@@ -38,6 +38,11 @@ string PC::print() const
 // Build and return a top-down area map around a given coordinate
 string PC::generate_area_map(const World & world, const map<string, shared_ptr<Character>> & actors) const
 {
+	// (VIEW_DISTANCE * 2) + 1 == the number of rooms to be rendered (across)
+	// * 3 == the total width by char count
+	// - 2 == the total width by char count after removing the borders
+	const int area_map_trimmed_width = (((C::VIEW_DISTANCE * 2) + 1) * 3) - 2;
+
 	stringstream user_map; // three stringstreams feed into one master stringstream
 
 	// create a 2D vector to represent whether or not a tree is at a location
@@ -115,7 +120,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 			//  1  2  3  4  5   6   7  8  9 10 11
 
 			// access_x = current index - (player index - (view distance + 1)) */
-			//      1   =     23        - (      28     - (    5        + 1 ))
+			//      1   =     23        - (      28     - (    5         + 1))
 
 			// FGA = forest grid access
 			int fga_x = cx - (x - (C::VIEW_DISTANCE + 1));
@@ -265,8 +270,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 						sw_corner = R::corner_char(wtn, wte, wts, wtw);
 					}
 				}
-
-
+				
 				// time for glorious nested ternary statements to do this cheap
 				a
 					<< nw_corner
@@ -285,8 +289,15 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 		} // end for each room in row
 
 		// each iteration, push the three stringstreams representing the row into the user's map
-		user_map << a.str() << endl << b.str() << endl << c.str() << endl;
+		user_map
+			<< a.str().substr(1, area_map_trimmed_width) << endl // don't add the first and last characters
+			<< b.str().substr(1, area_map_trimmed_width) << endl
+			<< c.str().substr(1, area_map_trimmed_width) << endl;
 	} // end for each row
 
-	return user_map.str(); // this now contains the client's entire visible area. No formatting is required, just dump this to console.
+	// return the user map, but trim the top and bottom row by removing area_map_trimmed_width from the beginning
+	// and area_map_trimmed_width * 2 from the end
+	return user_map.str().substr(
+		area_map_trimmed_width,
+		(user_map.str().length() - (area_map_trimmed_width * 2)) - 1);
 }
