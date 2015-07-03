@@ -8,22 +8,25 @@ void Recipes::load()
 	// for documentation, refer to add_recipe() below
 
 	cout << "\nLoading crafting recipes...";
-		
+
 	// add_recipe("recipe name", {}, {}, {}, {}, {});
 
 	// materials
-	add_recipe("stick", {}, {}, { { C::TREE_ID, 1 } }, {}, { { C::STICK_ID, 1 } });
-	add_recipe("branch", {}, {}, { { C::TREE_ID, 1 } }, {}, { { C::BRANCH_ID, 1 } });
-	add_recipe("vine", {}, {}, { { C::TREE_ID, 1 } }, {}, { { C::VINE_ID, 1 } });
-	add_recipe("stone", {}, {}, {}, {}, { { C::STONE_ID, 1 } }); // you can always get a stone
-	add_recipe("arrow", {}, { { C::ARROWHEAD_ID, 1 }, { C::STICK_ID, 1 } }, {}, {}, { { C::ARROW_ID, 1 } }); // a stick and an arrowhead
-	add_recipe("arrowhead", { { C::STONE_ID, 2 } }, { { C::STONE_ID, 1 } }, {}, {}, { { C::ARROWHEAD_ID, 3 } }); // requires two stones but only one is made into arrowheads
-	
+	add_recipe(C::STICK_ID, {}, {}, { { C::TREE_ID, 1 } }, {}, { { C::STICK_ID, 1 } });
+	add_recipe(C::BRANCH_ID, {}, {}, { { C::TREE_ID, 1 } }, {}, { { C::BRANCH_ID, 1 } });
+	add_recipe(C::VINE_ID, {}, {}, { { C::TREE_ID, 1 } }, {}, { { C::VINE_ID, 1 } });
+	add_recipe(C::STONE_ID, {}, {}, {}, {}, { { C::STONE_ID, 1 } }); // you can always get a stone
+	add_recipe(C::ARROW_ID, {}, { { C::ARROWHEAD_ID, 1 }, { C::STICK_ID, 1 } }, {}, {}, { { C::ARROW_ID, 1 } }); // a stick and an arrowhead
+	add_recipe(C::ARROWHEAD_ID, { { C::STONE_ID, 2 } }, { { C::STONE_ID, 1 } }, {}, {}, { { C::ARROWHEAD_ID, 3 } }); // requires two stones but only one is made into arrowheads
+
 	// equipment
-	add_recipe("staff", { { C::AXE_ID, 1 } }, { { C::BRANCH_ID, 1 } }, {}, {}, { { C::STAFF_ID, 1 } });
-	add_recipe("axe", {}, { { C::BRANCH_ID, 1 }, { C::STONE_ID, 1 }, { C::VINE_ID, 1 } }, {}, {}, { { C::AXE_ID, 1 } }); // maybe need a sharp stone?
-	add_recipe("bow", {}, { { C::BRANCH_ID, 1 }, { C::VINE_ID, 1 } }, {}, {}, { { C::BOW_ID, 1 } });
-	add_recipe("sword", {}, { { C::STONE_ID, 2 }, { C::STICK_ID, 1 } }, {}, {}, { { C::SWORD_ID, 1 } });
+	add_recipe(C::STAFF_ID, { { C::AXE_ID, 1 } }, { { C::BRANCH_ID, 1 } }, {}, {}, { { C::STAFF_ID, 1 } });
+	add_recipe(C::AXE_ID, {}, { { C::BRANCH_ID, 1 }, { C::STONE_ID, 1 }, { C::VINE_ID, 1 } }, {}, {}, { { C::AXE_ID, 1 } }); // maybe need a sharp stone?
+	add_recipe(C::BOW_ID, {}, { { C::BRANCH_ID, 1 }, { C::VINE_ID, 1 } }, {}, {}, { { C::BOW_ID, 1 } });
+	add_recipe(C::SWORD_ID, {}, { { C::STONE_ID, 2 }, { C::STICK_ID, 1 } }, {}, {}, { { C::SWORD_ID, 1 } });
+
+	// other
+	add_recipe(C::FORGE_ID, {}, { { C::STONE_ID, 20 } }, {}, {}, { { C::FORGE_ID, 1 } }); // 20 stones to build an immovable forge 
 
 }
 
