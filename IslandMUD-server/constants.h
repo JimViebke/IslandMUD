@@ -18,6 +18,7 @@ class Constants
 {
 public:
 
+	// general
 	const static int
 		GROUND_INDEX,
 		VIEW_DISTANCE,
@@ -31,7 +32,6 @@ public:
 		DEFAULT_SPAWN_Z;
 
 	// game data locations
-
 	static const string game_directory;
 	static const string world_terrain_file_location;
 	static const string world_biome_file_location;
@@ -39,13 +39,11 @@ public:
 	static const string user_data_directory;
 
 	// faction IDs
-
 	const static string PC_FACTION_ID; // players ("PCs")
 	const static string NPC_NEUTRAL_FACTION_ID; // neutral island inhabitants
 	const static string NPC_HOSTILE_FACTION_ID; // antagonists
-	
+
 	// map symbols
-	
 	const static char
 		PLAYER_CHAR,
 		NPC_NEUTRAL_CHAR,
@@ -56,10 +54,19 @@ public:
 		RUBBLE_CHAR;
 
 	const static string
+		// engine signals
 		GOOD_SIGNAL,
 		BAD_SIGNAL,
+
+		// item IDs
 		BAD_ITEM_ID,
 
+		SMELTER_ID,
+		FORGE_ID,
+		ANVIL_ID,
+		DEBRIS_ID, // collapsed ceilings
+
+		// item IDs -> materials
 		WOOD_ID,
 		STONE_ID,
 		VINE_ID,
@@ -70,17 +77,18 @@ public:
 
 		TREE_ID,
 
+		// item IDs -> equipment
 		AXE_ID,
 		STAFF_ID,
 		SWORD_ID,
 		BOW_ID,
 		TORCH_ID,
 		HAMMER_ID,
-		FORGE_ID,
-		ANVIL_ID,
-		DEBRIS_ID, // collapsed ceilings
 
+		// commands
 		BAD_COMMAND,
+
+		// action commands
 		LOGIN_COMMAND,
 		LOGOUT_COMMAND,
 		HELP_COMMAND,
@@ -95,6 +103,7 @@ public:
 		PRINT_RECIPES_COMMAND, // dev only. No full recipe printout in normal game.
 		ATTACK_COMMAND,
 
+		// direction commands/IDs
 		NORTH,
 		NORTH_EAST,
 		EAST,
@@ -104,12 +113,14 @@ public:
 		WEST,
 		NORTH_WEST,
 
+		// floor and ceiling IDs + directions
 		FLOOR,
 		CEILING,
 
 		UP,
 		DOWN,
 
+		// doors and walls
 		SURFACE,
 		WALL,
 		DOOR,
@@ -136,17 +147,16 @@ public:
 		XML_USER_MATERIALS,
 		XML_USER_MATERIAL_COUNT,
 
-		// user level xml consts
+		// user level xml
 		XML_LEVEL_SWORDSMANSHIP,
 		XML_LEVEL_ARCHERY,
 		XML_LEVEL_FOREST_VISIBILITY,
 		XML_LEVEL_HEALTH_MAX,
 
-		// user health
+		// user health xml
 		XML_CURRENT_HEALTH;
 
 	// surface information
-
 	static const vector<string> surface_ids;
 	static const vector<string> direction_ids;
 	static const vector<string> primary_direction_ids; // NESW
@@ -179,7 +189,11 @@ public:
 		NS_DOOR,
 		WE_DOOR;
 
+	// more box drawing
+
 	const static vector<char> CORNERS;
+
+	// walls, ceiling, and floor - min and max health
 
 	const static int
 		MIN_SURFACE_HEALTH,
@@ -188,17 +202,14 @@ public:
 
 	const static map<string, map<string, int>> damage_tables;
 
-	// AI movement costs
-
 	const static int
+		// AI movement costs
 		AI_MOVEMENT_COST,
 		AI_MOVEMENT_COST_DIAGONAL,
 		AI_MOVEMENT_COST_FOREST,
-		AI_MOVEMENT_COST_FOREST_DIAGONAL; 
+		AI_MOVEMENT_COST_FOREST_DIAGONAL,
 
-	// levels
-
-	const static int
+		// levels
 		SWORDSMANSHIP_LEVEL_MIN,
 		SWORDSMANSHIP_LEVEL_MAX,
 		ARCHERY_LEVEL_MIN,
@@ -210,7 +221,6 @@ public:
 		FULL_HEALTH_MAX;
 
 	// AI objective keywords
-
 	const static string
 		AI_OBJECTIVE_ACQUIRE,
 		AI_OBJECTIVE_GOTO;
