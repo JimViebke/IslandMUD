@@ -26,7 +26,8 @@ void Recipes::load()
 	add_recipe(C::SWORD_ID, {}, { { C::STONE_ID, 2 }, { C::STICK_ID, 1 } }, {}, {}, { { C::SWORD_ID, 1 } });
 
 	// other
-	add_recipe(C::FORGE_ID, {}, { { C::STONE_ID, 20 } }, {}, {}, { { C::FORGE_ID, 1 } }); // 20 stones to build an immovable forge 
+	add_recipe(C::FORGE_ID, {}, { { C::STONE_ID, 20 } }, {}, {}, { { C::FORGE_ID, 1 } }); // 20 stones to build a forge (which are immovable)
+	add_recipe(C::SMELTER_ID, {}, { { C::STONE_ID, 30 } }, {}, {}, { { C::SMELTER_ID, 1 } }); // 30 stones to build a smelter (which are immovable)
 
 }
 
