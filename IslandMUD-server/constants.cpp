@@ -3,6 +3,7 @@ Feb 14, 2015 */
 
 #include "constants.h"
 
+// general
 const int C::GROUND_INDEX = 3; // there are three levels below this
 const int C::VIEW_DISTANCE = 5; // 5+1+5 to a side == 11*11 total area
 
@@ -15,7 +16,6 @@ const int C::DEFAULT_SPAWN_Y = C::WORLD_Y_DIMENSION / 2; // E/W center
 const int C::DEFAULT_SPAWN_Z = C::GROUND_INDEX; // ground level spawn
 
 // game data locations
-
 const string C::game_directory = "C:/IslandMUD";
 const string C::world_terrain_file_location = C::game_directory + "/world_terrain.txt";
 const string C::world_biome_file_location = C::game_directory + "/biome_map.txt";
@@ -23,13 +23,11 @@ const string C::room_directory = C::game_directory + "/rooms";
 const string C::user_data_directory = C::game_directory + "/user_data";
 
 // faction IDs
-
 const string C::PC_FACTION_ID = "player";
 const string C::NPC_NEUTRAL_FACTION_ID = "neutral_NPC";
 const string C::NPC_HOSTILE_FACTION_ID = "hostile_NPC";
 
 // map symbols
-
 const char C::PLAYER_CHAR = '@';
 const char C::NPC_NEUTRAL_CHAR = '+';
 const char C::WATER_CHAR = '~';
@@ -39,16 +37,18 @@ const char C::ITEM_CHAR = '?';
 const char C::RUBBLE_CHAR = '#';
 
 // engine signals
-
 const string C::GOOD_SIGNAL = "good";
 const string C::BAD_SIGNAL = "bad";
 
-// item ids
-
+// item IDs
 const string C::BAD_ITEM_ID = "bad_item_id";
 
-// materials
+const string C::SMELTER_ID = "smelter";
+const string C::FORGE_ID = "forge";
+const string C::ANVIL_ID = "anvil";
+const string C::DEBRIS_ID = "debris";
 
+// item IDs -> materials
 const string C::WOOD_ID = "wood";
 const string C::STONE_ID = "stone";
 const string C::VINE_ID = "vine";
@@ -59,7 +59,7 @@ const string C::ARROWHEAD_ID = "arrowhead";
 
 const string C::TREE_ID = "tree";
 
-// equipment
+// item IDs -> equipment
 
 const string C::AXE_ID = "axe";
 const string C::STAFF_ID = "staff";
@@ -67,13 +67,11 @@ const string C::SWORD_ID = "sword";
 const string C::BOW_ID = "bow";
 const string C::TORCH_ID = "torch";
 const string C::HAMMER_ID = "hammer";
-const string C::FORGE_ID = "forge";
-const string C::ANVIL_ID = "anvil";
-const string C::DEBRIS_ID = "debris";
 
-// verb commands
-
+// commands
 const string C::BAD_COMMAND = "unknown_command";
+
+// action commands
 const string C::LOGIN_COMMAND = "login";
 const string C::LOGOUT_COMMAND = "logout";
 const string C::HELP_COMMAND = "help";
@@ -84,12 +82,11 @@ const string C::CRAFT_COMMAND = "craft";
 const string C::MOVE_COMMAND = "move";
 const string C::DROP_COMMAND = "drop";
 const string C::CONSTRUCT_COMMAND = "construct";
-const string C::WAIT_COMMAND = "wait"; // for debugging (see .h)
-const string C::PRINT_RECIPES_COMMAND = "recipes"; // for debugging (see .h)
+const string C::WAIT_COMMAND = "wait"; // for debugging (see constants.h)
+const string C::PRINT_RECIPES_COMMAND = "recipes"; // for debugging (see constants.h)
 const string C::ATTACK_COMMAND = "attack";
 
-// direction commands
-
+// direction commands/IDs
 const string C::NORTH = "north";
 const string C::NORTH_EAST = "northeast";
 const string C::EAST = "east";
@@ -99,8 +96,7 @@ const string C::SOUTH_WEST = "southwest";
 const string C::WEST = "west";
 const string C::NORTH_WEST = "northwest";
 
-// floor and ceiling IDs (walls use NESW)
-
+// floor and ceiling IDs + directions
 const string C::FLOOR = "floor";
 const string C::CEILING = "ceiling";
 
@@ -108,13 +104,11 @@ const string C::UP = "up";
 const string C::DOWN = "down";
 
 // doors and walls
-
 const string C::SURFACE = "surface";
 const string C::WALL = "wall";
 const string C::DOOR = "door";
 
-// world room xml consts
-
+// room xml
 const string C::XML_ROOM = "room";
 const string C::XML_IS_WATER = "is_water";
 const string C::XML_ITEM = "item";
@@ -127,8 +121,7 @@ const string C::XML_DOOR_HEALTH = "health";
 const string C::XML_DOOR_MATERIAL = "material";
 const string C::XML_DOOR_FACTION = "faction";
 
-// user data xml consts
-
+// user data xml
 const string C::XML_USER_STATUS = "status";
 const string C::XML_USER_STATUS_CURRENT_HEALTH = "current_health";
 const string C::XML_USER_LOCATION = "location";
@@ -137,15 +130,13 @@ const string C::XML_USER_EQUIPMENT = "equipment";
 const string C::XML_USER_MATERIALS = "materials";
 const string C::XML_USER_MATERIAL_COUNT = "count";
 
-// user level xml consts
-
+// user level xml
 const string C::XML_LEVEL_SWORDSMANSHIP = "swordsmanship";
 const string C::XML_LEVEL_ARCHERY = "archery";
 const string C::XML_LEVEL_FOREST_VISIBILITY = "forest_visibility";
 const string C::XML_LEVEL_HEALTH_MAX = "max_health";
 
-// user health
-
+// user health xml
 const string C::XML_CURRENT_HEALTH = "current_health";
 
 // store a vector of all valid surface ids
@@ -279,11 +270,8 @@ const int C::MIN_SURFACE_HEALTH = 0;
 const int C::MAX_SURFACE_HEALTH = 100;
 const int C::MAX_DOOR_HEALTH = 100;
 
-/*
-Create a two-dimensional map to calculate damamge values.
-
-Associate each attacking implement with a map of target, value pairs.
-*/
+/* Create a two-dimensional map to calculate damamge values.
+Associate each attacking implement with a map of target, value pairs. */
 
 const map<string, map<string, int>> C::damage_tables =
 {
@@ -316,14 +304,12 @@ const map<string, map<string, int>> C::damage_tables =
 };
 
 // AI movement costs
-
 const int C::AI_MOVEMENT_COST = 10; // 1 * 10
 const int C::AI_MOVEMENT_COST_DIAGONAL = 14; // sqrt(2) * 10
 const int C::AI_MOVEMENT_COST_FOREST = C::AI_MOVEMENT_COST * 2;
 const int C::AI_MOVEMENT_COST_FOREST_DIAGONAL = C::AI_MOVEMENT_COST_DIAGONAL * 2;
 
 // levels
-
 const int C::SWORDSMANSHIP_LEVEL_MIN = 10; // damage inflicted per strike
 const int C::SWORDSMANSHIP_LEVEL_MAX = 50;
 const int C::ARCHERY_LEVEL_MIN = 50; // odds of a shot making contact
@@ -335,6 +321,5 @@ const int C::FULL_HEALTH_MIN = 100; // this is full health for new players
 const int C::FULL_HEALTH_MAX = 200; // this is full health for fully leveled health
 
 // AI objective keywords
-
 const string C::AI_OBJECTIVE_ACQUIRE = "acquire";
 const string C::AI_OBJECTIVE_GOTO = "goto";

@@ -24,7 +24,7 @@ void Parse::initialize()
 		P::dict["take"] = P::dict["get"] = P::dict["pick"] = P::dict["choose"] = P::dict["grab"] = P::dict["acquire"] = C::TAKE_COMMAND;
 		P::dict["equip"] = P::dict["weild"] = P::dict["wield"] = C::EQUIP_COMMAND;
 		P::dict["dequip"] = P::dict["deequip"] = P::dict["unequip"] = C::DEQUIP_COMMAND;
-		P::dict["craft"] = P::dict["forge"] = P::dict["make"] = P::dict["create"] = P::dict["fashion"] = C::CRAFT_COMMAND;
+		P::dict["craft"] = P::dict["make"] = P::dict["create"] = P::dict["fashion"] = C::CRAFT_COMMAND;
 		P::dict["drop"] = P::dict["release"] = P::dict["unhand"] = C::DROP_COMMAND;
 		P::dict["wait"] = P::dict["pause"] = P::dict["consider"] = P::dict["delay"] = C::WAIT_COMMAND;
 		P::dict["construct"] = P::dict["build"] = P::dict["erect"] = C::CONSTRUCT_COMMAND;
@@ -32,6 +32,7 @@ void Parse::initialize()
 		
 		// items
 		P::dict["tree"] = C::TREE_ID;
+		P::dict["smelter"] = C::SMELTER_ID;
 		P::dict["forge"] = C::FORGE_ID;
 		P::dict["anvil"] = C::ANVIL_ID;
 
@@ -80,8 +81,8 @@ vector<string> Parse::tokenize(const string & s)
 
 	// convert the (space-delimited) user input to a vector of strings (one word per element)
 	stringstream ss(s);
-	istream_iterator<string> begin(ss);
-	istream_iterator<string> end;
+	const istream_iterator<string> begin(ss);
+	const istream_iterator<string> end;
 	vector<string> strings(begin, end);
 
 	R::print(strings); // debugging

@@ -227,7 +227,7 @@ void World::generate_room_at(const int & x, const int & y, const int & z)
 		load_vertical_rooms_to_XML(x, y, z_stack);
 
 		// attempt to extract the specified room
-		xml_node room_node = z_stack.child(("room-" + R::to_string(z)).c_str());
+		const xml_node room_node = z_stack.child(("room-" + R::to_string(z)).c_str());
 
 		// if the specified room is not in the stack
 		if (!room_node)
@@ -268,8 +268,8 @@ void World::generate_room_at(const int & x, const int & y, const int & z)
 void World::load_vertical_rooms_to_XML(const int & ix, const int & iy, xml_document & vertical_rooms)
 {
 	// convert integers to strings, since they'll be used multiple times
-	string x = R::to_string(ix);
-	string y = R::to_string(iy);
+	const string x = R::to_string(ix);
+	const string y = R::to_string(iy);
 
 	// populate the document using the file for the vertical stack of rooms at x,y
 	vertical_rooms.load_file((C::room_directory + "\\" + x + "\\" + x + "-" + y + ".xml").c_str());
@@ -298,7 +298,7 @@ void World::add_room_to_world(xml_node & room_node, const int & x, const int & y
 	for (const xml_node & surface : room_node.children(C::XML_SURFACE.c_str()))
 	{
 		// extract the attribute containing the health/integrity of the surface
-		xml_attribute health_attribute = surface.attribute(C::XML_SURFACE_HEALTH.c_str());
+		const xml_attribute health_attribute = surface.attribute(C::XML_SURFACE_HEALTH.c_str());
 
 		// construct a new surface to add to the room
 		room->add_surface(
@@ -312,15 +312,15 @@ void World::add_room_to_world(xml_node & room_node, const int & x, const int & y
 			);
 
 		// select the door node
-		xml_node door_node = surface.child(C::XML_DOOR.c_str());
+		const xml_node door_node = surface.child(C::XML_DOOR.c_str());
 
 		// if the door node exists
 		if (!door_node.empty())
 		{
 			// extract values
-			int health = door_node.attribute(C::XML_DOOR_HEALTH.c_str()).as_int();
-			string material_ID = door_node.attribute(C::XML_DOOR_MATERIAL.c_str()).value();
-			string faction_ID = door_node.attribute(C::XML_DOOR_FACTION.c_str()).value();
+			const int health = door_node.attribute(C::XML_DOOR_HEALTH.c_str()).as_int();
+			const string material_ID = door_node.attribute(C::XML_DOOR_MATERIAL.c_str()).value();
+			const string faction_ID = door_node.attribute(C::XML_DOOR_FACTION.c_str()).value();
 
 			// add a door to the surface
 			room->add_door(surface.child(C::XML_SURFACE_DIRECTION.c_str()).child_value(),
@@ -378,7 +378,7 @@ void World::load_room_to_world(const int & x, const int & y, const int & z)
 }
 
 // move a passed room to disk
-void World::unload_room(const int & x, const int & y, const int & z, shared_ptr<Room> & room)
+void World::unload_room(const int & x, const int & y, const int & z, const shared_ptr<Room> & room)
 {
 	// Unloads passed room. Can be called even if the room doesn't exist in the world structure
 

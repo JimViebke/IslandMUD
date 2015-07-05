@@ -83,6 +83,12 @@ public:
 	Tree() : Item(C::TREE_ID, false) {}
 };
 
+class Smelter : public Item
+{
+public:
+	Smelter() : Item(C::SMELTER_ID, false) {}
+};
+
 class Forge : public Item
 {
 public:
