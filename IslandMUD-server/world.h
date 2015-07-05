@@ -75,7 +75,7 @@ private:
 	void load_room_to_world(const int & x, const int & y, const int & z);
 
 	// move a passed room to disk
-	void unload_room(const int & x, const int & y, const int & z, shared_ptr<Room> & room);
+	void unload_room(const int & x, const int & y, const int & z, const shared_ptr<Room> & room);
 
 	// add a room to a z_stack at a given index
 	void add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xml_document & z_stack) const;

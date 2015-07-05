@@ -70,7 +70,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 	tree_grid index = current index - (player index - (view distance + 1)) */
 	for (int cx = x - (int)C::VIEW_DISTANCE; cx <= x + (int)C::VIEW_DISTANCE; ++cx)
 	{
-		int i = cx - (x - (C::VIEW_DISTANCE + 1));
+		const int i = cx - (x - (C::VIEW_DISTANCE + 1));
 		for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 		{
 			if (R::bounds_check(cx, cy))
@@ -123,8 +123,8 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 			//      1   =     23        - (      28     - (    5         + 1))
 
 			// FGA = forest grid access
-			int fga_x = cx - (x - (C::VIEW_DISTANCE + 1));
-			int fga_y = cy - (y - (C::VIEW_DISTANCE + 1));
+			const int fga_x = cx - (x - (C::VIEW_DISTANCE + 1));
+			const int fga_y = cy - (y - (C::VIEW_DISTANCE + 1));
 			if (forest_grid[fga_x][fga_y]) // if there is a tree here, determine how the tile should be drawn
 			{
 				// is a forest area at the neighbouring coordinates? f_n == forest_north
@@ -155,10 +155,10 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 			else
 			{
 				// use a boolean value to indicate the presence or absence of a wall in this room
-				bool n = world.room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::NORTH);
-				bool e = world.room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::EAST);
-				bool s = world.room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::SOUTH);
-				bool w = world.room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::WEST);
+				const bool n = world.room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::NORTH);
+				const bool e = world.room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::EAST);
+				const bool s = world.room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::SOUTH);
+				const bool w = world.room_at(cx, cy, C::GROUND_INDEX)->has_surface(C::WEST);
 
 				bool
 					// is there a door present in a given location?
@@ -223,10 +223,10 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				char nw_corner = C::LAND_CHAR, ne_corner = C::LAND_CHAR, se_corner = C::LAND_CHAR, sw_corner = C::LAND_CHAR;
 				{
 					// relative to the north west corner of the room, is there a wall to the n/e/s/w
-					bool wtn = world.room_has_surface(cx - 1, cy, C::GROUND_INDEX, C::WEST);
-					bool wte = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::NORTH);
-					bool wts = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::WEST);
-					bool wtw = world.room_has_surface(cx, cy - 1, C::GROUND_INDEX, C::NORTH);
+					const bool wtn = world.room_has_surface(cx - 1, cy, C::GROUND_INDEX, C::WEST);
+					const bool wte = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::NORTH);
+					const bool wts = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::WEST);
+					const bool wtw = world.room_has_surface(cx, cy - 1, C::GROUND_INDEX, C::NORTH);
 
 					// in order for this corner to render, there must be one adjacent local wall OR two adjacent remote walls
 					if (wte || wts || (wtn && wtw))
@@ -236,10 +236,10 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				}
 				{
 					// relative to the north east corner of the room, is there a wall to the n/e/s/w
-					bool wtn = world.room_has_surface(cx - 1, cy, C::GROUND_INDEX, C::EAST);
-					bool wte = world.room_has_surface(cx, cy + 1, C::GROUND_INDEX, C::NORTH);
-					bool wts = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::EAST);
-					bool wtw = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::NORTH);
+					const bool wtn = world.room_has_surface(cx - 1, cy, C::GROUND_INDEX, C::EAST);
+					const bool wte = world.room_has_surface(cx, cy + 1, C::GROUND_INDEX, C::NORTH);
+					const bool wts = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::EAST);
+					const bool wtw = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::NORTH);
 
 					if (wtw || wts || (wtn && wte))
 					{
@@ -248,10 +248,10 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				}
 				{
 					// relative to the south east corner of the room, is there a wall to the n/e/s/w
-					bool wtn = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::EAST);
-					bool wte = world.room_has_surface(cx, cy + 1, C::GROUND_INDEX, C::SOUTH);
-					bool wts = world.room_has_surface(cx + 1, cy, C::GROUND_INDEX, C::EAST);
-					bool wtw = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::SOUTH);
+					const bool wtn = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::EAST);
+					const bool wte = world.room_has_surface(cx, cy + 1, C::GROUND_INDEX, C::SOUTH);
+					const bool wts = world.room_has_surface(cx + 1, cy, C::GROUND_INDEX, C::EAST);
+					const bool wtw = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::SOUTH);
 
 					if (wtn || wtw || (wts && wte))
 					{
@@ -260,10 +260,10 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				}
 				{
 					// relative to the south west corner of the room, is there a wall to the n/e/s/w
-					bool wtn = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::WEST);
-					bool wte = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::SOUTH);
-					bool wts = world.room_has_surface(cx + 1, cy, C::GROUND_INDEX, C::WEST);
-					bool wtw = world.room_has_surface(cx, cy - 1, C::GROUND_INDEX, C::SOUTH);
+					const bool wtn = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::WEST);
+					const bool wte = world.room_has_surface(cx, cy, C::GROUND_INDEX, C::SOUTH);
+					const bool wts = world.room_has_surface(cx + 1, cy, C::GROUND_INDEX, C::WEST);
+					const bool wtw = world.room_has_surface(cx, cy - 1, C::GROUND_INDEX, C::SOUTH);
 
 					if (wtn || wte || (wts && wtw))
 					{

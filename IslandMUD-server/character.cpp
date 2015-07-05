@@ -21,12 +21,12 @@ string Character::login(World & world)
 	int loaded_x = -1, loaded_y = -1, loaded_z = -1;
 
 	// load the three values from the node
-	xml_node location_node = user_data_xml.child(C::XML_USER_LOCATION.c_str());
+	const xml_node location_node = user_data_xml.child(C::XML_USER_LOCATION.c_str());
 
 	// extract the attributes as well as the values for the attributes
-	xml_attribute x_attribute = location_node.attribute(string("x").c_str());
-	xml_attribute y_attribute = location_node.attribute(string("y").c_str());
-	xml_attribute z_attribute = location_node.attribute(string("z").c_str());
+	const xml_attribute x_attribute = location_node.attribute(string("x").c_str());
+	const xml_attribute y_attribute = location_node.attribute(string("y").c_str());
+	const xml_attribute z_attribute = location_node.attribute(string("z").c_str());
 	loaded_x = x_attribute.as_int();
 	loaded_y = y_attribute.as_int();
 	loaded_z = z_attribute.as_int();
@@ -57,13 +57,13 @@ string Character::login(World & world)
 
 
 	// select the level node
-	xml_node level_node = user_data_xml.child(C::XML_USER_LEVELS.c_str());
+	const xml_node level_node = user_data_xml.child(C::XML_USER_LEVELS.c_str());
 
 	// select each level attribute
-	xml_attribute swordsmanship_level_attribute = level_node.attribute(C::XML_LEVEL_SWORDSMANSHIP.c_str());
-	xml_attribute archery_level_attribute = level_node.attribute(C::XML_LEVEL_ARCHERY.c_str());
-	xml_attribute forest_visibility_level_attribute = level_node.attribute(C::XML_LEVEL_FOREST_VISIBILITY.c_str());
-	xml_attribute full_health_level_attribute = level_node.attribute(C::XML_LEVEL_HEALTH_MAX.c_str());
+	const xml_attribute swordsmanship_level_attribute = level_node.attribute(C::XML_LEVEL_SWORDSMANSHIP.c_str());
+	const xml_attribute archery_level_attribute = level_node.attribute(C::XML_LEVEL_ARCHERY.c_str());
+	const xml_attribute forest_visibility_level_attribute = level_node.attribute(C::XML_LEVEL_FOREST_VISIBILITY.c_str());
+	const xml_attribute full_health_level_attribute = level_node.attribute(C::XML_LEVEL_HEALTH_MAX.c_str());
 
 	// if an attribute is non-empty, load its level value
 	if (!swordsmanship_level_attribute.empty())
@@ -84,10 +84,10 @@ string Character::login(World & world)
 	}
 
 	// select status node (just holds current_health at this time)
-	xml_node status_node = user_data_xml.child(C::XML_USER_STATUS.c_str());
+	const xml_node status_node = user_data_xml.child(C::XML_USER_STATUS.c_str());
 
 	// if current_health is non-empty, set current health
-	xml_attribute current_health_attribute = status_node.attribute(C::XML_USER_STATUS_CURRENT_HEALTH.c_str());
+	const xml_attribute current_health_attribute = status_node.attribute(C::XML_USER_STATUS_CURRENT_HEALTH.c_str());
 	if (!current_health_attribute.empty())
 	{
 		this->set_current_health(current_health_attribute.as_int());
@@ -439,7 +439,7 @@ string Character::move(const string & direction_ID, World & world)
 	// world.load_room_to_world(x + dx, y + dy, z + dz);
 
 	// test if the environment (structures) allow the player to move in a given direction
-	string validate_movement = this->validate_movement(x, y, z, direction_ID, dx, dy, dz, world);
+	const string validate_movement = this->validate_movement(x, y, z, direction_ID, dx, dy, dz, world);
 
 	// if the validation failed for any reason
 	if (validate_movement != C::GOOD_SIGNAL)
@@ -467,7 +467,7 @@ string Character::move(const string & direction_ID, World & world)
 	else if (direction_ID == C::WEST || direction_ID == C::EAST)
 	{
 		// logic is the same as above, but in rotated axes (axes is plural of axis)
-		int ry = (direction_ID == C::WEST) ? y + C::VIEW_DISTANCE : y - C::VIEW_DISTANCE;
+		const int ry = (direction_ID == C::WEST) ? y + C::VIEW_DISTANCE : y - C::VIEW_DISTANCE;
 		for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 		{
 			world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
@@ -483,7 +483,7 @@ string Character::move(const string & direction_ID, World & world)
 
 		if (direction_ID == C::NORTH_WEST || direction_ID == C::NORTH_EAST) // moving north, parse south row
 		{
-			int rx = x + C::VIEW_DISTANCE;
+			const int rx = x + C::VIEW_DISTANCE;
 			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
 			{
 				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
@@ -492,7 +492,7 @@ string Character::move(const string & direction_ID, World & world)
 
 		if (direction_ID == C::NORTH_EAST || direction_ID == C::SOUTH_EAST) // moving east, parse west row
 		{
-			int ry = y - C::VIEW_DISTANCE;
+			const int ry = y - C::VIEW_DISTANCE;
 			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 			{
 				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
@@ -501,7 +501,7 @@ string Character::move(const string & direction_ID, World & world)
 
 		if (direction_ID == C::SOUTH_EAST || direction_ID == C::SOUTH_WEST) // moving south, parse north row
 		{
-			int rx = x - C::VIEW_DISTANCE;
+			const int rx = x - C::VIEW_DISTANCE;
 			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
 			{
 				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
@@ -510,7 +510,7 @@ string Character::move(const string & direction_ID, World & world)
 
 		if (direction_ID == C::SOUTH_WEST || direction_ID == C::NORTH_WEST) // moving west, parse east row
 		{
-			int ry = y + C::VIEW_DISTANCE;
+			const int ry = y + C::VIEW_DISTANCE;
 			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 			{
 				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);

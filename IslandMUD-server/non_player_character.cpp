@@ -81,7 +81,7 @@ bool Non_Player_Character::i_dont_have(const string & item_id) const
 }
 bool Non_Player_Character::im_planning_to_acquire(const string & item_ID) const
 {
-	for (const Objective objective : objectives)
+	for (const Objective & objective : objectives)
 	{
 		if (objective.verb == C::AI_OBJECTIVE_ACQUIRE &&
 			objective.noun == item_ID)
@@ -154,7 +154,7 @@ bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world)
 		// -- Move it to closed list
 
 		// find the cheapest room in the open list. Select it and move it to the closed list
-		Node current_room = move_and_get_lowest_g_cost(open_list, closed_list);
+		const Node current_room = move_and_get_lowest_g_cost(open_list, closed_list);
 
 		// for each room adjacent to current
 		for (const string & direction : C::direction_ids)
