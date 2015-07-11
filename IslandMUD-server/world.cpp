@@ -16,11 +16,21 @@ void World::load()
 // return shared_ptr to a room at a location
 shared_ptr<Room> World::room_at(const int & x, const int & y, const int & z) const
 {
-	return world.at(x).at(y).at(z);
+	if (!R::bounds_check(x, y, z))
+	{
+		return world[0];
+	}
+
+	return world.at((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + (z));
 }
 shared_ptr<Room> & World::room_at(const int & x, const int & y, const int & z)
 {
-	return world.at(x).at(y).at(z);
+	if (!R::bounds_check(x, y, z))
+	{
+		return world[0];
+	}
+
+	return world.at((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + (z));
 }
 
 // debugging
@@ -139,9 +149,7 @@ void World::load_world_container()
 {
 	cout << "\nCreating world container...";
 
-	world = vector<vector<vector<shared_ptr<Room>>>>(C::WORLD_X_DIMENSION,
-		vector<vector<shared_ptr<Room>>>(C::WORLD_Y_DIMENSION,
-		vector<shared_ptr<Room>>(C::WORLD_Z_DIMENSION)));
+	world = vector<shared_ptr<Room>>(C::WORLD_X_DIMENSION * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION);
 }
 
 void World::load_terrain_map()
