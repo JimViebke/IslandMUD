@@ -21,7 +21,8 @@ class World
 {
 private:
 	// x, y, and z dimensions repectively
-	vector<vector<vector<shared_ptr<Room>>>> world;
+	// vector<vector<vector<shared_ptr<Room>>>> world;
+	vector<shared_ptr<Room>> world;
 
 	// 2d terrain (biome) map
 	shared_ptr<vector<vector<char>>> terrain;
