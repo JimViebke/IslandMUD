@@ -75,6 +75,7 @@ void Hostile_NPC::update(World & world, map<string, shared_ptr<Character>> & act
 			if (!objective_iterator->already_planning_to_craft
 				&& one_can_craft(objective_iterator->noun))
 			{
+				// plan to craft the item
 				objective_iterator->already_planning_to_craft = true;
 				plan_to_craft(objective_iterator->noun);
 				objective_iterator = objectives.begin(); // obligatory reset
@@ -97,6 +98,7 @@ void Hostile_NPC::update(World & world, map<string, shared_ptr<Character>> & act
 			}
 		}
 
+		// objectives were not modified, move to next objective
 		++objective_iterator;
 	}
 
@@ -108,7 +110,6 @@ void Hostile_NPC::update(World & world, map<string, shared_ptr<Character>> & act
 	{
 		// try to craft the item, using obj->purpose if the (obj->verb == GOTO), else use obj->noun (most cases)
 		const string craft_attempt = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
-		// const string craft_attempt = craft(objective_iterator->noun, world);
 		if (craft_attempt.find("You now have") != string::npos)
 		{
 			// if successful, clear completed objectives
@@ -120,15 +121,15 @@ void Hostile_NPC::update(World & world, map<string, shared_ptr<Character>> & act
 				// save this because our firse erase will invalidate the iterator
 				const string PURPOSE = objective_iterator->purpose;
 
-				// erase the "goto"
+				// erase the "goto" objective
 				erase_goto_objective_matching(PURPOSE);
 
-				// erase the "aquire"
+				// erase the "aquire" objective
 				erase_acquire_objective_matching(PURPOSE);
 			}
 			else if (objective_iterator->noun == objective_iterator->purpose)
 			{
-				// this item is an end goal
+				// this item is an end goal (no "parent" goal)
 				erase_objectives_matching_purpose(objective_iterator->purpose);
 			}
 			else
