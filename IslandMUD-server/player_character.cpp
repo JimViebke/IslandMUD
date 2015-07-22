@@ -128,14 +128,14 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 			if (forest_grid[fga_x][fga_y]) // if there is a tree here, determine how the tile should be drawn
 			{
 				// is a forest area at the neighbouring coordinates? f_n == forest_north
-				bool f_n = forest_grid[fga_x - 1][fga_y];
-				bool f_ne = forest_grid[fga_x - 1][fga_y + 1];
-				bool f_e = forest_grid[fga_x][fga_y + 1];
-				bool f_se = forest_grid[fga_x + 1][fga_y + 1];
-				bool f_s = forest_grid[fga_x + 1][fga_y];
-				bool f_sw = forest_grid[fga_x + 1][fga_y - 1];
-				bool f_w = forest_grid[fga_x][fga_y - 1];
-				bool f_nw = forest_grid[fga_x - 1][fga_y - 1];
+				const bool f_n = forest_grid[fga_x - 1][fga_y];
+				const bool f_ne = forest_grid[fga_x - 1][fga_y + 1];
+				const bool f_e = forest_grid[fga_x][fga_y + 1];
+				const bool f_se = forest_grid[fga_x + 1][fga_y + 1];
+				const bool f_s = forest_grid[fga_x + 1][fga_y];
+				const bool f_sw = forest_grid[fga_x + 1][fga_y - 1];
+				const bool f_w = forest_grid[fga_x][fga_y - 1];
+				const bool f_nw = forest_grid[fga_x - 1][fga_y - 1];
 
 				// conditionally draw a tree or an empty space in the corners, other five are always draw as trees
 				a << ((f_n || f_nw || f_w) ? C::FOREST_CHAR : C::LAND_CHAR) << C::FOREST_CHAR << ((f_n || f_ne || f_e) ? C::FOREST_CHAR : C::LAND_CHAR);

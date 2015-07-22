@@ -49,6 +49,8 @@ void Non_Player_Character::erase_objectives_matching_purpose(const string purpos
 {
 	// arguement must be passed by value! Reference will change as the underlying structure is modified
 
+	// erase all objectives matching a purpose
+
 	for (unsigned i = 0; i < objectives.size();)
 	{
 		if (objectives[i].purpose == purpose)
@@ -57,18 +59,43 @@ void Non_Player_Character::erase_objectives_matching_purpose(const string purpos
 		}
 		else
 		{
-			++i;
+			++i; // no item was erased, move to next element
+		}
+	}
+}
+void Non_Player_Character::erase_goto_objective_matching(const string & purpose)
+{
+	// erase one goto objective matching purpose
+
+	for (deque<Objective>::iterator objective_iterator = objectives.begin();
+		objective_iterator != objectives.end(); ++objective_iterator)
+	{
+		if (objective_iterator->verb == C::AI_OBJECTIVE_GOTO && objective_iterator->purpose == purpose)
+		{
+			objectives.erase(objective_iterator);
+			return;
+		}
+	}
+}
+void Non_Player_Character::erase_acquire_objective_matching(const string & noun)
+{
+	// erase one acquire objective matching noun
+
+	for (deque<Objective>::iterator objective_iterator = objectives.begin();
+		objective_iterator != objectives.end(); ++objective_iterator)
+	{
+		if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE && objective_iterator->noun == noun)
+		{
+			objectives.erase(objective_iterator);
+			return;
 		}
 	}
 }
 
 // objective information
-string Non_Player_Character::the_item_im_looking_for() const
-{
-	return objectives.front().noun;
-}
 bool Non_Player_Character::one_can_craft(const string & item_id) const
 {
+	// if a recipe exists for an item, the item is craftable
 	return recipes.has_recipe_for(item_id);
 }
 bool Non_Player_Character::i_have(const string & item_id) const
@@ -81,6 +108,8 @@ bool Non_Player_Character::i_dont_have(const string & item_id) const
 }
 bool Non_Player_Character::im_planning_to_acquire(const string & item_ID) const
 {
+	// return true if an "acquire" objective has a noun matching item_ID
+
 	for (const Objective & objective : objectives)
 	{
 		if (objective.verb == C::AI_OBJECTIVE_ACQUIRE &&
@@ -90,6 +119,47 @@ bool Non_Player_Character::im_planning_to_acquire(const string & item_ID) const
 		}
 	}
 	return false;
+}
+bool Non_Player_Character::i_have_all_ingredients_to_craft(const string & item_ID) const
+{
+	// WARNING: this assumes item_ID is craftable
+
+	// Check if an NPC has all of the inventory requirements to craft an item.
+	// This must also check objectives to ensure the ingredients in the NPC's inventory
+	// aren't for another purpose.
+
+	Recipe recipe = recipes.get_recipe(item_ID);
+
+	// check both types of inventory requirements
+	for (map<string, int>::const_iterator inventory_need = recipe.inventory_need.cbegin();
+		inventory_need != recipe.inventory_need.cend(); ++inventory_need)
+	{
+		if (!this->has(inventory_need->first, inventory_need->second))
+		{
+			return false;
+		}
+	}
+	for (map<string, int>::const_iterator inventory_remove = recipe.inventory_remove.cbegin();
+		inventory_remove != recipe.inventory_remove.cend(); ++inventory_remove)
+	{
+		if (!this->has(inventory_remove->first, inventory_remove->second))
+		{
+			return false;
+		}
+	}
+
+	// for each objective
+	for (deque<Objective>::const_iterator objective_iterator = objectives.cbegin();
+		objective_iterator != objectives.cend(); ++objective_iterator)
+	{
+		// if I am still planning on acquiring an item for the purpose of crafting item_ID
+		if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE && objective_iterator->purpose == item_ID)
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 // objective planning
@@ -102,9 +172,29 @@ void Non_Player_Character::plan_to_craft(const string & item_id)
 	// assumes item_id is craftable
 
 	// The following loops deliberately do not take into account what the NPC already has.
-	// If the NPC has 3 wood and needs 8, it will add 8 vine-finding objectives.
-	// Rational is: don't count materials that are assumed to be present for another objective.
+	// If the NPC has 3 wood and needs 8, it will add 8 wood-finding objectives.
+	// Other materials are assumed to be present for other objective.
 
+	// Add the local requirements/needs before the inventory requirements/needs because
+	// the inventory requirements should always be completed first.
+
+	// two GOTO objective types
+	for (const pair<string, int> & requirement : recipes.get_recipe(item_id).local_need)
+	{
+		for (int i = 0; i < requirement.second; ++i)
+		{
+			add_objective(high_priority, C::AI_OBJECTIVE_GOTO, requirement.first, item_id);
+		}
+	}
+	for (const pair<string, int> & requirement : recipes.get_recipe(item_id).local_remove)
+	{
+		for (int i = 0; i < requirement.second; ++i)
+		{
+			add_objective(high_priority, C::AI_OBJECTIVE_GOTO, requirement.first, item_id);
+		}
+	}
+
+	// two ACQUIRE objective types
 	for (const pair<string, int> & requirement : recipes.get_recipe(item_id).inventory_need)
 	{
 		for (int i = 0; i < requirement.second; ++i)
@@ -294,6 +384,186 @@ bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world)
 
 	} while (true);
 }
+bool NPC::pathfind_to_closest_item(const string & item_id, World & world)
+{
+	// leave this for debugging
+	// cout << "\nSearching for path from " << x << "," << y << " to any " << item_id << ".\n";
+
+	/* 	Pathfinding resources:
+	http://www.redblobgames.com/pathfinding/a-star/introduction.html
+	http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#S7
+
+	F = G + H
+
+	G : actual cost to reach a certain room
+	H : estimated cost to reach destination from a certain room
+	F-cost = G + H */
+
+
+
+	vector<Node> open_list, closed_list;
+
+	// Add current room to open list.
+	open_list.push_back(Node(this->x, this->y, ""));
+
+	// cost to reach current room is of course 0
+	open_list[0].set_g(0);
+
+	// Do
+	do
+	{
+		// -- Find lowest f - cost room on open list
+		// -- Move it to closed list
+
+		// find the cheapest room in the open list. Select it and move it to the closed list
+		const Node current_room = move_and_get_lowest_g_cost(open_list, closed_list);
+
+		// for each room adjacent to current
+		for (const string & direction : C::direction_ids)
+		{
+			if (direction == C::UP || direction == C::DOWN) { continue; } // only pathfinding in 2D now
+
+			// calculate the location deltas
+			int dx = 0, dy = 0, dz = 0;
+			R::assign_movement_deltas(direction, dx, dy, dz);
+
+			// skip if the room if it is out of bounds,
+			if (!R::bounds_check(current_room.x + dx, current_room.y + dy, C::GROUND_INDEX)) { continue; }
+			// or it is not loaded,
+			if (world.room_at(current_room.x + dx, current_room.y + dy, C::GROUND_INDEX) == nullptr) { continue; }
+			// or it is not within view distance,
+			if (!world.room_at(current_room.x + dx, current_room.y + dy, C::GROUND_INDEX)->is_observed_by(this->name)) { continue; }
+			// or we can not travel to it from the current room
+			if (validate_movement(current_room.x, current_room.y, C::GROUND_INDEX, direction, dx, dy, 0, world) != C::GOOD_SIGNAL) { continue; }
+
+			// create a node to select the next adjacent room
+			Node adjacent_room(current_room.x + dx, current_room.y + dy, direction);
+
+			// pass if the adjacent node is already on the closed list
+			if (room_in_node_list(adjacent_room.x, adjacent_room.y, closed_list)) { continue; }
+
+			// if the room is not on the open list
+			if (!room_in_node_list(adjacent_room.x, adjacent_room.y, open_list))
+			{
+				// make the current room the parent of the adjacent room
+				adjacent_room.parent_x = current_room.x;
+				adjacent_room.parent_y = current_room.y;
+
+				// calculate the movement cost
+				int move_cost = (
+					// check if the NPC will have to move through a forest
+					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains_item(C::TREE_ID))
+					?
+					// determine if the movement is in a primary direction
+					((R::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
+					:
+					((R::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
+					);
+
+				// calculate the cost to this room
+				adjacent_room.set_g(current_room.g + move_cost);
+			}
+			// else the room is on the open list
+			else
+			{
+				// pull adjacent_room out of open_list
+				for (unsigned i = 0; i < open_list.size(); ++i) // for each node in the open list
+				{
+					if (open_list[i].x == adjacent_room.x && open_list[i].y == adjacent_room.y) // if the node is the current room
+					{
+						adjacent_room = get_node_at(adjacent_room.x, adjacent_room.y, open_list); // save it
+						open_list.erase(open_list.begin() + i); // erase the original
+						break; // adjacent_room is now the one from the list
+					}
+				}
+
+				// calculate the move cost
+				int move_cost = (
+					// check if the NPC will have to move through a forest
+					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains_item(C::TREE_ID))
+					?
+					// determine if the movement is in a primary direction
+					((R::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
+					:
+					((R::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
+					);
+
+				// if this way to the room is cheaper than the current best cost to the room
+				if (current_room.g + move_cost < adjacent_room.g)
+				{
+					// update the adjacent room's parent room to the current room
+					adjacent_room.parent_x = current_room.x;
+					adjacent_room.parent_y = current_room.y;
+
+					// update the g-score cost to the room
+					adjacent_room.set_g(current_room.g + move_cost);
+				}
+			}
+
+			// add the adjacent room to the open list
+			open_list.push_back(adjacent_room);
+
+		} // end for each adjacent room
+
+		// keep searching as long as there are still rooms to search
+	} while (open_list.size() > 0);
+
+
+
+	// get the target (destination) room
+	Node destination_room;
+	destination_room.g = 999999;
+	for (const Node & node : closed_list)
+	{
+		if (world.room_at(node.x, node.y, C::GROUND_INDEX)->contains_item(item_id) &&
+			node.g < destination_room.g)
+		{
+			destination_room = node;
+		}
+	}
+
+	// if no destination was found, there is no path
+	if (destination_room.x == -1 || destination_room.y == -1) { return false; }
+
+
+	Node current_room = destination_room;
+
+	// Starting from the target room, continue finding the parent room until the current room is found
+	// (this represents the path in reverse)
+	do
+	{
+		// get the parent room of the current room
+		Node parent_room = get_node_at(current_room.parent_x, current_room.parent_y, closed_list);
+
+		// leave this here for debugging
+		// cout << "\nI can get to " << current_room.x << "," << current_room.y << " from " << parent_room.x << "," << parent_room.y << ".";
+
+		// if the parent of current_room is our location
+		if (parent_room.x == this->x && parent_room.y == this->y)
+		{
+			// move to current_room
+			move(current_room.direction_from_parent, world);
+
+			/* leave this here for debugging
+			cout << endl;
+			for (const Node & node : closed_list)
+			{
+			cout << "Parent of " << node.x << "," << node.y << " is " << node.parent_x << "," << node.parent_y << ". Actual cost to node: " << node.g << ". Estimated cost to target: " << node.h << endl;
+			} */
+
+			return true; // we're done here
+		}
+		// if there is no parent room in the closed list (?!)
+		else if (parent_room.x == -1 || parent_room.y == -1)
+		{
+			return false; // something went horribly wrong
+		}
+
+		// move up the path by one room
+		current_room = parent_room;
+
+	} while (true);
+}
 
 // Node member setter
 void NPC::Node::set_g_h_f(const int & set_g, const int & set_h)
@@ -301,6 +571,10 @@ void NPC::Node::set_g_h_f(const int & set_g, const int & set_h)
 	g = set_g;
 	h = set_h;
 	f = g + h;
+}
+void NPC::Node::set_g(const int & set_g)
+{
+	g = set_g;
 }
 
 // pathfinding node utilities

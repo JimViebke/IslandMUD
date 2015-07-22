@@ -33,11 +33,13 @@ protected:
 		int objective_x, objective_y, objective_z;
 		string purpose; // "sword" (the reason this objective was added
 		bool already_planning_to_craft = false;
+
 		Objective(const string & verb, const string & noun, const string & purpose) :
 			verb(verb), noun(noun), purpose(purpose) {}
 		Objective(const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z) :
 			verb(verb), noun(noun), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z) {}
 	};
+
 	enum Objective_Priority { low_priority, high_priority };
 
 	deque<Objective> objectives;
@@ -50,13 +52,15 @@ protected:
 	void add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z);
 	void erase_objective(const deque<Objective>::iterator & objective_iterator);
 	void erase_objectives_matching_purpose(const string purpose);
+	void erase_goto_objective_matching(const string & purpose);
+	void erase_acquire_objective_matching(const string & noun);
 
 	// objective information
-	string the_item_im_looking_for() const;
 	bool one_can_craft(const string & item_id) const;
 	bool i_have(const string & item_id) const;
 	bool i_dont_have(const string & item_id) const;
 	bool im_planning_to_acquire(const string & item_ID) const;
+	bool i_have_all_ingredients_to_craft(const string & item_ID) const;
 
 	// objective planning
 	void plan_to_get(const string & item_id);
@@ -95,6 +99,7 @@ protected:
 
 	// returns true if successful
 	bool pathfind(const int & x_dest, const int & y_dest, World & world);
+	bool pathfind_to_closest_item(const string & item_id, World & world);
 
 private:
 
@@ -117,6 +122,7 @@ private:
 
 		// Node member setter
 		void set_g_h_f(const int & set_g, const int & set_h);
+		void set_g(const int & set_g);
 	};
 
 	// pathfinding node utilities
