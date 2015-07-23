@@ -5,11 +5,11 @@ Feb 14, 2015 */
 
 // general
 const int C::GROUND_INDEX = 3; // there are three levels below this
-const int C::VIEW_DISTANCE = 5; // 5+1+5 to a side == 11*11 total area
+const int C::VIEW_DISTANCE = 10; // 5+1+5 to a side == 11*11 total area
 
 const int C::WORLD_X_DIMENSION = 1000;
 const int C::WORLD_Y_DIMENSION = 1000;
-const int C::WORLD_Z_DIMENSION = 10;
+const int C::WORLD_Z_DIMENSION = 8;
 
 const int C::DEFAULT_SPAWN_X = C::WORLD_X_DIMENSION / 2; // N/S center
 const int C::DEFAULT_SPAWN_Y = C::WORLD_Y_DIMENSION / 2; // E/W center
@@ -83,6 +83,7 @@ const string C::MOVE_COMMAND = "move";
 const string C::DROP_COMMAND = "drop";
 const string C::CONSTRUCT_COMMAND = "construct";
 const string C::WAIT_COMMAND = "wait"; // for debugging (see constants.h)
+const string C::WITH_COMMAND = "with";
 const string C::PRINT_RECIPES_COMMAND = "recipes"; // for debugging (see constants.h)
 const string C::ATTACK_COMMAND = "attack";
 

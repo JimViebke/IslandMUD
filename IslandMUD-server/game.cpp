@@ -160,7 +160,8 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 			"\ntake / drop / craft / equip / dequip [item]" +
 			"\nattack [compass direction] wall / door" +
 			"\nconstruct [material] ceiling / floor" +
-			"\nconstruct [compass direction] [material] wall / door";
+			"\nconstruct [compass direction] [material] wall" +
+			"\nconstruct [compass direction] [material] wall with [material] door";			
 	}
 	// moving: "move northeast" OR "northeast"
 	else if ((command.size() == 2 && command[0] == C::MOVE_COMMAND)
@@ -193,10 +194,10 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 	{
 		return actors.find(actor_id)->second->construct_surface(command[2], command[1], world); // material, direction, world
 	}
-	// "construct west stone door"
-	else if (command.size() == 4 && command[0] == C::CONSTRUCT_COMMAND && command[3] == C::DOOR)
+	// "construct west stone wall with stick door"
+	else if (command.size() == 7 && command[0] == C::CONSTRUCT_COMMAND && command[3] == C::WALL && command[4] == C::WITH_COMMAND && command[6] == C::DOOR)
 	{
-		return actors.find(actor_id)->second->construct_door(command[2], command[1], world); // material, direction, world
+		return actors.find(actor_id)->second->construct_surface_with_door(command[2], command[1], command[5], world); // material, direction, world
 	}
 	// waiting: "wait"
 	else if (command.size() == 1 && command[0] == C::WAIT_COMMAND)

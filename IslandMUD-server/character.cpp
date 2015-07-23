@@ -706,16 +706,9 @@ string Character::construct_surface(const string & material_id, const string & s
 		// "You need 5 wood to continue construction."
 		return "You need " + R::to_string(C::SURFACE_REQUIREMENTS.find(material_id)->second) + " " + material_id + " to continue construction.";
 	}
-
-	// decrement the required supplies from the player's inventory
-	this->material_inventory.find(material_id)->second->amount -= C::SURFACE_REQUIREMENTS.find(material_id)->second;
-
-	// if the player has less that one of the material remaining
-	if (this->material_inventory.find(material_id)->second->amount < 1)
-	{
-		// remove the object from the player's inventory
-		this->material_inventory.erase(material_id);
-	}
+	
+	// remove the number of materials from the player's inventory
+	this->remove(material_id, C::SURFACE_REQUIREMENTS.find(material_id)->second);
 
 	// create a Room_Side and add it to Room::room_side using the surface ID
 	world.room_at(x, y, z)->add_surface(surface_id, material_id);
@@ -726,67 +719,123 @@ string Character::construct_surface(const string & material_id, const string & s
 		" wall to your " + surface_id : // wall to your [direction]
 		" " + surface_id); // ceiling/floor
 }
-string Character::construct_door(const string & material_ID, const string & surface_ID, World & world)
+string Character::construct_surface_with_door(const string & surface_material_id, const string & surface_id, const string & door_material_id, World & world)
 {
-	// check that the surface is valid
-	if (!R::contains(C::surface_ids, surface_ID))
+	// Part 1: validate that a surface can be constructed
+
+
+
+	if (world.room_at(x, y, z)->is_forest())
 	{
-		return surface_ID + " is not a surface.";
+		return "You are in a forest and cannot build a structure here.";
 	}
 
-	// check that this room has the surface specified
-	if (!world.room_at(x, y, z)->has_surface(surface_ID))
+	// make sure the material can be used to construct a surface
+	if (C::SURFACE_REQUIREMENTS.find(surface_material_id) == C::SURFACE_REQUIREMENTS.end())
 	{
-		//  no ceiling here / no west wall here
-		return "There is no " + surface_ID + ((surface_ID == C::CEILING || surface_ID == C::FLOOR) ? "" : " wall") + " here to have a door.";
+		return "You can't build a structure's surface out of " + surface_material_id + ".";
 	}
 
-	// check if the wall is standing
-	if (!world.room_at(x, y, z)->is_standing_wall(surface_ID))
+	// check if the surface already exists
+	if (world.room_at(x, y, z)->has_surface(surface_id)) // bounds checking not necissary because the player is standing here
 	{
-		return "A pile of rubble prevents construction.";
-	}
-
-	// check if a door already exists
-	if (world.room_at(x, y, z)->get_room_sides().find(surface_ID)->second.has_door())
-	{
-		// test if the door is rubble or intact
-		if (world.room_at(x, y, z)->get_room_sides().find(surface_ID)->second.get_door()->is_rubble())
+		// test if construction is prevented by an intact wall or a pile of rubble
+		if (world.room_at(x, y, z)->get_room_sides().find(surface_id)->second.is_rubble())
 		{
-			return "A pile of rubble in the doorway prevents construction.";
+			return "A pile of rubble prevents construction.";
 		}
-		else // the door is intact
+		else // the surface is intact
 		{
-			// ...in the ceiling / ...in the east wall
-			return "There is already a door in the " + surface_ID + ((surface_ID == C::CEILING || surface_ID == C::FLOOR) ? "." : " wall.");
+			return ((surface_id == C::CEILING || surface_id == C::FLOOR) ?
+				"A " + surface_id + " already exists here." : // ceiling or floor
+				"A(n) " + surface_id + " wall already exists here."); // any wall
 		}
 	}
+
+	// check that the surface to construct is a wall, ceiling, or floor
+	if (!R::contains(C::surface_ids, surface_id))
+	{
+		return "Construct a wall, ceiling or floor.";
+	}
+
+	// if the surface is a ceiling, check that any intact wall exists
+	if (surface_id == C::CEILING && // the user is construction a ceiling
+		!world.room_at(x, y, z)->has_standing_wall()) // the room does not have a wall
+	{
+		return "You need at least one standing wall to support a ceiling.";
+	}
+
+	// check that the player has the item
+	if (this->material_inventory.find(surface_material_id) == material_inventory.end())
+	{
+		return "You don't have " + surface_material_id + ".";
+	}
+
+	// check that the player has enough of the item to construct
+	if (this->material_inventory.find(surface_material_id)->second->amount < C::SURFACE_REQUIREMENTS.find(surface_material_id)->second)
+	{
+		// "You need 5 wood to continue construction of the wall."
+		return "You need " + R::to_string(C::SURFACE_REQUIREMENTS.find(surface_material_id)->second) + " " + surface_material_id + " to continue construction of the wall.";
+	}
+
+
+
+	// Part 2: Validate that a door can be constructed
+
+
 
 	// check that there exist requirements for making a door of the specified type
-	if (C::DOOR_REQUIREMENTS.find(material_ID) == C::DOOR_REQUIREMENTS.cend())
+	if (C::DOOR_REQUIREMENTS.find(door_material_id) == C::DOOR_REQUIREMENTS.cend())
 	{
-		return "ERROR: No material requirements available to construct door using " + material_ID;
+		return "You cannot construct a door using " + door_material_id + ".";
 	}
 
 	// extract the amount of materials required to make a door of the specified type
-	const unsigned MATERIAL_COUNT_REQUIRED = C::DOOR_REQUIREMENTS.find(material_ID)->second;
+	const unsigned DOOR_MATERIAL_COUNT_REQUIRED = C::DOOR_REQUIREMENTS.find(door_material_id)->second;
 
 	// check that the player has the required materials
-	if (!this->has(material_ID, MATERIAL_COUNT_REQUIRED))
+	if (!this->has(door_material_id, DOOR_MATERIAL_COUNT_REQUIRED))
 	{
 		// "A stone door requires 5 stone."
-		return "A " + material_ID + " door requires " + R::to_string(MATERIAL_COUNT_REQUIRED) + " " + material_ID + ".";
+		return "A " + door_material_id + " door requires " + R::to_string(DOOR_MATERIAL_COUNT_REQUIRED) + " " + door_material_id + ".";
 	}
 
+
+	// Part 3: Build the surface
+
+
+
+	// remove the materials to construct the surface
+	this->remove(surface_material_id, C::SURFACE_REQUIREMENTS.find(surface_material_id)->second);
+
+	// add the surface to the room
+	world.room_at(x, y, z)->add_surface(surface_id, surface_material_id);
+
+
+
+	// Part 4: Add the door to the surface
+
+
+
+	// remove the materials to construct the door
+	this->remove(door_material_id, C::DOOR_REQUIREMENTS.find(door_material_id)->second);
+
 	// add a door to the surface in the room
-	world.room_at(x, y, z)->add_door(surface_ID, C::MAX_SURFACE_HEALTH, material_ID, this->faction_ID);
+	world.room_at(x, y, z)->add_door(surface_id, C::MAX_SURFACE_HEALTH, door_material_id, this->faction_ID);
 
-	// remove the consumed materials from the actor's inventory
-	this->remove(material_ID, MATERIAL_COUNT_REQUIRED);
 
-	// "...door in the ceiling." or "...door in the west wall."
-	return "You construct a " + material_ID + " door in the " + surface_ID + ((surface_ID == C::CEILING || surface_ID == C::FLOOR) ? "." : " wall.");
+
+	// Part 5: the response
+
+
+
+	// "You construct a stone floor with a stone hatch." OR "You construct a stone wall to your north with a branch door."
+	return "You construct a " + surface_material_id + // you construct a [material]
+		((surface_id != C::CEILING && surface_id != C::FLOOR) ?
+		" wall to your " + surface_id + " with a " + door_material_id + " door." : // wall to your [direction]
+		" " + surface_id + " with a " + door_material_id + " hatch."); // ceiling/floor
 }
+
 string Character::attack_surface(const string & surface_ID, World & world)
 {
 	// get this check out of the way

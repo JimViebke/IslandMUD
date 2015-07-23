@@ -96,7 +96,7 @@ public:
 	string take(const string & item_id, World & world);
 	string drop(const string & drop_item_id, World & world);
 	string construct_surface(const string & material_id, const string & surface_id, World & world);
-	string construct_door(const string & material_ID, const string & surface_ID, World & world);
+	string construct_surface_with_door(const string & material_id, const string & surface_id, const string & door_material_id, World & world);
 	string attack_surface(const string & surface_ID, World & world);
 	string attack_door(const string & surface_ID, World & world);
 
