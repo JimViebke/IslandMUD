@@ -130,6 +130,9 @@ string Character::login(World & world)
 }
 string Character::logout()
 {
+	// if an item is equipped, move it back to the player's inventory
+	this->unequip();
+
 	// create a document to save the user's info
 	xml_document user_data_xml;
 
@@ -404,13 +407,16 @@ string Character::equip(const string & item_ID)
 	}
 
 }
-string Character::unequip(const string & item_ID)
+string Character::unequip()
 {
 	// test if no item is equipped
 	if (this->equipped_item == nullptr)
 	{
 		return "You aren't holding anything.";
 	}
+
+	// save the ID of the currently equipped item
+	const string item_ID = equipped_item->name;
 
 	// save the existing the item to the player's inventory
 	this->add(equipped_item);
@@ -688,7 +694,7 @@ string Character::construct_surface(const string & material_id, const string & s
 	}
 
 	// if the surface is a ceiling, check that any intact wall exists
-	if (surface_id == C::CEILING && // the user is construction a ceiling
+	if (surface_id == C::CEILING && // the user is constructing a ceiling
 		!world.room_at(x, y, z)->has_standing_wall()) // the room does not have a wall
 	{
 		return "You need at least one standing wall to support a ceiling.";
