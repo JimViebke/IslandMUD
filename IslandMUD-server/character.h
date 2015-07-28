@@ -88,7 +88,7 @@ public:
 	void add(const shared_ptr<Item> & item);
 	void remove(const string & item_id, const unsigned & count = 1);
 	string equip(const string & item_ID);
-	string unequip(const string & item_ID);
+	string unequip();
 
 	// actions
 	string craft(const string & craft_item_id, World & world);

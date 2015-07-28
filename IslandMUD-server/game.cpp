@@ -225,14 +225,15 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 	{
 		return actors.find(actor_id)->second->logout();
 	}
-	// equip and dequip are still buggy
+	// equip [item]
 	else if (command.size() == 2 && command[0] == C::EQUIP_COMMAND)
 	{
 		return actors.find(actor_id)->second->equip(command[1]);
 	}
-	else if (command.size() == 2 && command[0] == C::DEQUIP_COMMAND)
+	// dequip (2nd arg is optional and ignored)
+	else if ((command.size() == 1 || command.size() == 2) && command[0] == C::DEQUIP_COMMAND)
 	{
-		return actors.find(actor_id)->second->unequip(command[1]);
+		return actors.find(actor_id)->second->unequip();
 	}
 
 	return "Nothing happens.";
