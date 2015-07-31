@@ -6,14 +6,10 @@ Jun 3 2015 */
 
 #include "non_player_character.h"
 
-class NPC_Enemy;
-
-typedef NPC_Enemy Hostile_NPC;
-
-class NPC_Enemy : public Non_Player_Character
+class Hostile_NPC : public Non_Player_Character
 {
 public:
-	NPC_Enemy(const string & name, const string & faction_ID) : Non_Player_Character(name, faction_ID) {}
+	Hostile_NPC(const string & name, const string & faction_ID) : Non_Player_Character(name, faction_ID) {}
 
 	void update(World & world, map<string, shared_ptr<Character>> & actors);
 
