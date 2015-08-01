@@ -206,11 +206,11 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 					// if the actor is a hostile NPC
 					if (R::is<Hostile_NPC>(actors.find(actor_ID)->second))
 					{
-						++enemy_count; // count one more enemy in the room
+						++enemy_count; // count one more enemy NPC in the room
 					}
 					else if (R::is<Neutral_NPC>(actors.find(actor_ID)->second))
 					{
-						++neutral_count;
+						++neutral_count; // count one more neutral NPC in the room
 					}
 				}
 				// reduce enemy count to a single-digit number
