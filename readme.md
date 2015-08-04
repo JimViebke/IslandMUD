@@ -6,7 +6,7 @@
 
 **Nothing is permanent**
 - Players and NPCs can capture any structure or turn it to rubble.
-- Tools and weapons wear down, lose effectiveness, and break.
+- Tools and weapons wear down and break.
 - Neutral NPCs barter based on market prices and their own interests.
 
 **Leveling**
