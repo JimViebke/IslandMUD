@@ -35,6 +35,17 @@ string PC::print() const
 		"You aren't carrying anything."); // return generic "no items" message
 }
 
+string PC::get_equipped_item_id() const
+{
+	// if the player does not have anything equipped
+	if (this->equipped_item == nullptr)
+	{
+		return "You don't have anything at the ready.";
+	}
+
+	return "You are wielding a(n) " + this->equipped_item->name + ".";
+}
+
 // Build and return a top-down area map around a given coordinate
 string PC::generate_area_map(const World & world, const map<string, shared_ptr<Character>> & actors) const
 {
@@ -270,7 +281,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 						sw_corner = R::corner_char(wtn, wte, wts, wtw);
 					}
 				}
-				
+
 				// time for glorious nested ternary statements to do this cheap
 				a
 					<< nw_corner

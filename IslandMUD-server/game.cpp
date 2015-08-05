@@ -158,6 +158,7 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 			"\nrecipes" +
 			"\nmove [compass direction]" +
 			"\ntake / drop / craft / equip / dequip [item]" +
+			"\nequipped" +
 			"\nadd / place / put / drop [item] into chest" +
 			"\ntake [item] from chest" +
 			"\nchest" +
@@ -252,6 +253,16 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 	else if (command.size() == 4 && command[0] == C::TAKE_COMMAND && command[2] == C::FROM_COMMAND && command[3] == C::CHEST_ID)
 	{
 		return actors.find(actor_id)->second->take_from_chest(command[1], world);
+	}
+	else if (command.size() == 1 && (command[0] == C::EQUIP_COMMAND || command[0] == C::ITEM_COMMAND))
+	{
+		// extract the actor
+		const shared_ptr<Character> actor = actors.find(actor_id)->second;
+		if (R::is<PC>(actor)) // if the actor is a Player_Character
+		{
+			// convert the actor to a Player_Character
+			return R::convert_to<PC>(actor)->get_equipped_item_id();
+		}
 	}
 
 	return "Nothing happens.";
