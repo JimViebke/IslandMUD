@@ -80,6 +80,7 @@ const string C::LOGOUT_COMMAND = "logout";
 const string C::HELP_COMMAND = "help";
 const string C::TAKE_COMMAND = "take";
 const string C::EQUIP_COMMAND = "equip";
+const string C::ITEM_COMMAND = "item"; // view equipped item
 const string C::DEQUIP_COMMAND = "dequip";
 const string C::CRAFT_COMMAND = "craft";
 const string C::MOVE_COMMAND = "move";

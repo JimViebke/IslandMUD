@@ -22,7 +22,8 @@ void Parse::initialize()
 		P::dict["logout"] = P::dict["quit"] = P::dict["leave"] = C::LOGOUT_COMMAND;
 		P::dict["move"] = P::dict["m"] = P::dict["walk"] = P::dict["run"] = P::dict["head"] = P::dict["go"] = P::dict["continue"] = P::dict["work"] = C::MOVE_COMMAND;
 		P::dict["take"] = P::dict["get"] = P::dict["pick"] = P::dict["choose"] = P::dict["grab"] = P::dict["acquire"] = C::TAKE_COMMAND;
-		P::dict["equip"] = P::dict["weild"] = P::dict["wield"] = P::dict["ready"] = C::EQUIP_COMMAND;
+		P::dict["equip"] = P::dict["equipped"] = P::dict["weild"] = P::dict["wield"] = P::dict["ready"] = C::EQUIP_COMMAND;
+		P::dict["item"] = C::ITEM_COMMAND; // viewing equipped item
 		P::dict["dequip"] = P::dict["deequip"] = P::dict["unequip"] = P::dict["unwield"] = P::dict["unweild"] = P::dict["store"] = C::DEQUIP_COMMAND;
 		P::dict["craft"] = P::dict["make"] = P::dict["create"] = P::dict["fashion"] = C::CRAFT_COMMAND;
 		P::dict["drop"] = P::dict["release"] = P::dict["unhand"] = P::dict["add"] = P::dict["place"] = P::dict["put"] = C::DROP_COMMAND;
