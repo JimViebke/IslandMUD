@@ -19,7 +19,7 @@ void Parse::initialize()
 		// verbs
 		P::dict["help"] = P::dict["h"] = P::dict["q"] = P::dict["?"] = P::dict["assist"] = C::HELP_COMMAND;
 		// P::dict["login"] = C::LOGIN_COMMAND; // not used yet
-		P::dict["logout"] = P::dict["quit"] = P::dict["leave"] = C::LOGOUT_COMMAND;
+		P::dict["logout"] = P::dict["quit"] = P::dict["leave"] = P::dict["exit"] = C::LOGOUT_COMMAND;
 		P::dict["move"] = P::dict["m"] = P::dict["walk"] = P::dict["run"] = P::dict["head"] = P::dict["go"] = P::dict["continue"] = P::dict["work"] = C::MOVE_COMMAND;
 		P::dict["take"] = P::dict["get"] = P::dict["pick"] = P::dict["choose"] = P::dict["grab"] = P::dict["acquire"] = C::TAKE_COMMAND;
 		P::dict["equip"] = P::dict["equipped"] = P::dict["weild"] = P::dict["wield"] = P::dict["ready"] = C::EQUIP_COMMAND;
@@ -35,11 +35,11 @@ void Parse::initialize()
 		P::dict["attack"] = P::dict["smash"] = P::dict["strike"] = P::dict["bash"] = P::dict["break"] = P::dict["damage"] = P::dict["stab"] = P::dict["slash"] = C::ATTACK_COMMAND;
 		
 		// items
+
+		// items -> other
 		P::dict["smelter"] = C::SMELTER_ID;
 		P::dict["forge"] = C::FORGE_ID;
 		P::dict["anvil"] = C::ANVIL_ID;
-
-		// items -> other
 		P::dict["tree"] = C::TREE_ID;
 		P::dict["chest"] = P::dict["crate"] = C::CHEST_ID;
 

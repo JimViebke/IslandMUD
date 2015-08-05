@@ -9,16 +9,6 @@ string PC::print() const
 {
 	stringstream output;
 
-	// if the player is carrying any materials, list them above equipment
-	if (material_inventory.size() > 0)
-	{
-		for (multimap<string, shared_ptr<Material>>::const_iterator item_it = material_inventory.cbegin(); // for each item
-			item_it != material_inventory.cend(); ++item_it)
-		{
-			output << item_it->second->name << " (x" << item_it->second->amount << ") "; // add its name to the output: stick (x5)
-		}
-	}
-
 	// if the player is carrying any equipment, list them after materials
 	if (equipment_inventory.size() > 0) // if the player is carrying anything
 	{
@@ -26,6 +16,16 @@ string PC::print() const
 			item_it != equipment_inventory.cend(); ++item_it)
 		{
 			output << item_it->second->name << " "; // add its name to the output
+		}
+	}
+
+	// if the player is carrying any materials, list them above equipment
+	if (material_inventory.size() > 0)
+	{
+		for (multimap<string, shared_ptr<Material>>::const_iterator item_it = material_inventory.cbegin(); // for each item
+			item_it != material_inventory.cend(); ++item_it)
+		{
+			output << item_it->second->name << " (x" << item_it->second->amount << ") "; // add its name to the output: stick (x5)
 		}
 	}
 
