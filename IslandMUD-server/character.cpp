@@ -271,6 +271,7 @@ bool Character::has(const string & item_name, const unsigned & item_count) const
 	if (item_count == 1) // only one instance is required
 	{
 		return
+			((equipped_item != nullptr) ? equipped_item->name : "") == item_name ||
 			equipment_inventory.find(item_name) != equipment_inventory.cend() ||
 			material_inventory.find(item_name) != material_inventory.cend();
 	}
@@ -330,14 +331,16 @@ void Character::remove(const string & item_id, const unsigned & count)
 {
 	// WARNING - for materials this assumes the player has [count] instances
 
+	// if the player is holding the item
+	if (this->equipped_item != nullptr && this->equipped_item->name == item_id)
+	{
+		this->equipped_item = nullptr; // erase the item
+	}
 	// remove or reduce the item in the player's inventory
-	if (equipment_inventory.find(item_id) != equipment_inventory.cend())
+	else if (equipment_inventory.find(item_id) != equipment_inventory.cend())
 	{
 		for (unsigned i = 0; i < count; ++i)
 		{
-			// this deals with erase([key]) erroneously removing all instances of the item
-			// multimap<string, shared_ptr<Equipment>>::iterator equipment_it = equipment_inventory.find(item_id);
-
 			equipment_inventory.erase(equipment_inventory.find(item_id));
 		}
 	}
@@ -351,7 +354,7 @@ void Character::remove(const string & item_id, const unsigned & count)
 	}
 	else
 	{
-		// The player does not have the item
+		// the player does not have the item
 	}
 }
 string Character::equip(const string & item_ID)
@@ -365,6 +368,12 @@ string Character::equip(const string & item_ID)
 	if (!this->has(item_ID))
 	{
 		return string("You do not have a(n) ") + item_ID + " to equip.";
+	}
+
+	if (equipment_inventory.find(item_ID) == equipment_inventory.cend() &&
+		material_inventory.find(item_ID) == material_inventory.cend())
+	{
+		return string("You are holding a(n) ") + item_ID + " and don't have another one to equip.";
 	}
 
 	// create a stringstream to accumulate feedback
@@ -392,7 +401,18 @@ string Character::equip(const string & item_ID)
 	}
 
 	// remove or reduce the item in the player's inventory
-	this->remove(item_ID);
+	if (equipment_inventory.find(item_ID) != equipment_inventory.cend())
+	{
+		equipment_inventory.erase(equipment_inventory.find(item_ID));
+	}
+	else if (material_inventory.find(item_ID) != material_inventory.cend()) // the item is present in the material inventory
+	{
+		material_inventory.find(item_ID)->second->amount--; // decrement the material count in the player's inventory
+		if (material_inventory.find(item_ID)->second->amount < 1)
+		{
+			material_inventory.erase(material_inventory.find(item_ID));
+		}
+	}
 
 	// if the stringstream is empty (no item was previously equipped)
 	if (output.str().length() == 0)
@@ -548,8 +568,17 @@ string Character::move(const string & direction_ID, World & world)
 }
 string Character::craft(const string & craft_item_id, World & world)
 {
-	// finish crafting if the recipe does not exist
-	if (!Character::recipes.has_recipe_for(craft_item_id)) { return "Can't craft " + craft_item_id; }
+	// check for special cast
+	if (craft_item_id == C::CHEST_ID)
+	{
+		if (world.room_at(x, y, z)->has_chest())
+		{
+			return "There is already a chest here.";
+		}
+	}
+
+	// return if the recipe does not exist
+	if (!Character::recipes.has_recipe_for(craft_item_id)) { return "There is no way to craft a(n) " + craft_item_id + "."; }
 
 	// get the recipe
 	const Recipe recipe = Character::recipes.get_recipe(craft_item_id);
@@ -557,19 +586,19 @@ string Character::craft(const string & craft_item_id, World & world)
 	// verify the conditions for the recipe are present
 	for (map<string, int>::const_iterator it = recipe.inventory_need.cbegin(); it != recipe.inventory_need.cend(); ++it)
 	{
-		if (it->first != "" && this->does_not_have(it->first)) { return craft_item_id + " requires " + ((it->second > 0) ? "a(n)" : R::to_string(it->second)) + " " + it->first; }
+		if (it->first != "" && !this->has(it->first, it->second)) { return craft_item_id + " requires " + ((it->second == 1) ? "a(n)" : R::to_string(it->second)) + " " + it->first; }
 	}
 	for (map<string, int>::const_iterator it = recipe.inventory_remove.cbegin(); it != recipe.inventory_remove.cend(); ++it)
 	{
-		if (it->first != "" && this->does_not_have(it->first)) { return craft_item_id + " uses " + ((it->second > 0) ? "a(n)" : R::to_string(it->second)) + " " + it->first; }
+		if (it->first != "" && !this->has(it->first, it->second)) { return craft_item_id + " uses " + ((it->second == 1) ? "a(n)" : R::to_string(it->second)) + " " + it->first; }
 	}
 	for (map<string, int>::const_iterator it = recipe.local_need.cbegin(); it != recipe.local_need.cend(); ++it)
 	{
-		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return craft_item_id + " requires " + ((it->second > 0) ? "a" : R::to_string(it->second)) + " nearby " + it->first; }
+		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return craft_item_id + " requires " + ((it->second == 1) ? "a" : R::to_string(it->second)) + " nearby " + it->first; }
 	}
 	for (map<string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
 	{
-		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return craft_item_id + " uses " + ((it->second > 0) ? "a" : R::to_string(it->second)) + " nearby " + it->first; }
+		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return craft_item_id + " uses " + ((it->second == 1) ? "a" : R::to_string(it->second)) + " nearby " + it->first; }
 	}
 
 	// remove ingredients from inventory
@@ -582,6 +611,14 @@ string Character::craft(const string & craft_item_id, World & world)
 	for (map<string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
 	{
 		this->remove(it->first, it->second); // ID, count
+	}
+
+	// special test cast for chests
+	if (craft_item_id == C::CHEST_ID)
+	{
+		// add a chest to the room
+		world.room_at(x, y, z)->add_chest();
+		return "You craft a chest.";
 	}
 
 	// for each item to be given to the player
@@ -639,24 +676,94 @@ string Character::take(const string & take_item_id, World & world)
 }
 string Character::drop(const string & drop_item_id, World & world)
 {
-	if (!this->has(drop_item_id)) // if the player does not have the item specified
+	// if the player is holding the item specified
+	if (this->equipped_item != nullptr && this->equipped_item->name == drop_item_id)
 	{
-		// the item does not exist in the player's inventory
-		return "You don't have a(n) " + drop_item_id + " to drop.";
+		// add the item to the world
+		world.room_at(x, y, z)->add_item(this->equipped_item);
 	}
+	else
+	{
+		if (!this->has(drop_item_id)) // if the player does not have the item specified
+		{
+			// the item does not exist in the player's inventory
+			return "You don't have a(n) " + drop_item_id + " to drop.";
+		}
 
-	// add the item to the world
-	world.room_at(x, y, z)->add_item(
-		(equipment_inventory.find(drop_item_id) != equipment_inventory.end()) ? R::convert_to<Item>( // determine where to get the item from
-		equipment_inventory.find(drop_item_id)->second) : // upcast one of the items to an <Item> type
-		material_inventory.find(drop_item_id)->second
-		);
+		// add the item to the world
+		world.room_at(x, y, z)->add_item(
+			(equipment_inventory.find(drop_item_id) != equipment_inventory.end()) ? R::convert_to<Item>( // determine where to get the item from
+			equipment_inventory.find(drop_item_id)->second) : // upcast one of the items to an <Item> type
+			material_inventory.find(drop_item_id)->second
+			);
+	}
 
 	/// remove item
 	this->remove(drop_item_id);
 
 	// success reply
 	return "You drop a(n) " + drop_item_id + ".";
+}
+string Character::add_to_chest(const string & insert_item_id, World & world)
+{
+	// if this room does not have a chest
+	if (!world.room_at(x, y, z)->has_chest())
+	{
+		return "There is no chest here.";
+	}
+
+	// if the player doesn't have the item
+	if (!this->has(insert_item_id))
+	{
+		return "You don't have a(n) " + insert_item_id + ".";
+	}
+
+	// if the item is equipped
+	if (equipped_item != nullptr && equipped_item->name == insert_item_id)
+	{
+		world.room_at(x, y, z)->add_item_to_chest(equipped_item);
+	}
+	// if the item is a piece of equipment
+	else if (equipment_inventory.find(insert_item_id) != equipment_inventory.cend())
+	{
+		// add the item
+		world.room_at(x, y, z)->add_item_to_chest(equipment_inventory.find(insert_item_id)->second);
+	}
+	else // the item is a material that the user may have 1 or more
+	{
+		// create a new instance to add the the chest
+		world.room_at(x, y, z)->add_item_to_chest(Craft::make(insert_item_id));
+	}
+
+	// remove it from the player's inventory (this works for materials too)
+	this->remove(insert_item_id);
+
+	// You place the sword into the chest.
+	return "You place the " + insert_item_id + " into the chest.";
+}
+string Character::take_from_chest(const string & take_item_id, World & world)
+{
+	// if this room does not have a chest
+	if (!world.room_at(x, y, z)->has_chest())
+	{
+		return "There is no chest here.";
+	}
+
+	// if the player doesn't have the item
+	if (!world.room_at(x, y, z)->chest_has(take_item_id))
+	{
+		return "The chest does not contain a(n) " + take_item_id + ".";
+	}
+
+	this->add(world.room_at(x, y, z)->remove_from_chest(take_item_id));
+
+	// You place the sword into the chest.
+	return "You take the " + take_item_id + " from the chest.";
+}
+string Character::look_inside_chest(const World & world) const
+{
+	// validation within
+	return world.room_at(x, y, z)->chest_contents();
 }
 string Character::construct_surface(const string & material_id, const string & surface_id, World & world)
 {
@@ -712,7 +819,7 @@ string Character::construct_surface(const string & material_id, const string & s
 		// "You need 5 wood to continue construction."
 		return "You need " + R::to_string(C::SURFACE_REQUIREMENTS.find(material_id)->second) + " " + material_id + " to continue construction.";
 	}
-	
+
 	// remove the number of materials from the player's inventory
 	this->remove(material_id, C::SURFACE_REQUIREMENTS.find(material_id)->second);
 
@@ -841,7 +948,6 @@ string Character::construct_surface_with_door(const string & surface_material_id
 		" wall to your " + surface_id + " with a " + door_material_id + " door." : // wall to your [direction]
 		" " + surface_id + " with a " + door_material_id + " hatch."); // ceiling/floor
 }
-
 string Character::attack_surface(const string & surface_ID, World & world)
 {
 	// get this check out of the way

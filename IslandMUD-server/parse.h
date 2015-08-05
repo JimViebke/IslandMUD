@@ -20,15 +20,15 @@ typedef Parse P;
 
 class Parse
 {
+private:
+	Parse() = delete; // deliberately not implemented
+	
 public:
 	static map<string, string> dict; // first string maps to second string
-
-	Parse()	{ }
-
+	
 	static void initialize();
 
 	static vector<string> tokenize(const string & s);
-
 };
 
 #endif

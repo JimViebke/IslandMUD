@@ -95,6 +95,9 @@ public:
 	string move(const string & direction, World & world);
 	string take(const string & item_id, World & world);
 	string drop(const string & drop_item_id, World & world);
+	string add_to_chest(const string & insert_item_id, World & world);
+	string take_from_chest(const string & take_item_id, World & world);
+	string look_inside_chest(const World & world) const;
 	string construct_surface(const string & material_id, const string & surface_id, World & world);
 	string construct_surface_with_door(const string & material_id, const string & surface_id, const string & door_material_id, World & world);
 	string attack_surface(const string & surface_ID, World & world);

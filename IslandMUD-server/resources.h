@@ -55,14 +55,14 @@ public:
 	// verify a set of coordinates against the dimensions of the world
 	static inline bool bounds_check(const int & x, const int & y)
 	{
-		// x, and y must be from 0 to dimension-1 inclusive
+		// x, and y must be from 0 to dimension inclusive
 		return (x >= 0 && y >= 0 &&
 			x < C::WORLD_X_DIMENSION &&
 			y < C::WORLD_Y_DIMENSION);
 	}
 	static inline bool bounds_check(const int & x, const int & y, const int & z)
 	{
-		// ensure x, y, and z are from 0 to dimension-1 inclusive
+		// ensure x, y, and z are from 0 to dimension inclusive
 		return (x >= 0 && y >= 0 && z >= 0 &&
 			x < C::WORLD_X_DIMENSION &&
 			y < C::WORLD_Y_DIMENSION &&
@@ -146,15 +146,7 @@ public:
 			transform(word.begin(), word.end(), word.begin(), tolower);
 		}
 	}
-	static void to_lower_case(vector<string> & words)
-	{
-		// convert a vector of strings passed by referene to a vector of lowercase strings
-		for (unsigned i = 0; i < words.size(); ++i)
-		{
-			to_lower_case(words[i]);
-		}
-	}
-
+	
 	// math
 	static int euclidean_distance(const int & x1, const int & y1, const int & x2, const int & y2)
 	{

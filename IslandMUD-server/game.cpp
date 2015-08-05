@@ -158,10 +158,13 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 			"\nrecipes" +
 			"\nmove [compass direction]" +
 			"\ntake / drop / craft / equip / dequip [item]" +
+			"\nadd / place / put / drop [item] into chest" +
+			"\ntake [item] from chest" +
+			"\nchest" +
 			"\nattack [compass direction] wall / door" +
 			"\nconstruct [material] ceiling / floor" +
 			"\nconstruct [compass direction] [material] wall" +
-			"\nconstruct [compass direction] [material] wall with [material] door";			
+			"\nconstruct [compass direction] [material] wall with [material] door";
 	}
 	// moving: "move northeast" OR "northeast"
 	else if ((command.size() == 2 && command[0] == C::MOVE_COMMAND)
@@ -234,6 +237,21 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 	else if ((command.size() == 1 || command.size() == 2) && command[0] == C::DEQUIP_COMMAND)
 	{
 		return actors.find(actor_id)->second->unequip();
+	}
+	// put item in chest
+	else if (command.size() == 4 && command[0] == C::DROP_COMMAND && command[2] == C::INSERT_COMMAND && command[3] == C::CHEST_ID)
+	{
+		return actors.find(actor_id)->second->add_to_chest(command[1], world);
+	}
+	// chest
+	else if (command.size() == 1 && command[0] == C::CHEST_ID)
+	{
+		return actors.find(actor_id)->second->look_inside_chest(world);
+	}
+	// take [item] from chest
+	else if (command.size() == 4 && command[0] == C::TAKE_COMMAND && command[2] == C::FROM_COMMAND && command[3] == C::CHEST_ID)
+	{
+		return actors.find(actor_id)->second->take_from_chest(command[1], world);
 	}
 
 	return "Nothing happens.";

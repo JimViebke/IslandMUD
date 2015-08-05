@@ -69,6 +69,9 @@
     <ClCompile Include="room_side.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="chest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="message.h">

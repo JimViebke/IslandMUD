@@ -336,6 +336,46 @@ void World::add_room_to_world(xml_node & room_node, const int & x, const int & y
 		}
 	}
 
+	// extract the chest node
+	const xml_node chest_node = room_node.child(C::XML_CHEST.c_str());
+	
+	// if the extracted chest node exists
+	if (!chest_node.empty())
+	{
+		// create the chest's internal structure for equipment
+		multimap<string, shared_ptr<Equipment>> equipment_contents = {};
+		// for each equipment node
+		for (const xml_node & equipment_item_node : chest_node.child(C::XML_CHEST_EQUIPMENT.c_str()).children())
+		{
+			// create the equipment item
+			shared_ptr<Equipment> equipment = R::convert_to<Equipment>(Craft::make(equipment_item_node.name()));
+
+			// add the equipment to the equipment multimap
+			equipment_contents.insert(make_pair(equipment->name, equipment));
+		}
+
+		// create the chest's internal structure for materials
+		map<string, shared_ptr<Material>> material_contents = {};
+		// for each material node
+		for (const xml_node & material_item_node : chest_node.child(C::XML_CHEST_MATERIALS.c_str()).children())
+		{
+			// create the material item
+			shared_ptr<Material> material = R::convert_to<Material>(Craft::make(material_item_node.name()));
+
+			// set the amount
+			material->amount = material_item_node.attribute(C::XML_CHEST_MATERIALS_COUNT.c_str()).as_int();
+
+			// add the material to the materials multimap
+			material_contents.insert(make_pair(material->name, material));
+		}
+
+		// create the chest
+		const Chest chest(chest_node.attribute(C::XML_CHEST_HEALTH.c_str()).as_int(), equipment_contents, material_contents);
+
+		// add the chest to the room
+		room->set_chest(make_shared<Chest>(chest));
+	}
+	
 	// add room to world
 	room_at(x, y, z) = room;
 }
@@ -423,7 +463,7 @@ void World::add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xm
 	room_node.append_attribute(C::XML_IS_WATER.c_str()).set_value(room->is_water());
 
 	// for each item in the room
-	multimap<string, shared_ptr<Item>> room_item_contents = room->get_contents();
+	const multimap<string, shared_ptr<Item>> room_item_contents = room->get_contents();
 	for (multimap<string, shared_ptr<Item>>::const_iterator item_it = room_item_contents.cbegin();
 		item_it != room_item_contents.cend(); ++item_it)
 	{
@@ -435,7 +475,7 @@ void World::add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xm
 	}
 
 	// for each side of the room
-	map<string, Room_Side> room_sides = room->get_room_sides();
+	const map<string, Room_Side> room_sides = room->get_room_sides();
 	for (map<string, Room_Side>::const_iterator surface_it = room_sides.cbegin();
 		surface_it != room_sides.cend(); ++surface_it)
 	{
@@ -472,6 +512,43 @@ void World::add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xm
 			door_node.append_attribute(C::XML_DOOR_FACTION.c_str()).set_value(door->get_faction_ID().c_str());
 		}
 	}
+	
+	// if there is a chest in this room
+	if (room->has_chest())
+	{
+		// create a chest node on the room node and name the chest node
+		xml_node chest_node = room_node.append_child(C::XML_CHEST.c_str());
+		chest_node.set_name(C::XML_CHEST.c_str());
+
+		// extract the chest from the room
+		const shared_ptr<Chest> chest = room->get_chest(); // ****** HERE
+		
+		// add a health attribute to the chest node
+		chest_node.append_attribute(C::XML_CHEST_HEALTH.c_str()).set_value(chest->get_health());
+		
+		// add equipment and material nodes to the chest node
+		xml_node equipment_node = chest_node.append_child(C::XML_CHEST_EQUIPMENT.c_str());
+		xml_node material_node = chest_node.append_child(C::XML_CHEST_MATERIALS.c_str());
+
+		// for each equipment item
+		const multimap<string, shared_ptr<Equipment>> chest_equipment_contents = chest->get_equipment_contents(); // extract contents
+		for (multimap<string, shared_ptr<Equipment>>::const_iterator equipment_it = chest_equipment_contents.cbegin();
+			equipment_it != chest_equipment_contents.cend(); ++equipment_it)
+		{
+			// append a node where name is the equipment's ID
+			/* xml_node item_node = */ equipment_node.append_child(equipment_it->first.c_str());
+		}
+
+		// for each material item
+		const map<string, shared_ptr<Material>> chest_material_contents = chest->get_material_contents(); // extract contents
+		for (map<string, shared_ptr<Material>>::const_iterator material_it = chest_material_contents.cbegin();
+			material_it != chest_material_contents.cend(); ++material_it)
+		{
+			// append a node where name is the material's ID, with an attribute with a name of "XML_CHEST_MATERIALS_COUNT", and a value of the material's count 
+			/* xml_node item_node = */ material_node.append_child(material_it->first.c_str()).append_attribute(C::XML_CHEST_MATERIALS_COUNT.c_str()).set_value(material_it->second->amount);
+		}
+	}
+
 }
 
 // create a new empty room given its coordinates and the world terrain

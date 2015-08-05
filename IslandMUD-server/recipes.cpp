@@ -18,6 +18,7 @@ void Recipes::load()
 	add_recipe(C::STONE_ID, {}, {}, {}, {}, { { C::STONE_ID, 1 } }); // you can always get a stone
 	add_recipe(C::ARROW_ID, {}, { { C::ARROWHEAD_ID, 1 }, { C::STICK_ID, 1 } }, {}, {}, { { C::ARROW_ID, 1 } }); // a stick and an arrowhead
 	add_recipe(C::ARROWHEAD_ID, { { C::STONE_ID, 2 } }, { { C::STONE_ID, 1 } }, {}, {}, { { C::ARROWHEAD_ID, 3 } }); // requires two stones but only one is made into arrowheads
+	add_recipe(C::BOARD_ID, { { C::AXE_ID, 1 } }, {}, { {C::TREE_ID, 1} }, {}, { { C::BOARD_ID, 1 } });
 
 	// equipment
 	add_recipe(C::STAFF_ID, { { C::AXE_ID, 1 } }, { { C::BRANCH_ID, 1 } }, {}, {}, { { C::STAFF_ID, 1 } });
@@ -28,7 +29,8 @@ void Recipes::load()
 	// other
 	add_recipe(C::FORGE_ID, {}, { { C::STONE_ID, 20 } }, {}, {}, { { C::FORGE_ID, 1 } }); // 20 stones to build a forge (which are immovable)
 	add_recipe(C::SMELTER_ID, {}, { { C::STONE_ID, 30 } }, {}, {}, { { C::SMELTER_ID, 1 } }); // 30 stones to build a smelter (which are immovable)
-
+	add_recipe(C::CHEST_ID, { { C::AXE_ID, 1 } }, { {C::BOARD_ID, 5}  }, {}, {}, { { C::CHEST_ID, 1 } });
+	
 }
 
 // recipe population

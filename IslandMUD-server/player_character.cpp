@@ -279,7 +279,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				b
 					<< ((wr) ? C::RUBBLE_CHAR : ((wd) ? C::NS_DOOR : ((w) ? C::NS_WALL : C::LAND_CHAR)))
 					// if the current coordinates are the player's, draw an @ icon, else if there is an enemy, draw enemy count, else if there is an item, draw an item char, else empty
-					<< ((cx == x && cy == y) ? C::PLAYER_CHAR : ((enemy_count > 0) ? R::to_char(enemy_count) : ((neutral_count > 0) ? C::NPC_NEUTRAL_CHAR : ((world.room_at(cx, cy, C::GROUND_INDEX)->contains_no_items()) ? C::LAND_CHAR : C::ITEM_CHAR))))
+					<< ((cx == x && cy == y) ? C::PLAYER_CHAR : ((enemy_count > 0) ? R::to_char(enemy_count) : ((neutral_count > 0) ? C::NPC_NEUTRAL_CHAR : ((world.room_at(cx, cy, C::GROUND_INDEX)->has_chest()) ? C::CHEST_CHAR : ((world.room_at(cx, cy, C::GROUND_INDEX)->contains_no_items()) ? C::LAND_CHAR : C::ITEM_CHAR)))))
 					<< ((er) ? C::RUBBLE_CHAR : ((ed) ? C::NS_DOOR : ((e) ? C::NS_WALL : C::LAND_CHAR)));
 				c
 					<< sw_corner

@@ -17,6 +17,7 @@ class Room
 private:
 	bool updated = false; // has the room been updated since it was loaded?
 	bool water = false; // is this dry land or water
+	shared_ptr<Chest> chest;
 	map<string, Room_Side> room_sides = {}; // the floor, walls, and ceiling in the room (no key for absent surfaces)
 	multimap<string, shared_ptr<Item>> contents = {}; // the items in a room
 	vector<string> viewing_actor_ids = {}; // the PCs and NPCs who can see this room
@@ -47,6 +48,18 @@ public:
 	bool is_observed_by(const string & actor_id) const;
 	bool is_water() const;
 	bool is_forest() const;
+
+	// chests
+	void add_chest();
+	bool has_chest() const;
+	int chest_health() const;
+	void add_item_to_chest(const shared_ptr<Item> & item);
+	string chest_contents() const;
+	void damage_chest();
+	bool chest_has(const string & item_id) const;
+	shared_ptr<Item> remove_from_chest(const string & item_id);
+	shared_ptr<Chest> get_chest() const;
+	void set_chest(const shared_ptr<Chest> & set_chest);
 
 	// add and remove items
 	void add_item(const shared_ptr<Item> item);

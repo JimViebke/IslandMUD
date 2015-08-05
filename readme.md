@@ -6,12 +6,11 @@
 
 **Nothing is permanent**
 - Players and NPCs can capture any structure or turn it to rubble.
-- Tools and weapons wear down, lose effectiveness, and break.
+- Tools and weapons wear down and break.
 - Neutral NPCs barter based on market prices and their own interests.
 
 **Leveling**
 - ...is classless, invisible, and gradient
-- Abilities improve through use and decay over time
 - Maxing a stat is a difference of x5, not x100 (new players are still crucial to the fight)
 
 **Features**
@@ -19,7 +18,6 @@
 - Hostile NPCs as tough as any player
 - Neutral NPCs scattering the world who barter for the right price and offer quests
 - Allied player characters
-- Freedom to craft, build, trade, explore, defend, attack, or raid
 - Free, multiplayer, and open source
 
 **Bring your friends. You can't take on IslandMUD alone.**

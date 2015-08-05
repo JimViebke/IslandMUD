@@ -19,9 +19,9 @@ private:
 	bool takable = false; // items are untakable by default
 public:
 	string name;
-	int weight = 0;
+	// int weight = 0;
 	
-	Item(string item_name, bool takable = false) : name(item_name), takable(takable) {}
+	Item(string item_name, bool is_takable = false) : name(item_name), takable(is_takable) {}
 	virtual ~Item() {}
 
 	bool is_takable() const { return takable; }
@@ -77,6 +77,12 @@ public:
 	Arrowhead() : Material(C::ARROWHEAD_ID) {}
 };
 
+class Board : public Material
+{
+public:
+	Board() : Material(C::BOARD_ID) {}
+};
+
 class Tree : public Item
 {
 public:
@@ -104,9 +110,9 @@ public:
 class Equipment : public Item
 {
 public:
-	string equipment_material; // stone, iron, wood, etc
-	string handle_material; // wood, etc
-	// other member represent quality, health
+	// string equipment_material; // stone, iron, wood, etc
+	// string handle_material; // wood, etc
+	// other members represent quality, health
 
 	Equipment(string cust_name) : Item(cust_name, true) {} // all equipment is takable
 };
@@ -151,6 +157,36 @@ class Debris : public Item
 {
 public:
 	Debris() : Item(C::DEBRIS_ID) {}
+};
+
+class Chest : public Item
+{
+private:
+	int health = C::MAX_CHEST_HEALTH;
+	multimap<string, shared_ptr<Equipment>> equipment_contents = {};
+	map<string, shared_ptr<Material>> material_contents = {};
+
+public:
+	Chest() : Item(C::CHEST_ID) {}
+	Chest(const int & set_health, const multimap<string, shared_ptr<Equipment>> & set_equipment_contents,
+		const map<string, shared_ptr<Material>> & set_material_contents) : Item(C::CHEST_ID),
+		health(set_health), equipment_contents(set_equipment_contents), material_contents(set_material_contents) {}
+
+	// contents
+	void add(const shared_ptr<Item> & item);
+	void remove(const string & item_id, const unsigned & count = 1);
+	bool has(const string & item_id, const unsigned & count = 1) const;
+	shared_ptr<Item> take(const string & item_id);
+
+	// health
+	void damage(const int & amount);
+	void set_health(const int & amount);
+	int get_health() const;
+
+	// contents
+	string contents() const;
+	multimap<string, shared_ptr<Equipment>> get_equipment_contents() const;
+	map<string, shared_ptr<Material>> get_material_contents() const;
 };
 
 #endif
