@@ -51,6 +51,7 @@ public:
 		LAND_CHAR,
 		FOREST_CHAR,
 		ITEM_CHAR,
+		CHEST_CHAR,
 		RUBBLE_CHAR;
 
 	const static string
@@ -74,8 +75,11 @@ public:
 		BRANCH_ID,
 		ARROW_ID,
 		ARROWHEAD_ID,
+		BOARD_ID,
 
+		// item IDs -. other
 		TREE_ID,
+		CHEST_ID,
 
 		// item IDs -> equipment
 		AXE_ID,
@@ -98,6 +102,8 @@ public:
 		DEQUIP_COMMAND,
 		MOVE_COMMAND,
 		DROP_COMMAND,
+		INSERT_COMMAND,
+		FROM_COMMAND,
 		CONSTRUCT_COMMAND, // room sides
 		WAIT_COMMAND, // dev only. World is real-time.
 		WITH_COMMAND,
@@ -138,6 +144,11 @@ public:
 		XML_DOOR_HEALTH,
 		XML_DOOR_MATERIAL,
 		XML_DOOR_FACTION,
+		XML_CHEST,
+		XML_CHEST_HEALTH,
+		XML_CHEST_EQUIPMENT,
+		XML_CHEST_MATERIALS,
+		XML_CHEST_MATERIALS_COUNT,
 
 		// user data xml
 		XML_USER_STATUS,
@@ -225,6 +236,9 @@ public:
 	const static string
 		AI_OBJECTIVE_ACQUIRE,
 		AI_OBJECTIVE_GOTO;
+
+	const static int
+		MAX_CHEST_HEALTH;
 };
 
 #endif

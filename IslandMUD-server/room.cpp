@@ -151,6 +151,82 @@ bool Room::is_forest() const
 	return this->contains_item(C::TREE_ID);
 }
 
+// chests
+void Room::add_chest()
+{
+	updated = true;
+
+	chest = make_shared<Chest>();
+}
+bool Room::has_chest() const
+{
+	return chest != nullptr;
+}
+int Room::chest_health() const
+{
+	// return the chest's health, or 0 if there is no chest (indicating a validation failure in the calling function
+	return (has_chest()) ? chest->get_health() : 0;
+}
+void Room::add_item_to_chest(const shared_ptr<Item> & item)
+{
+	updated = true;
+
+	chest->add(item);
+}
+string Room::chest_contents() const
+{
+	// if a chest is here
+	if (has_chest())
+	{
+		// return the contents of the chest
+		return chest->contents();
+	}
+
+	// no chest exists in this room
+	return "There is no chest here.";
+}
+void Room::damage_chest()
+{
+	updated = true;
+
+	// use equipped weapon and damage tables
+
+
+}
+bool Room::chest_has(const string & item_id) const
+{
+	// if there is no hchest here
+	if (!has_chest())
+	{
+		return false;
+	}
+
+	return chest->has(item_id);
+}
+shared_ptr<Item> Room::remove_from_chest(const string & item_id)
+{
+	updated = true;
+
+	// manifest a stone if a chest does not exist
+	// (this would indicate an validation failure in the calling function)
+	if (!has_chest())
+	{
+		return Craft::make(C::STONE_ID);
+	}
+
+	return chest->take(item_id);
+}
+shared_ptr<Chest> Room::get_chest() const
+{
+	return chest;
+}
+void Room::set_chest(const shared_ptr<Chest> & set_chest)
+{
+	// only used at load time, so the "update" flag will not be set to true
+
+	this->chest = set_chest;
+}
+
 // add and remove items
 void Room::add_item(const shared_ptr<Item> item) // pass a copy rather than a reference
 {
@@ -503,14 +579,22 @@ string Room::summary(const string & player_ID) const
 	// report on the items in the room
 	if (contents.size() > 0) // if there are items present
 	{
-		summary_stream << "\n\nYou look around and notice ";
+		summary_stream << "\n\nYou look around and notice";
 		// for each item
 		for (multimap<string, shared_ptr<Item>>::const_iterator it = contents.cbegin();
 			it != contents.cend(); ++it)
 		{
-			// append the id (?) of the item
-			summary_stream << it->first << " ";
+			// append the id of the item
+			summary_stream << " " << it->first;
 		}
+		summary_stream << ".";
+	}
+
+	// if the room contains a chest
+	if (has_chest())
+	{
+		// append a sentence to the current paragraph
+		summary_stream << " There is a chest here.";
 	}
 
 	if (actor_ids.size() > 1)

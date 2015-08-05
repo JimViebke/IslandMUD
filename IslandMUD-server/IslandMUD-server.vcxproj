@@ -110,7 +110,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-  </ItemDefinitionGroup>  
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -153,6 +153,7 @@
     <ClCompile Include="character.cpp" />
     <ClCompile Include="constants.cpp" />
     <ClCompile Include="craft.cpp" />
+    <ClCompile Include="chest.cpp" />
     <ClCompile Include="door.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="generator.cpp" />

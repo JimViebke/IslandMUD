@@ -34,6 +34,7 @@ const char C::WATER_CHAR = '~';
 const char C::LAND_CHAR = ' ';
 const char C::FOREST_CHAR = '%';
 const char C::ITEM_CHAR = '?';
+const char C::CHEST_CHAR = char(220); // ascii 220
 const char C::RUBBLE_CHAR = '#';
 
 // engine signals
@@ -56,11 +57,13 @@ const string C::STICK_ID = "stick";
 const string C::BRANCH_ID = "branch";
 const string C::ARROW_ID = "arrow";
 const string C::ARROWHEAD_ID = "arrowhead";
+const string C::BOARD_ID = "board";
 
+// item IDs -> other
 const string C::TREE_ID = "tree";
+const string C::CHEST_ID = "chest";
 
 // item IDs -> equipment
-
 const string C::AXE_ID = "axe";
 const string C::STAFF_ID = "staff";
 const string C::SWORD_ID = "sword";
@@ -81,6 +84,8 @@ const string C::DEQUIP_COMMAND = "dequip";
 const string C::CRAFT_COMMAND = "craft";
 const string C::MOVE_COMMAND = "move";
 const string C::DROP_COMMAND = "drop";
+const string C::INSERT_COMMAND = "insert";
+const string C::FROM_COMMAND = "from";
 const string C::CONSTRUCT_COMMAND = "construct";
 const string C::WAIT_COMMAND = "wait"; // for debugging (see constants.h)
 const string C::WITH_COMMAND = "with";
@@ -121,6 +126,11 @@ const string C::XML_DOOR = "door";
 const string C::XML_DOOR_HEALTH = "health";
 const string C::XML_DOOR_MATERIAL = "material";
 const string C::XML_DOOR_FACTION = "faction";
+const string C::XML_CHEST = "chest";
+const string C::XML_CHEST_HEALTH = "health";
+const string C::XML_CHEST_EQUIPMENT = "equipment_contents";
+const string C::XML_CHEST_MATERIALS = "material_contents";
+const string C::XML_CHEST_MATERIALS_COUNT = "count";
 
 // user data xml
 const string C::XML_USER_STATUS = "status";
@@ -324,3 +334,5 @@ const int C::FULL_HEALTH_MAX = 200; // this is full health for fully leveled hea
 // AI objective keywords
 const string C::AI_OBJECTIVE_ACQUIRE = "acquire";
 const string C::AI_OBJECTIVE_GOTO = "goto";
+
+const int C::MAX_CHEST_HEALTH = 100;
