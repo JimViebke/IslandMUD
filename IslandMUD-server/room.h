@@ -18,7 +18,7 @@ private:
 	bool updated = false; // has the room been updated since it was loaded?
 	bool water = false; // is this dry land or water
 	shared_ptr<Chest> chest;
-	map<string, Room_Side> room_sides = {}; // the floor, walls, and ceiling in the room (no key for absent surfaces)
+	map<string, Room_Side> room_sides = {}; // the floor, walls, and ceiling in the room (present surfaces only)
 	multimap<string, shared_ptr<Item>> contents = {}; // the items in a room
 	vector<string> viewing_actor_ids = {}; // the PCs and NPCs who can see this room
 	vector<string> actor_ids = {}; // the PCs and NPCs in a room
