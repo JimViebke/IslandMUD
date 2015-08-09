@@ -29,23 +29,23 @@ string NPC::get_objectives() const
 }
 
 // objective creating and deletion
-void Non_Player_Character::add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const string & purpose)
+void NPC::add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const string & purpose)
 {
 	(priority == high_priority) ?
 		objectives.push_front(Objective(verb, noun, purpose)) :
 		objectives.push_back(Objective(verb, noun, purpose));
 }
-void Non_Player_Character::add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z)
+void NPC::add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z)
 {
 	(priority == high_priority) ?
 		objectives.push_front(Objective(verb, noun, x, y, z)) :
 		objectives.push_back(Objective(verb, noun, x, y, z));
 }
-void Non_Player_Character::erase_objective(const deque<Objective>::iterator & objective_iterator)
+void NPC::erase_objective(const deque<Objective>::iterator & objective_iterator)
 {
 	objectives.erase(objective_iterator);
 }
-void Non_Player_Character::erase_objectives_matching_purpose(const string purpose)
+void NPC::erase_objectives_matching_purpose(const string purpose)
 {
 	// arguement must be passed by value! Reference will change as the underlying structure is modified
 
@@ -63,7 +63,7 @@ void Non_Player_Character::erase_objectives_matching_purpose(const string purpos
 		}
 	}
 }
-void Non_Player_Character::erase_goto_objective_matching(const string & purpose)
+void NPC::erase_goto_objective_matching(const string & purpose)
 {
 	// erase one goto objective matching purpose
 
@@ -77,7 +77,7 @@ void Non_Player_Character::erase_goto_objective_matching(const string & purpose)
 		}
 	}
 }
-void Non_Player_Character::erase_acquire_objective_matching(const string & noun)
+void NPC::erase_acquire_objective_matching(const string & noun)
 {
 	// erase one acquire objective matching noun
 
@@ -93,20 +93,20 @@ void Non_Player_Character::erase_acquire_objective_matching(const string & noun)
 }
 
 // objective information
-bool Non_Player_Character::one_can_craft(const string & item_id) const
+bool NPC::one_can_craft(const string & item_id) const
 {
 	// if a recipe exists for an item, the item is craftable
 	return recipes.has_recipe_for(item_id);
 }
-bool Non_Player_Character::i_have(const string & item_id) const
+bool NPC::i_have(const string & item_id) const
 {
 	return this->has(item_id);
 }
-bool Non_Player_Character::i_dont_have(const string & item_id) const
+bool NPC::i_dont_have(const string & item_id) const
 {
 	return !this->has(item_id);
 }
-bool Non_Player_Character::im_planning_to_acquire(const string & item_ID) const
+bool NPC::im_planning_to_acquire(const string & item_ID) const
 {
 	// return true if an "acquire" objective has a noun matching item_ID
 
@@ -120,7 +120,7 @@ bool Non_Player_Character::im_planning_to_acquire(const string & item_ID) const
 	}
 	return false;
 }
-bool Non_Player_Character::i_have_all_ingredients_to_craft(const string & item_ID) const
+bool NPC::i_have_all_ingredients_to_craft(const string & item_ID) const
 {
 	// WARNING: this assumes item_ID is craftable
 
@@ -163,11 +163,11 @@ bool Non_Player_Character::i_have_all_ingredients_to_craft(const string & item_I
 }
 
 // objective planning
-void Non_Player_Character::plan_to_get(const string & item_id)
+void NPC::plan_to_get(const string & item_id)
 {
 	add_objective(high_priority, C::AI_OBJECTIVE_ACQUIRE, item_id, item_id);
 }
-void Non_Player_Character::plan_to_craft(const string & item_id)
+void NPC::plan_to_craft(const string & item_id)
 {
 	// assumes item_id is craftable
 
