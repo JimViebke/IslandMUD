@@ -13,6 +13,7 @@ Feb 14, 2015 */
 #include "player_character.h"
 #include "non_player_character.h"
 #include "npc_enemy.h"
+#include "npc_enemy_fighter.h"
 #include "npc_unaffiliated.h"
 #include "parse.h"
 #include "world.h"

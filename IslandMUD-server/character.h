@@ -49,6 +49,8 @@ public:
 	// Item dragging_item; // a character can drag an item if they don't want to carry it.
 	static Recipes recipes; // exists in memory once for all PCs and NPCs
 
+protected:
+
 	Character(const string & name, const string & set_faction_ID) : name(name)
 	{
 		// if the faction is valid
@@ -66,6 +68,8 @@ public:
 		}
 	}
 	virtual ~Character() {} // to make a polymorphic type
+
+public:
 
 	string login(World & world);
 	string logout();

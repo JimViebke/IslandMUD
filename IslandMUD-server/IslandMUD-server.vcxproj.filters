@@ -72,6 +72,12 @@
     <ClCompile Include="chest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="npc_enemy_fighter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="npc_enemy_worker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="message.h">
@@ -140,6 +146,12 @@
     <ClInclude Include="npc_enemy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="npc_enemy_fighter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="npc_enemy_worker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="notes.txt">
@@ -147,6 +159,11 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram.cd" />
+    <None Include="ClassDiagram - Items.cd">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ClassDiagram - NPCs.cd">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

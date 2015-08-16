@@ -15,7 +15,8 @@ void Game::main_test_loop() // debugging
 	}
 
 	{
-		Hostile_NPC jeb("Jeb", C::NPC_HOSTILE_FACTION_ID);
+		// pass name, faction, ai type
+		Hostile_NPC_Fighter jeb("Jeb", C::NPC_HOSTILE_FACTION_ID);
 		jeb.login(world);
 
 		jeb.move(C::WEST, world); // trust me
@@ -26,18 +27,19 @@ void Game::main_test_loop() // debugging
 		jeb.move(C::EAST, world);
 		jeb.move(C::EAST, world);
 
-		actors.insert(make_pair(jeb.name, make_shared<Hostile_NPC>(jeb)));
+		actors.insert(make_pair(jeb.name, make_shared<Hostile_NPC_Fighter>(jeb)));
 	}
 
-	{
+	// uncomment the b elow block to add a neutral NPC named Bill
+	/*{
 		Neutral_NPC bill("Bill", C::NPC_NEUTRAL_FACTION_ID);
 		bill.login(world);
 		for (unsigned i = 0; i < 20; ++i)
 		{
-			bill.move(C::WEST, world);
+		bill.move(C::WEST, world);
 		}
 		actors.insert(make_pair(bill.name, make_shared<Neutral_NPC>(bill)));
-	}
+		}*/
 
 
 	// Uncomment the below block to add a hostile NPC for each char in the string below.

@@ -160,6 +160,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="non_player_character.cpp" />
     <ClCompile Include="npc_enemy.cpp" />
+    <ClCompile Include="npc_enemy_fighter.cpp" />
+    <ClCompile Include="npc_enemy_worker.cpp" />
     <ClCompile Include="npc_unaffiliated.cpp" />
     <ClCompile Include="parse.cpp" />
     <ClCompile Include="player_character.cpp" />
@@ -181,6 +183,8 @@
     <ClInclude Include="message.h" />
     <ClInclude Include="non_player_character.h" />
     <ClInclude Include="npc_enemy.h" />
+    <ClInclude Include="npc_enemy_fighter.h" />
+    <ClInclude Include="npc_enemy_worker.h" />
     <ClInclude Include="npc_unaffiliated.h" />
     <ClInclude Include="parse.h" />
     <ClInclude Include="player_character.h" />
@@ -198,7 +202,8 @@
     <Text Include="notes.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram.cd" />
+    <None Include="ClassDiagram - Items.cd" />
+    <None Include="ClassDiagram - NPCs.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
