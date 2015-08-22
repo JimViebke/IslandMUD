@@ -14,7 +14,7 @@ void Game::main_test_loop() // debugging
 		actors.insert(pair<string, shared_ptr<PC>>(player.name, make_shared<PC>(player)));
 	}
 
-	{
+	/*{
 		// pass name, faction, ai type
 		Hostile_NPC_Fighter jeb("Jeb", C::NPC_HOSTILE_FACTION_ID);
 		jeb.login(world);
@@ -28,18 +28,13 @@ void Game::main_test_loop() // debugging
 		jeb.move(C::EAST, world);
 
 		actors.insert(make_pair(jeb.name, make_shared<Hostile_NPC_Fighter>(jeb)));
-	}
-
-	// uncomment the b elow block to add a neutral NPC named Bill
-	/*{
-		Neutral_NPC bill("Bill", C::NPC_NEUTRAL_FACTION_ID);
-		bill.login(world);
-		for (unsigned i = 0; i < 20; ++i)
-		{
-		bill.move(C::WEST, world);
-		}
-		actors.insert(make_pair(bill.name, make_shared<Neutral_NPC>(bill)));
 		}*/
+
+	{
+		Hostile_NPC_Worker bob("Bob", C::NPC_HOSTILE_FACTION_ID);
+		bob.login(world);
+		actors.insert(make_pair(bob.name, make_shared<Hostile_NPC_Worker>(bob)));
+	}
 
 
 	// Uncomment the below block to add a hostile NPC for each char in the string below.
@@ -69,12 +64,15 @@ void Game::main_test_loop() // debugging
 		{
 			shared_ptr<PC> dev = R::convert_to<PC>(actors.find("dev")->second);
 
-			cout << endl
-				<< endl
-				<< dev->generate_area_map(world, actors) << endl // a top down map
-				<< "Your coordinates are " << dev->x << ", " << dev->y << " (index " << dev->z << ")"
-				<< world.room_at(dev->x, dev->y, dev->z)->summary(dev->name) // "You look around and notice..."
-				<< dev->print(); // prepend "You have..."
+			if (auto_advance == 0)
+			{
+				cout << endl
+					<< endl
+					<< dev->generate_area_map(world, actors) << endl // a top down map
+					<< "Your coordinates are " << dev->x << ", " << dev->y << " (index " << dev->z << ")"
+					<< world.room_at(dev->x, dev->y, dev->z)->summary(dev->name) // "You look around and notice..."
+					<< dev->print(); // prepend "You have..."
+			}
 		}
 
 		// main print out
@@ -88,6 +86,7 @@ void Game::main_test_loop() // debugging
 		if (auto_advance > 0)
 		{
 			input = "wait"; // automatically set user input instead of getting it
+			--auto_advance;
 		}
 		else // most of the time
 		{
@@ -100,11 +99,28 @@ void Game::main_test_loop() // debugging
 		cout << "\nDEBUG parsed input: ";
 		R::print(tokenized_input);
 
-		// execute processed command against game world
-		// only count loaded rooms if total room count is less than or equal to 100K (100*100*10)
-		cout << "\nDEBUG Entering execute_command(), rooms loaded: " << ((C::WORLD_X_DIMENSION*C::WORLD_Y_DIMENSION*C::WORLD_Z_DIMENSION <= 100000) ? R::to_string(world.count_loaded_rooms()) : "(too large to count)") << "...";
-		output = execute_command("dev", tokenized_input);
-		cout << "\nDEBUG Exited execute_command(), rooms loaded: " << ((C::WORLD_X_DIMENSION*C::WORLD_Y_DIMENSION*C::WORLD_Z_DIMENSION <= 100000) ? R::to_string(world.count_loaded_rooms()) : "(too large to count)") << "...";
+		// hardcoding for development purposes
+		if (tokenized_input.size() > 1 && tokenized_input[0] == C::WAIT_COMMAND)
+		{
+			// tokenize the original input to prevent the number from being removed
+			stringstream ss(input);
+			const istream_iterator<string> begin(ss);
+			vector<string> strings(begin, istream_iterator<string>());
+
+			// extract and save the number of turns to delay
+			stringstream auto_advance_count;
+			auto_advance_count << strings[1];
+			auto_advance_count >> auto_advance;
+			--auto_advance; // fix a glitch
+		}
+		else // auto-advance was not invoked
+		{
+			// execute processed command against game world
+			// only count loaded rooms if total room count is less than or equal to 100K (100*100*10)
+			cout << "\nDEBUG Entering execute_command(), rooms loaded: " << ((C::WORLD_X_DIMENSION*C::WORLD_Y_DIMENSION*C::WORLD_Z_DIMENSION <= 100000) ? R::to_string(world.count_loaded_rooms()) : "(too large to count)") << "...";
+			output = execute_command("dev", tokenized_input);
+			cout << "\nDEBUG Exited execute_command(), rooms loaded: " << ((C::WORLD_X_DIMENSION*C::WORLD_Y_DIMENSION*C::WORLD_Z_DIMENSION <= 100000) ? R::to_string(world.count_loaded_rooms()) : "(too large to count)") << "...";
+		}
 
 		// now execute updates for all NPCs
 		for (pair<const string, shared_ptr<Character>> & actor : actors)
@@ -113,15 +129,23 @@ void Game::main_test_loop() // debugging
 			{
 				shared_ptr<NPC> npc = R::convert_to<NPC>(actor.second);
 
-				cout << npc->get_objectives() << endl; // debugging (before update)
-				cout << npc->get_inventory() << endl; // debugging (before update)
+				if (auto_advance == 0)
+				{
+					// cout << npc->get_objectives() << endl; // debugging (before update)
+					cout << npc->get_inventory() << endl; // debugging (before update)
+				}
 				npc->update(world, actors);
-				cout << npc->get_objectives() << endl; // debugging (after update)
-				cout << npc->get_inventory() << endl; // debugging (after update)
+				if (auto_advance == 0)
+				{
+					// cout << npc->get_objectives() << endl; // debugging (after update)
+					cout << npc->get_inventory() << endl; // debugging (after update)
+				}
 
 				actor.second = npc; // make sure to save back
 			}
 		}
+
+
 	}
 }
 
