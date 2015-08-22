@@ -236,10 +236,27 @@ public:
 	// AI objective keywords
 	const static string
 		AI_OBJECTIVE_ACQUIRE,
-		AI_OBJECTIVE_GOTO;
+		AI_OBJECTIVE_GOTO,
+		AI_OBJECTIVE_CONSTRUCT;
 
 	const static int
 		MAX_CHEST_HEALTH;
+
+	// NPC types
+	const static string
+		AI_TYPE_FIGHTER,
+		AI_TYPE_WORKER,
+		AI_TYPE_BLACKSMITH,
+		AI_TYPE_WATCH_GUARD,
+		AI_TYPE_PATROL_GUARD,
+		AI_TYPE_MINER;
+
+	const static int
+		FORTRESS_PARTITION_MIN_SIZE,
+		FORTRESS_MIN_X,
+		FORTRESS_MAX_X,
+		FORTRESS_MIN_Y,
+		FORTRESS_MAX_Y;
 };
 
 #endif

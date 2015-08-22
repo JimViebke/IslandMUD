@@ -18,7 +18,7 @@ typedef Non_Player_Character NPC; // ...in order to put this here
 class Non_Player_Character : public Character
 {
 public:
-	// hostile and neutral NPCs override this in their respective classes
+	// hostile and neutral NPCs override this in their child classes
 	virtual void update(World & world, map<string, shared_ptr<Character>> & actors) = 0;
 
 	// objective debugging
@@ -29,23 +29,40 @@ protected:
 	{
 	public:
 		// "get [] [] axe", "construct north stone surface", "construct north stone door"
-		string verb, direction, material, noun;
 		int objective_x, objective_y, objective_z;
-		string purpose; // "sword" (the reason this objective was added
-		bool already_planning_to_craft = false;
+		bool modifier, already_planning_to_craft = false;
+		string verb, direction, material, noun, purpose; // "sword" (the reason this objective was added
 
 		Objective(const string & verb, const string & noun, const string & purpose) :
 			verb(verb), noun(noun), purpose(purpose) {}
 		Objective(const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z) :
 			verb(verb), noun(noun), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z) {}
+		Objective(const string & verb, const string & noun, const string & material, const string & direction, const int & objective_x, const int & objective_y, const int & objective_z, const bool & modifier) :
+			verb(verb), noun(noun), material(material), direction(direction), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z), modifier(modifier) {}
 	};
 
 	enum Objective_Priority { low_priority, high_priority };
 
+	string ai_type;
 	deque<Objective> objectives;
 
 	// this can only be instantiated by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
-	Non_Player_Character(const string & name, const string & faction_ID) : Character(name, faction_ID) {}
+	Non_Player_Character(const string & name, const string & faction_ID, const string & set_ai_type) : Character(name, faction_ID)
+	{
+		if (set_ai_type == C::AI_TYPE_BLACKSMITH ||
+			set_ai_type == C::AI_TYPE_FIGHTER ||
+			set_ai_type == C::AI_TYPE_MINER ||
+			set_ai_type == C::AI_TYPE_PATROL_GUARD ||
+			set_ai_type == C::AI_TYPE_WATCH_GUARD ||
+			set_ai_type == C::AI_TYPE_WORKER)
+		{
+			this->ai_type = set_ai_type;
+		}
+		else
+		{
+			cout << "\nERROR: [" << set_ai_type << "] is not a known AI type.\n";
+		}
+	}
 
 	// objective creating and deletion
 	void add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const string & purpose);

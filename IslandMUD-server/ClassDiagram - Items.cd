@@ -119,27 +119,6 @@
       <FileName>item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Non_Player_Character" Collapsed="true">
-    <Position X="3.75" Y="4.75" Width="1.75" />
-    <TypeIdentifier>
-      <HashCode>BABAAgIAAoCAgAAgRQAAAAAAAAAABBACAAKAAAAkIgg=</HashCode>
-      <FileName>non_player_character.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Character" Collapsed="true">
-    <Position X="2.75" Y="3.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>hQgAAAJAAAAAggGkEAAxQAUAAAQOACECgIDoIQADvgI=</HashCode>
-      <FileName>character.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Player_Character" Collapsed="true">
-    <Position X="0.5" Y="4.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>EAQBAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>player_character.h</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Arrow" Collapsed="true">
     <Position X="40.5" Y="3.25" Width="1.5" />
     <TypeIdentifier>
@@ -180,20 +159,6 @@
     <TypeIdentifier>
       <HashCode>AEAAAAOAAAEEwEAEAAAAAAAAAAAAAAAAABAAAAADAAg=</HashCode>
       <FileName>item.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Hostile_NPC" Collapsed="true">
-    <Position X="2.75" Y="6.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAEAAA=</HashCode>
-      <FileName>npc_enemy.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Neutral_NPC" Collapsed="true">
-    <Position X="5" Y="6.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEgAA=</HashCode>
-      <FileName>npc_unaffiliated.h</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />
