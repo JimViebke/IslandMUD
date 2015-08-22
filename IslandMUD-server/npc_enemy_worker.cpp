@@ -177,7 +177,7 @@ void Hostile_NPC_Worker::plan_fortress()
 		partition_divided_on_last_pass = false;
 
 		// for each partition
-		for (int i = 0; i < partitions.size(); ++i)
+		for (unsigned i = 0; i < partitions.size(); ++i)
 		{
 			// draw a 50/50 chance of attemping a horizontal or vertical split
 			if (R::random_int_from(0, 1) == 1)
