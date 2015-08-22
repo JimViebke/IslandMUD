@@ -169,6 +169,12 @@ public:
 		return (a - b > 0) ? (a - b) : (b - a);
 	}
 
+	// random utils
+	static int random_int_from(const int & min, const int & max)
+	{
+		return min + static_cast<int>((rand() / static_cast<double>(RAND_MAX + 1)) * ((max + 1) - min));
+	}
+
 	// time
 	static inline __int64 current_time_in_ms()
 	{
