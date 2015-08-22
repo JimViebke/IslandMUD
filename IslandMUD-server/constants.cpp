@@ -335,7 +335,9 @@ const int C::FULL_HEALTH_MAX = 200; // this is full health for fully leveled hea
 // AI objective keywords
 const string C::AI_OBJECTIVE_ACQUIRE = "acquire";
 const string C::AI_OBJECTIVE_GOTO = "goto";
+const string C::AI_OBJECTIVE_CONSTRUCT = "construct";
 
+// chests
 const int C::MAX_CHEST_HEALTH = 100;
 
 // NPC types
@@ -345,3 +347,11 @@ const string C::AI_TYPE_BLACKSMITH = "blacksmith";
 const string C::AI_TYPE_WATCH_GUARD = "watchguard";
 const string C::AI_TYPE_PATROL_GUARD = "partrolguard";
 const string C::AI_TYPE_MINER = "miner";
+
+// fortress generation
+
+const int C::FORTRESS_PARTITION_MIN_SIZE = 3;
+const int C::FORTRESS_MIN_X = 20;
+const int C::FORTRESS_MAX_X = 20;
+const int C::FORTRESS_MIN_Y = 20;
+const int C::FORTRESS_MAX_Y = 20;

@@ -29,15 +29,16 @@ protected:
 	{
 	public:
 		// "get [] [] axe", "construct north stone surface", "construct north stone door"
-		string verb, direction, material, noun;
 		int objective_x, objective_y, objective_z;
-		string purpose; // "sword" (the reason this objective was added
-		bool already_planning_to_craft = false;
+		bool modifier, already_planning_to_craft = false;
+		string verb, direction, material, noun, purpose; // "sword" (the reason this objective was added
 
 		Objective(const string & verb, const string & noun, const string & purpose) :
 			verb(verb), noun(noun), purpose(purpose) {}
 		Objective(const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z) :
 			verb(verb), noun(noun), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z) {}
+		Objective(const string & verb, const string & noun, const string & material, const string & direction, const int & objective_x, const int & objective_y, const int & objective_z, const bool & modifier) :
+			verb(verb), noun(noun), material(material), direction(direction), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z), modifier(modifier) {}
 	};
 
 	enum Objective_Priority { low_priority, high_priority };
