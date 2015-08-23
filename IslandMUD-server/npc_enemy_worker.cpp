@@ -46,14 +46,19 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					return;
 				}
 
-				// construct the surface
-				// If the objective's modifier is true (in this case meaning the wall will have a door), compare
-				// the results of constructing a surface with a door. If the objective's modifier is false,
-				// compare the results of constructing just a surface
+				// determine whether the adjacent room has an opposite wall with a door. Neither needs to be intact.
+				int adjacent_x = x, adjacent_y = y;
+				{ // temporary scope to get rid of the extraneous z value as soon as possible
+					int throwaway_z;
+					R::assign_movement_deltas(objective_it->direction, adjacent_x, adjacent_y, throwaway_z);
+				}
+				const bool adjacent_room_has_opposing_door =
+					world.room_at(adjacent_x, adjacent_y, z)->has_surface(C::opposite_surface_id.find(objective_it->direction)->second) &&
+					world.room_at(adjacent_x, adjacent_y, z)->get_room_sides().find(C::opposite_surface_id.find(objective_it->direction)->second)->second.has_door();
 
-				// HERE ****** The should also take into account if the adjacent room has an opposite wall with a door. Then
-				// this room should have a door there as well.
-				if (((objective_it->modifier) ?
+				// construct the surface, with a door if the modifier is true, or if the adjacent_room_has_opposing_door
+				// flag is set
+				if (((objective_it->modifier || adjacent_room_has_opposing_door) ?
 					(construct_surface_with_door(objective_it->material, objective_it->direction, objective_it->material, world).find("You construct a ")) :
 					(construct_surface(objective_it->material, objective_it->direction, world).find("You construct a ")))
 					!= string::npos)
