@@ -56,6 +56,31 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					world.room_at(adjacent_x, adjacent_y, z)->has_surface(C::opposite_surface_id.find(objective_it->direction)->second) &&
 					world.room_at(adjacent_x, adjacent_y, z)->get_room_sides().find(C::opposite_surface_id.find(objective_it->direction)->second)->second.has_door();
 
+				// if we are about to construct a wall with a door against a wall without a door,
+				// move this door elsewhere. It is possible that this will move the door to another structure.
+				// It is therefore possible that a structure's only door could be moved to another structure.
+				if (objective_it->modifier &&
+					world.room_at(adjacent_x, adjacent_y, z)->has_surface(C::opposite_surface_id.find(objective_it->direction)->second) &&
+					!world.room_at(adjacent_x, adjacent_y, z)->get_room_sides().find(C::opposite_surface_id.find(objective_it->direction)->second)->second.has_door())
+				{
+					objective_it->modifier = false; // don't build a door against an opposing wall
+
+					// starting with the current objective
+					deque<Objective>::iterator it = objective_it;
+					// for each objective
+					while (++it != objectives.cend())
+					{
+						// if the objective is a construction objective AND its modifier is false (no door will be constructed)
+						if (it->verb == C::AI_OBJECTIVE_CONSTRUCT && !it->modifier)
+						{
+							// set the flag to true
+							it->modifier = true;
+							// we're finished
+							break;
+						}
+					}
+				}
+
 				// construct the surface, with a door if the modifier is true, or if the adjacent_room_has_opposing_door
 				// flag is set
 				if (((objective_it->modifier || adjacent_room_has_opposing_door) ?
