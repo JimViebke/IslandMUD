@@ -16,7 +16,7 @@ using namespace std;
 class Item
 {
 private:
-	bool takable; // items are untakable by default
+	bool takable;
 
 public:
 	string name;
@@ -40,6 +40,14 @@ public:
 		// if the passed value is out of bounds, set health to max_health, otherwise set to the passed value
 		health = ((set_health > C::DEFAULT_ITEM_MAX_HEALTH || set_health < C::DEFAULT_ITEM_MIN_HEALTH)
 			? C::DEFAULT_ITEM_MAX_HEALTH : set_health);
+	}
+	void update_health(int update_health)
+	{
+		// subtract the passed amount from the current health
+		health -= update_health;
+
+		// use set_health() to validate
+		set_health(health);
 	}
 
 };
@@ -206,6 +214,12 @@ public:
 	string contents() const;
 	multimap<string, shared_ptr<Equipment>> get_equipment_contents() const;
 	map<string, shared_ptr<Material>> get_material_contents() const;
+};
+
+class Log : public Item
+{
+public:
+	Log() : Item(C::LOG_ID, false) {}
 };
 
 #endif

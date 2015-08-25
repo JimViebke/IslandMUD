@@ -62,6 +62,7 @@ const string C::BOARD_ID = "board";
 // item IDs -> other
 const string C::TREE_ID = "tree";
 const string C::CHEST_ID = "chest";
+const string C::LOG_ID = "log";
 
 // item IDs -> equipment
 const string C::AXE_ID = "axe";
@@ -298,7 +299,8 @@ const map<string, map<string, int>> C::damage_tables =
 		{ C::STICK_ID, 49 }, // formerly 6
 		{ C::WOOD_ID, 49 }, // formerly 3
 		{ C::STONE_ID, 49, }, // formerly 1
-		{ C::BRANCH_ID, 49 }
+		{ C::BRANCH_ID, 49 },
+		{ C::TREE_ID, 49 } // possibly remove this
 	} },
 
 	{ string(C::STAFF_ID), {
@@ -310,7 +312,8 @@ const map<string, map<string, int>> C::damage_tables =
 	{ string(C::AXE_ID), {
 		{ C::STICK_ID, 10 },
 		{ C::WOOD_ID, 10 },
-		{ C::STONE_ID, 5 }
+		{ C::STONE_ID, 5 },
+		{ C::TREE_ID, 33 } // also set high for testing
 	} },
 
 	{ string(C::SWORD_ID), {

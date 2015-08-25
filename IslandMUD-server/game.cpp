@@ -251,6 +251,12 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 	{
 		return actors.find(actor_id)->second->attack_door(command[1], world);
 	}
+	// the player is attacking an item
+	else if (command.size() == 2 && command[0] == C::ATTACK_COMMAND)
+	{
+		return actors.find(actor_id)->second->attack_item(command[1], world);
+	}
+	// logout
 	else if (command.size() == 1 && command[0] == C::LOGOUT_COMMAND)
 	{
 		return actors.find(actor_id)->second->logout();

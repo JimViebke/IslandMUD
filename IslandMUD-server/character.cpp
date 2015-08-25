@@ -104,7 +104,7 @@ string Character::login(World & world)
 
 		// extract the value of the health attribute and use it to set the item's health
 		equipment->set_health(equipment_node.attribute(C::XML_ITEM_HEALTH.c_str()).as_int());
-		
+
 		// add the item to the player's inventory
 		equipment_inventory.insert(pair<string, shared_ptr<Equipment>>(equipment->name, equipment));
 	}
@@ -1043,6 +1043,66 @@ string Character::attack_door(const string & surface_ID, World & world)
 
 	// this feedback might not be correct for all cases
 	return "There is no door to your " + surface_ID;
+}
+
+string Character::attack_item(const string & target_ID, World & world)
+{
+	// if the target isn't here
+	if (!world.room_at(x, y, z)->contains_item(target_ID))
+	{
+		return "There is no " + target_ID + " here.";
+	}
+
+	// if the user has an item equipped
+	if (equipped_item != nullptr)
+	{
+		// if the attacking implement is not in the damage tables
+		if (C::damage_tables.find(equipped_item->name) == C::damage_tables.cend())
+		{
+			return "You can't do that with a(n) " + equipped_item->name + ".";
+		}
+
+		// extract the damage table for the attacking implement
+		const map<string, int> damage_table = C::damage_tables.find(equipped_item->name)->second;
+
+		// if the damage table does not have an entry for the target item ID
+		if (damage_table.find(target_ID) == damage_table.cend())
+		{
+			return "You can't do that to a " + target_ID + ".";
+		}
+
+		// damage the item, return a different message depending of if the item was destroyed or damaged
+		if (world.room_at(x, y, z)->damage_item(target_ID, damage_table.find(target_ID)->second))
+		{
+			return "You destroy the " + target_ID + " using your " + equipped_item->name + ".";
+		}
+		else
+		{
+			return "You damage the " + target_ID + " using your " + equipped_item->name + ".";
+		}
+	}
+	else // the user does not have an item equipped, do a barehanded attack
+	{
+		// extract the damage table for a bare-handed attack
+		const map<string, int> damage_table = C::damage_tables.find(C::ATTACK_COMMAND)->second;
+
+		// if the damage table does not contain an entry for the target
+		if (damage_table.find(target_ID) == damage_table.cend())
+		{
+			return "You can't do that to a " + target_ID + ".";
+		}
+
+		// the damage table does contain an entry for the target
+		if (world.room_at(x, y, z)->damage_item(target_ID, damage_table.find(target_ID)->second))
+		{
+			return "You destroy the " + target_ID + " using your bare hands.";
+		}
+		else
+		{
+			return "You damage the " + target_ID + " using your bare hands.";
+		}
+	}
+
 }
 
 // movement info

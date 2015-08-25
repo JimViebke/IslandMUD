@@ -61,9 +61,10 @@ public:
 	shared_ptr<Chest> get_chest() const;
 	void set_chest(const shared_ptr<Chest> & set_chest);
 
-	// add and remove items
+	// items
 	void add_item(const shared_ptr<Item> item);
 	void remove_item(const string & item_id, const int & count = 1);
+	bool damage_item(const string & item_id, const int & amount);
 
 	// add surfaces and doors
 	void add_surface(const string & surface_ID, const string & material_ID);

@@ -227,7 +227,7 @@ void Room::set_chest(const shared_ptr<Chest> & set_chest)
 	this->chest = set_chest;
 }
 
-// add and remove items
+// items
 void Room::add_item(const shared_ptr<Item> item) // pass a copy rather than a reference
 {
 	/* This doesn't stack materials.
@@ -246,6 +246,32 @@ void Room::remove_item(const string & item_id, const int & count)
 	}
 
 	updated = true;
+}
+bool Room::damage_item(const string & item_id, const int & amount)
+{
+	// return a boolean indicating if the target item was destroyed
+
+	// if the item will be destroyed
+	if (contents.find(item_id)->second->get_health() - amount <= C::DEFAULT_ITEM_MIN_HEALTH)
+	{
+		// remove the item from the room
+		remove_item(item_id);
+
+		// if the removed item was a tree
+		if (item_id == C::TREE_ID)
+		{
+			// add a log
+			add_item(Craft::make(C::LOG_ID));
+		}
+
+		return true;
+	}
+	else // the item will not be destroyed, just reduce its health
+	{
+		contents.find(item_id)->second->update_health(amount);
+
+		return false;
+	}
 }
 
 // add surfaces and doors

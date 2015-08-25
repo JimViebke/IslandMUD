@@ -80,6 +80,7 @@ public:
 		// item IDs -. other
 		TREE_ID,
 		CHEST_ID,
+		LOG_ID,
 
 		// item IDs -> equipment
 		AXE_ID,

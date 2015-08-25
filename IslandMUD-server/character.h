@@ -106,6 +106,7 @@ public:
 	string construct_surface_with_door(const string & material_id, const string & surface_id, const string & door_material_id, World & world);
 	string attack_surface(const string & surface_ID, World & world);
 	string attack_door(const string & surface_ID, World & world);
+	string attack_item(const string & target_ID, World & world);
 
 	// movement info
 	string validate_movement(const int & cx, const int & cy, const int & cz, const string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const;
