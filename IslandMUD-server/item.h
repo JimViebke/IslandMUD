@@ -26,8 +26,8 @@ protected:
 
 	int health = 100;
 
-	Item(string item_name, int health = C::DEFAULT_ITEM_MAX_HEALTH, bool is_takable = false) :
-		name(item_name), health(health), takable(is_takable) {}
+	Item(string item_name, bool is_takable, int health = C::DEFAULT_ITEM_MAX_HEALTH) :
+		name(item_name), takable(is_takable), health(health) {}
 
 	virtual ~Item() {}
 
@@ -168,7 +168,7 @@ public:
 class Debris : public Item
 {
 public:
-	Debris() : Item(C::DEBRIS_ID) {}
+	Debris() : Item(C::DEBRIS_ID, false) {}
 };
 
 class Chest : public Item
@@ -178,10 +178,10 @@ private:
 	map<string, shared_ptr<Material>> material_contents = {};
 
 public:
-	Chest() : Item(C::CHEST_ID) {}
+	Chest() : Item(C::CHEST_ID, false) {}
 
 	Chest(const int & set_health, const multimap<string, shared_ptr<Equipment>> & set_equipment_contents,
-		const map<string, shared_ptr<Material>> & set_material_contents) : Item(C::CHEST_ID, set_health),
+		const map<string, shared_ptr<Material>> & set_material_contents) : Item(C::CHEST_ID, false, set_health),
 		equipment_contents(set_equipment_contents),
 		material_contents(set_material_contents) {}
 
