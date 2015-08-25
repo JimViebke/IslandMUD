@@ -35,6 +35,12 @@ public:
 
 	bool is_takable() const { return takable; }
 	int get_health() const { return health; }
+	void set_health(int set_health)
+	{
+		// if the passed value is out of bounds, set health to max_health, otherwise set to the passed value
+		health = ((set_health > C::DEFAULT_ITEM_MAX_HEALTH || set_health < C::DEFAULT_ITEM_MIN_HEALTH)
+			? C::DEFAULT_ITEM_MAX_HEALTH : set_health);
+	}
 
 };
 

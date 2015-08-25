@@ -301,10 +301,18 @@ void World::add_room_to_world(xml_node & room_node, const int & x, const int & y
 	room_node.append_attribute(C::XML_IS_WATER.c_str()).as_bool(room->is_water());
 
 	// for each item in the room
-	for (const xml_node & item : room_node.children(C::XML_ITEM.c_str()))
+	for (const xml_node & item_node : room_node.children(C::XML_ITEM.c_str()))
 	{
 		// use the item ID to make a new item and add it to the room
-		room->add_item(Craft::make(item.child_value()));
+
+		// create the item
+		shared_ptr<Item> item = Craft::make(item_node.child_value());
+
+		// set the item's health
+		item->set_health(item_node.attribute(C::XML_ITEM_HEALTH.c_str()).as_int());
+
+		// add the item to the room
+		room->add_item(item);
 	}
 
 	// for each surface in the room
@@ -474,6 +482,9 @@ void World::add_room_to_z_stack(const int & z, const World::room_pointer::pointe
 	{
 		// create a node for an item
 		xml_node item_node = room_node.append_child(C::XML_ITEM.c_str());
+
+		// append the item's health as an attribute
+		item_node.append_attribute(C::XML_ITEM_HEALTH.c_str()).set_value(item_it->second->get_health());
 
 		// append the item's ID
 		item_node.append_child(node_pcdata).set_value(item_it->first.c_str());

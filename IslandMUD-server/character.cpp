@@ -97,16 +97,17 @@ string Character::login(World & world)
 
 
 	// for each item node of the equipment node
-	for (const xml_node & equipment : user_data_xml.child(C::XML_USER_EQUIPMENT.c_str()).children())
+	for (const xml_node & equipment_node : user_data_xml.child(C::XML_USER_EQUIPMENT.c_str()).children())
 	{
-		// use the name of the node to create an equipment object and add it to the player's equipment inventory
-		equipment_inventory.insert(pair<string, shared_ptr<Equipment>>(
-			equipment.name(),
-			R::convert_to<Equipment>(Craft::make(equipment.name()))
-			));
+		// create the item
+		shared_ptr<Equipment> equipment = R::convert_to<Equipment>(Craft::make(equipment_node.name()));
+
+		// extract the value of the health attribute and use it to set the item's health
+		equipment->set_health(equipment_node.attribute(C::XML_ITEM_HEALTH.c_str()).as_int());
+		
+		// add the item to the player's inventory
+		equipment_inventory.insert(pair<string, shared_ptr<Equipment>>(equipment->name, equipment));
 	}
-
-
 
 	// for each item in the material node
 	for (const xml_node & material : user_data_xml.child(C::XML_USER_MATERIALS.c_str()).children())
@@ -161,6 +162,9 @@ string Character::logout()
 	{
 		// save the equipment to a new node under the equipment node
 		xml_node equipment = equipment_node.append_child(it->first.c_str());
+
+		// append a health attribute to the equipment node and set its value to the health of the equipment
+		equipment.append_attribute(C::XML_ITEM_HEALTH.c_str()).set_value(it->second->get_health());
 	}
 
 	// for each material in the user's inventory

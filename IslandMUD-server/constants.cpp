@@ -119,6 +119,7 @@ const string C::DOOR = "door";
 const string C::XML_ROOM = "room";
 const string C::XML_IS_WATER = "is_water";
 const string C::XML_ITEM = "item";
+const string C::XML_ITEM_HEALTH = "health";
 const string C::XML_SURFACE = "surface";
 const string C::XML_SURFACE_HEALTH = "health";
 const string C::XML_SURFACE_DIRECTION = "direction";
