@@ -14,7 +14,12 @@ Feb 14, 2015 */
 #include <sys/stat.h> // check for file presence
 #include <chrono> // time
 
-#include <direct.h> // mkdir, only one of these should be needed
+#ifdef _WIN32
+#include <direct.h>
+#else
+#include <sys/stat.h>
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -127,7 +132,14 @@ public:
 	static inline void create_path_if_not_exists(const string & path)
 	{
 		// if a path does not exist, create it
+		#ifdef _WIN32
 		_mkdir(path.c_str());
+		#else
+		// TODO: cleanup "Dirty hack attack!"
+		std::stringstream command;
+		command << "mkdir -p " << path;
+		system(command.str().c_str());
+		#endif
 	}
 	static inline void to_file(const string & path, const string & contents)
 	{
@@ -143,10 +155,10 @@ public:
 		// convert a vector of strings passed by reference to a vector of lowercase strings
 		if (word.length() > 0)
 		{
-			transform(word.begin(), word.end(), word.begin(), tolower);
+			std::transform(word.begin(), word.end(), word.begin(), ::tolower);
 		}
 	}
-	
+
 	// math
 	static int euclidean_distance(const int & x1, const int & y1, const int & x2, const int & y2)
 	{
@@ -176,7 +188,7 @@ public:
 	}
 
 	// time
-	static inline __int64 current_time_in_ms()
+	static inline long long current_time_in_ms()
 	{
 		// return chrono::system_clock::to_time_t(chrono::system_clock::now());
 		return chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
@@ -199,7 +211,7 @@ public:
 	{
 		return !R::is<Derived_Type>(object);
 	}
-	template <typename Derived_Type, typename Parent_Type> static inline typename shared_ptr<Derived_Type> convert_to(shared_ptr<Parent_Type> const & object)
+	template <typename Derived_Type, typename Parent_Type> static inline shared_ptr<Derived_Type> convert_to(shared_ptr<Parent_Type> const & object)
 	{
 		return dynamic_pointer_cast<Derived_Type>(object);
 	}
