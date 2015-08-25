@@ -14,7 +14,7 @@ Feb 14, 2015 */
 #include <sys/stat.h> // check for file presence
 #include <chrono> // time
 
-#ifdef WINDOWS
+#ifdef _WIN32
 #include <direct.h>
 #else
 #include <sys/stat.h>
@@ -132,7 +132,7 @@ public:
 	static inline void create_path_if_not_exists(const string & path)
 	{
 		// if a path does not exist, create it
-		#ifdef WINDOWS
+		#ifdef _WIN32
 		_mkdir(path.c_str());
 		#else
 		// TODO: cleanup "Dirty hack attack!"
