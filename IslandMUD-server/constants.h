@@ -169,6 +169,11 @@ public:
 		// user health xml
 		XML_CURRENT_HEALTH;
 
+	// item health/integrity
+	static const int
+		DEFAULT_ITEM_MIN_HEALTH,
+		DEFAULT_ITEM_MAX_HEALTH;
+
 	// surface information
 	static const vector<string> surface_ids;
 	static const vector<string> direction_ids;

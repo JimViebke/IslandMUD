@@ -16,15 +16,25 @@ using namespace std;
 class Item
 {
 private:
-	bool takable = false; // items are untakable by default
+	bool takable; // items are untakable by default
+
 public:
 	string name;
 	// int weight = 0;
-	
-	Item(string item_name, bool is_takable = false) : name(item_name), takable(is_takable) {}
+
+protected:
+
+	int health = 100;
+
+	Item(string item_name, int health = C::DEFAULT_ITEM_MAX_HEALTH, bool is_takable = false) :
+		name(item_name), health(health), takable(is_takable) {}
+
 	virtual ~Item() {}
 
+public:
+
 	bool is_takable() const { return takable; }
+	int get_health() const { return health; }
 
 };
 
@@ -32,6 +42,8 @@ class Material : public Item
 {
 public:
 	unsigned amount = 1;
+
+protected:
 	Material(const string & cust_name) : Item(cust_name, true) {} // all materials are takable
 };
 
@@ -109,11 +121,11 @@ public:
 
 class Equipment : public Item
 {
-public:
 	// string equipment_material; // stone, iron, wood, etc
 	// string handle_material; // wood, etc
 	// other members represent quality, health
 
+protected:
 	Equipment(string cust_name) : Item(cust_name, true) {} // all equipment is takable
 };
 
@@ -162,15 +174,16 @@ public:
 class Chest : public Item
 {
 private:
-	int health = C::MAX_CHEST_HEALTH;
 	multimap<string, shared_ptr<Equipment>> equipment_contents = {};
 	map<string, shared_ptr<Material>> material_contents = {};
 
 public:
 	Chest() : Item(C::CHEST_ID) {}
+
 	Chest(const int & set_health, const multimap<string, shared_ptr<Equipment>> & set_equipment_contents,
-		const map<string, shared_ptr<Material>> & set_material_contents) : Item(C::CHEST_ID),
-		health(set_health), equipment_contents(set_equipment_contents), material_contents(set_material_contents) {}
+		const map<string, shared_ptr<Material>> & set_material_contents) : Item(C::CHEST_ID, set_health),
+		equipment_contents(set_equipment_contents),
+		material_contents(set_material_contents) {}
 
 	// contents
 	void add(const shared_ptr<Item> & item);

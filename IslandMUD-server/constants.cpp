@@ -151,6 +151,10 @@ const string C::XML_LEVEL_HEALTH_MAX = "max_health";
 // user health xml
 const string C::XML_CURRENT_HEALTH = "current_health";
 
+// item health/integrity
+const int C::DEFAULT_ITEM_MIN_HEALTH = 0;
+const int C::DEFAULT_ITEM_MAX_HEALTH = 100;
+
 // store a vector of all valid surface ids
 const vector<string> C::surface_ids = { C::NORTH, C::EAST, C::SOUTH, C::WEST, C::FLOOR, C::CEILING };
 
