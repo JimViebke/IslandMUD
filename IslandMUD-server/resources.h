@@ -132,14 +132,14 @@ public:
 	static inline void create_path_if_not_exists(const string & path)
 	{
 		// if a path does not exist, create it
-		#ifdef _WIN32
+#ifdef _WIN32
 		_mkdir(path.c_str());
-		#else
+#else
 		// TODO: cleanup "Dirty hack attack!"
 		std::stringstream command;
 		command << "mkdir -p " << path;
 		system(command.str().c_str());
-		#endif
+#endif
 	}
 	static inline void to_file(const string & path, const string & contents)
 	{
