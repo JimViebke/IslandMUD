@@ -202,6 +202,7 @@
     <Text Include="notes.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Rakefile" />
     <None Include="ClassDiagram - Items.cd" />
     <None Include="ClassDiagram - NPCs.cd" />
   </ItemGroup>
