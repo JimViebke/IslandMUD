@@ -2,6 +2,7 @@
 May 15 2015 */
 
 #include <iomanip>
+#include <memory>
 
 #include "world.h"
 #include "character.h"
@@ -211,7 +212,7 @@ void World::load_terrain_map()
 		// save the final terrain to disk
 		gen.save_terrain();
 
-		terrain = make_unique<vector<vector<char>>>(gen.get_terrain());
+		terrain = std::make_unique<std::vector<std::vector<char>>>(gen.get_terrain());
 	}
 }
 
@@ -338,7 +339,7 @@ void World::add_room_to_world(xml_node & room_node, const int & x, const int & y
 
 	// extract the chest node
 	const xml_node chest_node = room_node.child(C::XML_CHEST.c_str());
-	
+
 	// if the extracted chest node exists
 	if (!chest_node.empty())
 	{
@@ -375,7 +376,7 @@ void World::add_room_to_world(xml_node & room_node, const int & x, const int & y
 		// add the chest to the room
 		room->set_chest(make_shared<Chest>(chest));
 	}
-	
+
 	// add room to world
 	room_at(x, y, z) = room;
 }
@@ -512,7 +513,7 @@ void World::add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xm
 			door_node.append_attribute(C::XML_DOOR_FACTION.c_str()).set_value(door->get_faction_ID().c_str());
 		}
 	}
-	
+
 	// if there is a chest in this room
 	if (room->has_chest())
 	{
@@ -522,10 +523,10 @@ void World::add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xm
 
 		// extract the chest from the room
 		const shared_ptr<Chest> chest = room->get_chest(); // ****** HERE
-		
+
 		// add a health attribute to the chest node
 		chest_node.append_attribute(C::XML_CHEST_HEALTH.c_str()).set_value(chest->get_health());
-		
+
 		// add equipment and material nodes to the chest node
 		xml_node equipment_node = chest_node.append_child(C::XML_CHEST_EQUIPMENT.c_str());
 		xml_node material_node = chest_node.append_child(C::XML_CHEST_MATERIALS.c_str());
@@ -544,7 +545,7 @@ void World::add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xm
 		for (map<string, shared_ptr<Material>>::const_iterator material_it = chest_material_contents.cbegin();
 			material_it != chest_material_contents.cend(); ++material_it)
 		{
-			// append a node where name is the material's ID, with an attribute with a name of "XML_CHEST_MATERIALS_COUNT", and a value of the material's count 
+			// append a node where name is the material's ID, with an attribute with a name of "XML_CHEST_MATERIALS_COUNT", and a value of the material's count
 			/* xml_node item_node = */ material_node.append_child(material_it->first.c_str()).append_attribute(C::XML_CHEST_MATERIALS_COUNT.c_str()).set_value(material_it->second->amount);
 		}
 	}

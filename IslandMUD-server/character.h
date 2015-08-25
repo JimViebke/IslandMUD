@@ -17,7 +17,7 @@ using namespace std;
 class Character
 {
 private:
-	__int64 last_action_timestamp;
+	long long last_action_timestamp;
 
 	// these are levels/skills/abilities
 	int swordsmanship_level = C::SWORDSMANSHIP_LEVEL_MIN;
@@ -87,7 +87,7 @@ public:
 	bool has(const string & item_name, const unsigned & item_count = 1) const;
 	bool does_not_have(const string & item_name, const unsigned & item_count = 1) const;
 	string get_inventory() const; // debugging
-	
+
 	// inventory manipulation
 	void add(const shared_ptr<Item> & item);
 	void remove(const string & item_id, const unsigned & count = 1);
