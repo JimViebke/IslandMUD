@@ -19,10 +19,12 @@ using namespace pugi;
 
 class World
 {
+public:
+
+	typedef unique_ptr<Room> room_pointer;
+
 private:
-	// x, y, and z dimensions repectively
-	// vector<vector<vector<shared_ptr<Room>>>> world;
-	vector<shared_ptr<Room>> world;
+	vector<room_pointer> world;
 
 	// 2d terrain (biome) map
 	shared_ptr<vector<vector<char>>> terrain;
@@ -33,9 +35,10 @@ public:
 
 	void load();
 
-	// return shared_ptr to a room at a location
-	shared_ptr<Room> room_at(const int & x, const int & y, const int & z) const;
-	shared_ptr<Room> & room_at(const int & x, const int & y, const int & z);
+	// access a room given coordinates
+	World::room_pointer::pointer room_at(const int & x, const int & y, const int & z);
+	const World::room_pointer::pointer room_at(const int & x, const int & y, const int & z) const;
+	World::room_pointer & room_pointer_at(const int & x, const int & y, const int & z);
 
 	// debugging
 	unsigned count_loaded_rooms() const;
@@ -76,13 +79,16 @@ private:
 	void load_room_to_world(const int & x, const int & y, const int & z);
 
 	// move a passed room to disk
-	void unload_room(const int & x, const int & y, const int & z, const shared_ptr<Room> & room);
+	void unload_room(const int & x, const int & y, const int & z, const World::room_pointer::pointer room);
 
 	// add a room to a z_stack at a given index
-	void add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xml_document & z_stack) const;
+	void add_room_to_z_stack(const int & z, const World::room_pointer::pointer room, xml_document & z_stack) const;
 
 	// create a new empty room given its coordinates and the world terrain
-	shared_ptr<Room> create_room(const int & x, const int & y, const int & z) const;
+	room_pointer create_room(const int & x, const int & y, const int & z) const;
+
+	// remove a room from memory
+	void erase_room_from_memory(const int & x, const int & y, const int & z);
 };
 
 #endif

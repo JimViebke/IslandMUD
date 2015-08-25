@@ -215,6 +215,12 @@ public:
 	{
 		return dynamic_pointer_cast<Derived_Type>(object);
 	}
+
+	// managed pointer utilities
+	template<typename T, typename... Args> static inline unique_ptr<T> make_unique(Args&&... args)
+	{
+		return unique_ptr<T>(new T(forward<Args>(args)...));
+	}
 };
 
 #endif

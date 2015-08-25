@@ -54,8 +54,6 @@ string Character::login(World & world)
 	// spawn in the player
 	world.room_at(x, y, z)->add_actor(this->name);
 
-
-
 	// select the level node
 	const xml_node level_node = user_data_xml.child(C::XML_USER_LEVELS.c_str());
 
@@ -1079,8 +1077,8 @@ string Character::validate_movement(const int & cx, const int & cy, const int & 
 		direction_ID == C::NORTH_WEST || direction_ID == C::NORTH_EAST ||
 		direction_ID == C::SOUTH_EAST || direction_ID == C::SOUTH_WEST)
 	{
-		const shared_ptr<Room> current_room = world.room_at(cx, cy, cz);
-		const shared_ptr<Room> destination_room = world.room_at(cx + dx, cy + dy, cz);
+		const World::room_pointer::pointer current_room = world.room_at(cx, cy, cz);
+		const World::room_pointer::pointer destination_room = world.room_at(cx + dx, cy + dy, cz);
 
 		if (direction_ID == C::NORTH_WEST)
 		{
