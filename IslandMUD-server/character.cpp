@@ -1044,7 +1044,6 @@ string Character::attack_door(const string & surface_ID, World & world)
 	// this feedback might not be correct for all cases
 	return "There is no door to your " + surface_ID;
 }
-
 string Character::attack_item(const string & target_ID, World & world)
 {
 	// if the target isn't here

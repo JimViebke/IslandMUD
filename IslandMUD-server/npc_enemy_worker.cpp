@@ -18,6 +18,124 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 		}
 	}
 
+	// make sure the NPC has an axe to cut down trees
+	if (i_dont_have(C::AXE_ID) && !im_planning_to_acquire(C::AXE_ID))
+	{
+		plan_to_get(C::AXE_ID);
+	}
+
+	// as an optimizations, only enter the next block if the AI doesn't have an axe
+	if (i_dont_have(C::AXE_ID))
+	{
+		// in this block: take the item if it's here, move to the item if it is visible and reachable,
+		for (deque<Objective>::iterator objective_iterator = objectives.begin();
+			objective_iterator != objectives.end();)
+		{
+
+			if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE)
+			{
+				// if the item is here, take it, remove the current objective, and return
+				if (world.room_at(x, y, z)->contains_item(objective_iterator->noun))
+				{
+					take(objective_iterator->noun, world);
+
+					if (objective_iterator->noun == objective_iterator->purpose)
+					{
+						// this item is an end goal
+						erase_objectives_matching_purpose(objective_iterator->purpose); // erasing all objectives
+					}
+					else
+					{
+						// this item is a means to an end
+						erase_objective(objective_iterator);
+					}
+
+					return;
+				}
+
+				// see if the item is reachable
+				if (pathfind_to_closest_item(objective_iterator->noun, world))
+				{
+					return;
+				}
+
+				// a path could not be found to the item, plan to craft it if it is craftable and the NPC isn't planning to already
+
+				// if i'm not already planning on crafting the item
+				// AND the item is craftable
+				if (!objective_iterator->already_planning_to_craft
+					&& one_can_craft(objective_iterator->noun))
+				{
+					// plan to craft the item
+					objective_iterator->already_planning_to_craft = true;
+					plan_to_craft(objective_iterator->noun);
+					objective_iterator = objectives.begin(); // obligatory reset
+					continue; // jump to next iteration
+				}
+			}
+
+			// if I am planning on moving to an instance 
+			if (objective_iterator->verb == C::AI_OBJECTIVE_GOTO)
+			{
+				if (one_can_craft(objective_iterator->purpose) && i_have_all_ingredients_to_craft(objective_iterator->purpose))
+				{
+					if (pathfind_to_closest_item(objective_iterator->noun, world))
+					{
+						// delete extra objectives here
+						// or maybe not; perhaps the objective should be cleared when the item is taken/crafted
+
+						return;
+					}
+				}
+			}
+
+			// objectives were not modified, move to next objective
+			++objective_iterator;
+		}
+
+
+
+		// the next block: work through all objectives, see which objectives can be resolved through crafting attemps.
+		for (deque<Objective>::iterator objective_iterator = objectives.begin();
+			objective_iterator != objectives.end(); ++objective_iterator)
+		{
+			// try to craft the item, using obj->purpose if the (obj->verb == GOTO), else use obj->noun (most cases)
+			const string craft_attempt = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
+			if (craft_attempt.find("You now have") != string::npos)
+			{
+				// if successful, clear completed objectives
+
+				if (objective_iterator->verb == C::AI_OBJECTIVE_GOTO)
+				{
+					// the item crafted was from a "goto" objective
+
+					// save this because our firse erase will invalidate the iterator
+					const string PURPOSE = objective_iterator->purpose;
+
+					// erase the "goto" objective
+					erase_goto_objective_matching(PURPOSE);
+
+					// erase the "aquire" objective
+					erase_acquire_objective_matching(PURPOSE);
+				}
+				else if (objective_iterator->noun == objective_iterator->purpose)
+				{
+					// this item is an end goal (no "parent" goal)
+					erase_objectives_matching_purpose(objective_iterator->purpose);
+				}
+				else
+				{
+					// this item is only a means to an end
+					erase_objective(objective_iterator);
+				}
+
+				return;
+			}
+		}
+	}
+	
+
+
 	// for each objective
 	for (deque<Objective>::iterator objective_it = objectives.begin();
 		objective_it != objectives.end();)
@@ -41,9 +159,17 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				// check if there is a tree in the way
 				if (world.room_at(x, y, z)->contains_item(C::TREE_ID))
 				{
-					// tree needs chopping - just simulate it for now
-					world.room_at(x, y, z)->remove_item(C::TREE_ID);
-					return;
+					// if the axe is not equipped
+					if (equipped_item == nullptr || equipped_item->name != C::AXE_ID)
+					{
+						// equip the axe
+						equip(C::AXE_ID);
+					}
+
+					// chop the tree
+					attack_item(C::TREE_ID, world);
+					
+					return; // finished update
 				}
 
 				// determine whether the adjacent room has an opposite wall with a door. Neither needs to be intact.
