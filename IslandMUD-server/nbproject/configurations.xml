@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="95">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>character.h</itemPath>
+      <itemPath>constants.h</itemPath>
+      <itemPath>craft.h</itemPath>
+      <itemPath>door.h</itemPath>
+      <itemPath>game.h</itemPath>
+      <itemPath>generator.h</itemPath>
+      <itemPath>item.h</itemPath>
+      <itemPath>non_player_character.h</itemPath>
+      <itemPath>npc_enemy.h</itemPath>
+      <itemPath>npc_enemy_fighter.h</itemPath>
+      <itemPath>npc_enemy_worker.h</itemPath>
+      <itemPath>npc_unaffiliated.h</itemPath>
+      <itemPath>parse.h</itemPath>
+      <itemPath>player_character.h</itemPath>
+      <itemPath>pugiconfig.hpp</itemPath>
+      <itemPath>pugixml.hpp</itemPath>
+      <itemPath>recipe.h</itemPath>
+      <itemPath>recipes.h</itemPath>
+      <itemPath>resource.h</itemPath>
+      <itemPath>resources.h</itemPath>
+      <itemPath>room.h</itemPath>
+      <itemPath>room_side.h</itemPath>
+      <itemPath>world.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+      <itemPath>notes.txt</itemPath>
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>character.cpp</itemPath>
+      <itemPath>chest.cpp</itemPath>
+      <itemPath>constants.cpp</itemPath>
+      <itemPath>craft.cpp</itemPath>
+      <itemPath>door.cpp</itemPath>
+      <itemPath>game.cpp</itemPath>
+      <itemPath>generator.cpp</itemPath>
+      <itemPath>main.cpp</itemPath>
+      <itemPath>non_player_character.cpp</itemPath>
+      <itemPath>npc_enemy.cpp</itemPath>
+      <itemPath>npc_enemy_fighter.cpp</itemPath>
+      <itemPath>npc_enemy_worker.cpp</itemPath>
+      <itemPath>npc_unaffiliated.cpp</itemPath>
+      <itemPath>parse.cpp</itemPath>
+      <itemPath>player_character.cpp</itemPath>
+      <itemPath>pugixml.cpp</itemPath>
+      <itemPath>recipes.cpp</itemPath>
+      <itemPath>resources.cpp</itemPath>
+      <itemPath>room.cpp</itemPath>
+      <itemPath>room_side.cpp</itemPath>
+      <itemPath>world.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+      </compileType>
+      <item path="character.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="character.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="chest.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="constants.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="constants.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="craft.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="craft.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="door.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="door.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="game.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="game.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="generator.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="generator.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="non_player_character.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="non_player_character.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="notes.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="npc_enemy.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="npc_enemy.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="npc_enemy_fighter.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="npc_enemy_fighter.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="npc_enemy_worker.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="npc_enemy_worker.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="npc_unaffiliated.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="npc_unaffiliated.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="parse.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="parse.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="player_character.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="player_character.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="pugiconfig.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="pugixml.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="pugixml.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="recipe.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="recipes.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="recipes.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="resource.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="resources.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="resources.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="room.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="room.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="room_side.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="room_side.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="world.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="world.h" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+      </compileType>
+      <item path="character.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="character.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="chest.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="constants.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="constants.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="craft.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="craft.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="door.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="door.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="game.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="game.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="generator.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="generator.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="non_player_character.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="non_player_character.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="notes.txt" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="npc_enemy.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="npc_enemy.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="npc_enemy_fighter.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="npc_enemy_fighter.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="npc_enemy_worker.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="npc_enemy_worker.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="npc_unaffiliated.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="npc_unaffiliated.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="parse.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="parse.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="player_character.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="player_character.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="pugiconfig.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="pugixml.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="pugixml.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="recipe.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="recipes.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="recipes.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="resource.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="resources.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="resources.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="room.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="room.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="room_side.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="room_side.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="world.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="world.h" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>
