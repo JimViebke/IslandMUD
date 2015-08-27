@@ -68,6 +68,10 @@
                    projectFiles="false"
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
+      <itemPath>nbproject/Makefile-Debug.mk</itemPath>
+      <itemPath>nbproject/Makefile-Release.mk</itemPath>
+      <itemPath>nbproject/Makefile-impl.mk</itemPath>
+      <itemPath>nbproject/Makefile-variables.mk</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
@@ -77,11 +81,18 @@
   <confs>
     <conf name="Debug" type="1">
       <toolsSet>
-        <compilerSet>default</compilerSet>
+        <compilerSet>GNU|GNU</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
+        <cTool>
+          <commandlineTool>gcc-4.9</commandlineTool>
+        </cTool>
+        <ccTool>
+          <standard>8</standard>
+          <commandlineTool>g++-4.9</commandlineTool>
+        </ccTool>
       </compileType>
       <item path="character.cpp" ex="false" tool="1" flavor2="0">
       </item>

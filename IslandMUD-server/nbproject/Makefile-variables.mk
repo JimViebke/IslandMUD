@@ -7,13 +7,13 @@ CND_BASEDIR=`pwd`
 CND_BUILDDIR=build
 CND_DISTDIR=dist
 # Debug configuration
-CND_PLATFORM_Debug=None-Windows
-CND_ARTIFACT_DIR_Debug=dist/Debug/None-Windows
+CND_PLATFORM_Debug=GNU-Linux-x86
+CND_ARTIFACT_DIR_Debug=dist/Debug/GNU-Linux-x86
 CND_ARTIFACT_NAME_Debug=islandmud-server
-CND_ARTIFACT_PATH_Debug=dist/Debug/None-Windows/islandmud-server
-CND_PACKAGE_DIR_Debug=dist/Debug/None-Windows/package
+CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux-x86/islandmud-server
+CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux-x86/package
 CND_PACKAGE_NAME_Debug=islandmud-server.tar
-CND_PACKAGE_PATH_Debug=dist/Debug/None-Windows/package/islandmud-server.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux-x86/package/islandmud-server.tar
 # Release configuration
 CND_PLATFORM_Release=None-Windows
 CND_ARTIFACT_DIR_Release=dist/Release/None-Windows
