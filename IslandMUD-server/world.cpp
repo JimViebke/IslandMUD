@@ -216,7 +216,7 @@ void World::load_terrain_map()
 		// save the final terrain to disk
 		gen.save_terrain();
 
-		terrain = std::make_unique<std::vector<std::vector<char>>>(gen.get_terrain());
+		terrain = R::make_unique<std::vector<std::vector<char>>>(gen.get_terrain());
 	}
 }
 
