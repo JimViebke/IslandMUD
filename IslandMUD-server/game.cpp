@@ -181,9 +181,8 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 	if (command.size() == 1 && command[0] == C::HELP_COMMAND)
 	{
 		return string("help:\n") +
-			"\nrecipes" +
 			"\nmove [compass direction]" +
-			"\ntake / drop / craft / equip / dequip [item]" +
+			"\ntake / drop / craft / equip / dequip / chop / smash [item]" +
 			"\nequipped" +
 			"\nadd / place / put / drop [item] into chest" +
 			"\ntake [item] from chest" +
@@ -191,7 +190,8 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 			"\nattack [compass direction] wall / door" +
 			"\nconstruct [material] ceiling / floor" +
 			"\nconstruct [compass direction] [material] wall" +
-			"\nconstruct [compass direction] [material] wall with [material] door";
+			"\nconstruct [compass direction] [material] wall with [material] door" +
+			"\nrecipes";
 	}
 	// moving: "move northeast" OR "northeast"
 	else if ((command.size() == 2 && command[0] == C::MOVE_COMMAND)
