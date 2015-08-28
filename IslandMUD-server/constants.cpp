@@ -16,7 +16,11 @@ const int C::DEFAULT_SPAWN_Y = C::WORLD_Y_DIMENSION / 2; // E/W center
 const int C::DEFAULT_SPAWN_Z = C::GROUND_INDEX; // ground level spawn
 
 // game data locations
+#ifdef _WIN32
 const string C::game_directory = "C:/IslandMUD";
+#else
+const string C::game_directory = "/home/IslandMUD";
+#endif
 const string C::world_terrain_file_location = C::game_directory + "/world_terrain.txt";
 const string C::world_biome_file_location = C::game_directory + "/biome_map.txt";
 const string C::room_directory = C::game_directory + "/rooms";
