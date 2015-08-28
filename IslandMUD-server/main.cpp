@@ -16,7 +16,7 @@ int main()
 	R::create_path_if_not_exists(C::room_directory);
 	R::create_path_if_not_exists(C::user_data_directory);
 
-	// ensure .bat utilites are on the disk
+	// ensure .bat utilities are on the disk
 	R::to_file(C::game_directory + "\\" + "move room data to delete folder.bat.txt",
 		string("move C:\\IslandMUD\\rooms C:\\IslandMUD\\delete"));
 	R::to_file(C::game_directory + "\\" + "wipe delete folder.bat",
