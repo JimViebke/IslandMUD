@@ -80,6 +80,7 @@ public:
 		// item IDs -. other
 		TREE_ID,
 		CHEST_ID,
+		LOG_ID,
 
 		// item IDs -> equipment
 		AXE_ID,
@@ -137,6 +138,7 @@ public:
 		XML_ROOM,
 		XML_IS_WATER,
 		XML_ITEM,
+		XML_ITEM_HEALTH,
 		XML_SURFACE,
 		XML_SURFACE_HEALTH,
 		XML_SURFACE_DIRECTION,
@@ -168,6 +170,11 @@ public:
 
 		// user health xml
 		XML_CURRENT_HEALTH;
+
+	// item health/integrity
+	static const int
+		DEFAULT_ITEM_MIN_HEALTH,
+		DEFAULT_ITEM_MAX_HEALTH;
 
 	// surface information
 	static const vector<string> surface_ids;

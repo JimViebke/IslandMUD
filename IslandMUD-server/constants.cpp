@@ -16,7 +16,11 @@ const int C::DEFAULT_SPAWN_Y = C::WORLD_Y_DIMENSION / 2; // E/W center
 const int C::DEFAULT_SPAWN_Z = C::GROUND_INDEX; // ground level spawn
 
 // game data locations
+#ifdef _WIN32
 const string C::game_directory = "C:/IslandMUD";
+#else
+const string C::game_directory = "/home/IslandMUD";
+#endif
 const string C::world_terrain_file_location = C::game_directory + "/world_terrain.txt";
 const string C::world_biome_file_location = C::game_directory + "/biome_map.txt";
 const string C::room_directory = C::game_directory + "/rooms";
@@ -62,6 +66,7 @@ const string C::BOARD_ID = "board";
 // item IDs -> other
 const string C::TREE_ID = "tree";
 const string C::CHEST_ID = "chest";
+const string C::LOG_ID = "log";
 
 // item IDs -> equipment
 const string C::AXE_ID = "axe";
@@ -119,6 +124,7 @@ const string C::DOOR = "door";
 const string C::XML_ROOM = "room";
 const string C::XML_IS_WATER = "is_water";
 const string C::XML_ITEM = "item";
+const string C::XML_ITEM_HEALTH = "health";
 const string C::XML_SURFACE = "surface";
 const string C::XML_SURFACE_HEALTH = "health";
 const string C::XML_SURFACE_DIRECTION = "direction";
@@ -150,6 +156,10 @@ const string C::XML_LEVEL_HEALTH_MAX = "max_health";
 
 // user health xml
 const string C::XML_CURRENT_HEALTH = "current_health";
+
+// item health/integrity
+const int C::DEFAULT_ITEM_MIN_HEALTH = 0;
+const int C::DEFAULT_ITEM_MAX_HEALTH = 100;
 
 // store a vector of all valid surface ids
 const vector<string> C::surface_ids = { C::NORTH, C::EAST, C::SOUTH, C::WEST, C::FLOOR, C::CEILING };
@@ -293,7 +303,8 @@ const map<string, map<string, int>> C::damage_tables =
 		{ C::STICK_ID, 49 }, // formerly 6
 		{ C::WOOD_ID, 49 }, // formerly 3
 		{ C::STONE_ID, 49, }, // formerly 1
-		{ C::BRANCH_ID, 49 }
+		{ C::BRANCH_ID, 49 },
+		{ C::TREE_ID, 49 } // possibly remove this
 	} },
 
 	{ string(C::STAFF_ID), {
@@ -305,7 +316,8 @@ const map<string, map<string, int>> C::damage_tables =
 	{ string(C::AXE_ID), {
 		{ C::STICK_ID, 10 },
 		{ C::WOOD_ID, 10 },
-		{ C::STONE_ID, 5 }
+		{ C::STONE_ID, 5 },
+		{ C::TREE_ID, 33 } // also set high for testing
 	} },
 
 	{ string(C::SWORD_ID), {

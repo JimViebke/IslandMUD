@@ -2,6 +2,7 @@
 May 15 2015 */
 
 #include <iomanip>
+#include <memory>
 
 #include "world.h"
 #include "character.h"
@@ -13,24 +14,28 @@ void World::load()
 	load_terrain_map();
 }
 
-// return shared_ptr to a room at a location
-shared_ptr<Room> World::room_at(const int & x, const int & y, const int & z) const
+// access a room given coordinates
+World::room_pointer::pointer World::room_at(const int & x, const int & y, const int & z)
 {
 	if (!R::bounds_check(x, y, z))
 	{
-		return world[0];
+		return world.begin()->get();
 	}
 
-	return world.at((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + (z));
+	return (world.begin() + ((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + z))->get();
 }
-shared_ptr<Room> & World::room_at(const int & x, const int & y, const int & z)
+const World::room_pointer::pointer World::room_at(const int & x, const int & y, const int & z) const
 {
 	if (!R::bounds_check(x, y, z))
 	{
-		return world[0];
+		return world.cbegin()->get();
 	}
 
-	return world.at((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + (z));
+	return (world.cbegin() + ((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + z))->get();
+}
+World::room_pointer & World::room_pointer_at(const int & x, const int & y, const int & z)
+{
+	return *(world.begin() + ((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + z));
 }
 
 // debugging
@@ -123,8 +128,8 @@ void World::unload_room(const int & x, const int & y, const int & z)
 	// pass the coordinates and a shared_ptr to the room
 	unload_room(x, y, z, room_at(x, y, z));
 
-	// set the shared_ptr at x,y,z to null
-	room_at(x, y, z) = nullptr;
+	// set the pointer at x,y,z to null
+	erase_room_from_memory(x, y, z);
 }
 
 bool World::room_has_surface(const int & x, const int & y, const int & z, const string & direction_ID) const
@@ -149,7 +154,7 @@ void World::load_world_container()
 {
 	cout << "\nCreating world container...";
 
-	world = vector<shared_ptr<Room>>(C::WORLD_X_DIMENSION * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION);
+	world = vector<room_pointer>(C::WORLD_X_DIMENSION * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION);
 }
 
 void World::load_terrain_map()
@@ -211,7 +216,7 @@ void World::load_terrain_map()
 		// save the final terrain to disk
 		gen.save_terrain();
 
-		terrain = make_unique<vector<vector<char>>>(gen.get_terrain());
+		terrain = R::make_unique<std::vector<std::vector<char>>>(gen.get_terrain());
 	}
 }
 
@@ -241,13 +246,13 @@ void World::generate_room_at(const int & x, const int & y, const int & z)
 		if (!room_node)
 		{
 			// create the room
-			shared_ptr<Room> room = create_room(x, y, z);
+			room_pointer room = create_room(x, y, z);
 
 			// add it to the world...
-			this->room_at(x, y, z) = room;
+			room_pointer_at(x, y, z) = std::move(room);
 
 			// ...and the z-stack
-			this->add_room_to_z_stack(z, room, z_stack);
+			this->add_room_to_z_stack(z, room_at(x, y, z), z_stack);
 		}
 	}
 	else
@@ -256,13 +261,13 @@ void World::generate_room_at(const int & x, const int & y, const int & z)
 		// create specified room and add it to it
 
 		// create the room
-		shared_ptr<Room> room = create_room(x, y, z);
+		room_pointer room = create_room(x, y, z);
 
 		// add it to the world...
-		this->room_at(x, y, z) = room;
+		room_pointer_at(x, y, z) = std::move(room);
 
 		// ...and the z-stack
-		this->add_room_to_z_stack(z, room, z_stack);
+		this->add_room_to_z_stack(z, room_at(x, y, z), z_stack);
 
 		// save the stack to disk
 		z_stack.save_file(z_stack_path.c_str());
@@ -287,7 +292,7 @@ void World::load_vertical_rooms_to_XML(const int & ix, const int & iy, xml_docum
 void World::add_room_to_world(xml_node & room_node, const int & x, const int & y, const int & z)
 {
 	// create an empty room
-	shared_ptr<Room> room = make_shared<Room>();
+	room_pointer room(R::make_unique<Room>());
 
 	// set whether or not the room is water (off-island or river/lake)
 	room->set_water_status(room_node.attribute(C::XML_IS_WATER.c_str()).as_bool());
@@ -296,10 +301,18 @@ void World::add_room_to_world(xml_node & room_node, const int & x, const int & y
 	room_node.append_attribute(C::XML_IS_WATER.c_str()).as_bool(room->is_water());
 
 	// for each item in the room
-	for (const xml_node & item : room_node.children(C::XML_ITEM.c_str()))
+	for (const xml_node & item_node : room_node.children(C::XML_ITEM.c_str()))
 	{
 		// use the item ID to make a new item and add it to the room
-		room->add_item(Craft::make(item.child_value()));
+
+		// create the item
+		shared_ptr<Item> item = Craft::make(item_node.child_value());
+
+		// set the item's health
+		item->set_health(item_node.attribute(C::XML_ITEM_HEALTH.c_str()).as_int());
+
+		// add the item to the room
+		room->add_item(item);
 	}
 
 	// for each surface in the room
@@ -338,7 +351,7 @@ void World::add_room_to_world(xml_node & room_node, const int & x, const int & y
 
 	// extract the chest node
 	const xml_node chest_node = room_node.child(C::XML_CHEST.c_str());
-	
+
 	// if the extracted chest node exists
 	if (!chest_node.empty())
 	{
@@ -375,9 +388,9 @@ void World::add_room_to_world(xml_node & room_node, const int & x, const int & y
 		// add the chest to the room
 		room->set_chest(make_shared<Chest>(chest));
 	}
-	
+
 	// add room to world
-	room_at(x, y, z) = room;
+	room_pointer_at(x, y, z) = std::move(room);
 }
 
 // move specific room into memory
@@ -426,7 +439,7 @@ void World::load_room_to_world(const int & x, const int & y, const int & z)
 }
 
 // move a passed room to disk
-void World::unload_room(const int & x, const int & y, const int & z, const shared_ptr<Room> & room)
+void World::unload_room(const int & x, const int & y, const int & z, const World::room_pointer::pointer room)
 {
 	// Unloads passed room. Can be called even if the room doesn't exist in the world structure
 
@@ -451,7 +464,7 @@ void World::unload_room(const int & x, const int & y, const int & z, const share
 }
 
 // add a room to a z_stack at a given index
-void World::add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xml_document & z_stack) const
+void World::add_room_to_z_stack(const int & z, const World::room_pointer::pointer room, xml_document & z_stack) const
 {
 	// delete the room node if it already exists
 	z_stack.remove_child(("room-" + R::to_string(z)).c_str());
@@ -469,6 +482,9 @@ void World::add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xm
 	{
 		// create a node for an item
 		xml_node item_node = room_node.append_child(C::XML_ITEM.c_str());
+
+		// append the item's health as an attribute
+		item_node.append_attribute(C::XML_ITEM_HEALTH.c_str()).set_value(item_it->second->get_health());
 
 		// append the item's ID
 		item_node.append_child(node_pcdata).set_value(item_it->first.c_str());
@@ -512,7 +528,7 @@ void World::add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xm
 			door_node.append_attribute(C::XML_DOOR_FACTION.c_str()).set_value(door->get_faction_ID().c_str());
 		}
 	}
-	
+
 	// if there is a chest in this room
 	if (room->has_chest())
 	{
@@ -522,10 +538,10 @@ void World::add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xm
 
 		// extract the chest from the room
 		const shared_ptr<Chest> chest = room->get_chest(); // ****** HERE
-		
+
 		// add a health attribute to the chest node
 		chest_node.append_attribute(C::XML_CHEST_HEALTH.c_str()).set_value(chest->get_health());
-		
+
 		// add equipment and material nodes to the chest node
 		xml_node equipment_node = chest_node.append_child(C::XML_CHEST_EQUIPMENT.c_str());
 		xml_node material_node = chest_node.append_child(C::XML_CHEST_MATERIALS.c_str());
@@ -544,7 +560,7 @@ void World::add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xm
 		for (map<string, shared_ptr<Material>>::const_iterator material_it = chest_material_contents.cbegin();
 			material_it != chest_material_contents.cend(); ++material_it)
 		{
-			// append a node where name is the material's ID, with an attribute with a name of "XML_CHEST_MATERIALS_COUNT", and a value of the material's count 
+			// append a node where name is the material's ID, with an attribute with a name of "XML_CHEST_MATERIALS_COUNT", and a value of the material's count
 			/* xml_node item_node = */ material_node.append_child(material_it->first.c_str()).append_attribute(C::XML_CHEST_MATERIALS_COUNT.c_str()).set_value(material_it->second->amount);
 		}
 	}
@@ -552,9 +568,9 @@ void World::add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xm
 }
 
 // create a new empty room given its coordinates and the world terrain
-shared_ptr<Room> World::create_room(const int & x, const int & y, const int & z) const
+World::room_pointer World::create_room(const int & x, const int & y, const int & z) const
 {
-	shared_ptr<Room> room = make_shared<Room>();
+	room_pointer room = R::make_unique<Room>();
 
 	// if the room is ground level and the terrain map indicates the room is forest
 	if (z == C::GROUND_INDEX && terrain->operator[](x)[y] == C::FOREST_CHAR)
@@ -568,4 +584,9 @@ shared_ptr<Room> World::create_room(const int & x, const int & y, const int & z)
 	}
 
 	return room;
+}
+
+void World::erase_room_from_memory(const int & x, const int & y, const int & z)
+{
+	(world.begin() + ((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + z))->reset();
 }

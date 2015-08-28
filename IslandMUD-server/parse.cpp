@@ -32,7 +32,7 @@ void Parse::initialize()
 		P::dict["wait"] = P::dict["pause"] = P::dict["consider"] = P::dict["delay"] = P::dict["advance"] = C::WAIT_COMMAND;
 		P::dict["with"] = C::WITH_COMMAND;
 		P::dict["construct"] = P::dict["build"] = P::dict["erect"] = C::CONSTRUCT_COMMAND;
-		P::dict["attack"] = P::dict["smash"] = P::dict["strike"] = P::dict["bash"] = P::dict["break"] = P::dict["damage"] = P::dict["stab"] = P::dict["slash"] = C::ATTACK_COMMAND;
+		P::dict["attack"] = P::dict["smash"] = P::dict["strike"] = P::dict["bash"] = P::dict["break"] = P::dict["damage"] = P::dict["stab"] = P::dict["slash"] = P::dict["chop"] = C::ATTACK_COMMAND;
 
 		// items
 
@@ -42,6 +42,7 @@ void Parse::initialize()
 		P::dict["anvil"] = C::ANVIL_ID;
 		P::dict["tree"] = C::TREE_ID;
 		P::dict["chest"] = P::dict["crate"] = C::CHEST_ID;
+		P::dict["log"] = C::LOG_ID;
 
 		// items -> materials
 		P::dict["stone"] = P::dict["rock"] = C::STONE_ID;

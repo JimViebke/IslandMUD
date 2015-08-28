@@ -165,5 +165,6 @@
     <None Include="ClassDiagram - NPCs.cd">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\Rakefile" />
   </ItemGroup>
 </Project>

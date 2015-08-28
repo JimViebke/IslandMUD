@@ -54,8 +54,6 @@ string Character::login(World & world)
 	// spawn in the player
 	world.room_at(x, y, z)->add_actor(this->name);
 
-
-
 	// select the level node
 	const xml_node level_node = user_data_xml.child(C::XML_USER_LEVELS.c_str());
 
@@ -99,16 +97,17 @@ string Character::login(World & world)
 
 
 	// for each item node of the equipment node
-	for (const xml_node & equipment : user_data_xml.child(C::XML_USER_EQUIPMENT.c_str()).children())
+	for (const xml_node & equipment_node : user_data_xml.child(C::XML_USER_EQUIPMENT.c_str()).children())
 	{
-		// use the name of the node to create an equipment object and add it to the player's equipment inventory
-		equipment_inventory.insert(pair<string, shared_ptr<Equipment>>(
-			equipment.name(),
-			R::convert_to<Equipment>(Craft::make(equipment.name()))
-			));
+		// create the item
+		shared_ptr<Equipment> equipment = R::convert_to<Equipment>(Craft::make(equipment_node.name()));
+
+		// extract the value of the health attribute and use it to set the item's health
+		equipment->set_health(equipment_node.attribute(C::XML_ITEM_HEALTH.c_str()).as_int());
+
+		// add the item to the player's inventory
+		equipment_inventory.insert(pair<string, shared_ptr<Equipment>>(equipment->name, equipment));
 	}
-
-
 
 	// for each item in the material node
 	for (const xml_node & material : user_data_xml.child(C::XML_USER_MATERIALS.c_str()).children())
@@ -163,6 +162,9 @@ string Character::logout()
 	{
 		// save the equipment to a new node under the equipment node
 		xml_node equipment = equipment_node.append_child(it->first.c_str());
+
+		// append a health attribute to the equipment node and set its value to the health of the equipment
+		equipment.append_attribute(C::XML_ITEM_HEALTH.c_str()).set_value(it->second->get_health());
 	}
 
 	// for each material in the user's inventory
@@ -1042,6 +1044,65 @@ string Character::attack_door(const string & surface_ID, World & world)
 	// this feedback might not be correct for all cases
 	return "There is no door to your " + surface_ID;
 }
+string Character::attack_item(const string & target_ID, World & world)
+{
+	// if the target isn't here
+	if (!world.room_at(x, y, z)->contains_item(target_ID))
+	{
+		return "There is no " + target_ID + " here.";
+	}
+
+	// if the user has an item equipped
+	if (equipped_item != nullptr)
+	{
+		// if the attacking implement is not in the damage tables
+		if (C::damage_tables.find(equipped_item->name) == C::damage_tables.cend())
+		{
+			return "You can't do that with a(n) " + equipped_item->name + ".";
+		}
+
+		// extract the damage table for the attacking implement
+		const map<string, int> damage_table = C::damage_tables.find(equipped_item->name)->second;
+
+		// if the damage table does not have an entry for the target item ID
+		if (damage_table.find(target_ID) == damage_table.cend())
+		{
+			return "You can't do that to a " + target_ID + ".";
+		}
+
+		// damage the item, return a different message depending of if the item was destroyed or damaged
+		if (world.room_at(x, y, z)->damage_item(target_ID, damage_table.find(target_ID)->second))
+		{
+			return "You destroy the " + target_ID + " using your " + equipped_item->name + ".";
+		}
+		else
+		{
+			return "You damage the " + target_ID + " using your " + equipped_item->name + ".";
+		}
+	}
+	else // the user does not have an item equipped, do a barehanded attack
+	{
+		// extract the damage table for a bare-handed attack
+		const map<string, int> damage_table = C::damage_tables.find(C::ATTACK_COMMAND)->second;
+
+		// if the damage table does not contain an entry for the target
+		if (damage_table.find(target_ID) == damage_table.cend())
+		{
+			return "You can't do that to a " + target_ID + ".";
+		}
+
+		// the damage table does contain an entry for the target
+		if (world.room_at(x, y, z)->damage_item(target_ID, damage_table.find(target_ID)->second))
+		{
+			return "You destroy the " + target_ID + " using your bare hands.";
+		}
+		else
+		{
+			return "You damage the " + target_ID + " using your bare hands.";
+		}
+	}
+
+}
 
 // movement info
 string Character::validate_movement(const int & cx, const int & cy, const int & cz, const string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const
@@ -1079,8 +1140,8 @@ string Character::validate_movement(const int & cx, const int & cy, const int & 
 		direction_ID == C::NORTH_WEST || direction_ID == C::NORTH_EAST ||
 		direction_ID == C::SOUTH_EAST || direction_ID == C::SOUTH_WEST)
 	{
-		const shared_ptr<Room> current_room = world.room_at(cx, cy, cz);
-		const shared_ptr<Room> destination_room = world.room_at(cx + dx, cy + dy, cz);
+		const World::room_pointer::pointer current_room = world.room_at(cx, cy, cz);
+		const World::room_pointer::pointer destination_room = world.room_at(cx + dx, cy + dy, cz);
 
 		if (direction_ID == C::NORTH_WEST)
 		{

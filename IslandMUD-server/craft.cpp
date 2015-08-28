@@ -20,6 +20,7 @@ shared_ptr<Item> Craft::make(const string & item_ID)
 	else if (item_ID == C::SMELTER_ID) { return make_shared<Smelter>(); }
 	else if (item_ID == C::FORGE_ID) { return make_shared<Forge>(); }
 	else if (item_ID == C::HAMMER_ID) { return make_shared<Hammer>(); }
+	else if (item_ID == C::LOG_ID) { return make_shared<Log>(); }
 	else if (item_ID == C::STAFF_ID) { return make_shared<Staff>(); }
 	else if (item_ID == C::STICK_ID) { return make_shared<Stick>(); }
 	else if (item_ID == C::STONE_ID) { return make_shared<Rock>(); }
