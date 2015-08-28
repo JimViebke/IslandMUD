@@ -7,7 +7,7 @@ Jun 3 2015 */
 string NPC::get_objectives() const
 {
 	stringstream result;
-	result << name << "'s objectives:\n";
+	result << name << " (" << x << "," << y << ") objectives:\n";
 	for (unsigned i = 0; i < objectives.size(); ++i)
 	{
 		// verb, direction, material, noun;
