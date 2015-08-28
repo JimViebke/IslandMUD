@@ -184,7 +184,11 @@ public:
 	// random utils
 	static int random_int_from(const int & min, const int & max)
 	{
-		return min + static_cast<int>((rand() / static_cast<double>(RAND_MAX + 1)) * ((max + 1) - min));
+		// #ifdef _WIN32
+		return min + (rand() % (int)(max - min + 1));
+		// #else           
+		// return min + (rand() % (int)(max - min + 1));
+		// #endif
 	}
 
 	// time
