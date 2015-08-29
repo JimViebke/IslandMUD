@@ -164,13 +164,16 @@ public:
 	{
 		int x_diff = R::difference(x1, x2);
 		int y_diff = R::difference(y1, y2);
-		return static_cast<int>(sqrt( // use Pythagoras's theorem
+		return static_cast<int>(sqrt( // use Pythagoras' theorem
 			(x_diff * x_diff) +
 			(y_diff * y_diff)
 			));
 	}
 	static int diagonal_distance(const int & x1, const int & y1, const int & x2, const int & y2)
 	{
+		// Because this uses different movement costs, this works for AI pathfinding, but
+		// not so much for determining if a coordinate is visible from another coordinate.
+
 		// a diagonal move = (sqrt(2) * straight move)
 		int dx = abs(x1 - x2);
 		int dy = abs(y1 - y2);
