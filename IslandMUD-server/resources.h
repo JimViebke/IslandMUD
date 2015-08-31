@@ -118,7 +118,7 @@ public:
 		}
 		return false;
 	}
-	template <typename T> static inline void erase_element_from_vector(vector<T> & vec, T erase_element)
+	template <typename T> static inline void erase_element_from_vector(vector<T> & vec, const T & erase_element)
 	{
 		vec.erase(find(vec.begin(), vec.end(), erase_element));
 	}
