@@ -327,6 +327,9 @@ const map<string, map<string, int>> C::damage_tables =
 	} }
 };
 
+// AI constants
+const int C::AI_MAX_OBJECTIVE_ATTEMPTS = 50; // the point at which an AI must return control
+
 // AI movement costs
 const int C::AI_MOVEMENT_COST = 10; // 1 * 10
 const int C::AI_MOVEMENT_COST_DIAGONAL = 14; // sqrt(2) * 10

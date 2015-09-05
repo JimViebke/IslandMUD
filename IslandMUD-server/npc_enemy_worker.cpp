@@ -24,14 +24,18 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 		plan_to_get(C::AXE_ID);
 	}
 
+	// attempt to move to the destination, return if successful
+	if (make_path_movement(world)) { return; }
+
 	// as an optimizations, only enter the next block if the AI doesn't have an axe
 	if (i_dont_have(C::AXE_ID))
 	{
-		// in this block: take the item if it's here, move to the item if it is visible and reachable,
+		// in this block: take the item if it's here, move to the item if it is visible and reachable, otherwise plan to craft the item
+		// and aquire those resources
 		for (deque<Objective>::iterator objective_iterator = objectives.begin();
 			objective_iterator != objectives.end();)
 		{
-
+			// if the NPC is searching for an item
 			if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE)
 			{
 				// if the item is here, take it, remove the current objective, and return
@@ -74,7 +78,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				}
 			}
 
-			// if I am planning on moving to an instance 
+			// if the NPC is am planning on moving to an instance 
 			if (objective_iterator->verb == C::AI_OBJECTIVE_GOTO)
 			{
 				if (one_can_craft(objective_iterator->purpose) && i_have_all_ingredients_to_craft(objective_iterator->purpose))
@@ -92,8 +96,6 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 			// objectives were not modified, move to next objective
 			++objective_iterator;
 		}
-
-
 
 		// the next block: work through all objectives, see which objectives can be resolved through crafting attemps.
 		for (deque<Objective>::iterator objective_iterator = objectives.begin();
@@ -133,13 +135,20 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 			}
 		}
 	}
-	
 
 
-	// for each objective
+
+	// count how many objectives the AI attempts, return after this passes AI_MAX_OBJECTIVE_ATTEMPTS to
+	// prevent AI from getting stuck in infinite loops if no objective can be completed
+	int objective_attempts = 0;
+
+	// the next block: travel to each coordinate and construct structures as planned
 	for (deque<Objective>::iterator objective_it = objectives.begin();
 		objective_it != objectives.end();)
 	{
+		// limit how many objective attempts the AI can make before control is returned
+		if (++objective_attempts > C::AI_MAX_OBJECTIVE_ATTEMPTS) { return; }
+
 		// check if the objective is a construction objective
 		if (objective_it->verb == C::AI_OBJECTIVE_CONSTRUCT)
 		{
@@ -168,7 +177,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 
 					// chop the tree
 					attack_item(C::TREE_ID, world);
-					
+
 					return; // finished update
 				}
 
@@ -214,18 +223,41 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					(construct_surface(objective_it->material, objective_it->direction, world).find("You construct a ")))
 					!= string::npos)
 				{
+					// if this door was placed against another door, add another door elsewhere to increase the chances that
+					// this room has a door of its own (one that isn't shared with an adjacent room
+					if (adjacent_room_has_opposing_door)
+					{
+						// starting with the current objective
+						deque<Objective>::iterator it = objective_it;
+						// for each objective
+						while (++it != objectives.cend())
+						{
+							// if the objective is a construction objective AND its modifier is false (no door will be constructed)
+							if (it->verb == C::AI_OBJECTIVE_CONSTRUCT && !it->modifier)
+							{
+								// set the flag to true
+								it->modifier = true;
+								// we're finished
+								break;
+							}
+						}
+					}
+
 					// if successful, erase the objective and return
 					objectives.erase(objective_it);
 					return;
 				}
 			}
 			// we are not at the destination, attempt to pathfind to it
-			else if (pathfind(objective_it->objective_x, objective_it->objective_y, world))
+			else if (save_path_to(objective_it->objective_x, objective_it->objective_y, world))
 			{
 				return;
 			}
 			// we could not pathfind to the destination, test if it is out of sight range
-			else if (R::diagonal_distance(x, y, objective_it->objective_x, objective_it->objective_y) > C::VIEW_DISTANCE)
+			// else if (R::diagonal_distance(x, y, objective_it->objective_x, objective_it->objective_y) > C::VIEW_DISTANCE)
+			else if (world.room_at(objective_it->objective_x, objective_it->objective_y, z) == nullptr ||
+				(world.room_at(objective_it->objective_x, objective_it->objective_y, z) != nullptr &&
+				!world.room_at(objective_it->objective_x, objective_it->objective_y, z)->is_observed_by(this->name)))
 			{
 				// The location is out of sight range. Move in the direction of the destination.
 
@@ -235,65 +267,106 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					// don't pathfind to corner; pathfind to the edge of the visible area that
 					// is inline with the destination
 
-					if (pathfind(
+					if (save_path_to(
 						(((x - objective_it->objective_x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x - C::VIEW_DISTANCE)),
 						(((y - objective_it->objective_y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y - C::VIEW_DISTANCE)), world))
 					{
-						return;
+						// attempt to move to the destination, return if successful
+						if (make_path_movement(world)) { return; }
 					}
 				}
 
 				if (x > objective_it->objective_x && y < objective_it->objective_y) // northeast
 				{
-					if (pathfind(
+					if (save_path_to(
 						(((x - objective_it->objective_x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x - C::VIEW_DISTANCE)),
 						(((objective_it->objective_y - y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y + C::VIEW_DISTANCE)), world))
 					{
-						return;
+						if (make_path_movement(world)) { return; }
 					}
 				}
 
 				if (x < objective_it->objective_x && y > objective_it->objective_y) // southwest
 				{
-					if (pathfind(
+					if (save_path_to(
 						(((objective_it->objective_x - x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x + C::VIEW_DISTANCE)),
 						(((y - objective_it->objective_y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y - C::VIEW_DISTANCE)), world))
 					{
-						return;
+						if (make_path_movement(world)) { return; }
 					}
 				}
 
 				if (x < objective_it->objective_x && y < objective_it->objective_y) // southeast
 				{
-					if (pathfind(
+					if (save_path_to(
 						(((objective_it->objective_x - x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x + C::VIEW_DISTANCE)),
 						(((objective_it->objective_y - y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y + C::VIEW_DISTANCE)), world))
 					{
-						return;
+						if (make_path_movement(world)) { return; }
 					}
 				}
 
-				// execution reaches here if a diagonal movment failed or the target is directly n/e/s/w
+				// execution reaches here if a diagonal movement failed or the target is directly n/e/s/w or
+				// the target is visible but unreachable
 
 				if (x > objective_it->objective_x) // north
 				{
-					if (pathfind(x - C::VIEW_DISTANCE, y, world)) { return; }
+					if (save_path_to(x - C::VIEW_DISTANCE, y, world))
+					{ 
+						// attempt to move to the destination, return if successful
+						if (make_path_movement(world)) { return; }
+					}
 				}
 
 				if (x < objective_it->objective_x) // south
 				{
-					if (pathfind(x + C::VIEW_DISTANCE, y, world)) { return; }
+					if (save_path_to(x + C::VIEW_DISTANCE, y, world))
+					{
+						if (make_path_movement(world)) { return; }
+					}
 				}
 
 				if (y > objective_it->objective_y) // west
 				{
-					if (pathfind(x, y - C::VIEW_DISTANCE, world)) { return; }
+					if (save_path_to(x, y - C::VIEW_DISTANCE, world))
+					{
+						if (make_path_movement(world)) { return; }
+					}
 				}
 
 				if (y < objective_it->objective_y) // east
 				{
-					if (pathfind(x, y + C::VIEW_DISTANCE, world)) { return; }
+					if (save_path_to(x, y + C::VIEW_DISTANCE, world))
+					{
+						if (make_path_movement(world)) { return; }
+					}
 				}
+			}
+			else
+			{
+				// The destination is visible, but the NPC can't find a path to it.
+				// Move the current objective to the end. Handle the next objective.
+
+				// if the NPC is already on the last objective and could not pathfind to it
+				if ((--objectives.end()) == objective_it)
+				{
+					return; // give up
+				}
+
+				// copy the current objective
+				const Objective obj = *objective_it;
+
+				// erase the current objective
+				objectives.erase(objective_it);
+
+				// add the objective to the end of the objective deque
+				objectives.push_back(obj);
+
+				// set the current objective back to the beginning of the list
+				objective_it = objectives.begin();
+
+				// begin the next iteration
+				continue;
 			}
 		}
 
@@ -315,6 +388,10 @@ void Hostile_NPC_Worker::plan_fortress()
 	{
 		fortress_x = R::random_int_from(0, C::WORLD_X_DIMENSION);
 		fortress_y = R::random_int_from(0, C::WORLD_Y_DIMENSION);
+
+		// debugging
+		// cout << "fortress_x=" << fortress_x << " fortress_y=" << fortress_y << endl;
+		// cin.ignore();
 	} while (R::euclidean_distance(C::WORLD_X_DIMENSION / 2, C::WORLD_Y_DIMENSION / 2,
 		fortress_x + (FORTRESS_HEIGHT / 2),
 		fortress_y + (FORTRESS_WIDTH / 2)) >= C::WORLD_X_DIMENSION * 0.45);
