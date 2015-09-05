@@ -161,6 +161,9 @@ const string C::XML_CURRENT_HEALTH = "current_health";
 const int C::DEFAULT_ITEM_MIN_HEALTH = 0;
 const int C::DEFAULT_ITEM_MAX_HEALTH = 100;
 
+// int to char conversion
+const vector<char> C::numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+
 // store a vector of all valid surface ids
 const vector<string> C::surface_ids = { C::NORTH, C::EAST, C::SOUTH, C::WEST, C::FLOOR, C::CEILING };
 

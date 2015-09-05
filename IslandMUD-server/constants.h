@@ -176,6 +176,9 @@ public:
 		DEFAULT_ITEM_MIN_HEALTH,
 		DEFAULT_ITEM_MAX_HEALTH;
 
+	// int to char conversion
+	static const vector<char> numbers;
+
 	// surface information
 	static const vector<string> surface_ids;
 	static const vector<string> direction_ids;
