@@ -87,7 +87,7 @@ public:
 	}
 
 	// movement
-	void static inline assign_movement_deltas(const string & direction_ID, int & dx, int & dy, int & dz)
+	static inline void assign_movement_deltas(const string & direction_ID, int & dx, int & dy, int & dz)
 	{
 		// express movement through three dimensions in dx, dy, dz
 		// If direction_ID is invalid, output arguments will not be modified.
@@ -105,6 +105,28 @@ public:
 
 		// nothing to return, values passed by reference
 	}
+	static inline string get_movement_direction(const int & x, const int & y, const int & dest_x, const int & dest_y)
+	{
+		if (x == dest_x) // east or west
+		{
+			if (y + 1 == dest_y) { return C::EAST; }
+			if (y - 1 == dest_y) { return C::WEST; }
+		}
+		else if (x + 1 == dest_x) // south
+		{
+			if (y + 1 == dest_y) { return C::SOUTH_EAST; }
+			if (y == dest_y) { return C::SOUTH; }
+			if (y - 1 == dest_y) { return C::SOUTH_WEST; }
+		}
+		else if (x - 1 == dest_x) // north
+		{
+			if (y + 1 == dest_y) { return C::NORTH_EAST; }
+			if (y == dest_y) { return C::NORTH; }
+			if (y - 1 == dest_y) { return C::NORTH_WEST; }
+		}
+
+		return ""; // empty string object
+	}
 
 	// vector utilities
 	template <typename T> static inline bool contains(const vector<T> & v, const T & find_element)
@@ -118,7 +140,7 @@ public:
 		}
 		return false;
 	}
-	template <typename T> static inline void erase_element_from_vector(vector<T> & vec, T erase_element)
+	template <typename T> static inline void erase_element_from_vector(vector<T> & vec, const T & erase_element)
 	{
 		vec.erase(find(vec.begin(), vec.end(), erase_element));
 	}
@@ -164,13 +186,16 @@ public:
 	{
 		int x_diff = R::difference(x1, x2);
 		int y_diff = R::difference(y1, y2);
-		return static_cast<int>(sqrt( // use Pythagoras's theorem
+		return static_cast<int>(sqrt( // use Pythagoras' theorem
 			(x_diff * x_diff) +
 			(y_diff * y_diff)
 			));
 	}
 	static int diagonal_distance(const int & x1, const int & y1, const int & x2, const int & y2)
 	{
+		// Because this uses different movement costs, this works for AI pathfinding, but
+		// not so much for determining if a coordinate is visible from another coordinate.
+
 		// a diagonal move = (sqrt(2) * straight move)
 		int dx = abs(x1 - x2);
 		int dy = abs(y1 - y2);
@@ -184,7 +209,11 @@ public:
 	// random utils
 	static int random_int_from(const int & min, const int & max)
 	{
-		return min + static_cast<int>((rand() / static_cast<double>(RAND_MAX + 1)) * ((max + 1) - min));
+		// #ifdef _WIN32
+		return min + (rand() % (int)(max - min + 1));
+		// #else           
+		// return min + (rand() % (int)(max - min + 1));
+		// #endif
 	}
 
 	// time

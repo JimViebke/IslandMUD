@@ -7,7 +7,7 @@ Jun 3 2015 */
 string NPC::get_objectives() const
 {
 	stringstream result;
-	result << name << "'s objectives:\n";
+	result << name << " (" << x << "," << y << ") objectives:\n";
 	for (unsigned i = 0; i < objectives.size(); ++i)
 	{
 		// verb, direction, material, noun;
@@ -563,6 +563,198 @@ bool NPC::pathfind_to_closest_item(const string & item_id, World & world)
 		current_room = parent_room;
 
 	} while (true);
+}
+bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
+{
+	// leave this for debugging
+	// cout << "\nSearching for path from " << x << "," << y << " to " << x_dest << "," << y_dest << ".\n";
+
+	/* 	Pathfinding resources:
+	http://www.redblobgames.com/pathfinding/a-star/introduction.html
+	http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#S7
+
+	F = G + H
+
+	G : actual cost to reach a certain room
+	H : estimated cost to reach destination from a certain room
+	F-cost = G + H */
+
+	// start by removing any existing planned path
+	path.clear();
+
+	vector<Node> open_list, closed_list;
+
+	// Add current room to open list.
+	open_list.push_back(Node(this->x, this->y, ""));
+
+	// calculate current room's costs. G cost starts at 0.
+	open_list[0].set_g_h_f(0, R::diagonal_distance(x_dest, y_dest, this->x, this->y));
+
+	// Do
+	do
+	{
+		// -- Find lowest f - cost room on open list
+		// -- Move it to closed list
+
+		// find the cheapest room in the open list. Select it and move it to the closed list
+		const Node current_room = move_and_get_lowest_g_cost(open_list, closed_list);
+
+		// for each room adjacent to current
+		for (const string & direction : C::direction_ids)
+		{
+			if (direction == C::UP || direction == C::DOWN) { continue; } // only pathfinding in 2D now
+
+			// calculate the location deltas
+			int dx = 0, dy = 0, dz = 0;
+			R::assign_movement_deltas(direction, dx, dy, dz);
+
+			// skip if the room if it is out of bounds,
+			if (!R::bounds_check(current_room.x + dx, current_room.y + dy, C::GROUND_INDEX)) { continue; }
+			// or it is not loaded,
+			if (world.room_at(current_room.x + dx, current_room.y + dy, C::GROUND_INDEX) == nullptr) { continue; }
+			// or it is not within view distance,
+			if (!world.room_at(current_room.x + dx, current_room.y + dy, C::GROUND_INDEX)->is_observed_by(this->name)) { continue; }
+			// or we can not travel to it from the current room
+			if (validate_movement(current_room.x, current_room.y, C::GROUND_INDEX, direction, dx, dy, 0, world) != C::GOOD_SIGNAL) { continue; }
+
+			// create a node to select the next adjacent room
+			Node adjacent_room(current_room.x + dx, current_room.y + dy, direction);
+
+			// pass if the adjacent node is already on the closed list
+			if (room_in_node_list(adjacent_room.x, adjacent_room.y, closed_list)) { continue; }
+
+			// if the room is not on the open list
+			if (!room_in_node_list(adjacent_room.x, adjacent_room.y, open_list))
+			{
+				// make the current room the parent of the adjacent room
+				adjacent_room.parent_x = current_room.x;
+				adjacent_room.parent_y = current_room.y;
+
+				// calculate the movement cost
+				int move_cost = (
+					// check if the NPC will have to move through a forest
+					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains_item(C::TREE_ID))
+					?
+					// determine if the movement is in a primary direction
+					((R::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
+					:
+					((R::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
+					);
+
+				// use the g- and h-score to set the g-, h-, and f-score.
+				adjacent_room.set_g_h_f(
+					current_room.g + move_cost,
+					R::diagonal_distance(x_dest, y_dest, adjacent_room.x, adjacent_room.y));
+			}
+			// else the room is on the open list
+			else
+			{
+				// pull adjacent_room out of open_list
+				for (unsigned i = 0; i < open_list.size(); ++i) // for each node in the open list
+				{
+					if (open_list[i].x == adjacent_room.x && open_list[i].y == adjacent_room.y) // if the node is the current room
+					{
+						adjacent_room = get_node_at(adjacent_room.x, adjacent_room.y, open_list); // save it
+						open_list.erase(open_list.begin() + i); // erase the original
+						break; // adjacent_room is now the one from the list
+					}
+				}
+
+				// calculate the move cost
+				int move_cost = (
+					// check if the NPC will have to move through a forest
+					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains_item(C::TREE_ID))
+					?
+					// determine if the movement is in a primary direction
+					((R::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
+					:
+					((R::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
+					);
+
+				// if this way to the room is cheaper than the current best cost to the room
+				if (current_room.g + move_cost < adjacent_room.g)
+				{
+					// update the adjacent room's parent room to the current room
+					adjacent_room.parent_x = current_room.x;
+					adjacent_room.parent_y = current_room.y;
+
+					// use the g- and h-score to set the g-, h-, and f-score.
+					adjacent_room.set_g_h_f(
+						current_room.g + move_cost,
+						R::diagonal_distance(x_dest, y_dest, adjacent_room.x, adjacent_room.y));
+				}
+			}
+
+			// add the adjacent room to the open list
+			open_list.push_back(adjacent_room);
+
+		} // end for each adjacent room
+
+		// keep searching as long as there are still rooms to search
+	} while (open_list.size() > 0);
+
+
+
+	// get the target (destination) room
+	Node current_room = get_node_at(x_dest, y_dest, closed_list);
+
+	// if the target room is not in the closed list, a path could not be found
+	if (current_room.x == -1 || current_room.y == -1) 
+	{
+		return false;
+	}
+	else
+	{
+		// the target room is in the closed list, add it to the coordinate path
+		path.push_back(Coordinate(current_room.x, current_room.y, C::GROUND_INDEX));
+	}
+
+	// Starting from the target room, continue finding the parent room until the current room is found
+	// (this represents the path in reverse)
+	// Add each coordinate to the NPC's path
+	do
+	{
+		// get the parent room of the current room
+		Node parent_room = get_node_at(current_room.parent_x, current_room.parent_y, closed_list);
+
+		// leave this here for debugging
+		// cout << "\nI can get to " << current_room.x << "," << current_room.y << " from " << parent_room.x << "," << parent_room.y << ".";
+
+		// if the parent of current_room is our location
+		if (parent_room.x == this->x && parent_room.y == this->y)
+		{
+			return true; // we're done here
+		}
+		// if there is no parent room in the closed list (?!)
+		else if (parent_room.x == -1 || parent_room.y == -1)
+		{
+			return false; // something went horribly wrong
+		}
+
+		// add the parent room's coordinates to the path
+		path.push_front(Coordinate(parent_room.x, parent_room.y, C::GROUND_INDEX));
+
+		// move up the path by one room
+		current_room = parent_room;
+
+	} while (true);
+}
+bool NPC::make_path_movement(World & world)
+{
+	// if the NPC is currently pathfinding to a destination
+	if (!path.empty())
+	{
+		// attempt to move to the next node
+		if (this->move(R::get_movement_direction(x, y, path.begin()->coord_x, path.begin()->coord_y), world).find("You move ") != string::npos)
+		{
+			// if successful, remove the coordinate that we travelled to
+			path.erase(path.begin());
+			return true; // finished
+		}
+	}
+
+	// there was no path to follow or a move could not be made with the existing path
+	return false;
 }
 
 // Node member setter

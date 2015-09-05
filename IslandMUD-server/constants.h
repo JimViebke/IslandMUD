@@ -222,6 +222,10 @@ public:
 
 	const static map<string, map<string, int>> damage_tables;
 
+	// AI constants
+	const static int
+		AI_MAX_OBJECTIVE_ATTEMPTS; // the point at which an AI must return control
+
 	const static int
 		// AI movement costs
 		AI_MOVEMENT_COST,
