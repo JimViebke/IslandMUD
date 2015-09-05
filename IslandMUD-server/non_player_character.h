@@ -127,6 +127,7 @@ protected:
 	bool pathfind(const int & x_dest, const int & y_dest, World & world);
 	bool pathfind_to_closest_item(const string & item_id, World & world);
 	bool save_path_to(const int & x_dest, const int & y_dest, World & world);
+	bool make_path_movement(World & world);
 
 private:
 

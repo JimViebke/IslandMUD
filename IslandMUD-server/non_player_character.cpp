@@ -739,6 +739,23 @@ bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
 
 	} while (true);
 }
+bool NPC::make_path_movement(World & world)
+{
+	// if the NPC is currently pathfinding to a destination
+	if (!path.empty())
+	{
+		// attempt to move to the next node
+		if (this->move(R::get_movement_direction(x, y, path.begin()->coord_x, path.begin()->coord_y), world).find("You move ") != string::npos)
+		{
+			// if successful, remove the coordinate that we travelled to
+			path.erase(path.begin());
+			return true; // finished
+		}
+	}
+
+	// there was no path to follow or a move could not be made with the existing path
+	return false;
+}
 
 // Node member setter
 void NPC::Node::set_g_h_f(const int & set_g, const int & set_h)
