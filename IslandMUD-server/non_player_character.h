@@ -43,8 +43,17 @@ protected:
 
 	enum Objective_Priority { low_priority, high_priority };
 
+	class Coordinate
+	{
+	public:
+		int coord_x, coord_y, coord_z;
+		Coordinate(const int & set_x, const int & set_y, const int & set_z) :
+			coord_x(set_x), coord_y(set_y), coord_z(set_z) {}
+	};
+
 	string ai_type;
 	deque<Objective> objectives;
+	deque<Coordinate> path;
 
 	// this can only be instantiated by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
 	Non_Player_Character(const string & name, const string & faction_ID, const string & set_ai_type) : Character(name, faction_ID)
@@ -117,6 +126,7 @@ protected:
 	// returns true if successful
 	bool pathfind(const int & x_dest, const int & y_dest, World & world);
 	bool pathfind_to_closest_item(const string & item_id, World & world);
+	bool save_path_to(const int & x_dest, const int & y_dest, World & world);
 
 private:
 
@@ -135,9 +145,8 @@ private:
 		string direction_from_parent;
 
 		Node() {}
-		Node(const int & x, const int & y, const string & dir) : x(x), y(y), direction_from_parent(dir) {}
+		Node(const int & set_x, const int & set_y, const string & dir) : x(set_x), y(set_y), direction_from_parent(dir) {}
 
-		// Node member setter
 		void set_g_h_f(const int & set_g, const int & set_h);
 		void set_g(const int & set_g);
 	};

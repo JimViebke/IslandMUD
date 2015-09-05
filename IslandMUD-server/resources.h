@@ -87,7 +87,7 @@ public:
 	}
 
 	// movement
-	void static inline assign_movement_deltas(const string & direction_ID, int & dx, int & dy, int & dz)
+	static inline void assign_movement_deltas(const string & direction_ID, int & dx, int & dy, int & dz)
 	{
 		// express movement through three dimensions in dx, dy, dz
 		// If direction_ID is invalid, output arguments will not be modified.
@@ -104,6 +104,28 @@ public:
 		else if (direction_ID == C::DOWN) { --dz; }
 
 		// nothing to return, values passed by reference
+	}
+	static inline string get_movement_direction(const int & x, const int & y, const int & dest_x, const int & dest_y)
+	{
+		if (x == dest_x) // east or west
+		{
+			if (y + 1 == dest_y) { return C::EAST; }
+			if (y - 1 == dest_y) { return C::WEST; }
+		}
+		else if (x + 1 == dest_x) // south
+		{
+			if (y + 1 == dest_y) { return C::SOUTH_EAST; }
+			if (y == dest_y) { return C::SOUTH; }
+			if (y - 1 == dest_y) { return C::SOUTH_WEST; }
+		}
+		else if (x - 1 == dest_x) // north
+		{
+			if (y + 1 == dest_y) { return C::NORTH_EAST; }
+			if (y == dest_y) { return C::NORTH; }
+			if (y - 1 == dest_y) { return C::NORTH_WEST; }
+		}
+
+		return ""; // empty string object
 	}
 
 	// vector utilities
