@@ -137,7 +137,7 @@ void Game::main_test_loop() // debugging
 				npc->update(world, actors);
 				if (auto_advance == 0)
 				{
-					// cout << npc->get_objectives() << endl; // debugging (after update)
+					cout << npc->get_objectives() << endl; // debugging (after update)
 					cout << npc->get_inventory() << endl; // debugging (after update)
 				}
 
