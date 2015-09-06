@@ -13,7 +13,7 @@ string Character::login(World & world)
 	xml_document user_data_xml;
 
 	// load the player's data to user_data_xml
-	user_data_xml.load_file((C::user_data_directory + "\\" + this->name + ".xml").c_str());
+	user_data_xml.load_file((C::user_data_directory + "/" + this->name + ".xml").c_str());
 
 
 
@@ -180,7 +180,7 @@ string Character::logout()
 	}
 
 	// save the user_data to disk
-	user_data_xml.save_file((C::user_data_directory + "\\" + this->name + ".xml").c_str()); // returns an unused boolean
+	user_data_xml.save_file((C::user_data_directory + "/" + this->name + ".xml").c_str()); // returns an unused boolean
 
 	return "You have logged out.";
 }

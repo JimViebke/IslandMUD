@@ -36,7 +36,7 @@ public:
 		srand((unsigned)time(NULL)); // seed rand
 		
 		// create the timestamped directory
-		generated_terrain_dir = C::game_directory + "/gen " + R::to_string(R::current_time_in_ms());
+		generated_terrain_dir = C::game_directory + "/gen_" + R::to_string(R::current_time_in_ms());
 		R::create_path_if_not_exists(generated_terrain_dir);
 
 		// fill both working vectors with empty space

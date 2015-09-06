@@ -224,11 +224,11 @@ void World::load_terrain_map()
 void World::generate_room_at(const int & x, const int & y, const int & z)
 {
 	// ensure the folder exists
-	string z_stack_path = C::room_directory + "\\" + R::to_string(x);
+	string z_stack_path = C::room_directory + "/" + R::to_string(x);
 	R::create_path_if_not_exists(z_stack_path);
 
 	// extend the path to include the file
-	z_stack_path += "\\" + R::to_string(x) + "-" + R::to_string(y) + ".xml";
+	z_stack_path += "/" + R::to_string(x) + "-" + R::to_string(y) + ".xml";
 
 	// create an XML document to store the Z stack
 	xml_document z_stack;
@@ -285,7 +285,7 @@ void World::load_vertical_rooms_to_XML(const int & ix, const int & iy, xml_docum
 	const string y = R::to_string(iy);
 
 	// populate the document using the file for the vertical stack of rooms at x,y
-	vertical_rooms.load_file((C::room_directory + "\\" + x + "\\" + x + "-" + y + ".xml").c_str());
+	vertical_rooms.load_file((C::room_directory + "/" + x + "/" + x + "-" + y + ".xml").c_str());
 }
 
 // build a room given an XML node, add to world at x,y,z
@@ -409,7 +409,7 @@ void World::load_room_to_world(const int & x, const int & y, const int & z)
 	// get the path to the z_stack
 	const string str_x = R::to_string(x);
 	const string str_y = R::to_string(y);
-	const string z_stack_path = C::room_directory + "\\" + str_x + "\\" + str_x + "-" + str_y + ".xml";
+	const string z_stack_path = C::room_directory + "/" + str_x + "/" + str_x + "-" + str_y + ".xml";
 
 	// if the z_stack does not exist
 	if (!R::file_exists(z_stack_path))
@@ -444,7 +444,7 @@ void World::unload_room(const int & x, const int & y, const int & z, const World
 	// Unloads passed room. Can be called even if the room doesn't exist in the world structure
 
 	// ensure the path exists up to \x
-	string room_path = (C::room_directory + "\\" + R::to_string(x) + "\\");
+	string room_path = (C::room_directory + "/" + R::to_string(x) + "/");
 	R::create_path_if_not_exists(room_path);
 
 	// ensure the path exists up to \x-y.xml
