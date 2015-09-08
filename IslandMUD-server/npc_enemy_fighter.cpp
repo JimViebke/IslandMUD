@@ -84,7 +84,7 @@ void Hostile_NPC_Fighter::update(World & world, map<string, shared_ptr<Character
 		// if I am planning on moving to an instance 
 		if (objective_iterator->verb == C::AI_OBJECTIVE_GOTO)
 		{
-			if (one_can_craft(objective_iterator->purpose) && i_have_all_ingredients_to_craft(objective_iterator->purpose))
+			if (one_can_craft(objective_iterator->purpose) && crafting_requirements_met(objective_iterator->purpose, world))
 			{
 				if (pathfind_to_closest_item(objective_iterator->noun, world))
 				{
