@@ -31,7 +31,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 	if (i_dont_have(C::AXE_ID))
 	{
 		// in this block: take the item if it's here, move to the item if it is visible and reachable, otherwise plan to craft the item
-		// and aquire those resources
+		// and aquire needed resources
 		for (deque<Objective>::iterator objective_iterator = objectives.begin();
 			objective_iterator != objectives.end();)
 		{
@@ -41,6 +41,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				// if the item is here, take it, remove the current objective, and return
 				if (world.room_at(x, y, z)->contains_item(objective_iterator->noun))
 				{
+					// remove the item from the room
 					take(objective_iterator->noun, world);
 
 					if (objective_iterator->noun == objective_iterator->purpose)
@@ -60,7 +61,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				// see if the item is reachable
 				if (pathfind_to_closest_item(objective_iterator->noun, world))
 				{
-					cout << "Found a path to " << objective_iterator->noun << endl;
+					cout << "Found a path to " << objective_iterator->noun << endl; // debugging
 					return;
 				}
 
@@ -79,7 +80,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				}
 			}
 
-			// if the NPC is am planning on moving to an instance 
+			// if the NPC is planning on moving to an instance of an item
 			if (objective_iterator->verb == C::AI_OBJECTIVE_GOTO)
 			{
 				if (one_can_craft(objective_iterator->purpose) && crafting_requirements_met(objective_iterator->purpose, world))
@@ -117,10 +118,9 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 
 						return;
 					}
-
-					// delete extra objectives here
-					// or maybe not; perhaps the objective should be cleared when the item is taken/crafted
 				}
+				// the item is not craftable, or it is not craftable at this time. Continue to
+				// pathfind to the nearest instance of the item
 				else if (pathfind_to_closest_item(objective_iterator->noun, world))
 				{
 					return;
