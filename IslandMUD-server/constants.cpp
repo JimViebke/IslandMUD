@@ -38,7 +38,7 @@ const char C::WATER_CHAR = '~';
 const char C::LAND_CHAR = ' ';
 const char C::FOREST_CHAR = '%';
 const char C::ITEM_CHAR = '?';
-const char C::CHEST_CHAR = char(220); // ascii 220
+const char C::CHEST_CHAR = char(220); // extended ascii 220
 const char C::RUBBLE_CHAR = '#';
 
 // engine signals
