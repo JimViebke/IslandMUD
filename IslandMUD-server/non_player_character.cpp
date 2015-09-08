@@ -120,7 +120,7 @@ bool NPC::im_planning_to_acquire(const string & item_ID) const
 	}
 	return false;
 }
-bool NPC::i_have_all_ingredients_to_craft(const string & item_ID) const
+bool NPC::crafting_requirements_met(const string & item_ID, const World & world) const
 {
 	// WARNING: this assumes item_ID is craftable
 
@@ -143,6 +143,24 @@ bool NPC::i_have_all_ingredients_to_craft(const string & item_ID) const
 		inventory_remove != recipe.inventory_remove.cend(); ++inventory_remove)
 	{
 		if (!this->has(inventory_remove->first, inventory_remove->second))
+		{
+			return false;
+		}
+	}
+
+	// check both types of local requirements
+	for (map<string, int>::const_iterator local_need = recipe.local_need.cbegin();
+		local_need != recipe.local_need.cend(); ++local_need)
+	{
+		if (!world.room_at(x, y, z)->contains_item(local_need->first, local_need->second))
+		{
+			return false;
+		}
+	}
+	for (map<string, int>::const_iterator local_remove = recipe.local_remove.cbegin();
+		local_remove != recipe.local_remove.cend(); ++local_remove)
+	{
+		if (!world.room_at(x, y, z)->contains_item(local_remove->first, local_remove->second))
 		{
 			return false;
 		}
@@ -699,7 +717,7 @@ bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
 	Node current_room = get_node_at(x_dest, y_dest, closed_list);
 
 	// if the target room is not in the closed list, a path could not be found
-	if (current_room.x == -1 || current_room.y == -1) 
+	if (current_room.x == -1 || current_room.y == -1)
 	{
 		return false;
 	}

@@ -31,7 +31,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 	if (i_dont_have(C::AXE_ID))
 	{
 		// in this block: take the item if it's here, move to the item if it is visible and reachable, otherwise plan to craft the item
-		// and aquire those resources
+		// and aquire needed resources
 		for (deque<Objective>::iterator objective_iterator = objectives.begin();
 			objective_iterator != objectives.end();)
 		{
@@ -41,6 +41,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				// if the item is here, take it, remove the current objective, and return
 				if (world.room_at(x, y, z)->contains_item(objective_iterator->noun))
 				{
+					// remove the item from the room
 					take(objective_iterator->noun, world);
 
 					if (objective_iterator->noun == objective_iterator->purpose)
@@ -60,6 +61,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				// see if the item is reachable
 				if (pathfind_to_closest_item(objective_iterator->noun, world))
 				{
+					cout << "Found a path to " << objective_iterator->noun << endl; // debugging
 					return;
 				}
 
@@ -78,18 +80,50 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				}
 			}
 
-			// if the NPC is am planning on moving to an instance 
+			// if the NPC is planning on moving to an instance of an item
 			if (objective_iterator->verb == C::AI_OBJECTIVE_GOTO)
 			{
-				if (one_can_craft(objective_iterator->purpose) && i_have_all_ingredients_to_craft(objective_iterator->purpose))
+				if (one_can_craft(objective_iterator->purpose) && crafting_requirements_met(objective_iterator->purpose, world))
 				{
-					if (pathfind_to_closest_item(objective_iterator->noun, world))
+					// try to craft the item, using obj->purpose if the (obj->verb == GOTO), else use obj->noun (most cases)
+					const string craft_attempt = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
+
+					if (craft_attempt.find("You now have") != string::npos)
 					{
-						// delete extra objectives here
-						// or maybe not; perhaps the objective should be cleared when the item is taken/crafted
+						// if successful, clear completed objectives
+
+						if (objective_iterator->verb == C::AI_OBJECTIVE_GOTO)
+						{
+							// the item crafted was from a "goto" objective
+
+							// save this because our firse erase will invalidate the iterator
+							const string PURPOSE = objective_iterator->purpose;
+
+							// erase the "goto" objective
+							erase_goto_objective_matching(PURPOSE);
+
+							// erase the "aquire" objective
+							erase_acquire_objective_matching(PURPOSE);
+						}
+						else if (objective_iterator->noun == objective_iterator->purpose)
+						{
+							// this item is an end goal (no "parent" goal)
+							erase_objectives_matching_purpose(objective_iterator->purpose);
+						}
+						else
+						{
+							// this item is only a means to an end
+							erase_objective(objective_iterator);
+						}
 
 						return;
 					}
+				}
+				// the item is not craftable, or it is not craftable at this time. Continue to
+				// pathfind to the nearest instance of the item
+				else if (pathfind_to_closest_item(objective_iterator->noun, world))
+				{
+					return;
 				}
 			}
 
@@ -312,7 +346,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				if (x > objective_it->objective_x) // north
 				{
 					if (save_path_to(x - C::VIEW_DISTANCE, y, world))
-					{ 
+					{
 						// attempt to move to the destination, return if successful
 						if (make_path_movement(world)) { return; }
 					}

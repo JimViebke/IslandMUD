@@ -5,7 +5,7 @@ Feb 14, 2015 */
 
 // general
 const int C::GROUND_INDEX = 3; // there are three levels below this
-const int C::VIEW_DISTANCE = 10; // 5+1+5 to a side == 11*11 total area
+const int C::VIEW_DISTANCE = 9; // 5+1+5 to a side == 11*11 total area
 
 const int C::WORLD_X_DIMENSION = 1000;
 const int C::WORLD_Y_DIMENSION = 1000;
@@ -38,7 +38,7 @@ const char C::WATER_CHAR = '~';
 const char C::LAND_CHAR = ' ';
 const char C::FOREST_CHAR = '%';
 const char C::ITEM_CHAR = '?';
-const char C::CHEST_CHAR = char(220); // ascii 220
+const char C::CHEST_CHAR = char(220); // extended ascii 220
 const char C::RUBBLE_CHAR = '#';
 
 // engine signals

@@ -1,4 +1,4 @@
-/* Jim Viebke
+﻿/* Jim Viebke
 May 15 2015 */
 
 #include "game.h"
@@ -72,6 +72,43 @@ void Game::main_test_loop() // debugging
 					<< "Your coordinates are " << dev->x << ", " << dev->y << " (index " << dev->z << ")"
 					<< world.room_at(dev->x, dev->y, dev->z)->summary(dev->name) // "You look around and notice..."
 					<< dev->print(); // prepend "You have..."
+
+#ifndef _WIN32
+				pugi::xml_document document;
+
+				// load the file from the disk into the xml_document in memory
+				document.load_file(string("/home/IslandMUD/example.xml").c_str());
+
+				// select the root/test node, create it if it does not exist
+				xml_node root_node = document.child(string("test").c_str());
+				if (root_node.empty())
+				{
+					root_node = document.append_child(string("test").c_str());
+				}
+
+				// remove any existing sample node
+				root_node.remove_child(string("sample").c_str());
+
+				// create an ostringstream and add the same printout from the console
+				ostringstream output;
+				output << endl
+					<< endl
+					<< dev->generate_area_map(world, actors) << endl // a top down map
+					<< "Your coordinates are " << dev->x << ", " << dev->y << " (index " << dev->z << ")"
+					<< world.room_at(dev->x, dev->y, dev->z)->summary(dev->name) // "You look around and notice..."
+					<< dev->print(); // prepend "You have..."
+
+				// append a sample node to the test/root node, append an anonymous pcdata node to the sample node,
+				// and append the contents of the ostringstream to the anonymous pcdata node
+				// root_node.append_child(string("sample").c_str()).append_child(node_pcdata).set_value(output.str().c_str());
+				root_node.append_child(string("sample").c_str()).append_child(node_pcdata).set_value(string("this is a test [╩╦╩╦▄╦╩╦╩] this is a test\n" + output.str()).c_str());
+
+				// save the document
+				document.save_file(string("/home/IslandMUD/example.xml").c_str()); // returns an unused boolean
+
+				cout << "done\n";
+#endif
+
 			}
 		}
 

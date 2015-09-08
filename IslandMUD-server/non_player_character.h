@@ -86,7 +86,7 @@ protected:
 	bool i_have(const string & item_id) const;
 	bool i_dont_have(const string & item_id) const;
 	bool im_planning_to_acquire(const string & item_ID) const;
-	bool i_have_all_ingredients_to_craft(const string & item_ID) const;
+	bool crafting_requirements_met(const string & item_ID, const World & world) const;
 
 	// objective planning
 	void plan_to_get(const string & item_id);
