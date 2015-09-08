@@ -1,4 +1,4 @@
-/* Jim Viebke
+﻿/* Jim Viebke
 May 15 2015 */
 
 #include "game.h"
@@ -100,22 +100,14 @@ void Game::main_test_loop() // debugging
 
 				// append a sample node to the test/root node, append an anonymous pcdata node to the sample node,
 				// and append the contents of the ostringstream to the anonymous pcdata node
-				root_node.append_child(string("sample").c_str()).append_child(node_pcdata).set_value(output.str().c_str());
+				// root_node.append_child(string("sample").c_str()).append_child(node_pcdata).set_value(output.str().c_str());
+				root_node.append_child(string("sample").c_str()).append_child(node_pcdata).set_value(string("this is a test [╩╦╩╦▄╦╩╦╩] this is a test\n" + output.str()).c_str());
 
 				// save the document
 				document.save_file(string("/home/IslandMUD/example.xml").c_str()); // returns an unused boolean
 
 				cout << "done\n";
 #endif
-
-
-
-
-
-
-
-
-
 
 			}
 		}
