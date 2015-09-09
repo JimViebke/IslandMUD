@@ -18,6 +18,7 @@ void Parse::initialize()
 
 		// verbs
 		P::dict["help"] = P::dict["h"] = P::dict["q"] = P::dict["?"] = P::dict["assist"] = P::dict["command"] = P::dict["commands"] = C::HELP_COMMAND;
+		P::dict["legend"] = C::LEGEND_COMMAND;
 		// P::dict["login"] = C::LOGIN_COMMAND; // not used yet
 		P::dict["logout"] = P::dict["quit"] = P::dict["leave"] = P::dict["exit"] = C::LOGOUT_COMMAND;
 		P::dict["move"] = P::dict["m"] = P::dict["walk"] = P::dict["run"] = P::dict["head"] = P::dict["go"] = P::dict["continue"] = P::dict["work"] = C::MOVE_COMMAND;
