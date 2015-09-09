@@ -73,6 +73,21 @@ void Game::main_test_loop() // debugging
 					<< world.room_at(dev->x, dev->y, dev->z)->summary(dev->name) // "You look around and notice..."
 					<< dev->print(); // prepend "You have..."
 
+				/*#ifdef _WIN32
+				{
+				cout << "This is a test (WIN32): " << C::NW_CORNER << C::NW_CORNER << C::NW_CORNER << C::NW_CORNER << " <- that was a test." << endl;
+				string s;
+				s += C::NW_CORNER; s += C::NW_CORNER; s += C::NW_CORNER; s += C::NW_CORNER;
+				cout << "Another ╔╔╔╔ test: " << s << " <- that was another test." << endl;
+				}
+				#else
+				{
+				cout << "This is a test (LINUX): ╔╔╔╔ <- that was a test." << endl;
+				string s = "╔╔╔╔";
+				cout << "Another test: " << s << " <- that was another test." << endl;
+				}
+				#endif*/
+
 #ifndef _WIN32
 				pugi::xml_document document;
 
@@ -101,7 +116,16 @@ void Game::main_test_loop() // debugging
 				// append a sample node to the test/root node, append an anonymous pcdata node to the sample node,
 				// and append the contents of the ostringstream to the anonymous pcdata node
 				// root_node.append_child(string("sample").c_str()).append_child(node_pcdata).set_value(output.str().c_str());
-				root_node.append_child(string("sample").c_str()).append_child(node_pcdata).set_value(string("this is a test [╩╦╩╦▄╦╩╦╩] this is a test\n" + output.str()).c_str());
+
+				const string s = "╔╔╔╔";
+				stringstream ss;
+				ss << string("this is a test [╩╦╩╦▄╦╩╦╩] this is a test\n");
+				ss << string("Another test: ");
+				ss << s;
+				ss << endl;
+				ss << "Final test" << "╔╔╔╔" << endl;
+				ss << output.str();
+				root_node.append_child(string("sample").c_str()).append_child(node_pcdata).set_value(ss.str().c_str());
 
 				// save the document
 				document.save_file(string("/home/IslandMUD/example.xml").c_str()); // returns an unused boolean

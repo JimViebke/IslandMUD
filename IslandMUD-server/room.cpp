@@ -605,14 +605,38 @@ string Room::summary(const string & player_ID) const
 	// report on the items in the room
 	if (contents.size() > 0) // if there are items present
 	{
-		summary_stream << "\n\nYou look around and notice";
-		// for each item
+		// create a map of <item id, item count>
+		map<string, int> stacked_contents;
 		for (multimap<string, shared_ptr<Item>>::const_iterator it = contents.cbegin();
 			it != contents.cend(); ++it)
 		{
-			// append the id of the item
-			summary_stream << " " << it->first;
+			stacked_contents[it->first]++;
 		}
+
+		// save an iterator to the last item
+		const map<string, int>::const_iterator last_item_it = --stacked_contents.cend();
+
+		summary_stream << "\n\nHere there is";
+		// for each item
+		for (map<string, int>::const_iterator item_it = stacked_contents.cbegin();
+			item_it != stacked_contents.cend(); ++item_it)
+		{
+			// if there is more than one instance of the item here
+			if (item_it->second > 1)
+			{
+				// append the item_id followed by the count
+				summary_stream << " " << item_it->first << " (x" << item_it->second << ")";
+			}
+			else
+			{
+				// don't append the count
+				summary_stream << " a(n) " << item_it->first;
+			}
+
+			// conditionally append a comma
+			summary_stream << ((item_it == last_item_it) ? "" : ",");
+		}
+
 		summary_stream << ".";
 	}
 
