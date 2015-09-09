@@ -218,6 +218,7 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 	if (command.size() == 1 && command[0] == C::HELP_COMMAND)
 	{
 		return string("help:\n") +
+			"\nlegend" +
 			"\nmove [compass direction]" +
 			"\ntake / drop / craft / equip / dequip / chop / smash [item]" +
 			"\nequipped" +
@@ -229,6 +230,24 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 			"\nconstruct [compass direction] [material] wall" +
 			"\nconstruct [compass direction] [material] wall with [material] door" +
 			"\nrecipes";
+	}
+	else if (command.size() == 1 && command[0] == C::LEGEND_COMMAND)
+	{
+		return string("legend:\n") +
+			"\n " + C::FOREST_CHAR + "     forest" +
+			"\n " + C::WATER_CHAR + "     water" +
+			"\n " + C::LAND_CHAR + "     land" +
+			"\n" +
+			"\n " + C::PLAYER_CHAR + "     you" +
+			"\n 1     number of militants" +
+			"\n " + C::NPC_NEUTRAL_CHAR + "     one or more neutral inhabitants" +
+			"\n" +
+			"\n " + C::ITEM_CHAR + "     one or more items" +
+			"\n " + C::CHEST_CHAR + "     a chest" +
+			"\n" +
+			"\n " + C::WE_WALL + C::WE_WALL + C::WE_WALL + "   a wall" +
+			"\n " + C::WE_WALL + C::WE_DOOR + C::WE_WALL + "   a wall with a door" +
+			"\n " + C::WE_WALL + C::RUBBLE_CHAR + C::WE_WALL + "   a smashed wall (traversable)";
 	}
 	// moving: "move northeast" OR "northeast"
 	else if ((command.size() == 2 && command[0] == C::MOVE_COMMAND)
