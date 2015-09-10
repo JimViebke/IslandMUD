@@ -29,7 +29,7 @@ using namespace std;
 
 class Resources; // forward declaring
 
-typedef Resources R;
+using R = Resources;
 
 class Resources
 {
@@ -51,7 +51,7 @@ public:
 		output << val;
 		return output.str();
 	}
-	static inline char to_char(const unsigned & val)
+	static inline char_type to_char_type(const unsigned & val)
 	{
 		return C::numbers[val];
 	}
@@ -74,7 +74,7 @@ public:
 	}
 
 	// box drawing
-	static char corner_char(const bool & north, const bool & east, const bool & south, const bool & west)
+	static char_type corner_char(const bool & north, const bool & east, const bool & south, const bool & west)
 	{
 		int index = 0;
 		if (north) { index += 1; }

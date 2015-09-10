@@ -21,13 +21,13 @@ class World
 {
 public:
 
-	typedef unique_ptr<Room> room_pointer;
+	using room_pointer = unique_ptr<Room>;
 
 private:
 	vector<room_pointer> world;
 
 	// 2d terrain (biome) map
-	shared_ptr<vector<vector<char>>> terrain;
+	shared_ptr<vector<vector<char_type>>> terrain;
 
 public:
 

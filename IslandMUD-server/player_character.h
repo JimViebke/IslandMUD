@@ -8,7 +8,7 @@ Feb 14, 2015 */
 
 class Player_Character;
 
-typedef Player_Character PC;
+using PC = Player_Character;
 
 class Player_Character : public Character
 {
