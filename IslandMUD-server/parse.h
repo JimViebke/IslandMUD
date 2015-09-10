@@ -16,7 +16,7 @@ user input parsing */
 
 class Parse; // forward declaring
 
-typedef Parse P;
+using P = Parse;
 
 class Parse
 {

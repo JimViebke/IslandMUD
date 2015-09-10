@@ -13,7 +13,7 @@ This contains NPC members and functionality that is common for hostile and neutr
 
 class Non_Player_Character; // forward-declaring...
 
-typedef Non_Player_Character NPC; // ...in order to put this here
+using NPC = Non_Player_Character; // ...in order to put this here
 
 class Non_Player_Character : public Character
 {
