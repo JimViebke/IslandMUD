@@ -225,6 +225,7 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 	{
 		return string("help:\n") +
 			"\nlegend" +
+			"\nrecipes" +
 			"\nmove [compass direction]" +
 			"\ntake / drop / craft / equip / dequip / chop / smash [item]" +
 			"\nequipped" +
@@ -234,8 +235,7 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 			"\nattack [compass direction] wall / door" +
 			"\nconstruct [material] ceiling / floor" +
 			"\nconstruct [compass direction] [material] wall" +
-			"\nconstruct [compass direction] [material] wall with [material] door" +
-			"\nrecipes";
+			"\nconstruct [compass direction] [material] wall with [material] door";
 	}
 	else if (command.size() == 1 && command[0] == C::LEGEND_COMMAND)
 	{
