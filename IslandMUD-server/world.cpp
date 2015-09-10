@@ -165,7 +165,7 @@ void World::load_terrain_map()
 
 	// load the contents of the terrain file, if it exists
 	{
-		vector<vector<char>> temp_terrain;
+		vector<vector<char_type>> temp_terrain;
 		if (R::file_exists(C::world_terrain_file_location))
 		{
 			fstream terrain_file;
@@ -175,12 +175,24 @@ void World::load_terrain_map()
 			{
 				if (row.length() > 1) // if the row is not empty
 				{
-					temp_terrain.push_back(vector<char>(row.begin(), row.end())); // copy the contents of the row into an anonymous vector
+#ifdef _WIN32
+					temp_terrain.push_back(vector<char_type>(row.begin(), row.end())); // copy the contents of the row into an anonymous vector
+#else
+					vector<char_type> vec;
+					// for each character in the string
+					for (string::iterator it = row.begin(); it != row.end(); ++it)
+					{
+						// add it to the vector as a string of its own
+						vec.push_back(string(1, *it));
+					}
+					// add the vector as the next row in the terrain file
+					temp_terrain.push_back(vec);
+#endif
 				}
 			}
 		}
 
-		this->terrain = make_shared<vector<vector<char>>>(temp_terrain);
+		this->terrain = make_shared<vector<vector<char_type>>>(temp_terrain);
 	}
 
 	// test if the loaded terrain is the correct dimensions
@@ -216,7 +228,7 @@ void World::load_terrain_map()
 		// save the final terrain to disk
 		gen.save_terrain();
 
-		terrain = R::make_unique<std::vector<std::vector<char>>>(gen.get_terrain());
+		terrain = R::make_unique<std::vector<std::vector<char_type>>>(gen.get_terrain());
 	}
 }
 

@@ -211,7 +211,7 @@ void Generator::save_terrain() const
 {
 	to_file(v2, C::world_terrain_file_location);
 }
-vector<vector<char>> Generator::get_terrain()
+vector<vector<char_type>> Generator::get_terrain()
 {
 	return v2; // return generated world
 }
@@ -222,21 +222,25 @@ vector<vector<char>> Generator::get_terrain()
 
 
 
-void Generator::size_vector(vector<vector<char>> & v, const int & x, const int & y)
+void Generator::size_vector(vector<vector<char_type>> & v, const int & x, const int & y)
 {
 	// this should be the only place in this class that a vector is sized		
 
-	vector<vector<char>> sized_vector;
+	vector<vector<char_type>> sized_vector;
 	sized_vector.reserve(x);
 
 	for (int i = 0; i < x; ++i)
 	{
-		vector<char> row;
+		vector<char_type> row;
 		row.reserve(y);
 
 		for (int j = 0; j < y; ++j)
 		{
+#ifdef _WIN32
 			row.push_back(' ');
+#else
+            row.push_back(" ");
+#endif
 		}
 
 		sized_vector.push_back(row);
@@ -250,7 +254,7 @@ void Generator::save_current_terrain() const
 {
 	to_file(v2, generated_terrain_dir + "/" + generator_pattern.str() + ".txt");
 }
-void Generator::to_file(const vector<vector<char>> & v, const string & dir) const
+void Generator::to_file(const vector<vector<char_type>> & v, const string & dir) const
 {
 	ostringstream iss;
 	for (unsigned i = 0; i < v.size(); ++i)

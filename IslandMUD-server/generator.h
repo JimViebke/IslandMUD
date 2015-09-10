@@ -25,7 +25,7 @@ private:
 
 	string generated_terrain_dir; // the path to place the terrain
 
-	vector<vector<char>> v1, v2, biome_map;
+	vector<vector<char_type>> v1, v2, biome_map;
 
 public:
 
@@ -54,14 +54,14 @@ public:
 
 	// two optional ways of getting the final result, either by saving the terrain to the disk, or by retriving it manually
 	void save_terrain() const;
-	vector<vector<char>> get_terrain();
+	vector<vector<char_type>> get_terrain();
 
 private:
 
-	void size_vector(vector<vector<char>> & v, const int & x, const int & y);
+	void size_vector(vector<vector<char_type>> & v, const int & x, const int & y);
 
 	void save_current_terrain() const;
-	void to_file(const vector<vector<char>> & v, const string & dir) const;
+	void to_file(const vector<vector<char_type>> & v, const string & dir) const;
 };
 
 #endif

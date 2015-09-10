@@ -54,7 +54,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 	// - 2 == the total width by char count after removing the borders
 	const int area_map_trimmed_width = (((C::VIEW_DISTANCE * 2) + 1) * 3) - 2;
 
-	stringstream user_map; // three stringstreams feed into one master stringstream
+	vector<vector<char_type>> user_map; // three vectors feed into one vector
 
 	// create a 2D vector to represent whether or not a tree is at a location
 	vector<vector<bool>> forest_grid;
@@ -96,28 +96,28 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 	set n, e, s, w to(room contains surface ? ); */
 	for (int cx = x - (int)C::VIEW_DISTANCE; cx <= x + (int)C::VIEW_DISTANCE; ++cx)
 	{
-		stringstream a, b, c;
+		vector<char_type> a, b, c; // three rows
 		for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 		{
 			// if the room is out of bounds
 			if (!R::bounds_check(cx, cy, C::GROUND_INDEX))
 			{
 				// draw the "room"
-				a << "***";
-				b << "***";
-				c << "***";
+				a.push_back(C::LAND_CHAR); a.push_back(C::LAND_CHAR); a.push_back(C::LAND_CHAR);
+				b.push_back(C::LAND_CHAR); b.push_back(C::OUT_OF_BOUNDS_CHAR); b.push_back(C::LAND_CHAR);
+				c.push_back(C::LAND_CHAR); c.push_back(C::LAND_CHAR); c.push_back(C::LAND_CHAR);
 
-				// nothing left to do with this room, skip to next room
+				// skip to next room
 				continue;
 			}
 
-			// if the coordinates are valid but the room is not loaded (this would be an error)
+			// if the coordinates are valid but the room is not loaded (this would be a major error)
 			if (world.room_at(cx, cy, C::GROUND_INDEX) == nullptr)
 			{
-				// draw the room with "err"
-				a << "! !";
-				b << "err";
-				c << "! !";
+				// draw the "room"
+				a.push_back(C::LAND_CHAR); a.push_back(C::LAND_CHAR); a.push_back(C::LAND_CHAR);
+				b.push_back(C::LAND_CHAR); b.push_back(C::ERROR_CHAR); b.push_back(C::LAND_CHAR);
+				c.push_back(C::LAND_CHAR); c.push_back(C::LAND_CHAR); c.push_back(C::LAND_CHAR);
 
 				// skip to next room
 				continue;
@@ -149,18 +149,17 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				const bool f_nw = forest_grid[fga_x - 1][fga_y - 1];
 
 				// conditionally draw a tree or an empty space in the corners, other five are always draw as trees
-				a << ((f_n || f_nw || f_w) ? C::FOREST_CHAR : C::LAND_CHAR) << C::FOREST_CHAR << ((f_n || f_ne || f_e) ? C::FOREST_CHAR : C::LAND_CHAR);
-				b << C::FOREST_CHAR << ((cx == x && cy == y) ? C::PLAYER_CHAR : C::FOREST_CHAR) << C::FOREST_CHAR;
-				c << ((f_s || f_sw || f_w) ? C::FOREST_CHAR : C::LAND_CHAR) << C::FOREST_CHAR << ((f_s || f_se || f_e) ? C::FOREST_CHAR : C::LAND_CHAR);
+				a.push_back(((f_n || f_nw || f_w) ? C::FOREST_CHAR : C::LAND_CHAR)); a.push_back(C::FOREST_CHAR); a.push_back(((f_n || f_ne || f_e) ? C::FOREST_CHAR : C::LAND_CHAR));
+				b.push_back(C::FOREST_CHAR); b.push_back(((cx == x && cy == y) ? C::PLAYER_CHAR : C::FOREST_CHAR)); b.push_back(C::FOREST_CHAR);
+				c.push_back(((f_s || f_sw || f_w) ? C::FOREST_CHAR : C::LAND_CHAR)); c.push_back(C::FOREST_CHAR); c.push_back(((f_s || f_se || f_e) ? C::FOREST_CHAR : C::LAND_CHAR));
 			}
 			// if the room is water
 			else if (world.room_at(cx, cy, C::GROUND_INDEX)->is_water())
 			{
 				// Either draw a 3x3 grid with a "wave", or a 3x3 grid with the player's icon.
-
-				a << "   ";
-				b << " " << ((cx == x && cy == y) ? C::PLAYER_CHAR : C::WATER_CHAR) << " ";
-				c << "   ";
+				a.push_back(C::LAND_CHAR); a.push_back(C::LAND_CHAR); a.push_back(C::LAND_CHAR);
+				b.push_back(C::LAND_CHAR); b.push_back(((cx == x && cy == y) ? C::PLAYER_CHAR : C::WATER_CHAR)); b.push_back(C::LAND_CHAR);
+				c.push_back(C::LAND_CHAR); c.push_back(C::LAND_CHAR); c.push_back(C::LAND_CHAR);
 			}
 			// there is no tree, so there may be a structure
 			else
@@ -231,7 +230,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				// if (enemy_count > 0) { cout << "\nAt " << cx << "," << cy << " there are " << enemy_count << " enemies."; }
 				// if (neutral_count > 0) { cout << "\nAt " << cx << "," << cy << " there are " << neutral_count << " neutrals."; }
 
-				char nw_corner = C::LAND_CHAR, ne_corner = C::LAND_CHAR, se_corner = C::LAND_CHAR, sw_corner = C::LAND_CHAR;
+				char_type nw_corner = C::LAND_CHAR, ne_corner = C::LAND_CHAR, se_corner = C::LAND_CHAR, sw_corner = C::LAND_CHAR;
 				{
 					// relative to the north west corner of the room, is there a wall to the n/e/s/w
 					const bool wtn = world.room_has_surface(cx - 1, cy, C::GROUND_INDEX, C::WEST);
@@ -283,32 +282,41 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				}
 
 				// time for glorious nested ternary statements to do this cheap
-				a
-					<< nw_corner
-					<< ((nr) ? C::RUBBLE_CHAR : ((nd) ? C::WE_DOOR : ((n) ? C::WE_WALL : C::LAND_CHAR)))
-					<< ne_corner;
-				b
-					<< ((wr) ? C::RUBBLE_CHAR : ((wd) ? C::NS_DOOR : ((w) ? C::NS_WALL : C::LAND_CHAR)))
-					// if the current coordinates are the player's, draw an @ icon, else if there is an enemy, draw enemy count, else if there is an item, draw an item char, else empty
-					<< ((cx == x && cy == y) ? C::PLAYER_CHAR : ((enemy_count > 0) ? R::to_char(enemy_count) : ((neutral_count > 0) ? C::NPC_NEUTRAL_CHAR : ((world.room_at(cx, cy, C::GROUND_INDEX)->has_chest()) ? C::CHEST_CHAR : ((world.room_at(cx, cy, C::GROUND_INDEX)->contains_no_items()) ? C::LAND_CHAR : C::ITEM_CHAR)))))
-					<< ((er) ? C::RUBBLE_CHAR : ((ed) ? C::NS_DOOR : ((e) ? C::NS_WALL : C::LAND_CHAR)));
-				c
-					<< sw_corner
-					<< ((sr) ? C::RUBBLE_CHAR : ((sd) ? C::WE_DOOR : ((s) ? C::WE_WALL : C::LAND_CHAR)))
-					<< se_corner;
+				a.push_back(nw_corner);
+				a.push_back(((nr) ? C::RUBBLE_CHAR : ((nd) ? C::WE_DOOR : ((n) ? C::WE_WALL : C::LAND_CHAR))));
+				a.push_back(ne_corner);
+
+				b.push_back(((wr) ? C::RUBBLE_CHAR : ((wd) ? C::NS_DOOR : ((w) ? C::NS_WALL : C::LAND_CHAR))));
+				// if the current coordinates are the player's, draw an @ icon, else if there is an enemy, draw enemy count, else if there is an item, draw an item char, else empty
+				b.push_back(((cx == x && cy == y) ? C::PLAYER_CHAR : ((enemy_count > 0) ? R::to_char_type(enemy_count) : ((neutral_count > 0) ? C::NPC_NEUTRAL_CHAR : ((world.room_at(cx, cy, C::GROUND_INDEX)->has_chest()) ? C::CHEST_CHAR : ((world.room_at(cx, cy, C::GROUND_INDEX)->contains_no_items()) ? C::LAND_CHAR : C::ITEM_CHAR))))));
+				b.push_back(((er) ? C::RUBBLE_CHAR : ((ed) ? C::NS_DOOR : ((e) ? C::NS_WALL : C::LAND_CHAR))));
+
+				c.push_back(sw_corner);
+				c.push_back(((sr) ? C::RUBBLE_CHAR : ((sd) ? C::WE_DOOR : ((s) ? C::WE_WALL : C::LAND_CHAR))));
+				c.push_back(se_corner);
 			}
 		} // end for each room in row
 
-		// each iteration, push the three stringstreams representing the row into the user's map
-		user_map
-			<< a.str().substr(1, area_map_trimmed_width) << endl // don't add the first and last characters
-			<< b.str().substr(1, area_map_trimmed_width) << endl
-			<< c.str().substr(1, area_map_trimmed_width) << endl;
+		// add each row to the user map
+		user_map.push_back(a);
+		user_map.push_back(b);
+		user_map.push_back(c);
 	} // end for each row
 
-	// return the user map, but trim the top and bottom row by removing area_map_trimmed_width from the beginning
-	// and area_map_trimmed_width * 2 from the end
-	return user_map.str().substr(
-		area_map_trimmed_width,
-		(user_map.str().length() - (area_map_trimmed_width * 2)) - 1);
+	stringstream result;
+	// for each row except the first and last
+	for (unsigned i = 1; i < user_map.size() - 1; ++i)
+	{
+		// for all iterations except the first, append a newline
+		if (i != 1) { result << endl; }
+
+		// for each character in the row except the first and last
+		for (unsigned j = 1; j < user_map[i].size() - 1; ++j)
+		{
+			// add the character to the result
+			result << user_map[i][j];
+		}
+	}
+
+	return result.str();
 }

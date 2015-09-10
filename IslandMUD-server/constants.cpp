@@ -32,14 +32,29 @@ const string C::NPC_NEUTRAL_FACTION_ID = "neutral_NPC";
 const string C::NPC_HOSTILE_FACTION_ID = "hostile_NPC";
 
 // map symbols
-const char C::PLAYER_CHAR = '@';
-const char C::NPC_NEUTRAL_CHAR = '+';
-const char C::WATER_CHAR = '~';
-const char C::LAND_CHAR = ' ';
-const char C::FOREST_CHAR = '%';
-const char C::ITEM_CHAR = '?';
-const char C::CHEST_CHAR = char(220); // extended ascii 220
-const char C::RUBBLE_CHAR = '#';
+#ifdef _WIN32
+const char_type C::OUT_OF_BOUNDS_CHAR = '*';
+const char_type C::ERROR_CHAR = '!';
+const char_type C::PLAYER_CHAR = '@';
+const char_type C::NPC_NEUTRAL_CHAR = '+';
+const char_type C::WATER_CHAR = '~';
+const char_type C::LAND_CHAR = ' ';
+const char_type C::FOREST_CHAR = '%';
+const char_type C::ITEM_CHAR = '?';
+const char_type C::CHEST_CHAR = char(220); // extended ascii 220
+const char_type C::RUBBLE_CHAR = '#';
+#else
+const char_type C::OUT_OF_BOUNDS_CHAR = "*";
+const char_type C::ERROR_CHAR = "!";
+const char_type C::PLAYER_CHAR = "@";
+const char_type C::NPC_NEUTRAL_CHAR = "+";
+const char_type C::WATER_CHAR = "~";
+const char_type C::LAND_CHAR = " ";
+const char_type C::FOREST_CHAR = "%";
+const char_type C::ITEM_CHAR = "?";
+const char_type C::CHEST_CHAR = "▄"; // extended ascii 220
+const char_type C::RUBBLE_CHAR = "#";
+#endif
 
 // engine signals
 const string C::GOOD_SIGNAL = "good";
@@ -163,7 +178,11 @@ const int C::DEFAULT_ITEM_MIN_HEALTH = 0;
 const int C::DEFAULT_ITEM_MAX_HEALTH = 100;
 
 // efficient int to char conversion
-const vector<char> C::numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+#ifdef _WIN32
+const vector<char_type> C::numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+#else
+const vector<char_type> C::numbers = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+#endif
 
 // store a vector of all valid surface ids
 const vector<string> C::surface_ids = { C::NORTH, C::EAST, C::SOUTH, C::WEST, C::FLOOR, C::CEILING };
@@ -219,27 +238,47 @@ const map<string, unsigned> C::DOOR_REQUIREMENTS =
 
 // box drawing
 
-const char C::NW_CORNER = char(201); // ╔
-const char C::NE_CORNER = char(187); // ╗
-const char C::SW_CORNER = char(200); // ╚
-const char C::SE_CORNER = char(188); // ╝
+#ifdef _WIN32
+const char_type C::NW_CORNER = char(201); // ╔
+const char_type C::NE_CORNER = char(187); // ╗
+const char_type C::SW_CORNER = char(200); // ╚
+const char_type C::SE_CORNER = char(188); // ╝
 
-const char C::NES_CORNER = char(204); // ╠
-const char C::ESW_CORNER = char(203); // ­╦
-const char C::NSW_CORNER = char(185); // ╣
-const char C::NEW_CORNER = char(202); // ╩
+const char_type C::NES_CORNER = char(204); // ╠
+const char_type C::ESW_CORNER = char(203); // ­╦
+const char_type C::NSW_CORNER = char(185); // ╣
+const char_type C::NEW_CORNER = char(202); // ╩
 
-const char C::NESW = char(206); // ╬
+const char_type C::NESW = char(206); // ╬
 
-const char C::NS_WALL = char(186); // ║
-const char C::WE_WALL = char(205); // ═
+const char_type C::NS_WALL = char(186); // ║
+const char_type C::WE_WALL = char(205); // ═
 
-const char C::NS_DOOR = char(179); // │
-const char C::WE_DOOR = char(196); // ─
+const char_type C::NS_DOOR = char(179); // │
+const char_type C::WE_DOOR = char(196); // ─
+#else
+const char_type C::NW_CORNER = "╔"; // ╔
+const char_type C::NE_CORNER = "╗"; // ╗
+const char_type C::SW_CORNER = "╚"; // ╚
+const char_type C::SE_CORNER = "╝"; // ╝
+
+const char_type C::NES_CORNER = "╠"; // ╠
+const char_type C::ESW_CORNER = "╦"; // ╦
+const char_type C::NSW_CORNER = "╣"; // ╣
+const char_type C::NEW_CORNER = "╩"; // ╩
+
+const char_type C::NESW = "╬"; // ╬
+
+const char_type C::NS_WALL = "║"; // ║
+const char_type C::WE_WALL = "═"; // ═
+
+const char_type C::NS_DOOR = "│"; // │
+const char_type C::WE_DOOR = "─"; // ─
+#endif
 
 // more box drawing
 
-const vector<char> C::CORNERS = {
+const vector<char_type> C::CORNERS = {
 	// wsen
 	// 0000 land_char
 	C::LAND_CHAR,

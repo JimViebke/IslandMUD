@@ -10,9 +10,15 @@ Feb 14, 2015 */
 
 using namespace std;
 
+#ifdef _WIN32
+using char_type = char;
+#else
+using char_type = string;
+#endif
+
 class Constants; // forward declaring...
 
-typedef Constants C; // ...in order to put this up here
+using C = Constants; // ...in order to put this up here
 
 class Constants
 {
@@ -44,7 +50,9 @@ public:
 	const static string NPC_HOSTILE_FACTION_ID; // antagonists
 
 	// map symbols
-	const static char
+	const static char_type
+		OUT_OF_BOUNDS_CHAR,
+		ERROR_CHAR,
 		PLAYER_CHAR,
 		NPC_NEUTRAL_CHAR,
 		WATER_CHAR,
@@ -177,8 +185,8 @@ public:
 		DEFAULT_ITEM_MIN_HEALTH,
 		DEFAULT_ITEM_MAX_HEALTH;
 
-	// int to char conversion
-	static const vector<char> numbers;
+	// int to char_type conversion
+	static const vector<char_type> numbers;
 
 	// surface information
 	static const vector<string> surface_ids;
@@ -194,7 +202,7 @@ public:
 
 	// box drawing (more explaination at implementation)
 
-	const static char
+	const static char_type
 		NW_CORNER,
 		NE_CORNER,
 		SW_CORNER,
@@ -215,7 +223,7 @@ public:
 
 	// more box drawing
 
-	const static vector<char> CORNERS;
+	const static vector<char_type> CORNERS;
 
 	// walls, ceiling, and floor - min and max health
 
