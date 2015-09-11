@@ -207,6 +207,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					{
 						// equip the axe
 						equip(C::AXE_ID);
+						return; // finished
 					}
 
 					// chop the tree
@@ -221,45 +222,14 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					int throwaway_z;
 					R::assign_movement_deltas(objective_it->direction, adjacent_x, adjacent_y, throwaway_z);
 				}
-				const bool adjacent_room_has_opposing_door =
-					world.room_at(adjacent_x, adjacent_y, z)->has_surface(C::opposite_surface_id.find(objective_it->direction)->second) &&
-					world.room_at(adjacent_x, adjacent_y, z)->get_room_sides().find(C::opposite_surface_id.find(objective_it->direction)->second)->second.has_door();
 
-				// if we are about to construct a wall with a door against a wall without a door,
-				// move this door elsewhere. It is possible that this will move the door to another structure.
-				// It is therefore possible that a structure's only door could be moved to another structure.
-				if (objective_it->modifier &&
-					world.room_at(adjacent_x, adjacent_y, z)->has_surface(C::opposite_surface_id.find(objective_it->direction)->second) &&
-					!world.room_at(adjacent_x, adjacent_y, z)->get_room_sides().find(C::opposite_surface_id.find(objective_it->direction)->second)->second.has_door())
+				// if an opposing surface exists, don't construct a surface here.
+				if (world.room_at(adjacent_x, adjacent_y, z)->has_surface(C::opposite_surface_id.find(objective_it->direction)->second))
 				{
-					objective_it->modifier = false; // don't build a door against an opposing wall
-
-					// starting with the current objective
-					deque<Objective>::iterator it = objective_it;
-					// for each objective
-					while (++it != objectives.cend())
-					{
-						// if the objective is a construction objective AND its modifier is false (no door will be constructed)
-						if (it->verb == C::AI_OBJECTIVE_CONSTRUCT && !it->modifier)
-						{
-							// set the flag to true
-							it->modifier = true;
-							// we're finished
-							break;
-						}
-					}
-				}
-
-				// construct the surface, with a door if the modifier is true, or if the adjacent_room_has_opposing_door
-				// flag is set
-				if (((objective_it->modifier || adjacent_room_has_opposing_door) ?
-					(construct_surface_with_door(objective_it->material, objective_it->direction, objective_it->material, world).find("You construct a ")) :
-					(construct_surface(objective_it->material, objective_it->direction, world).find("You construct a ")))
-					!= string::npos)
-				{
-					// if this door was placed against another door, add another door elsewhere to increase the chances that
-					// this room has a door of its own (one that isn't shared with an adjacent room
-					if (adjacent_room_has_opposing_door)
+					// If the NPC was about to build a surface with a door, move the door elsewhere.
+					// It is possible that this will move the door to another structure.
+					// It is therefore possible that a structure's only door could be moved to another structure.
+					if (objective_it->modifier)
 					{
 						// starting with the current objective
 						deque<Objective>::iterator it = objective_it;
@@ -277,6 +247,25 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 						}
 					}
 
+					// erase current objective
+					objectives.erase(objective_it);
+
+					// if there are more objectives
+					if (objectives.size() > 0)
+					{
+						// continue with the next objective
+						objective_it = objectives.begin();
+						continue;
+					}
+					return; // there are no more objectives
+				}
+
+				// construct the surface, with a door if the modifier is true
+				if (((objective_it->modifier) ?
+					(construct_surface_with_door(objective_it->material, objective_it->direction, objective_it->material, world).find("You construct a ")) :
+					(construct_surface(objective_it->material, objective_it->direction, world).find("You construct a ")))
+					!= string::npos)
+				{
 					// if successful, erase the objective and return
 					objectives.erase(objective_it);
 					return;
@@ -285,123 +274,135 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 			// we are not at the destination, attempt to pathfind to it
 			else if (save_path_to(objective_it->objective_x, objective_it->objective_y, world))
 			{
+				// make the first move then return
+				make_path_movement(world);
 				return;
 			}
-			// we could not pathfind to the destination, test if it is out of sight range
-			// else if (R::diagonal_distance(x, y, objective_it->objective_x, objective_it->objective_y) > C::VIEW_DISTANCE)
-			else if (world.room_at(objective_it->objective_x, objective_it->objective_y, z) == nullptr ||
-				(world.room_at(objective_it->objective_x, objective_it->objective_y, z) != nullptr &&
-				!world.room_at(objective_it->objective_x, objective_it->objective_y, z)->is_observed_by(this->name)))
+
+			// we could not pathfind to the destination, try to move in the direction of the destination.
+
+			if (x > objective_it->objective_x && y > objective_it->objective_y) // northwest
 			{
-				// The location is out of sight range. Move in the direction of the destination.
+				// if the target is out of view but inline with any part of the current visible area,
+				// don't pathfind to corner; pathfind to the edge of the visible area that
+				// is inline with the destination
 
-				if (x > objective_it->objective_x && y > objective_it->objective_y) // northwest
+				if (save_path_to(
+					(((x - objective_it->objective_x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x - C::VIEW_DISTANCE)),
+					(((y - objective_it->objective_y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y - C::VIEW_DISTANCE)), world))
 				{
-					// if the target is out of view but inline with any part of the current visible area,
-					// don't pathfind to corner; pathfind to the edge of the visible area that
-					// is inline with the destination
-
-					if (save_path_to(
-						(((x - objective_it->objective_x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x - C::VIEW_DISTANCE)),
-						(((y - objective_it->objective_y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y - C::VIEW_DISTANCE)), world))
-					{
-						// attempt to move to the destination, return if successful
-						if (make_path_movement(world)) { return; }
-					}
+					// attempt to move to the destination, return if successful
+					if (make_path_movement(world)) { return; }
 				}
+			}
 
-				if (x > objective_it->objective_x && y < objective_it->objective_y) // northeast
+			if (x > objective_it->objective_x && y < objective_it->objective_y) // northeast
+			{
+				if (save_path_to(
+					(((x - objective_it->objective_x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x - C::VIEW_DISTANCE)),
+					(((objective_it->objective_y - y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y + C::VIEW_DISTANCE)), world))
 				{
-					if (save_path_to(
-						(((x - objective_it->objective_x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x - C::VIEW_DISTANCE)),
-						(((objective_it->objective_y - y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y + C::VIEW_DISTANCE)), world))
-					{
-						if (make_path_movement(world)) { return; }
-					}
+					if (make_path_movement(world)) { return; }
 				}
+			}
 
-				if (x < objective_it->objective_x && y > objective_it->objective_y) // southwest
+			if (x < objective_it->objective_x && y > objective_it->objective_y) // southwest
+			{
+				if (save_path_to(
+					(((objective_it->objective_x - x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x + C::VIEW_DISTANCE)),
+					(((y - objective_it->objective_y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y - C::VIEW_DISTANCE)), world))
 				{
-					if (save_path_to(
-						(((objective_it->objective_x - x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x + C::VIEW_DISTANCE)),
-						(((y - objective_it->objective_y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y - C::VIEW_DISTANCE)), world))
-					{
-						if (make_path_movement(world)) { return; }
-					}
+					if (make_path_movement(world)) { return; }
 				}
+			}
 
-				if (x < objective_it->objective_x && y < objective_it->objective_y) // southeast
+			if (x < objective_it->objective_x && y < objective_it->objective_y) // southeast
+			{
+				if (save_path_to(
+					(((objective_it->objective_x - x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x + C::VIEW_DISTANCE)),
+					(((objective_it->objective_y - y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y + C::VIEW_DISTANCE)), world))
 				{
-					if (save_path_to(
-						(((objective_it->objective_x - x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x + C::VIEW_DISTANCE)),
-						(((objective_it->objective_y - y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y + C::VIEW_DISTANCE)), world))
-					{
-						if (make_path_movement(world)) { return; }
-					}
+					if (make_path_movement(world)) { return; }
 				}
+			}
 
-				// execution reaches here if a diagonal movement failed or the target is directly n/e/s/w or
-				// the target is visible but unreachable
+			// execution reaches here if a diagonal movement failed or the target is directly n/e/s/w or
+			// the target is visible but unreachable
 
-				if (x > objective_it->objective_x) // north
+			if (x > objective_it->objective_x) // north
+			{
+				// starting at the edge of view and working toward the player
+				for (int i = C::VIEW_DISTANCE; i > 0; --i)
 				{
-					if (save_path_to(x - C::VIEW_DISTANCE, y, world))
+					// if a path can be found
+					if (save_path_to(x - i, y, world))
 					{
-						// attempt to move to the destination, return if successful
-						if (make_path_movement(world)) { return; }
-					}
-				}
-
-				if (x < objective_it->objective_x) // south
-				{
-					if (save_path_to(x + C::VIEW_DISTANCE, y, world))
-					{
-						if (make_path_movement(world)) { return; }
-					}
-				}
-
-				if (y > objective_it->objective_y) // west
-				{
-					if (save_path_to(x, y - C::VIEW_DISTANCE, world))
-					{
-						if (make_path_movement(world)) { return; }
-					}
-				}
-
-				if (y < objective_it->objective_y) // east
-				{
-					if (save_path_to(x, y + C::VIEW_DISTANCE, world))
-					{
-						if (make_path_movement(world)) { return; }
+						// make the first move
+						make_path_movement(world);
+						return;
 					}
 				}
 			}
-			else
+
+			if (x < objective_it->objective_x) // south
 			{
-				// The destination is visible, but the NPC can't find a path to it.
-				// Move the current objective to the end. Handle the next objective.
-
-				// if the NPC is already on the last objective and could not pathfind to it
-				if ((--objectives.end()) == objective_it)
+				for (int i = C::VIEW_DISTANCE; i > 0; --i)
 				{
-					return; // give up
+					if (save_path_to(x + i, y, world))
+					{
+						make_path_movement(world);
+						return;
+					}
 				}
-
-				// copy the current objective
-				const Objective obj = *objective_it;
-
-				// erase the current objective
-				objectives.erase(objective_it);
-
-				// add the objective to the end of the objective deque
-				objectives.push_back(obj);
-
-				// set the current objective back to the beginning of the list
-				objective_it = objectives.begin();
-
-				// begin the next iteration
-				continue;
 			}
+
+			if (y > objective_it->objective_y) // west
+			{
+				for (int i = C::VIEW_DISTANCE; i > 0; --i)
+				{
+					if (save_path_to(x, y - i, world))
+					{
+						make_path_movement(world);
+						return;
+					}
+				}
+			}
+
+			if (y < objective_it->objective_y) // east
+			{
+				for (int i = C::VIEW_DISTANCE; i > 0; --i)
+				{
+					if (save_path_to(x, y + i, world))
+					{
+						make_path_movement(world);
+						return;
+					}
+				}
+			}
+
+			// The NPC can't pathfind to the current destintation
+			// Move the current objective to the end. Handle the next objective.
+
+			// if the NPC is already on the last objective and could not pathfind to it
+			if ((--objectives.end()) == objective_it)
+			{
+				return; // give up
+			}
+
+			// copy the current objective
+			const Objective obj = *objective_it;
+
+			// erase the current objective
+			objectives.erase(objective_it);
+
+			// add the objective to the end of the objective deque
+			objectives.push_back(obj);
+
+			// set the current objective back to the beginning of the list
+			objective_it = objectives.begin();
+
+			// begin the next iteration
+			continue;
 		}
 
 		// next objective
@@ -524,6 +525,61 @@ void Hostile_NPC_Worker::plan_fortress()
 		// create a new structure using the generated parameters
 		structures.push_back(Structure(structure_x, structure_y, structure_height, structure_width));
 	}
+
+	// Create a 2D vector of booleans. Set flags to true to represent the footprint structures within the fortress.
+	// For alignment, subtract fortress_x from all x and height values, and subtract fortress_y from all
+	// y and width values. The magic number +4 comes from the need to have a padding of 2 around all sides of the fortress.
+	// The magic number +2 is for the same reason.
+	vector<vector<bool>> fortress_footprint(FORTRESS_HEIGHT + 4, vector<bool>(FORTRESS_WIDTH + 4, false));
+	for (const Structure & structure : structures)
+	{
+		for (int i = 0; i < structure.height; ++i)
+		{
+			for (int j = 0; j < structure.width; ++j)
+			{
+				fortress_footprint[(structure.x - fortress_x) + 2 + i][
+					(structure.y - fortress_y) + 2 + j] = true;
+			}
+		}
+	}
+
+	// print the fortress footprint as a 2D grid
+	//cout << endl;
+	//for (int i = 0; i < fortress_footprint.size(); ++i)
+	//{
+	//	for (int j = 0; j < fortress_footprint[i].size(); ++j)
+	//	{
+	//		cout << fortress_footprint[i][j];
+	//	}
+	//	cout << endl;
+	//}
+	//cin.ignore();
+
+	/*
+	000000000000000000000000
+	000000000000000000000000
+	001111000000111101110000
+	001111011000111101110000
+	001111011000000001110000
+	000000000000000000111100
+	000110110110000000111100
+	000110110110000000111100
+	000001100000111001110000
+	001101100011111001110000
+	001101100011111000000000
+	001101100000000000001100
+	001101100110000000001100
+	001101100111111111001100
+	000000000111111111000000
+	000011011111111000001100
+	000011011111111011101100
+	000000011100000011100000
+	000000001111011000001100
+	000001111111011001101100
+	001101111111011001101100
+	001101111111011000001100
+	000000000000000000000000
+	000000000000000000000000*/
 
 	// this prints the location and dimensions of each structure in the fortress
 	/* cout << "structures = [\n";
