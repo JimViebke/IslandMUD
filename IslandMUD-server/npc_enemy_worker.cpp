@@ -581,6 +581,16 @@ void Hostile_NPC_Worker::plan_fortress()
 	000000000000000000000000
 	000000000000000000000000*/
 
+	// int i = 3;
+	/* for (int j = 2; j < fortress_footprint[2].size(); ++j)
+	{
+	if (fortress_footprint[3][j])
+	{
+	objectives.push_back(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::SOUTH, fortress_x - 2, fortress_y + j - 2, C::GROUND_INDEX,
+	R::random_int_from(1, 5) == 1));
+	}
+	} */
+
 	// this prints the location and dimensions of each structure in the fortress
 	/* cout << "structures = [\n";
 	for (int i = 0; i < structures.size(); ++i)
@@ -598,7 +608,7 @@ void Hostile_NPC_Worker::plan_fortress()
 
 		// determine the location of doors on the current structure
 
-		const int structure_diameter = (structure.width + structure.height * 2);
+		const int structure_diameter = (structure.width + structure.height) * 2;
 
 		// all buildings have a door, located anywhere
 		int door_one_position = R::random_int_from(1, structure_diameter),
@@ -627,6 +637,11 @@ void Hostile_NPC_Worker::plan_fortress()
 			}
 		}
 
+		// this vector represents surfaces on this structure that could have a door added
+		vector<Objective> door_candidate_surfaces;
+		// this vector represents all other surfaces that either have a door already, or cannot have a door added
+		vector<Objective> non_door_candidate_surfaces;
+
 		// add construction objectives
 
 		// create a counter that will be incremented as each surface is planned
@@ -637,34 +652,186 @@ void Hostile_NPC_Worker::plan_fortress()
 		// iterate over the west side of the structure
 		for (int x_coord = structure.x; x_coord <= (structure.x + structure.height) - 1; ++x_coord)
 		{
-			this->objectives.push_back(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::WEST, x_coord, structure.y, C::GROUND_INDEX,
-				(door_counter == door_one_position || door_counter == door_two_position || door_counter == door_three_position)));
+			Objective construction_objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::WEST, x_coord, structure.y, C::GROUND_INDEX,
+				(door_counter == door_one_position || door_counter == door_two_position || door_counter == door_three_position));
+
+			// Determine if this surface is a door_candidate surface.
+			// A surface is a door candidate surface if it does not have a door and it does not have an opposing wall
+
+			// if the objective does not have a door
+			if (construction_objective.modifier == false)
+			{
+				// flag defaults to true
+				bool is_door_candidate_surface = true;
+
+				// for each existing objective
+				for (const Objective & objective : objectives)
+				{
+					// if the objective represents an opposing wall
+					if (objective.objective_x == construction_objective.objective_x &&
+						objective.objective_y == construction_objective.objective_y - 1 &&
+						objective.direction == C::EAST && objective.verb == C::AI_OBJECTIVE_CONSTRUCT)
+					{
+						// add the construction objective to the non_door_surfaces vector
+						non_door_candidate_surfaces.push_back(construction_objective);
+						// disable the candidate flag
+						is_door_candidate_surface = false;
+						break;
+					}
+				}
+
+				// if the door candidate flag is still set to true
+				if (is_door_candidate_surface)
+				{
+					// add the objective to the vector of door_candidate_surfaces
+					door_candidate_surfaces.push_back(construction_objective);
+				}
+			}
+			else
+			{
+				non_door_candidate_surfaces.push_back(construction_objective);
+			}
+
 			++door_counter;
 		}
 
 		// iterate over the south side of the structure
 		for (int y_coord = structure.y; y_coord <= (structure.y + structure.width) - 1; ++y_coord)
 		{
-			this->objectives.push_back(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::SOUTH, (structure.x + structure.height) - 1, y_coord, C::GROUND_INDEX,
-				(door_counter == door_one_position || door_counter == door_two_position || door_counter == door_three_position)));
+			Objective construction_objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::SOUTH, (structure.x + structure.height) - 1, y_coord, C::GROUND_INDEX,
+				(door_counter == door_one_position || door_counter == door_two_position || door_counter == door_three_position));
+
+			if (construction_objective.modifier == false)
+			{
+				bool is_door_candidate_surface = true;
+
+				for (const Objective & objective : objectives)
+				{
+					if (objective.objective_x == construction_objective.objective_x + 1 &&
+						objective.objective_y == construction_objective.objective_y &&
+						objective.direction == C::NORTH && objective.verb == C::AI_OBJECTIVE_CONSTRUCT)
+					{
+						non_door_candidate_surfaces.push_back(construction_objective);
+						is_door_candidate_surface = false;
+						break;
+					}
+				}
+
+				// if the door candidate flag is still set to true
+				if (is_door_candidate_surface)
+				{
+					// add the objective to the vector of door_candidate_surfaces
+					door_candidate_surfaces.push_back(construction_objective);
+				}
+			}
+			else
+			{
+				non_door_candidate_surfaces.push_back(construction_objective);
+			}
+
 			++door_counter;
 		}
 
 		// iterate over the north side of the structure
 		for (int y_coord = structure.y; y_coord <= (structure.y + structure.width) - 1; ++y_coord)
 		{
-			this->objectives.push_back(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::NORTH, structure.x, y_coord, C::GROUND_INDEX,
-				(door_counter == door_one_position || door_counter == door_two_position || door_counter == door_three_position)));
+			Objective construction_objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::NORTH, structure.x, y_coord, C::GROUND_INDEX,
+				(door_counter == door_one_position || door_counter == door_two_position || door_counter == door_three_position));
+
+			if (construction_objective.modifier == false)
+			{
+				bool is_door_candidate_surface = true;
+
+				for (const Objective & objective : objectives)
+				{
+					if (objective.objective_x == construction_objective.objective_x - 1 &&
+						objective.objective_y == construction_objective.objective_y &&
+						objective.direction == C::SOUTH && objective.verb == C::AI_OBJECTIVE_CONSTRUCT)
+					{
+						non_door_candidate_surfaces.push_back(construction_objective);
+						is_door_candidate_surface = false;
+						break;
+					}
+				}
+
+				// if the door candidate flag is still set to true
+				if (is_door_candidate_surface)
+				{
+					// add the objective to the vector of door_candidate_surfaces
+					door_candidate_surfaces.push_back(construction_objective);
+				}
+			}
+			else
+			{
+				non_door_candidate_surfaces.push_back(construction_objective);
+			}
+
 			++door_counter;
 		}
 
 		// iterate over the east side of the structure
 		for (int x_coord = structure.x; x_coord <= (structure.x + structure.height) - 1; ++x_coord)
 		{
-			this->objectives.push_back(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::EAST, x_coord, (structure.y + structure.width) - 1, C::GROUND_INDEX,
-				(door_counter == door_one_position || door_counter == door_two_position || door_counter == door_three_position)));
+			Objective construction_objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::EAST, x_coord, (structure.y + structure.width) - 1, C::GROUND_INDEX,
+				(door_counter == door_one_position || door_counter == door_two_position || door_counter == door_three_position));
+
+			if (construction_objective.modifier == false)
+			{
+				bool is_door_candidate_surface = true;
+
+				for (const Objective & objective : objectives)
+				{
+					if (objective.objective_x == construction_objective.objective_x &&
+						objective.objective_y == construction_objective.objective_y + 1 &&
+						objective.direction == C::WEST && objective.verb == C::AI_OBJECTIVE_CONSTRUCT)
+					{
+						non_door_candidate_surfaces.push_back(construction_objective);
+						is_door_candidate_surface = false;
+						break;
+					}
+				}
+
+				// if the door candidate flag is still set to true
+				if (is_door_candidate_surface)
+				{
+					// add the objective to the vector of door_candidate_surfaces
+					door_candidate_surfaces.push_back(construction_objective);
+				}
+			}
+			else
+			{
+				non_door_candidate_surfaces.push_back(construction_objective);
+			}
+
 			++door_counter;
 		}
+
+
+		// Look at all doors in non_door_candidate_surfaces, ensure at least one door exists.
+		// If not, select a random door in door_candidate_surfaces, and set the objective's modifier (door) flag
+		// to true.
+		bool door_found = false;
+		for (const Objective & construction_objective : non_door_candidate_surfaces)
+		{
+			// if the surface will have a door
+			if (construction_objective.modifier)
+			{
+				// set the door found flag to true then break, this structure is good.
+				door_found = true;
+				break;
+			}
+		}
+
+		// if no door was found on the structure
+		if (!door_found)
+		{
+			// add two doors in random locations
+			door_candidate_surfaces[R::random_int_from(0, (int)door_candidate_surfaces.size() - 1)].modifier = true;
+		}
+
+		// add all new construction objectives to this NPCs deque of objectives
+		objectives.insert(objectives.end(), door_candidate_surfaces.begin(), door_candidate_surfaces.end());
+		objectives.insert(objectives.end(), non_door_candidate_surfaces.begin(), non_door_candidate_surfaces.end());
 
 		// finished planning for this structure
 	}
