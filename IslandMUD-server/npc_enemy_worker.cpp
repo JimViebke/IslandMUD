@@ -827,6 +827,7 @@ void Hostile_NPC_Worker::plan_fortress()
 		{
 			// add two doors in random locations
 			door_candidate_surfaces[R::random_int_from(0, (int)door_candidate_surfaces.size() - 1)].modifier = true;
+			door_candidate_surfaces[R::random_int_from(0, (int)door_candidate_surfaces.size() - 1)].modifier = true; // this line is deliberate
 		}
 
 		// add all new construction objectives to this NPCs deque of objectives
