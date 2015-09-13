@@ -20,6 +20,8 @@ public:
 
 	void plan_fortress();
 
+	void plan_fortress_outer_wall(const int & fortress_x, const int & fortress_y, const vector<vector<bool>> & fortress_footprint);
+
 private:
 	class Partition
 	{
@@ -36,6 +38,9 @@ private:
 		Structure(const int & x, const int & y, const int & height, const int & width) :
 			x(x), y(y), height(height), width(width) {}
 	};
+
+	// used during fortress outer wall generation
+	enum Area_Type { structure, fortress_interior, fortress_exterior };
 };
 
 #endif

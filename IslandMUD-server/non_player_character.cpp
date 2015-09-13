@@ -763,7 +763,7 @@ bool NPC::make_path_movement(World & world)
 	if (!path.empty())
 	{
 		// attempt to move to the next node
-		if (this->move(R::get_movement_direction(x, y, path.begin()->coord_x, path.begin()->coord_y), world).find("You move ") != string::npos)
+		if (this->move(R::get_movement_direction(x, y, path.begin()->_x, path.begin()->_y), world).find("You move ") != string::npos)
 		{
 			// if successful, remove the coordinate that we travelled to
 			path.erase(path.begin());
