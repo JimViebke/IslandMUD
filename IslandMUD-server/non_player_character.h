@@ -46,9 +46,9 @@ protected:
 	class Coordinate
 	{
 	public:
-		int coord_x, coord_y, coord_z;
-		Coordinate(const int & set_x, const int & set_y, const int & set_z) :
-			coord_x(set_x), coord_y(set_y), coord_z(set_z) {}
+		int _x, _y, _z;
+		Coordinate(const int & set_x, const int & set_y, const int & set_z = -1) :
+			_x(set_x), _y(set_y), _z(set_z) {}
 	};
 
 	string ai_type;
