@@ -2,6 +2,8 @@
 /* Jim Viebke
 Aug 15 2015 */
 
+#include <queue>
+
 #include "npc_enemy_worker.h"
 
 void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>> & actors)
@@ -543,62 +545,8 @@ void Hostile_NPC_Worker::plan_fortress()
 		}
 	}
 
-	// print the fortress footprint as a 2D grid
-	//cout << endl;
-	//for (int i = 0; i < fortress_footprint.size(); ++i)
-	//{
-	//	for (int j = 0; j < fortress_footprint[i].size(); ++j)
-	//	{
-	//		cout << fortress_footprint[i][j];
-	//	}
-	//	cout << endl;
-	//}
-	//cin.ignore();
-
-	/*
-	000000000000000000000000
-	000000000000000000000000
-	001111000000111101110000
-	001111011000111101110000
-	001111011000000001110000
-	000000000000000000111100
-	000110110110000000111100
-	000110110110000000111100
-	000001100000111001110000
-	001101100011111001110000
-	001101100011111000000000
-	001101100000000000001100
-	001101100110000000001100
-	001101100111111111001100
-	000000000111111111000000
-	000011011111111000001100
-	000011011111111011101100
-	000000011100000011100000
-	000000001111011000001100
-	000001111111011001101100
-	001101111111011001101100
-	001101111111011000001100
-	000000000000000000000000
-	000000000000000000000000*/
-
-	// int i = 3;
-	/* for (int j = 2; j < fortress_footprint[2].size(); ++j)
-	{
-	if (fortress_footprint[3][j])
-	{
-	objectives.push_back(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::SOUTH, fortress_x - 2, fortress_y + j - 2, C::GROUND_INDEX,
-	R::random_int_from(1, 5) == 1));
-	}
-	} */
-
-	// this prints the location and dimensions of each structure in the fortress
-	/* cout << "structures = [\n";
-	for (int i = 0; i < structures.size(); ++i)
-	{
-	cout << "[" << structures[i].x << ", " << structures[i].y << ", " << structures[i].height << ", " << structures[i].width << "], ";
-	if ((i + 1) % 5 == 0) { cout << endl; }
-	}
-	cout << "]" << endl; */
+	// the footprint of each structure is known at this time; plan an outer wall around the fortress' structures
+	plan_fortress_outer_wall(fortress_x, fortress_y, fortress_footprint);
 
 	// now add construction objectives objectives for every surface of every structure
 	for (const Structure & structure : structures)
@@ -838,4 +786,141 @@ void Hostile_NPC_Worker::plan_fortress()
 	}
 
 	// finished planning for all structures
+}
+
+void Hostile_NPC_Worker::plan_fortress_outer_wall(const int & fortress_x, const int & fortress_y, const vector<vector<bool>> & fortress_footprint)
+{
+	// create a vector the same size as the fortress, populated with Area_type::fortress_exterior
+	vector<vector<Area_Type>> area(fortress_footprint.size(), vector<Area_Type>(fortress_footprint[0].size(), Area_Type::fortress_exterior));
+
+	// for each room that could possibly be a structure
+	for (unsigned i = 2; i < fortress_footprint.size() - 2; ++i)
+	{
+		for (unsigned j = 2; j < fortress_footprint[0].size() - 2; ++j)
+		{
+			// if the room is a structure
+			if (fortress_footprint[i][j])
+			{
+				// mark it as a structure on the area map
+				area[i][j] = Area_Type::structure;
+
+				// if the adjacent eight rooms are not structure, set them to interior
+
+				if (area[i - 1][j - 1] != Area_Type::structure)
+				{
+					area[i - 1][j - 1] = Area_Type::fortress_interior;
+				}
+				if (area[i - 1][j] != Area_Type::structure)
+				{
+					area[i - 1][j] = Area_Type::fortress_interior;
+				}
+				if (area[i - 1][j + 1] != Area_Type::structure)
+				{
+					area[i - 1][j + 1] = Area_Type::fortress_interior;
+				}
+
+				if (area[i][j - 1] != Area_Type::structure)
+				{
+					area[i][j - 1] = Area_Type::fortress_interior;
+				}
+				if (area[i][j + 1] != Area_Type::structure)
+				{
+					area[i][j + 1] = Area_Type::fortress_interior;
+				}
+
+				if (area[i + 1][j - 1] != Area_Type::structure)
+				{
+					area[i + 1][j - 1] = Area_Type::fortress_interior;
+				}
+				if (area[i + 1][j] != Area_Type::structure)
+				{
+					area[i + 1][j] = Area_Type::fortress_interior;
+				}
+				if (area[i + 1][j + 1] != Area_Type::structure)
+				{
+					area[i + 1][j + 1] = Area_Type::fortress_interior;
+				}
+			}
+		}
+	}
+
+	// create a 2D vector of booleans to indicate which nodes/rooms the below flood fill visited
+	vector<vector<bool>> exterior_visited(area.size(), vector<bool>(area[0].size(), false));
+
+	// use a deque-based 4-directional flood fill
+	std::deque<Coordinate> flood_fill;
+
+	// start with 0,0
+	flood_fill.push_back(Coordinate(0, 0));
+
+	// while there are still nodes to examine
+	while (!flood_fill.empty())
+	{
+		// extract and remove the next node
+		Coordinate node = flood_fill.front();
+		flood_fill.erase(flood_fill.begin());
+
+		// add neighboring nodes
+
+		// if this is an exterior node
+		if (area[node._x][node._y] == Area_Type::fortress_exterior)
+		{
+			// add each neighbor that has not been visisted
+			if (node._x - 1 >= 0 && !exterior_visited[node._x - 1][node._y]) // north
+			{
+				// if the adjacent node is not within the fortress
+				if (area[node._x - 1][node._y] != Area_Type::fortress_interior)
+				{
+					// add the adjacent node to the list to explore
+					flood_fill.push_front(Coordinate(node._x - 1, node._y));
+					exterior_visited[node._x - 1][node._y] = true;
+				}
+				else // the adjacent node is within the fortress
+				{
+					// add an objective to construct an outer wall here
+					objectives.push_front(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::NORTH, fortress_x + node._x - 2, fortress_y + node._y - 2, C::GROUND_INDEX,
+						R::random_int_from(1, 6) == 1));
+				}
+			}
+			if (node._x + 1 < (int)area.size() && !exterior_visited[node._x + 1][node._y]) // south
+			{
+				if (area[node._x + 1][node._y] != Area_Type::fortress_interior)
+				{
+					flood_fill.push_front(Coordinate(node._x + 1, node._y));
+					exterior_visited[node._x + 1][node._y] = true;
+				}
+				else
+				{
+					objectives.push_front(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::SOUTH, fortress_x + node._x - 2, fortress_y + node._y - 2, C::GROUND_INDEX,
+						R::random_int_from(1, 6) == 1));
+				}
+			}
+			if (node._y - 1 >= 0 && !exterior_visited[node._x][node._y - 1]) // west
+			{
+				if (area[node._x][node._y - 1] != Area_Type::fortress_interior)
+				{
+					flood_fill.push_front(Coordinate(node._x, node._y - 1));
+					exterior_visited[node._x][node._y - 1] = true;
+				}
+				else
+				{
+					objectives.push_front(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::WEST, fortress_x + node._x - 2, fortress_y + node._y - 2, C::GROUND_INDEX,
+						R::random_int_from(1, 6) == 1));
+				}
+			}
+			if (node._y + 1 < (int)area.size() && !exterior_visited[node._x][node._y + 1]) // east
+			{
+				if (area[node._x][node._y + 1] != Area_Type::fortress_interior)
+				{
+					flood_fill.push_front(Coordinate(node._x, node._y + 1));
+					exterior_visited[node._x][node._y + 1] = true;
+				}
+				else
+				{
+					objectives.push_front(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::EAST, fortress_x + node._x - 2, fortress_y + node._y - 2, C::GROUND_INDEX,
+						R::random_int_from(1, 6) == 1));
+				}
+			}
+		}
+	}
 }
