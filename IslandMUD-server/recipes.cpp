@@ -67,37 +67,37 @@ string Recipes::get_recipes() const
 	stringstream output;
 	for (auto & recipe : recipes)
 	{
-		output << "Recipe name: " << recipe.first << endl;
+		output << recipe.first << endl;
 		if (recipe.second.inventory_need.size() > 0)
 		{
-			output << "Requirements:\n";
+			output << "\tRequired in inventory:\n";
 			for (map<string, int>::const_iterator it = recipe.second.inventory_need.cbegin(); it != recipe.second.inventory_need.cend(); ++it)
 			{
-				output << "\t" << it->second << " " << it->first << endl; // 5 stick
+				output << "\t\t" << it->second << " " << it->first << endl; // 5 stick
 			}
 		}
 		if (recipe.second.inventory_remove.size() > 0)
 		{
-			output << "Requirements that will be removed from your inventory:\n";
+			output << "\tUsed from inventory:\n";
 			for (map<string, int>::const_iterator it = recipe.second.inventory_remove.cbegin(); it != recipe.second.inventory_remove.cend(); ++it)
 			{
-				output << "\t" << it->second << " " << it->first << endl; // 5 stick
+				output << "\t\t" << it->second << " " << it->first << endl; // 5 stick
 			}
 		}
 		if (recipe.second.local_need.size() > 0)
 		{
-			output << "Local requirements:\n";
+			output << "\tLocally required:\n";
 			for (map<string, int>::const_iterator it = recipe.second.local_need.cbegin(); it != recipe.second.local_need.cend(); ++it)
 			{
-				output << "\t" << it->second << " " << it->first << endl; // 5 stick
+				output << "\t\t" << it->second << " " << it->first << endl; // 5 stick
 			}
 		}
 		if (recipe.second.local_remove.size() > 0)
 		{
-			output << "Local requirements that will be removed from the area:\n";
+			output << "\tLocally consumed:\n";
 			for (map<string, int>::const_iterator it = recipe.second.local_remove.cbegin(); it != recipe.second.local_remove.cend(); ++it)
 			{
-				output << "\t" << it->second << " " << it->first << endl; // 5 stick
+				output << "\t\t" << it->second << " " << it->first << endl; // 5 stick
 			}
 		}
 		output << endl;
