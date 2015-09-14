@@ -57,7 +57,7 @@ void Parse::initialize()
 		// items -> tools
 		P::dict["bow"] = C::BOW_ID;
 		P::dict["staff"] = C::STAFF_ID;
-		P::dict["axe"] = C::AXE_ID;
+		P::dict["axe"] = P::dict["ax"] = C::AXE_ID;
 		P::dict["sword"] = C::SWORD_ID;
 		P::dict["hammer"] = C::HAMMER_ID;
 

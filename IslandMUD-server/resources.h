@@ -86,6 +86,22 @@ public:
 	}
 
 	// movement
+	static inline void assign_movement_deltas(const string & direction_ID, int & dx, int & dy)
+	{
+		// express movement through two dimensions in dx, dy
+		// If direction_ID is invalid, output arguments will not be modified.
+
+		if (direction_ID == C::NORTH) { --dx; }
+		else if (direction_ID == C::SOUTH) { ++dx; }
+		else if (direction_ID == C::WEST) { --dy; }
+		else if (direction_ID == C::EAST) { ++dy; }
+		else if (direction_ID == C::NORTH_WEST) { --dx; --dy; }
+		else if (direction_ID == C::NORTH_EAST) { --dx; ++dy; }
+		else if (direction_ID == C::SOUTH_EAST) { ++dx; ++dy; }
+		else if (direction_ID == C::SOUTH_WEST) { ++dx; --dy; }
+
+		// nothing to return, values passed by reference
+	}
 	static inline void assign_movement_deltas(const string & direction_ID, int & dx, int & dy, int & dz)
 	{
 		// express movement through three dimensions in dx, dy, dz
