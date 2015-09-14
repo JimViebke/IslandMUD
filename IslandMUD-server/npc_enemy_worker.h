@@ -10,7 +10,20 @@ Aug 15 2015 */
 class Hostile_NPC_Worker : public Hostile_NPC
 {
 private:
+
+	class Structure_Objectives
+	{
+	private:
+		bool doors_planned = false;
+
+	public:
+		vector<Objective> structure_surface_objectives;
+		void add(const Objective & obj);
+		void plan_doors(const World & world);
+	};
+
 	bool fortress_planned = false;
+	deque<Structure_Objectives> planned_structures;
 
 public:
 	Hostile_NPC_Worker(const string & name, const string & faction_ID) :
