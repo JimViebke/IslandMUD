@@ -49,24 +49,11 @@ string PC::get_equipped_item_id() const
 // Build and return a top-down area map around a given coordinate
 string PC::generate_area_map(const World & world, const map<string, shared_ptr<Character>> & actors) const
 {
-	// (VIEW_DISTANCE * 2) + 1 == the number of rooms to be rendered (across)
-	// * 3 == the total width by char count
-	// - 2 == the total width by char count after removing the borders
-	const int area_map_trimmed_width = (((C::VIEW_DISTANCE * 2) + 1) * 3) - 2;
-
 	vector<vector<char_type>> user_map; // three vectors feed into one vector
 
-	// create a 2D vector to represent whether or not a tree is at a location
-	vector<vector<bool>> forest_grid;
-	for (int i = 0; i < (C::VIEW_DISTANCE * 2) + 3; ++i) // (view+1+view) plus a padding of 1 on each side
-	{
-		vector<bool> row;
-		for (int j = 0; j < (C::VIEW_DISTANCE * 2) + 3; ++j)
-		{
-			row.push_back(false);
-		}
-		forest_grid.push_back(row);
-	}
+	// create a 2D vector to represent whether or not a tree is at a location.
+	// Dimensions are (view+1+view) plus a padding of 1 on each side
+	vector<vector<bool>> forest_grid((C::VIEW_DISTANCE * 2) + 3, vector<bool>((C::VIEW_DISTANCE * 2) + 3, false));
 
 	/*
 	We're looking for presence/absence info on trees in a 11*11 radius, and fitting it into a 13x13 grid, with a ring around for bounds padding.
