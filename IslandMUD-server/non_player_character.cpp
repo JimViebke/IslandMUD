@@ -815,6 +815,10 @@ bool NPC::make_path_movement(World & world)
 	return false;
 }
 
+// Node constructors
+NPC::Node::Node() {}
+NPC::Node::Node(const int & set_x, const int & set_y, const string & dir) : x(set_x), y(set_y), direction_from_parent(dir) {}
+
 // Node member setter
 void NPC::Node::set_g_h_f(const int & set_g, const int & set_h)
 {
