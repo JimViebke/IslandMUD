@@ -27,7 +27,7 @@ private:
 
 public:
 	Hostile_NPC_Worker(const string & name, const string & faction_ID) :
-		Hostile_NPC(name, faction_ID, C::AI_TYPE_WORKER) {}
+		Hostile_NPC(name, faction_ID) {}
 
 	void update(World & world, map<string, shared_ptr<Character>> & actors);
 

@@ -265,15 +265,7 @@ public:
 	const static int
 		MAX_CHEST_HEALTH;
 
-	// NPC types
-	const static string
-		AI_TYPE_FIGHTER,
-		AI_TYPE_WORKER,
-		AI_TYPE_BLACKSMITH,
-		AI_TYPE_WATCH_GUARD,
-		AI_TYPE_PATROL_GUARD,
-		AI_TYPE_MINER;
-
+	// fortress generation bounds
 	const static int
 		FORTRESS_PARTITION_MIN_SIZE,
 		FORTRESS_MIN_X,

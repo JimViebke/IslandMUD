@@ -47,12 +47,11 @@ protected:
 		Coordinate(const int & set_x, const int & set_y, const int & set_z = -1);
 	};
 
-	string ai_type;
 	deque<Objective> objectives;
 	deque<Coordinate> path;
 
 	// this can only be instantiated by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
-	Non_Player_Character(const string & name, const string & faction_ID, const string & set_ai_type);
+	Non_Player_Character(const string & name, const string & faction_ID);
 
 	// objective creating and deletion
 	void add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const string & purpose);

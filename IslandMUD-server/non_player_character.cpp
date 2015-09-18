@@ -6,22 +6,7 @@ Jun 3 2015 */
 // using NPC = Non_Player_Character; // ...in order to put this here
 
 // this can only be instantiated by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
-NPC::Non_Player_Character(const string & name, const string & faction_ID, const string & set_ai_type) : Character(name, faction_ID)
-{
-	if (set_ai_type == C::AI_TYPE_BLACKSMITH ||
-		set_ai_type == C::AI_TYPE_FIGHTER ||
-		set_ai_type == C::AI_TYPE_MINER ||
-		set_ai_type == C::AI_TYPE_PATROL_GUARD ||
-		set_ai_type == C::AI_TYPE_WATCH_GUARD ||
-		set_ai_type == C::AI_TYPE_WORKER)
-	{
-		this->ai_type = set_ai_type;
-	}
-	else
-	{
-		cout << "\nERROR: [" << set_ai_type << "] is not a known AI type.\n";
-	}
-}
+NPC::Non_Player_Character(const string & name, const string & faction_ID) : Character(name, faction_ID) {}
 
 // objective debugging
 string NPC::get_objectives() const
