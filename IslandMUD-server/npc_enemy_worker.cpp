@@ -416,8 +416,41 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 
 	if (planned_structures.size() > 0)
 	{
+		// for each planned structure
+		for (deque<Structure_Objectives>::iterator structure_it = planned_structures.begin();
+			structure_it != planned_structures.end();)
+		{
+			// if the structure has no remaining surfaces
+			if (structure_it->structure_surface_objectives.size() == 0)
+			{
+				// erase the planned structure
+				structure_it = planned_structures.erase(structure_it);
+			}
+			else
+			{
+				// move to next structure
+				++structure_it;
+			}
+		}
+	}
+
+	if (planned_structures.size() > 0)
+	{
 		// select the next planned structure
 		deque<Structure_Objectives>::iterator structure_it = planned_structures.begin();
+
+		// debug code
+		/*if (structure_it->structure_surface_objectives.size() > 0)
+		{
+		for (vector<Objective>::iterator objective_it = structure_it->structure_surface_objectives.begin();
+		objective_it != structure_it->structure_surface_objectives.end(); ++objective_it)
+		{
+		if (objective_it->objective_x == 83 && objective_it->objective_y == 50)
+		{
+		break;
+		}
+		}
+		}*/
 
 		// for each construction objective
 		for (vector<Objective>::iterator objective_it = structure_it->structure_surface_objectives.begin();
@@ -610,7 +643,7 @@ void Hostile_NPC_Worker::plan_fortress()
 	} while (R::euclidean_distance(C::WORLD_X_DIMENSION / 2, C::WORLD_Y_DIMENSION / 2,
 		fortress_x + (FORTRESS_HEIGHT / 2),
 		fortress_y + (FORTRESS_WIDTH / 2)) >= C::WORLD_X_DIMENSION * 0.45);
-	
+
 	// the first partition is the size of the fortress 
 	vector<Partition> partitions;
 	partitions.push_back(Partition(fortress_x, fortress_y, FORTRESS_HEIGHT, FORTRESS_WIDTH));

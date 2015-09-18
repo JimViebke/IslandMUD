@@ -3,6 +3,26 @@ Jun 3 2015 */
 
 #include "non_player_character.h"
 
+// using NPC = Non_Player_Character; // ...in order to put this here
+
+// this can only be instantiated by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
+NPC::Non_Player_Character(const string & name, const string & faction_ID, const string & set_ai_type) : Character(name, faction_ID)
+{
+	if (set_ai_type == C::AI_TYPE_BLACKSMITH ||
+		set_ai_type == C::AI_TYPE_FIGHTER ||
+		set_ai_type == C::AI_TYPE_MINER ||
+		set_ai_type == C::AI_TYPE_PATROL_GUARD ||
+		set_ai_type == C::AI_TYPE_WATCH_GUARD ||
+		set_ai_type == C::AI_TYPE_WORKER)
+	{
+		this->ai_type = set_ai_type;
+	}
+	else
+	{
+		cout << "\nERROR: [" << set_ai_type << "] is not a known AI type.\n";
+	}
+}
+
 // objective debugging
 string NPC::get_objectives() const
 {
@@ -28,6 +48,17 @@ string NPC::get_objectives() const
 	return result.str();
 }
 
+// NPC objective constructors
+NPC::Objective::Objective(const string & verb, const string & noun, const string & purpose) :
+verb(verb), noun(noun), purpose(purpose) {}
+NPC::Objective::Objective(const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z) :
+verb(verb), noun(noun), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z) {}
+NPC::Objective::Objective(const string & verb, const string & noun, const string & material, const string & direction, const int & objective_x, const int & objective_y, const int & objective_z, const bool & modifier) :
+verb(verb), noun(noun), material(material), direction(direction), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z), modifier(modifier) {}
+
+// NPC Coordinate constructor
+NPC::Coordinate::Coordinate(const int & set_x, const int & set_y, const int & set_z) : _x(set_x), _y(set_y), _z(set_z) {}
+
 // objective creating and deletion
 void NPC::add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const string & purpose)
 {
@@ -51,15 +82,18 @@ void NPC::erase_objectives_matching_purpose(const string purpose)
 
 	// erase all objectives matching a purpose
 
+	// for each objective
 	for (unsigned i = 0; i < objectives.size();)
 	{
+		// if the objective matches the passed purpose
 		if (objectives[i].purpose == purpose)
 		{
+			// erase the objective
 			objectives.erase(objectives.begin() + i);
 		}
-		else
+		else // the objective does not match the passed purpose and will not be erased
 		{
-			++i; // no item was erased, move to next element
+			++i; // move to to next element
 		}
 	}
 }
@@ -67,11 +101,14 @@ void NPC::erase_goto_objective_matching(const string & purpose)
 {
 	// erase one goto objective matching purpose
 
+	// for each objective
 	for (deque<Objective>::iterator objective_iterator = objectives.begin();
 		objective_iterator != objectives.end(); ++objective_iterator)
 	{
+		// if the objective is a go-to objective matching the passed purpose
 		if (objective_iterator->verb == C::AI_OBJECTIVE_GOTO && objective_iterator->purpose == purpose)
 		{
+			// erase the objective and return
 			objectives.erase(objective_iterator);
 			return;
 		}
@@ -81,11 +118,14 @@ void NPC::erase_acquire_objective_matching(const string & noun)
 {
 	// erase one acquire objective matching noun
 
+	// for each objective
 	for (deque<Objective>::iterator objective_iterator = objectives.begin();
 		objective_iterator != objectives.end(); ++objective_iterator)
 	{
+		// if the objective is an acquire objective matching the passed noun
 		if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE && objective_iterator->noun == noun)
 		{
+			// erase the objective and return
 			objectives.erase(objective_iterator);
 			return;
 		}
@@ -771,7 +811,7 @@ bool NPC::make_path_movement(World & world)
 		}
 	}
 
-	// there was no path to follow or a move could not be made with the existing path
+	// there was no path to follow or the next planned move in the path could not be made
 	return false;
 }
 
@@ -885,6 +925,6 @@ NPC::Node NPC::get_node_at(const int & find_x, const int & find_y, const vector<
 		}
 	}
 
-	// the node could not be found
+	// the node could not be found, return a default (invalid) node
 	return Node();
 }
