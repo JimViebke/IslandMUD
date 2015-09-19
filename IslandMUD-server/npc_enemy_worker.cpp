@@ -189,7 +189,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 		// check if the objective is a construction objective
 		if (objective_it->verb == C::AI_OBJECTIVE_CONSTRUCT)
 		{
-			// if we are at the destination
+			// if the NPC is at the destination
 			if (x == objective_it->objective_x && y == objective_it->objective_y)
 			{
 				// if the surface already exists, erase the objective and continue
@@ -244,7 +244,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 							{
 								// set the flag to true
 								it->modifier = true;
-								// we're finished
+								// finished
 								break;
 							}
 						}
@@ -274,7 +274,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					return;
 				}
 			}
-			// we are not at the destination, attempt to pathfind to it
+			// the NPC is not at the destination, attempt to pathfind to it
 			else if (save_path_to(objective_it->objective_x, objective_it->objective_y, world))
 			{
 				// make the first move then return
@@ -282,7 +282,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				return;
 			}
 
-			// we could not pathfind to the destination, try to move in the direction of the destination.
+			// the NPC could not pathfind to the destination, try to move in the direction of the destination.
 
 			if (x > objective_it->objective_x && y > objective_it->objective_y) // northwest
 			{
@@ -459,7 +459,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 			// limit how many objective attempts the AI can make before control is returned
 			if (++objective_attempts > C::AI_MAX_OBJECTIVE_ATTEMPTS) { return; }
 
-			// if we are at the destination
+			// if the NPC is at the destination
 			if (x == objective_it->objective_x && y == objective_it->objective_y)
 			{
 				// this internally ensures it will only execute once
@@ -510,7 +510,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					return;
 				}
 			}
-			// we are not at the destination, attempt to pathfind to it
+			// the NPC is not at the destination, attempt to pathfind to it
 			else if (save_path_to(objective_it->objective_x, objective_it->objective_y, world))
 			{
 				// make the first move then return
@@ -520,7 +520,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 
 
 
-			// we could not pathfind to the destination, try to move in the direction of the destination.
+			// the NPC could not pathfind to the destination, try to move in the direction of the destination.
 
 			if (x > objective_it->objective_x && y > objective_it->objective_y) // northwest
 			{
@@ -570,7 +570,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 			// execution reaches here if a diagonal movement failed or the target is directly n/e/s/w or
 			// the target is visible but unreachable
 
-			if (x > objective_it->objective_x) // north
+			if (x > objective_it->objective_x) // need to move north
 			{
 				// starting at the edge of view and working toward the player
 				for (int i = C::VIEW_DISTANCE; i > 0; --i)
@@ -580,42 +580,66 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					{
 						// make the first move
 						make_path_movement(world);
+
+						if (x == objective_it->objective_x) // if the NPC are parallel with the destination, don't over shoot
+						{
+							path.clear();
+						}
+
 						return;
 					}
 				}
 			}
 
-			if (x < objective_it->objective_x) // south
+			if (x < objective_it->objective_x) // need to move south
 			{
 				for (int i = C::VIEW_DISTANCE; i > 0; --i)
 				{
 					if (save_path_to(x + i, y, world))
 					{
 						make_path_movement(world);
+
+						if (x == objective_it->objective_x)
+						{
+							path.clear();
+						}
+
 						return;
 					}
 				}
 			}
 
-			if (y > objective_it->objective_y) // west
+			if (y > objective_it->objective_y) // need to move west
 			{
 				for (int i = C::VIEW_DISTANCE; i > 0; --i)
 				{
 					if (save_path_to(x, y - i, world))
 					{
 						make_path_movement(world);
+
+						if (y == objective_it->objective_y)
+						{
+							path.clear();
+						}
+
 						return;
 					}
 				}
 			}
 
-			if (y < objective_it->objective_y) // east
+			if (y < objective_it->objective_y) // need to move east
 			{
 				for (int i = C::VIEW_DISTANCE; i > 0; --i)
 				{
 					if (save_path_to(x, y + i, world))
 					{
 						make_path_movement(world);
+
+						if (y == objective_it->objective_y)
+						{
+							path.clear();
+						}
+
 						return;
 					}
 				}
