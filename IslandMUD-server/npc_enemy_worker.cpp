@@ -189,7 +189,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 		// check if the objective is a construction objective
 		if (objective_it->verb == C::AI_OBJECTIVE_CONSTRUCT)
 		{
-			// if we are at the destination
+			// if the NPC is at the destination
 			if (x == objective_it->objective_x && y == objective_it->objective_y)
 			{
 				// if the surface already exists, erase the objective and continue
@@ -244,7 +244,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 							{
 								// set the flag to true
 								it->modifier = true;
-								// we're finished
+								// finished
 								break;
 							}
 						}
@@ -274,7 +274,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					return;
 				}
 			}
-			// we are not at the destination, attempt to pathfind to it
+			// the NPC is not at the destination, attempt to pathfind to it
 			else if (save_path_to(objective_it->objective_x, objective_it->objective_y, world))
 			{
 				// make the first move then return
@@ -282,7 +282,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				return;
 			}
 
-			// we could not pathfind to the destination, try to move in the direction of the destination.
+			// the NPC could not pathfind to the destination, try to move in the direction of the destination.
 
 			if (x > objective_it->objective_x && y > objective_it->objective_y) // northwest
 			{
@@ -416,8 +416,41 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 
 	if (planned_structures.size() > 0)
 	{
+		// for each planned structure
+		for (deque<Structure_Objectives>::iterator structure_it = planned_structures.begin();
+			structure_it != planned_structures.end();)
+		{
+			// if the structure has no remaining surfaces
+			if (structure_it->structure_surface_objectives.size() == 0)
+			{
+				// erase the planned structure
+				structure_it = planned_structures.erase(structure_it);
+			}
+			else
+			{
+				// move to next structure
+				++structure_it;
+			}
+		}
+	}
+
+	if (planned_structures.size() > 0)
+	{
 		// select the next planned structure
 		deque<Structure_Objectives>::iterator structure_it = planned_structures.begin();
+
+		// debug code
+		/*if (structure_it->structure_surface_objectives.size() > 0)
+		{
+		for (vector<Objective>::iterator objective_it = structure_it->structure_surface_objectives.begin();
+		objective_it != structure_it->structure_surface_objectives.end(); ++objective_it)
+		{
+		if (objective_it->objective_x == 83 && objective_it->objective_y == 50)
+		{
+		break;
+		}
+		}
+		}*/
 
 		// for each construction objective
 		for (vector<Objective>::iterator objective_it = structure_it->structure_surface_objectives.begin();
@@ -426,7 +459,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 			// limit how many objective attempts the AI can make before control is returned
 			if (++objective_attempts > C::AI_MAX_OBJECTIVE_ATTEMPTS) { return; }
 
-			// if we are at the destination
+			// if the NPC is at the destination
 			if (x == objective_it->objective_x && y == objective_it->objective_y)
 			{
 				// this internally ensures it will only execute once
@@ -477,7 +510,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					return;
 				}
 			}
-			// we are not at the destination, attempt to pathfind to it
+			// the NPC is not at the destination, attempt to pathfind to it
 			else if (save_path_to(objective_it->objective_x, objective_it->objective_y, world))
 			{
 				// make the first move then return
@@ -487,7 +520,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 
 
 
-			// we could not pathfind to the destination, try to move in the direction of the destination.
+			// the NPC could not pathfind to the destination, try to move in the direction of the destination.
 
 			if (x > objective_it->objective_x && y > objective_it->objective_y) // northwest
 			{
@@ -537,7 +570,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 			// execution reaches here if a diagonal movement failed or the target is directly n/e/s/w or
 			// the target is visible but unreachable
 
-			if (x > objective_it->objective_x) // north
+			if (x > objective_it->objective_x) // need to move north
 			{
 				// starting at the edge of view and working toward the player
 				for (int i = C::VIEW_DISTANCE; i > 0; --i)
@@ -547,42 +580,66 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					{
 						// make the first move
 						make_path_movement(world);
+
+						if (x == objective_it->objective_x) // if the NPC is parallel with the destination, don't over shoot
+						{
+							path.clear();
+						}
+
 						return;
 					}
 				}
 			}
 
-			if (x < objective_it->objective_x) // south
+			if (x < objective_it->objective_x) // need to move south
 			{
 				for (int i = C::VIEW_DISTANCE; i > 0; --i)
 				{
 					if (save_path_to(x + i, y, world))
 					{
 						make_path_movement(world);
+
+						if (x == objective_it->objective_x)
+						{
+							path.clear();
+						}
+
 						return;
 					}
 				}
 			}
 
-			if (y > objective_it->objective_y) // west
+			if (y > objective_it->objective_y) // need to move west
 			{
 				for (int i = C::VIEW_DISTANCE; i > 0; --i)
 				{
 					if (save_path_to(x, y - i, world))
 					{
 						make_path_movement(world);
+
+						if (y == objective_it->objective_y)
+						{
+							path.clear();
+						}
+
 						return;
 					}
 				}
 			}
 
-			if (y < objective_it->objective_y) // east
+			if (y < objective_it->objective_y) // need to move east
 			{
 				for (int i = C::VIEW_DISTANCE; i > 0; --i)
 				{
 					if (save_path_to(x, y + i, world))
 					{
 						make_path_movement(world);
+
+						if (y == objective_it->objective_y)
+						{
+							path.clear();
+						}
+
 						return;
 					}
 				}
@@ -610,7 +667,7 @@ void Hostile_NPC_Worker::plan_fortress()
 	} while (R::euclidean_distance(C::WORLD_X_DIMENSION / 2, C::WORLD_Y_DIMENSION / 2,
 		fortress_x + (FORTRESS_HEIGHT / 2),
 		fortress_y + (FORTRESS_WIDTH / 2)) >= C::WORLD_X_DIMENSION * 0.45);
-	
+
 	// the first partition is the size of the fortress 
 	vector<Partition> partitions;
 	partitions.push_back(Partition(fortress_x, fortress_y, FORTRESS_HEIGHT, FORTRESS_WIDTH));

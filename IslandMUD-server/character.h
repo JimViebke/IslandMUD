@@ -37,9 +37,9 @@ public:
 protected:
 
 	string faction_ID;
+	shared_ptr<Item> equipped_item;
 	string leader_ID;
 	vector<string> follower_ids;
-	shared_ptr<Item> equipped_item;
 
 	multimap<string, shared_ptr<Equipment>> equipment_inventory; // equipment doesn't stack
 	map<string, shared_ptr<Material>> material_inventory; // materials stack
@@ -51,22 +51,7 @@ public:
 
 protected:
 
-	Character(const string & name, const string & set_faction_ID) : name(name)
-	{
-		// if the faction is valid
-		if (set_faction_ID == C::PC_FACTION_ID ||
-			set_faction_ID == C::NPC_NEUTRAL_FACTION_ID ||
-			set_faction_ID == C::NPC_HOSTILE_FACTION_ID)
-		{
-			// set the actor's faction
-			this->faction_ID = set_faction_ID;
-		}
-		else // the faction is not valid
-		{
-			// Raise an error in the console
-			cout << "ERROR: attempted to create character with invalid faction: [" << set_faction_ID << "]\n";
-		}
-	}
+	Character(const string & name, const string & set_faction_ID);
 	virtual ~Character() {} // to make a polymorphic type
 
 public:

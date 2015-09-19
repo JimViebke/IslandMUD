@@ -398,14 +398,6 @@ const string C::AI_OBJECTIVE_CONSTRUCT = "construct";
 // chests
 const int C::MAX_CHEST_HEALTH = 100;
 
-// NPC types
-const string C::AI_TYPE_FIGHTER = "fighter";
-const string C::AI_TYPE_WORKER = "worker";
-const string C::AI_TYPE_BLACKSMITH = "blacksmith";
-const string C::AI_TYPE_WATCH_GUARD = "watchguard";
-const string C::AI_TYPE_PATROL_GUARD = "partrolguard";
-const string C::AI_TYPE_MINER = "miner";
-
 // fortress generation
 
 const int C::FORTRESS_PARTITION_MIN_SIZE = 3;

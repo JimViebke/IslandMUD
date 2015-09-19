@@ -11,7 +11,7 @@ class Hostile_NPC_Fighter : public Hostile_NPC
 {
 public:
 	Hostile_NPC_Fighter(const string & name, const string & faction_ID) :
-		Hostile_NPC(name, faction_ID, C::AI_TYPE_FIGHTER) {}
+		Hostile_NPC(name, faction_ID) {}
 
 	void update(World & world, map<string, shared_ptr<Character>> & actors);
 };

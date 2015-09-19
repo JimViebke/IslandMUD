@@ -7,6 +7,24 @@ Jeb 16 2015 */
 
 Recipes Character::recipes;
 
+// Character constructor
+Character::Character(const string & name, const string & set_faction_ID) : name(name)
+{
+	// if the faction is valid
+	if (set_faction_ID == C::PC_FACTION_ID ||
+		set_faction_ID == C::NPC_NEUTRAL_FACTION_ID ||
+		set_faction_ID == C::NPC_HOSTILE_FACTION_ID)
+	{
+		// set the actor's faction
+		this->faction_ID = set_faction_ID;
+	}
+	else // the faction is not valid
+	{
+		// Raise an error in the console
+		cout << "ERROR: attempted to create character with invalid faction: [" << set_faction_ID << "]\n";
+	}
+}
+
 string Character::login(World & world)
 {
 	// create a document to load the player's data

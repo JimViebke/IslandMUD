@@ -31,14 +31,11 @@ protected:
 		// "get [] [] axe", "construct north stone surface", "construct north stone door"
 		int objective_x, objective_y, objective_z;
 		bool modifier, already_planning_to_craft = false;
-		string verb, direction, material, noun, purpose; // "sword" (the reason this objective was added
+		string verb, direction, material, noun, purpose; // purpose is the reason this objective was added
 
-		Objective(const string & verb, const string & noun, const string & purpose) :
-			verb(verb), noun(noun), purpose(purpose) {}
-		Objective(const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z) :
-			verb(verb), noun(noun), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z) {}
-		Objective(const string & verb, const string & noun, const string & material, const string & direction, const int & objective_x, const int & objective_y, const int & objective_z, const bool & modifier) :
-			verb(verb), noun(noun), material(material), direction(direction), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z), modifier(modifier) {}
+		Objective(const string & verb, const string & noun, const string & purpose);
+		Objective(const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z);
+		Objective(const string & verb, const string & noun, const string & material, const string & direction, const int & objective_x, const int & objective_y, const int & objective_z, const bool & modifier);
 	};
 
 	enum Objective_Priority { low_priority, high_priority };
@@ -47,31 +44,14 @@ protected:
 	{
 	public:
 		int _x, _y, _z;
-		Coordinate(const int & set_x, const int & set_y, const int & set_z = -1) :
-			_x(set_x), _y(set_y), _z(set_z) {}
+		Coordinate(const int & set_x, const int & set_y, const int & set_z = -1);
 	};
 
-	string ai_type;
 	deque<Objective> objectives;
 	deque<Coordinate> path;
 
 	// this can only be instantiated by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
-	Non_Player_Character(const string & name, const string & faction_ID, const string & set_ai_type) : Character(name, faction_ID)
-	{
-		if (set_ai_type == C::AI_TYPE_BLACKSMITH ||
-			set_ai_type == C::AI_TYPE_FIGHTER ||
-			set_ai_type == C::AI_TYPE_MINER ||
-			set_ai_type == C::AI_TYPE_PATROL_GUARD ||
-			set_ai_type == C::AI_TYPE_WATCH_GUARD ||
-			set_ai_type == C::AI_TYPE_WORKER)
-		{
-			this->ai_type = set_ai_type;
-		}
-		else
-		{
-			cout << "\nERROR: [" << set_ai_type << "] is not a known AI type.\n";
-		}
-	}
+	Non_Player_Character(const string & name, const string & faction_ID);
 
 	// objective creating and deletion
 	void add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const string & purpose);
@@ -145,8 +125,8 @@ private:
 			h = 0, g = 0, f = 0;
 		string direction_from_parent;
 
-		Node() {}
-		Node(const int & set_x, const int & set_y, const string & dir) : x(set_x), y(set_y), direction_from_parent(dir) {}
+		Node();
+		Node(const int & set_x, const int & set_y, const string & dir);
 
 		void set_g_h_f(const int & set_g, const int & set_h);
 		void set_g(const int & set_g);
