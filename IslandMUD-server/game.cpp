@@ -253,7 +253,7 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 			"\n" +
 			"\n " + C::WE_WALL + C::WE_WALL + C::WE_WALL + "   a wall" +
 			"\n " + C::WE_WALL + C::WE_DOOR + C::WE_WALL + "   a wall with a door" +
-			"\n " + C::WE_WALL + C::RUBBLE_CHAR + C::WE_WALL + "   a smashed wall (traversable)";
+			"\n " + C::WE_WALL + C::RUBBLE_CHAR + C::WE_WALL + "   a smashed door or wall (traversable)";
 	}
 	// moving: "move northeast" OR "northeast"
 	else if ((command.size() == 2 && command[0] == C::MOVE_COMMAND)
