@@ -581,7 +581,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 						// make the first move
 						make_path_movement(world);
 
-						if (x == objective_it->objective_x) // if the NPC are parallel with the destination, don't over shoot
+						if (x == objective_it->objective_x) // if the NPC is parallel with the destination, don't over shoot
 						{
 							path.clear();
 						}
