@@ -37,9 +37,9 @@ public:
 protected:
 
 	string faction_ID;
+	shared_ptr<Item> equipped_item;
 	string leader_ID;
 	vector<string> follower_ids;
-	shared_ptr<Item> equipped_item;
 
 	multimap<string, shared_ptr<Equipment>> equipment_inventory; // equipment doesn't stack
 	map<string, shared_ptr<Material>> material_inventory; // materials stack
