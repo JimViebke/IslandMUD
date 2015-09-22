@@ -28,7 +28,7 @@ void Parse::initialize()
 		P::dict["dequip"] = P::dict["deequip"] = P::dict["unequip"] = P::dict["unwield"] = P::dict["unweild"] = P::dict["store"] = P::dict["sheathe"] = P::dict["sheath"] = C::DEQUIP_COMMAND;
 		P::dict["craft"] = P::dict["make"] = P::dict["create"] = P::dict["fashion"] = C::CRAFT_COMMAND;
 		P::dict["drop"] = P::dict["release"] = P::dict["unhand"] = P::dict["add"] = P::dict["place"] = P::dict["put"] = C::DROP_COMMAND;
-		P::dict["into"] = P::dict["in"] = P::dict["to"] = C::INSERT_COMMAND;
+		P::dict["into"] = P::dict["in"] = P::dict["to"] = P::dict["within"] = C::INSERT_COMMAND;
 		P::dict["from"] = P::dict["form"] = C::FROM_COMMAND;
 		P::dict["wait"] = P::dict["pause"] = P::dict["consider"] = P::dict["delay"] = P::dict["advance"] = C::WAIT_COMMAND;
 		P::dict["with"] = C::WITH_COMMAND;
