@@ -434,6 +434,8 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 		}
 	}
 
+
+
 	if (planned_structures.size() > 0)
 	{
 		// select the next planned structure
@@ -462,8 +464,15 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 			// if the NPC is at the destination
 			if (x == objective_it->objective_x && y == objective_it->objective_y)
 			{
-				// this internally ensures it will only execute once
-				structure_it->plan_doors(world);
+				// if the doors have not yet been planned for this structure
+				if (!structure_it->already_planned_doors())
+				{
+					// plan doors for this structure
+					structure_it->plan_doors(world);
+
+					// for some reason, in debug mode we're now obligated to reset the iterator to prevent invalid iterators
+					objective_it = structure_it->structure_surface_objectives.begin();
+				}
 
 				// if the surface already exists, erase the objective and continue
 				if (world.room_at(x, y, z)->has_surface(objective_it->direction))
@@ -995,4 +1004,9 @@ void Hostile_NPC_Worker::Structure_Objectives::plan_doors(const World & world)
 	{
 		structure_surface_objectives[R::random_int_from(0, (int)structure_surface_objectives.size() - 1)].modifier = true;
 	}
+}
+
+bool Hostile_NPC_Worker::Structure_Objectives::already_planned_doors() const
+{
+	return doors_planned;
 }
