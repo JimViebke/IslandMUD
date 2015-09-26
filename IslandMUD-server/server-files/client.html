@@ -1,0 +1,33 @@
+<html style="">
+<head>
+	<title>IslandMUD</title>
+	<style type="text/css">
+		#map {
+			white-space: pre;
+			font-family: "Courier New", Courier, monospace;
+			color: #00ff00;
+			background-color: black;
+			line-height: 95%;
+		}
+	</style>
+	<style type="text/css"></style>
+</head>
+<body>
+	<time></time>
+	<div id="map">Waiting for server...</div>
+	<script src="socket.io/socket.io.js"></script>
+	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	<script>
+		// create websocket pointing to the server
+		var socket = io.connect('http://192.168.0.30:8000');
+		
+		// when data is received, parse and display it
+		socket.on('notification', function (data)
+		{
+			var _data = JSON.parse(data);
+			$('#map').html(_data.test.sample);
+			$('time').html(new Date());
+		});
+	</script>
+</body>
+</html>

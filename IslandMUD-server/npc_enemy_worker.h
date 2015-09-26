@@ -20,6 +20,7 @@ private:
 		vector<Objective> structure_surface_objectives;
 		void add(const Objective & obj);
 		void plan_doors(const World & world);
+		bool already_planned_doors() const;
 	};
 
 	bool fortress_planned = false;

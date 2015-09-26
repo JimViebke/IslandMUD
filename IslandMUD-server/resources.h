@@ -172,10 +172,7 @@ public:
 #ifdef _WIN32
 		_mkdir(path.c_str());
 #else
-		// TODO: cleanup "Dirty hack attack!"
-		std::stringstream command;
-		command << "mkdir -p " << path;
-		system(command.str().c_str());
+		system(string("mkdir -p " + path).c_str());
 #endif
 	}
 	static inline void to_file(const string & path, const string & contents)
