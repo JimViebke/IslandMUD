@@ -441,19 +441,6 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 		// select the next planned structure
 		deque<Structure_Objectives>::iterator structure_it = planned_structures.begin();
 
-		// debug code
-		/*if (structure_it->structure_surface_objectives.size() > 0)
-		{
-		for (vector<Objective>::iterator objective_it = structure_it->structure_surface_objectives.begin();
-		objective_it != structure_it->structure_surface_objectives.end(); ++objective_it)
-		{
-		if (objective_it->objective_x == 83 && objective_it->objective_y == 50)
-		{
-		break;
-		}
-		}
-		}*/
-
 		// for each construction objective
 		for (vector<Objective>::iterator objective_it = structure_it->structure_surface_objectives.begin();
 			objective_it != structure_it->structure_surface_objectives.end();)
@@ -473,7 +460,11 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					// for some reason, in debug mode we're now obligated to reset the iterator to prevent invalid iterators
 					objective_it = structure_it->structure_surface_objectives.begin();
 				}
+			}
 
+			// if the NPC is at the destination (this check needs to be done a second time, because the iterator may change when doors are planned
+			if (x == objective_it->objective_x && y == objective_it->objective_y)
+			{
 				// if the surface already exists, erase the objective and continue
 				if (world.room_at(x, y, z)->has_surface(objective_it->direction))
 				{
