@@ -50,11 +50,12 @@ public:
 	bool is_forest() const;
 
 	// chests
-	void add_chest();
+	void add_chest(const string & set_faction_id);
 	bool has_chest() const;
+	string get_chest_faction_id() const;
 	int chest_health() const;
 	void add_item_to_chest(const shared_ptr<Item> & item);
-	string chest_contents() const;
+	string chest_contents(const string & faction_ID) const;
 	void damage_chest();
 	bool chest_has(const string & item_id) const;
 	shared_ptr<Item> remove_from_chest(const string & item_id);

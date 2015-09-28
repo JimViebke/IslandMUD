@@ -637,7 +637,7 @@ string Character::craft(const string & craft_item_id, World & world)
 	if (craft_item_id == C::CHEST_ID)
 	{
 		// add a chest to the room
-		world.room_at(x, y, z)->add_chest();
+		world.room_at(x, y, z)->add_chest(this->faction_ID);
 		return "You craft a chest.";
 	}
 
@@ -732,6 +732,12 @@ string Character::add_to_chest(const string & insert_item_id, World & world)
 		return "There is no chest here.";
 	}
 
+	// if the chest was crafted by another faction
+	if (world.room_at(x, y, z)->get_chest_faction_id() != this->faction_ID)
+	{
+		return "This chest has an unfamiliar lock.";
+	}
+
 	// if the player doesn't have the item
 	if (!this->has(insert_item_id))
 	{
@@ -769,6 +775,12 @@ string Character::take_from_chest(const string & take_item_id, World & world)
 		return "There is no chest here.";
 	}
 
+	// if the chest was crafted by another faction
+	if (world.room_at(x, y, z)->get_chest_faction_id() != this->faction_ID)
+	{
+		return "This chest has an unfamiliar lock.";
+	}
+
 	// if the player doesn't have the item
 	if (!world.room_at(x, y, z)->chest_has(take_item_id))
 	{
@@ -783,7 +795,7 @@ string Character::take_from_chest(const string & take_item_id, World & world)
 string Character::look_inside_chest(const World & world) const
 {
 	// validation within
-	return world.room_at(x, y, z)->chest_contents();
+	return world.room_at(x, y, z)->chest_contents(faction_ID);
 }
 string Character::construct_surface(const string & material_id, const string & surface_id, World & world)
 {

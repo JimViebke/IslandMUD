@@ -93,6 +93,37 @@ shared_ptr<Item> Chest::take(const string & item_id)
 		return Craft::make(C::STONE_ID);
 	}
 }
+string Chest::contents() const
+{
+	if (equipment_contents.size() == 0 && material_contents.size() == 0)
+	{
+		return "The chest is empty.";
+	}
+
+	stringstream output;
+	output << "The chest contains";
+
+	for (multimap<string, shared_ptr<Equipment>>::const_iterator it = equipment_contents.begin();
+		it != equipment_contents.end(); ++it)
+	{
+		output << " a(n) " << it->second->name;
+	}
+	for (map<string, shared_ptr<Material>>::const_iterator it = material_contents.begin();
+		it != material_contents.end(); ++it)
+	{
+		output << " " << it->second->name << ":" << it->second->amount;
+	}
+
+	return (output.str() + ".");
+}
+multimap<string, shared_ptr<Equipment>> Chest::get_equipment_contents() const
+{
+	return equipment_contents;
+}
+map<string, shared_ptr<Material>> Chest::get_material_contents() const
+{
+	return material_contents;
+}
 
 // health
 void Chest::damage(const int & amount)
@@ -126,34 +157,8 @@ int Chest::get_health() const
 	return health;
 }
 
-string Chest::contents() const
+// faction ID retrieval
+string Chest::get_faction_id() const
 {
-	if (equipment_contents.size() == 0 && material_contents.size() == 0)
-	{
-		return "The chest is empty.";
-	}
-
-	stringstream output;
-	output << "The chest contains";
-
-	for (multimap<string, shared_ptr<Equipment>>::const_iterator it = equipment_contents.begin();
-		it != equipment_contents.end(); ++it)
-	{
-		output << " a(n) " << it->second->name;
-	}
-	for (map<string, shared_ptr<Material>>::const_iterator it = material_contents.begin();
-		it != material_contents.end(); ++it)
-	{
-		output << " " << it->second->name << ":" << it->second->amount;
-	}
-
-	return (output.str() + ".");
-}
-multimap<string, shared_ptr<Equipment>> Chest::get_equipment_contents() const
-{
-	return equipment_contents;
-}
-map<string, shared_ptr<Material>> Chest::get_material_contents() const
-{
-	return material_contents;
+	return this->faction_id;
 }
