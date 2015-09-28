@@ -151,6 +151,7 @@ const string C::XML_DOOR_MATERIAL = "material";
 const string C::XML_DOOR_FACTION = "faction";
 const string C::XML_CHEST = "chest";
 const string C::XML_CHEST_HEALTH = "health";
+const string C::XML_CHEST_FACTION_ID = "faction_id";
 const string C::XML_CHEST_EQUIPMENT = "equipment_contents";
 const string C::XML_CHEST_MATERIALS = "material_contents";
 const string C::XML_CHEST_MATERIALS_COUNT = "count";

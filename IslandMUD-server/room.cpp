@@ -152,19 +152,24 @@ bool Room::is_forest() const
 }
 
 // chests
-void Room::add_chest()
+void Room::add_chest(const string & set_faction_id)
 {
 	updated = true;
 
-	chest = make_shared<Chest>();
+	chest = make_shared<Chest>(set_faction_id);
 }
 bool Room::has_chest() const
 {
 	return chest != nullptr;
 }
+string Room::get_chest_faction_id() const
+{
+	// return the chest's faction, or "" if there is no chest (indicating a validation failure in the calling function)
+	return (has_chest()) ? chest->get_faction_id() : "";
+}
 int Room::chest_health() const
 {
-	// return the chest's health, or 0 if there is no chest (indicating a validation failure in the calling function
+	// return the chest's health, or 0 if there is no chest (indicating a validation failure in the calling function)
 	return (has_chest()) ? chest->get_health() : 0;
 }
 void Room::add_item_to_chest(const shared_ptr<Item> & item)
@@ -173,17 +178,23 @@ void Room::add_item_to_chest(const shared_ptr<Item> & item)
 
 	chest->add(item);
 }
-string Room::chest_contents() const
+string Room::chest_contents(const string & faction_ID) const
 {
-	// if a chest is here
-	if (has_chest())
+	// if no chest exists in this room
+	if (!has_chest())
 	{
-		// return the contents of the chest
-		return chest->contents();
+		return "There is no chest here.";
 	}
 
-	// no chest exists in this room
-	return "There is no chest here.";
+	// if the chest was crafted by another faction
+	if (chest->get_faction_id() != faction_ID)
+	{
+		return "This chest has an unfamiliar lock.";
+	}
+
+	// return the contents of the chest
+	return chest->contents();
+
 }
 void Room::damage_chest()
 {

@@ -394,11 +394,12 @@ void World::add_room_to_world(xml_node & room_node, const int & x, const int & y
 			material_contents.insert(make_pair(material->name, material));
 		}
 
-		// create the chest
-		const Chest chest(chest_node.attribute(C::XML_CHEST_HEALTH.c_str()).as_int(), equipment_contents, material_contents);
-
-		// add the chest to the room
-		room->set_chest(make_shared<Chest>(chest));
+		// create an anonymous chest object and add the chest to the room
+		room->set_chest(make_shared<Chest>(Chest(
+			chest_node.attribute(C::XML_CHEST_FACTION_ID.c_str()).as_string(), // the chest's faction ID
+			chest_node.attribute(C::XML_CHEST_HEALTH.c_str()).as_int(), // the chest's health
+			equipment_contents, material_contents) // the chest's contents
+			));
 	}
 
 	// add room to world
@@ -550,6 +551,9 @@ void World::add_room_to_z_stack(const int & z, const World::room_pointer::pointe
 
 		// extract the chest from the room
 		const shared_ptr<Chest> chest = room->get_chest(); // ****** HERE
+
+		// add an attribute for the chest's faction ID
+		chest_node.append_attribute(C::XML_CHEST_FACTION_ID.c_str()).set_value(chest->get_faction_id().c_str());
 
 		// add a health attribute to the chest node
 		chest_node.append_attribute(C::XML_CHEST_HEALTH.c_str()).set_value(chest->get_health());
