@@ -212,23 +212,50 @@ void World::load_terrain_map()
 
 	if (!terrain_loaded_from_file_good) // if the terrain needs to regenerated
 	{
-		// create the world generator object
+		// create the generator object
 		Generator gen;
 
-		gen.generate_biome_map();
-		gen.generate_static_using_biome_map();
+		// generate a biome map
+		vector<vector<char_type>> biome_map = gen.generate_biome_map(C::LAND_CHAR, C::FOREST_CHAR, 3, 1, 25); // hardcoding a bit here
+		gen.to_file(biome_map, gen.get_generated_terrain_dir() + "/biome_map.txt");
 
-		gen.game_of_life(5);
-		gen.fill(2);
-		gen.clean(3);
-		gen.fill(4); // this is the same as fill(12), but each call has a seperate printout this way
-		gen.fill(4);
-		gen.fill(4);
+		// use the biome map to generate static in a full size map
+		vector<vector<char_type>> world_map = gen.generate_static_using_biome_map(biome_map, 25); // hardcoding again
+		gen.to_file(world_map, gen.get_generated_terrain_dir() + "/static.txt");
+
+		gen.game_of_life(world_map, 5); gen.save_intermediate_map(world_map);
+		gen.fill(world_map, 2);  gen.save_intermediate_map(world_map);
+		gen.clean(world_map, 3); gen.save_intermediate_map(world_map);
+		gen.fill(world_map, 4);  gen.save_intermediate_map(world_map); // this is the same as fill(12), but each call has a seperate printout this way
+		gen.fill(world_map, 4);  gen.save_intermediate_map(world_map);
+		gen.fill(world_map, 4);  gen.save_intermediate_map(world_map);
 
 		// save the final terrain to disk
-		gen.save_terrain();
+		gen.to_file(world_map, C::world_terrain_file_location);
 
-		terrain = R::make_unique<std::vector<std::vector<char_type>>>(gen.get_terrain());
+		terrain = R::make_unique<vector<vector<char_type>>>(world_map);
+	}
+
+	// temporary scope - this is expirementation for mineral field generation, don't trust variable names yet
+	{
+		// create the generator object
+		Generator gen;
+
+		// generate a biome map
+		vector<vector<char_type>> biome_map = gen.generate_biome_map(C::LAND_CHAR, C::FOREST_CHAR, 1, 19, 25); // hardcoding a bit here
+		
+		// use the biome map to generate static in a full size map
+		vector<vector<char_type>> mineral_map = gen.generate_static_using_biome_map(biome_map, 25); // hardcoding again
+
+		gen.game_of_life(mineral_map, 5); gen.save_intermediate_map(mineral_map);
+		gen.fill(mineral_map, 2);  gen.save_intermediate_map(mineral_map);
+		gen.clean(mineral_map, 3); gen.save_intermediate_map(mineral_map);
+		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map); // this is the same as fill(12), but each call has a seperate printout this way
+		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map);
+		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map);
+
+		// save the mineral map to disk
+		gen.to_file(mineral_map, C::game_directory + "/test_mineral_generation.txt");
 	}
 }
 

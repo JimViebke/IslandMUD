@@ -224,4 +224,16 @@ public:
 	Log() : Item(C::LOG_ID, false) {}
 };
 
+class Iron_Ore : public Item
+{
+public:
+	Iron_Ore() : Item(C::IRON_ORE_ID, false) {}
+};
+
+class Limestone : public Item
+{
+public:
+	Limestone() : Item(C::LIMESTONE_ID, false) {}
+};
+
 #endif
