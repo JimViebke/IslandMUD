@@ -38,11 +38,11 @@ public:
 		DEFAULT_SPAWN_Z;
 
 	// game data locations
-	static const string game_directory;
-	static const string world_terrain_file_location;
-	static const string world_biome_file_location;
-	static const string room_directory;
-	static const string user_data_directory;
+	static const string
+		game_directory,
+		world_terrain_file_location,
+		room_directory,
+		user_data_directory;
 
 	// faction IDs
 	const static string PC_FACTION_ID; // players ("PCs")
@@ -85,7 +85,7 @@ public:
 		ARROWHEAD_ID,
 		BOARD_ID,
 
-		// item IDs -. other
+		// item IDs -> other
 		TREE_ID,
 		CHEST_ID,
 		LOG_ID,
@@ -97,6 +97,10 @@ public:
 		BOW_ID,
 		TORCH_ID,
 		HAMMER_ID,
+
+		// item IDs -> rocks and minerals
+		IRON_ORE_ID,
+		LIMESTONE_ID,
 
 		// commands
 		BAD_COMMAND,

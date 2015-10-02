@@ -11,6 +11,8 @@ using namespace std;
 
 int main()
 {
+	srand((unsigned)time(NULL)); // seed rand
+
 	// write game directories to disk
 	R::create_path_if_not_exists(C::game_directory);
 	R::create_path_if_not_exists(C::room_directory);
@@ -23,7 +25,7 @@ int main()
 	R::to_file(C::game_directory + "/" + "wipe delete folder.bat",
 		string("del /f/s/q C:/IslandMUD/delete > nul") + "\n" + "rmdir /s/q C:/IslandMUD/delete");
 #else
-	// add Linux equivalent
+	// add Linux equivalent?
 #endif
 
 	// create game object

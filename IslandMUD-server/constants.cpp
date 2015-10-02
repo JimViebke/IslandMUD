@@ -7,8 +7,8 @@ Feb 14, 2015 */
 const int C::GROUND_INDEX = 3; // there are three levels below this
 const int C::VIEW_DISTANCE = 9; // 5+1+5 to a side == 11*11 total area
 
-const int C::WORLD_X_DIMENSION = 100;
-const int C::WORLD_Y_DIMENSION = 100;
+const int C::WORLD_X_DIMENSION = 1000;
+const int C::WORLD_Y_DIMENSION = 1000;
 const int C::WORLD_Z_DIMENSION = 8;
 
 const int C::DEFAULT_SPAWN_X = C::WORLD_X_DIMENSION / 2; // N/S center
@@ -22,7 +22,6 @@ const string C::game_directory = "C:/IslandMUD";
 const string C::game_directory = "/home/IslandMUD";
 #endif
 const string C::world_terrain_file_location = C::game_directory + "/world_terrain.txt";
-const string C::world_biome_file_location = C::game_directory + "/biome_map.txt";
 const string C::room_directory = C::game_directory + "/rooms";
 const string C::user_data_directory = C::game_directory + "/user_data";
 
@@ -90,6 +89,10 @@ const string C::SWORD_ID = "sword";
 const string C::BOW_ID = "bow";
 const string C::TORCH_ID = "torch";
 const string C::HAMMER_ID = "hammer";
+
+// item IDs -> rocks and minerals
+const string C::IRON_ORE_ID = "iron ore";
+const string C::LIMESTONE_ID = "limestone";
 
 // commands
 const string C::BAD_COMMAND = "unknown_command";

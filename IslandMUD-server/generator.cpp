@@ -3,60 +3,84 @@ May 15 2015 */
 
 #include "generator.h"
 
-void Generator::generate_biome_map()
+Generator::Generator()
 {
-	// reset/reserve vector to be full of spaces
-	size_vector(biome_map, C::WORLD_X_DIMENSION / biome_size, C::WORLD_Y_DIMENSION / biome_size);
+	cout << "\nGenerating new world terrain map...";
 
+	// create the timestamped directory
+	generated_terrain_dir = C::game_directory + "/gen_" + R::to_string(R::current_time_in_ms());
+	R::create_path_if_not_exists(generated_terrain_dir);
+}
+
+vector<vector<char_type>> Generator::generate_biome_map(const char_type & default_char, const char_type & fill_char, const int & fill_ratio, const int & default_ratio, const int & biome_size)
+{
+	vector<vector<char_type>> biome_map(C::WORLD_X_DIMENSION / biome_size, vector<char_type>(C::WORLD_Y_DIMENSION / biome_size,
+#ifdef _WIN32
+		' '
+#else
+		" "
+#endif
+		));
+
+	// generate the biome map
 	for (int i = 0; i < (C::WORLD_X_DIMENSION / biome_size); ++i)
 	{
 		for (int j = 0; j < (C::WORLD_Y_DIMENSION / biome_size); ++j)
 		{
-			biome_map[i][j] = ((rand() % 3 == 1) ? C::LAND_CHAR : C::FOREST_CHAR); // 1/3 land biome, 2/3 forest biome
+			biome_map[i][j] = (
+				(R::random_int_from(1, max(1, fill_ratio + default_ratio)) <= fill_ratio) ? fill_char : default_char);
 		}
 	}
-	
+
 	// update the pattern
 	generator_pattern << "B.66"; // Biomes are ~66% forest
 
 	// save the biome map to file
 	to_file(biome_map, generated_terrain_dir + "/biome_map.txt");
+
+	return biome_map; // this will be used for the next generation step
 }
-void Generator::generate_static_using_biome_map()
+vector<vector<char_type>> Generator::generate_static_using_biome_map(const vector<vector<char_type>> & biome_map, const int & biome_size)
 {
-	for (unsigned x = 0; x < v2.size(); ++x)
+	vector<vector<char_type>> v(C::WORLD_X_DIMENSION, vector<char_type>(C::WORLD_Y_DIMENSION,
+#ifdef _WIN32
+		' '
+#else
+		" "
+#endif
+		));
+
+	for (unsigned x = 0; x < v.size(); ++x)
 	{
-		for (unsigned y = 0; y < v2[0].size(); ++y)
+		for (unsigned y = 0; y < v[0].size(); ++y)
 		{
 			// if the coordinates are not within the islands radius
 			if (R::euclidean_distance(x, y, x_center, y_center) > island_radius)
 			{
-				v2[x][y] = C::WATER_CHAR;
+				v[x][y] = C::WATER_CHAR;
 			}
 			// if the biome map contains a land char
 			else if (biome_map[x / biome_size][y / biome_size] == C::LAND_CHAR)
 			{
-				v2[x][y] = C::LAND_CHAR;
+				v[x][y] = C::LAND_CHAR;
 			}
 			// the biome map contains a forest char, generate forest/land
 			else
 			{
-				// push back forest or land
-				v2[x][y] = (rand() % 4) ? C::LAND_CHAR : C::FOREST_CHAR;
+				// push back forest or land (again, hardcoding static here)
+				v[x][y] = (rand() % 4) ? C::LAND_CHAR : C::FOREST_CHAR;
 			}
 		}
 	}
 
-	// copy over
-	v1 = v2;
-
-	// save static
-	to_file(v2, generated_terrain_dir + "/static.txt");
+	return v; // this will be used for the next generation step
 }
 
 // different pass types to call manually
-void Generator::game_of_life(const int & iterations)
+void Generator::game_of_life(vector<vector<char_type>> & original, const int & iterations)
 {
+	vector<vector<char_type>> working = original; // copy to start
+
 	for (int pass = 0; pass < iterations; ++pass)
 	{
 		// for each row (excluding a 1-thick border)
@@ -66,7 +90,7 @@ void Generator::game_of_life(const int & iterations)
 			for (int j = 0; j < C::WORLD_Y_DIMENSION - 1; ++j)
 			{
 				// if the current cell/room is water, skip it
-				if (v2[i][j] == C::WATER_CHAR)
+				if (original[i][j] == C::WATER_CHAR)
 				{
 					continue;
 				}
@@ -74,16 +98,16 @@ void Generator::game_of_life(const int & iterations)
 				// for every land cell, count its forest neighours (sp?)
 				int live_neighbors = 0;
 				// count the row above
-				if (v1[i - 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (v1[i - 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (v1[i - 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i - 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i - 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i - 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 				// count the left and right neighers
-				if (v1[i][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (v1[i][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 				// count the row below
-				if (v1[i + 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (v1[i + 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (v1[i + 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i + 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i + 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i + 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 
 				/* Wikipedia:
 				Any live cell with fewer than two live neighbours dies, as if caused by under-population.
@@ -92,31 +116,31 @@ void Generator::game_of_life(const int & iterations)
 				Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 				*/
 
-				if (v2[i][j] == C::FOREST_CHAR) // any living cell...
+				if (working[i][j] == C::FOREST_CHAR) // any living cell...
 				{
 					if (live_neighbors < 2 || live_neighbors > 3) // ...with <2 or >3 neighbors...
 					{
-						v2[i][j] = C::LAND_CHAR; // ...dies
+						working[i][j] = C::LAND_CHAR; // ...dies
 					}
 				}
 				else if (live_neighbors == 3) // a dead cell with 3 neighbors...
 				{
-					v2[i][j] = C::FOREST_CHAR; // ...is born
+					working[i][j] = C::FOREST_CHAR; // ...is born
 				}
 			}
 		}
 
 		// copy the working vector back into the original vector for the next iteration
-		v1 = v2;
+		original = working;
 	} // end pass forloop
 
 	// save
 	generator_pattern << iterations << "C+";
-	save_current_terrain();
-
 }
-void Generator::clean(const int & iterations)
+void Generator::clean(vector<vector<char_type>> & original, const int & iterations)
 {
+	vector<vector<char_type>> working = original; // copy to start
+
 	for (int pass = 0; pass < iterations; ++pass)
 	{
 		// for each row (excluding a 1-thick border)
@@ -126,7 +150,7 @@ void Generator::clean(const int & iterations)
 			for (int j = 0; j < C::WORLD_Y_DIMENSION - 1; ++j)
 			{
 				// if the current cell/room is water, skip it
-				if (v2[i][j] == C::WATER_CHAR)
+				if (working[i][j] == C::WATER_CHAR)
 				{
 					continue;
 				}
@@ -134,34 +158,35 @@ void Generator::clean(const int & iterations)
 				// for every land cell, count its forest neighours (sp?)
 				int live_neighbors = 0;
 				// count the row above
-				if (v1[i - 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (v1[i - 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (v1[i - 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i - 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i - 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i - 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 				// count the left and right neighers
-				if (v1[i][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (v1[i][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 				// count the row below
-				if (v1[i + 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (v1[i + 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (v1[i + 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i + 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i + 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i + 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 
 				if (live_neighbors < 2)
 				{
-					v2[i][j] = C::LAND_CHAR; // dies
+					working[i][j] = C::LAND_CHAR; // dies
 				}
 			}
 		}
 
 		// copy the working vector back into the original vector for the next iteration
-		v1 = v2;
+		original = working;
 
-		// update generator patter for each generation
+		// update generator pattern for each generation
 		generator_pattern << "C";
 	}
-	save_current_terrain();
 }
-void Generator::fill(const int & iterations)
+void Generator::fill(vector<vector<char_type>> & original, const int & iterations)
 {
+	vector<vector<char_type>> working = original; // copy to start
+
 	for (int pass = 0; pass < iterations; ++pass)
 	{
 		// for each row (excluding a 1-thick border)
@@ -171,7 +196,7 @@ void Generator::fill(const int & iterations)
 			for (int j = 0; j < C::WORLD_Y_DIMENSION - 1; ++j)
 			{
 				// if the current cell/room is water, skip it
-				if (v2[i][j] == C::WATER_CHAR)
+				if (working[i][j] == C::WATER_CHAR)
 				{
 					continue;
 				}
@@ -179,96 +204,63 @@ void Generator::fill(const int & iterations)
 				// for every land cell, count its forest neighours (sp?)
 				int live_neighbors = 0;
 				// count the row above
-				if (v1[i - 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (v1[i - 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (v1[i - 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i - 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i - 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i - 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 				// count the left and right neighers
-				if (v1[i][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (v1[i][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 				// count the row below
-				if (v1[i + 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (v1[i + 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (v1[i + 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i + 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i + 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i + 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
 
 				if (live_neighbors > 3)
 				{
-					v2[i][j] = C::FOREST_CHAR; // birth or survival
+					working[i][j] = C::FOREST_CHAR; // birth or survival
 				}
 			}
 		}
 
 		// copy the working vector back into the original vector for the next iteration
-		v1 = v2;
+		original = working;
 
 		// upate generator pattern
 		generator_pattern << "F";
 	}
-	save_current_terrain();
 }
 
-// two optional ways of getting the final result, either by saving the terrain to the disk, or by retriving it manually
-void Generator::save_terrain() const
+// save intermediate generated maps to /gen_[timestamp]/[pattern].txt
+void Generator::save_intermediate_map(const vector<vector<char_type>> & v) const
 {
-	to_file(v2, C::world_terrain_file_location);
-}
-vector<vector<char_type>> Generator::get_terrain()
-{
-	return v2; // return generated world
+	to_file(v, generated_terrain_dir + "/" + generator_pattern.str() + ".txt");
 }
 
-
-
-/* Private member functions */
-
-
-
-void Generator::size_vector(vector<vector<char_type>> & v, const int & x, const int & y)
+// save to custom location
+void Generator::to_file(const vector<vector<char_type>> & v, const string & path) const
 {
-	// this should be the only place in this class that a vector is sized		
-
-	vector<vector<char_type>> sized_vector;
-	sized_vector.reserve(x);
-
-	for (int i = 0; i < x; ++i)
-	{
-		vector<char_type> row;
-		row.reserve(y);
-
-		for (int j = 0; j < y; ++j)
-		{
-#ifdef _WIN32
-			row.push_back(' ');
-#else
-            row.push_back(" ");
-#endif
-		}
-
-		sized_vector.push_back(row);
-	}
-
-	// overwrite passed-in vector result
-	v = sized_vector;
-}
-
-void Generator::save_current_terrain() const
-{
-	to_file(v2, generated_terrain_dir + "/" + generator_pattern.str() + ".txt");
-}
-void Generator::to_file(const vector<vector<char_type>> & v, const string & dir) const
-{
-	ostringstream iss;
+	ostringstream oss;
 	for (unsigned i = 0; i < v.size(); ++i)
 	{
 		for (unsigned j = 0; j < v[0].size(); ++j)
 		{
-			iss << v[i][j];
+			oss << v[i][j];
 		}
-		iss << endl;
+		oss << endl;
 	}
 
 	// save to disk
 	ofstream myfile;
-	myfile.open(dir);
-	myfile << iss.str();
-	myfile.close();
+	myfile.open(path);
+	myfile << oss.str();
+	myfile.close(); // with RAII this shouldn't be necessary
+}
+
+string Generator::get_generator_pattern() const
+{
+	return generator_pattern.str();
+}
+string Generator::get_generated_terrain_dir() const
+{
+	return generated_terrain_dir;
 }
