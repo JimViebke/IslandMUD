@@ -17,11 +17,13 @@ const int C::DEFAULT_SPAWN_Z = C::GROUND_INDEX; // ground level spawn
 
 // game data locations
 #ifdef _WIN32
-const string C::game_directory = "C:/IslandMUD";
+const string C::game_directory = "C:/IslandMUD"; // Windows path
 #else
-const string C::game_directory = "/home/IslandMUD";
+const string C::game_directory = "/home/IslandMUD"; // Linux path
 #endif
 const string C::world_terrain_file_location = C::game_directory + "/world_terrain.txt";
+const string C::iron_ore_terrain_file_location = C::game_directory + "/iron_ore_map.txt";
+const string C::limestone_terrain_file_location = C::game_directory + "/limestone_map.txt";
 const string C::room_directory = C::game_directory + "/rooms";
 const string C::user_data_directory = C::game_directory + "/user_data";
 
@@ -39,6 +41,7 @@ const char_type C::NPC_NEUTRAL_CHAR = '+';
 const char_type C::WATER_CHAR = '~';
 const char_type C::LAND_CHAR = ' ';
 const char_type C::FOREST_CHAR = '%';
+const char_type C::GENERIC_MINERAL_CHAR = char(177); // extended ascii 177
 const char_type C::ITEM_CHAR = '?';
 const char_type C::CHEST_CHAR = char(220); // extended ascii 220
 const char_type C::RUBBLE_CHAR = '#';
@@ -50,6 +53,7 @@ const char_type C::NPC_NEUTRAL_CHAR = "+";
 const char_type C::WATER_CHAR = "~";
 const char_type C::LAND_CHAR = " ";
 const char_type C::FOREST_CHAR = "%";
+const char_type C::GENERIC_MINERAL_CHAR = "▒"
 const char_type C::ITEM_CHAR = "?";
 const char_type C::CHEST_CHAR = "▄"; // extended ascii 220
 const char_type C::RUBBLE_CHAR = "#";

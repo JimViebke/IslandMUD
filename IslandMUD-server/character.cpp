@@ -1170,8 +1170,8 @@ string Character::validate_movement(const int & cx, const int & cy, const int & 
 		direction_ID == C::NORTH_WEST || direction_ID == C::NORTH_EAST ||
 		direction_ID == C::SOUTH_EAST || direction_ID == C::SOUTH_WEST)
 	{
-		const World::room_pointer::pointer current_room = world.room_at(cx, cy, cz);
-		const World::room_pointer::pointer destination_room = world.room_at(cx + dx, cy + dy, cz);
+		const unique_ptr<Room>::pointer current_room = world.room_at(cx, cy, cz);
+		const unique_ptr<Room>::pointer destination_room = world.room_at(cx + dx, cy + dy, cz);
 
 		if (direction_ID == C::NORTH_WEST)
 		{

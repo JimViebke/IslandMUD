@@ -200,7 +200,7 @@ void Game::load()
 	// load the parse dictionary
 	Parse::initialize();
 
-	// load and create the world. All rooms will be on disk.
+	// load the world
 	world.load();
 
 	// accept incoming signals to the network, and adds then to the raw input queue

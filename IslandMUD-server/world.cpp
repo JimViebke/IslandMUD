@@ -8,14 +8,19 @@ May 15 2015 */
 #include "character.h"
 #include "npc_enemy.h"
 
+World::World()
+{
+
+}
+
 void World::load()
 {
-	load_world_container();
-	load_terrain_map();
+	create_world_container();
+	load_or_generate_terrain_and_mineral_maps();
 }
 
 // access a room given coordinates
-World::room_pointer::pointer World::room_at(const int & x, const int & y, const int & z)
+unique_ptr<Room>::pointer World::room_at(const int & x, const int & y, const int & z)
 {
 	if (!R::bounds_check(x, y, z))
 	{
@@ -24,7 +29,7 @@ World::room_pointer::pointer World::room_at(const int & x, const int & y, const 
 
 	return (world.begin() + ((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + z))->get();
 }
-const World::room_pointer::pointer World::room_at(const int & x, const int & y, const int & z) const
+const unique_ptr<Room>::pointer World::room_at(const int & x, const int & y, const int & z) const
 {
 	if (!R::bounds_check(x, y, z))
 	{
@@ -33,7 +38,7 @@ const World::room_pointer::pointer World::room_at(const int & x, const int & y, 
 
 	return (world.cbegin() + ((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + z))->get();
 }
-World::room_pointer & World::room_pointer_at(const int & x, const int & y, const int & z)
+unique_ptr<Room> & World::room_pointer_at(const int & x, const int & y, const int & z)
 {
 	return *(world.begin() + ((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + z));
 }
@@ -132,6 +137,7 @@ void World::unload_room(const int & x, const int & y, const int & z)
 	erase_room_from_memory(x, y, z);
 }
 
+// room information
 bool World::room_has_surface(const int & x, const int & y, const int & z, const string & direction_ID) const
 {
 	// if the room is outside of bounds
@@ -150,19 +156,112 @@ bool World::room_has_surface(const int & x, const int & y, const int & z, const 
 
 
 
-void World::load_world_container()
+void World::create_world_container()
 {
 	cout << "\nCreating world container...";
 
-	world = vector<room_pointer>(C::WORLD_X_DIMENSION * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION);
+	world = vector<unique_ptr<Room>>(C::WORLD_X_DIMENSION * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION);
+}
+void World::load_or_generate_terrain_and_mineral_maps()
+{
+	// terrain adn mineral maps are only used to generate rooms that do not already exist on disk
+
+	cout << "\nLoading world terrain and mineral maps...";
+
+	// generate a new world terrain map if needed
+	if (load_existing_world_terrain())
+	{
+		cout << "\nLoaded existing world terrain map...";
+	}
+	else
+	{
+		// create the generator object
+		Generator gen("world terrain map");
+
+		// generate a biome map
+		vector<vector<char_type>> biome_map = gen.generate_biome_map(C::LAND_CHAR, C::FOREST_CHAR, 3, 1, 25); // hardcoding a bit here
+		gen.to_file(biome_map, gen.get_generated_terrain_dir() + "/biome_map.txt");
+
+		// use the biome map to generate static in a full size map
+		vector<vector<char_type>> world_map = gen.generate_static_using_biome_map(biome_map, 25); // hardcoding again
+		gen.to_file(world_map, gen.get_generated_terrain_dir() + "/static.txt");
+
+		gen.game_of_life(world_map, 5); gen.save_intermediate_map(world_map);
+		gen.fill(world_map, 2);  gen.save_intermediate_map(world_map);
+		gen.clean(world_map, 3); gen.save_intermediate_map(world_map);
+		gen.fill(world_map, 4);  gen.save_intermediate_map(world_map); // this is the same as fill(12), but each call has a seperate printout this way
+		gen.fill(world_map, 4);  gen.save_intermediate_map(world_map);
+		gen.fill(world_map, 4);  gen.save_intermediate_map(world_map);
+
+		// save the final terrain to disk
+		gen.to_file(world_map, C::world_terrain_file_location);
+
+		this->terrain = R::make_unique<vector<vector<char_type>>>(world_map);
+	}
+
+	// generate a new iron ore mineral map if needed
+	if (load_existing_iron_ore_map())
+	{
+		cout << "\nLoaded existing iron ore mineral map...";
+	}
+	else
+	{
+		// create the generator object
+		Generator gen("iron ore mineral map");
+
+		// generate a biome map
+		vector<vector<char_type>> biome_map = gen.generate_biome_map(C::LAND_CHAR, C::GENERIC_MINERAL_CHAR, 1, 19, 25); // hardcoding a bit here
+
+		// use the biome map to generate static in a full size map
+		vector<vector<char_type>> mineral_map = gen.generate_static_using_biome_map(biome_map, 25); // hardcoding again
+
+		gen.game_of_life(mineral_map, 5); gen.save_intermediate_map(mineral_map);
+		gen.fill(mineral_map, 2);  gen.save_intermediate_map(mineral_map);
+		gen.clean(mineral_map, 3); gen.save_intermediate_map(mineral_map);
+		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map); // this is the same as fill(12), but each call has a seperate printout this way
+		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map);
+		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map);
+
+		// save the mineral map to disk
+		gen.to_file(mineral_map, C::iron_ore_terrain_file_location);
+
+		this->iron_ore_map = R::make_unique<vector<vector<char_type>>>(mineral_map);
+	}
+
+	// generate a new limestone mineral map if needed
+	if (load_existing_limestone_map())
+	{
+		cout << "\nLoaded existing limestone mineral map...";
+	}
+	else
+	{
+		// create the generator object
+		Generator gen("limestone mineral map");
+
+		// generate a biome map
+		vector<vector<char_type>> biome_map = gen.generate_biome_map(C::LAND_CHAR, C::GENERIC_MINERAL_CHAR, 1, 39, 25); // hardcoding a bit here
+
+		// use the biome map to generate static in a full size map
+		vector<vector<char_type>> mineral_map = gen.generate_static_using_biome_map(biome_map, 25); // hardcoding again
+
+		gen.game_of_life(mineral_map, 5); gen.save_intermediate_map(mineral_map);
+		gen.fill(mineral_map, 2);  gen.save_intermediate_map(mineral_map);
+		gen.clean(mineral_map, 3); gen.save_intermediate_map(mineral_map);
+		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map); // this is the same as fill(12), but each call has a seperate printout this way
+		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map);
+		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map);
+
+		// save the mineral map to disk
+		gen.to_file(mineral_map, C::limestone_terrain_file_location);
+
+		this->limestone_map = R::make_unique<vector<vector<char_type>>>(mineral_map);
+	}
 }
 
-void World::load_terrain_map()
+// three functions for loading and verifying the world map and the two mineral maps
+
+bool World::load_existing_world_terrain()
 {
-	// world terrain is only used to generate rooms that do not already exist on disk
-
-	cout << "\nLoading world terrain map...";
-
 	// load the contents of the terrain file, if it exists
 	{
 		vector<vector<char_type>> temp_terrain;
@@ -192,7 +291,7 @@ void World::load_terrain_map()
 			}
 		}
 
-		this->terrain = make_shared<vector<vector<char_type>>>(temp_terrain);
+		this->terrain = R::make_unique<vector<vector<char_type>>>(temp_terrain);
 	}
 
 	// test if the loaded terrain is the correct dimensions
@@ -210,53 +309,109 @@ void World::load_terrain_map()
 		}
 	}
 
-	if (!terrain_loaded_from_file_good) // if the terrain needs to regenerated
+	return terrain_loaded_from_file_good;
+}
+bool World::load_existing_iron_ore_map()
+{
+	// load the contents of the terrain file, if it exists
 	{
-		// create the generator object
-		Generator gen;
+		vector<vector<char_type>> temp_terrain;
+		if (R::file_exists(C::iron_ore_terrain_file_location))
+		{
+			fstream terrain_file;
+			terrain_file.open(C::iron_ore_terrain_file_location);
+			string row;
+			while (getline(terrain_file, row)) // for each row
+			{
+				if (row.length() > 1) // if the row is not empty
+				{
+#ifdef _WIN32
+					temp_terrain.push_back(vector<char_type>(row.begin(), row.end())); // copy the contents of the row into an anonymous vector
+#else
+					vector<char_type> vec;
+					// for each character in the string
+					for (string::iterator it = row.begin(); it != row.end(); ++it)
+					{
+						// add it to the vector as a string of its own
+						vec.push_back(string(1, *it));
+					}
+					// add the vector as the next row in the terrain file
+					temp_terrain.push_back(vec);
+#endif
+				}
+			}
+		}
 
-		// generate a biome map
-		vector<vector<char_type>> biome_map = gen.generate_biome_map(C::LAND_CHAR, C::FOREST_CHAR, 3, 1, 25); // hardcoding a bit here
-		gen.to_file(biome_map, gen.get_generated_terrain_dir() + "/biome_map.txt");
-
-		// use the biome map to generate static in a full size map
-		vector<vector<char_type>> world_map = gen.generate_static_using_biome_map(biome_map, 25); // hardcoding again
-		gen.to_file(world_map, gen.get_generated_terrain_dir() + "/static.txt");
-
-		gen.game_of_life(world_map, 5); gen.save_intermediate_map(world_map);
-		gen.fill(world_map, 2);  gen.save_intermediate_map(world_map);
-		gen.clean(world_map, 3); gen.save_intermediate_map(world_map);
-		gen.fill(world_map, 4);  gen.save_intermediate_map(world_map); // this is the same as fill(12), but each call has a seperate printout this way
-		gen.fill(world_map, 4);  gen.save_intermediate_map(world_map);
-		gen.fill(world_map, 4);  gen.save_intermediate_map(world_map);
-
-		// save the final terrain to disk
-		gen.to_file(world_map, C::world_terrain_file_location);
-
-		terrain = R::make_unique<vector<vector<char_type>>>(world_map);
+		this->iron_ore_map = R::make_unique<vector<vector<char_type>>>(temp_terrain);
 	}
 
-	// temporary scope - this is expirementation for mineral field generation, don't trust variable names yet
+	// test if the loaded terrain is the correct dimensions
+	bool terrain_loaded_from_file_good = false;
+	if (iron_ore_map->size() == C::WORLD_X_DIMENSION)
 	{
-		// create the generator object
-		Generator gen;
-
-		// generate a biome map
-		vector<vector<char_type>> biome_map = gen.generate_biome_map(C::LAND_CHAR, C::FOREST_CHAR, 1, 19, 25); // hardcoding a bit here
-		
-		// use the biome map to generate static in a full size map
-		vector<vector<char_type>> mineral_map = gen.generate_static_using_biome_map(biome_map, 25); // hardcoding again
-
-		gen.game_of_life(mineral_map, 5); gen.save_intermediate_map(mineral_map);
-		gen.fill(mineral_map, 2);  gen.save_intermediate_map(mineral_map);
-		gen.clean(mineral_map, 3); gen.save_intermediate_map(mineral_map);
-		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map); // this is the same as fill(12), but each call has a seperate printout this way
-		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map);
-		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map);
-
-		// save the mineral map to disk
-		gen.to_file(mineral_map, C::game_directory + "/test_mineral_generation.txt");
+		terrain_loaded_from_file_good = true;
+		for (unsigned i = 0; i < iron_ore_map->size(); ++i)
+		{
+			if (iron_ore_map->operator[](i).size() != C::WORLD_Y_DIMENSION)
+			{
+				terrain_loaded_from_file_good = false;
+				break;
+			}
+		}
 	}
+
+	return terrain_loaded_from_file_good;
+}
+bool World::load_existing_limestone_map()
+{
+	// load the contents of the terrain file, if it exists
+	{
+		vector<vector<char_type>> temp_terrain;
+		if (R::file_exists(C::limestone_terrain_file_location))
+		{
+			fstream terrain_file;
+			terrain_file.open(C::limestone_terrain_file_location);
+			string row;
+			while (getline(terrain_file, row)) // for each row
+			{
+				if (row.length() > 1) // if the row is not empty
+				{
+#ifdef _WIN32
+					temp_terrain.push_back(vector<char_type>(row.begin(), row.end())); // copy the contents of the row into an anonymous vector
+#else
+					vector<char_type> vec;
+					// for each character in the string
+					for (string::iterator it = row.begin(); it != row.end(); ++it)
+					{
+						// add it to the vector as a string of its own
+						vec.push_back(string(1, *it));
+					}
+					// add the vector as the next row in the terrain file
+					temp_terrain.push_back(vec);
+#endif
+				}
+			}
+		}
+
+		this->limestone_map = R::make_unique<vector<vector<char_type>>>(temp_terrain);
+	}
+
+	// test if the loaded terrain is the correct dimensions
+	bool terrain_loaded_from_file_good = false;
+	if (limestone_map->size() == C::WORLD_X_DIMENSION)
+	{
+		terrain_loaded_from_file_good = true;
+		for (unsigned i = 0; i < limestone_map->size(); ++i)
+		{
+			if (limestone_map->operator[](i).size() != C::WORLD_Y_DIMENSION)
+			{
+				terrain_loaded_from_file_good = false;
+				break;
+			}
+		}
+	}
+
+	return terrain_loaded_from_file_good;
 }
 
 // a room at x,y,z does not exist on the disk; create it and add it to the world
@@ -285,7 +440,7 @@ void World::generate_room_at(const int & x, const int & y, const int & z)
 		if (!room_node)
 		{
 			// create the room
-			room_pointer room = create_room(x, y, z);
+			unique_ptr<Room> room = create_room(x, y, z);
 
 			// add it to the world...
 			room_pointer_at(x, y, z) = std::move(room);
@@ -300,7 +455,7 @@ void World::generate_room_at(const int & x, const int & y, const int & z)
 		// create specified room and add it to it
 
 		// create the room
-		room_pointer room = create_room(x, y, z);
+		unique_ptr<Room> room = create_room(x, y, z);
 
 		// add it to the world...
 		room_pointer_at(x, y, z) = std::move(room);
@@ -331,7 +486,7 @@ void World::load_vertical_rooms_to_XML(const int & ix, const int & iy, xml_docum
 void World::add_room_to_world(xml_node & room_node, const int & x, const int & y, const int & z)
 {
 	// create an empty room
-	room_pointer room(R::make_unique<Room>());
+	unique_ptr<Room> room(R::make_unique<Room>());
 
 	// set whether or not the room is water (off-island or river/lake)
 	room->set_water_status(room_node.attribute(C::XML_IS_WATER.c_str()).as_bool());
@@ -479,7 +634,7 @@ void World::load_room_to_world(const int & x, const int & y, const int & z)
 }
 
 // move a passed room to disk
-void World::unload_room(const int & x, const int & y, const int & z, const World::room_pointer::pointer room)
+void World::unload_room(const int & x, const int & y, const int & z, const unique_ptr<Room>::pointer room)
 {
 	// Unloads passed room. Can be called even if the room doesn't exist in the world structure
 
@@ -504,7 +659,7 @@ void World::unload_room(const int & x, const int & y, const int & z, const World
 }
 
 // add a room to a z_stack at a given index
-void World::add_room_to_z_stack(const int & z, const World::room_pointer::pointer room, xml_document & z_stack) const
+void World::add_room_to_z_stack(const int & z, const unique_ptr<Room>::pointer room, xml_document & z_stack) const
 {
 	// delete the room node if it already exists
 	z_stack.remove_child(("room-" + R::to_string(z)).c_str());
@@ -611,9 +766,9 @@ void World::add_room_to_z_stack(const int & z, const World::room_pointer::pointe
 }
 
 // create a new empty room given its coordinates and the world terrain
-World::room_pointer World::create_room(const int & x, const int & y, const int & z) const
+unique_ptr<Room> World::create_room(const int & x, const int & y, const int & z) const
 {
-	room_pointer room = R::make_unique<Room>();
+	unique_ptr<Room> room = R::make_unique<Room>();
 
 	// if the room is ground level and the terrain map indicates the room is forest
 	if (z == C::GROUND_INDEX && terrain->operator[](x)[y] == C::FOREST_CHAR)

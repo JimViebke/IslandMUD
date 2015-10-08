@@ -17,7 +17,7 @@ class Generator
 {
 public:
 
-	Generator(); // defined in class file
+	Generator(const string & map_type); // defined in class file
 
 	// generate a miniature map of the biomes
 	vector<vector<char_type>> generate_biome_map(const char_type & default_char, const char_type & fill_char,

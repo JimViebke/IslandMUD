@@ -3,9 +3,9 @@ May 15 2015 */
 
 #include "generator.h"
 
-Generator::Generator()
+Generator::Generator(const string & map_type)
 {
-	cout << "\nGenerating new world terrain map...";
+	cout << "\nGenerating new " << map_type << "...";
 
 	// create the timestamped directory
 	generated_terrain_dir = C::game_directory + "/gen_" + R::to_string(R::current_time_in_ms());
@@ -239,6 +239,7 @@ void Generator::save_intermediate_map(const vector<vector<char_type>> & v) const
 // save to custom location
 void Generator::to_file(const vector<vector<char_type>> & v, const string & path) const
 {
+	// copy the entire vector into a stringstream
 	ostringstream oss;
 	for (unsigned i = 0; i < v.size(); ++i)
 	{
@@ -249,7 +250,7 @@ void Generator::to_file(const vector<vector<char_type>> & v, const string & path
 		oss << endl;
 	}
 
-	// save to disk
+	// save the stringstream to the specified path
 	ofstream myfile;
 	myfile.open(path);
 	myfile << oss.str();
