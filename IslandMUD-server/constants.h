@@ -41,6 +41,8 @@ public:
 	static const string
 		game_directory,
 		world_terrain_file_location,
+		iron_ore_terrain_file_location,
+		limestone_terrain_file_location,
 		room_directory,
 		user_data_directory;
 
@@ -58,6 +60,7 @@ public:
 		WATER_CHAR,
 		LAND_CHAR,
 		FOREST_CHAR,
+		GENERIC_MINERAL_CHAR,
 		ITEM_CHAR,
 		CHEST_CHAR,
 		RUBBLE_CHAR;
