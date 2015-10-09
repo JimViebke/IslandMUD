@@ -183,15 +183,15 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		gen.to_file(biome_map, gen.get_generated_terrain_dir() + "/biome_map.txt");
 
 		// use the biome map to generate static in a full size map
-		vector<vector<char_type>> world_map = gen.generate_static_using_biome_map(biome_map, 25); // hardcoding again
+		vector<vector<char_type>> world_map = gen.generate_static_using_biome_map(biome_map, 25, C::LAND_CHAR, C::FOREST_CHAR); // hardcoding again
 		gen.to_file(world_map, gen.get_generated_terrain_dir() + "/static.txt");
 
-		gen.game_of_life(world_map, 5); gen.save_intermediate_map(world_map);
-		gen.fill(world_map, 2);  gen.save_intermediate_map(world_map);
-		gen.clean(world_map, 3); gen.save_intermediate_map(world_map);
-		gen.fill(world_map, 4);  gen.save_intermediate_map(world_map); // this is the same as fill(12), but each call has a seperate printout this way
-		gen.fill(world_map, 4);  gen.save_intermediate_map(world_map);
-		gen.fill(world_map, 4);  gen.save_intermediate_map(world_map);
+		gen.game_of_life(world_map, 5, C::LAND_CHAR, C::FOREST_CHAR); gen.save_intermediate_map(world_map);
+		gen.fill(world_map, 2, C::LAND_CHAR, C::FOREST_CHAR);  gen.save_intermediate_map(world_map);
+		gen.clean(world_map, 3, C::LAND_CHAR, C::FOREST_CHAR); gen.save_intermediate_map(world_map);
+		gen.fill(world_map, 4, C::LAND_CHAR, C::FOREST_CHAR);  gen.save_intermediate_map(world_map); // this is the same as fill(12), but each call has a seperate printout this way
+		gen.fill(world_map, 4, C::LAND_CHAR, C::FOREST_CHAR);  gen.save_intermediate_map(world_map);
+		gen.fill(world_map, 4, C::LAND_CHAR, C::FOREST_CHAR);  gen.save_intermediate_map(world_map);
 
 		// save the final terrain to disk
 		gen.to_file(world_map, C::world_terrain_file_location);
@@ -213,14 +213,14 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		vector<vector<char_type>> biome_map = gen.generate_biome_map(C::LAND_CHAR, C::GENERIC_MINERAL_CHAR, 1, 19, 25); // hardcoding a bit here
 
 		// use the biome map to generate static in a full size map
-		vector<vector<char_type>> mineral_map = gen.generate_static_using_biome_map(biome_map, 25); // hardcoding again
+		vector<vector<char_type>> mineral_map = gen.generate_static_using_biome_map(biome_map, 25, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR); // hardcoding again
 
-		gen.game_of_life(mineral_map, 5); gen.save_intermediate_map(mineral_map);
-		gen.fill(mineral_map, 2);  gen.save_intermediate_map(mineral_map);
-		gen.clean(mineral_map, 3); gen.save_intermediate_map(mineral_map);
-		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map); // this is the same as fill(12), but each call has a seperate printout this way
-		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map);
-		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map);
+		gen.game_of_life(mineral_map, 5, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR); gen.save_intermediate_map(mineral_map);
+		gen.fill(mineral_map, 2, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR);  gen.save_intermediate_map(mineral_map);
+		gen.clean(mineral_map, 3, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR); gen.save_intermediate_map(mineral_map);
+		gen.fill(mineral_map, 4, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR);  gen.save_intermediate_map(mineral_map); // this is the same as fill(12), but each call has a seperate printout this way
+		gen.fill(mineral_map, 4, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR);  gen.save_intermediate_map(mineral_map);
+		gen.fill(mineral_map, 4, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR);  gen.save_intermediate_map(mineral_map);
 
 		// save the mineral map to disk
 		gen.to_file(mineral_map, C::iron_ore_terrain_file_location);
@@ -242,14 +242,14 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		vector<vector<char_type>> biome_map = gen.generate_biome_map(C::LAND_CHAR, C::GENERIC_MINERAL_CHAR, 1, 39, 25); // hardcoding a bit here
 
 		// use the biome map to generate static in a full size map
-		vector<vector<char_type>> mineral_map = gen.generate_static_using_biome_map(biome_map, 25); // hardcoding again
+		vector<vector<char_type>> mineral_map = gen.generate_static_using_biome_map(biome_map, 25, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR); // hardcoding again
 
-		gen.game_of_life(mineral_map, 5); gen.save_intermediate_map(mineral_map);
-		gen.fill(mineral_map, 2);  gen.save_intermediate_map(mineral_map);
-		gen.clean(mineral_map, 3); gen.save_intermediate_map(mineral_map);
-		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map); // this is the same as fill(12), but each call has a seperate printout this way
-		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map);
-		gen.fill(mineral_map, 4);  gen.save_intermediate_map(mineral_map);
+		gen.game_of_life(mineral_map, 5, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR); gen.save_intermediate_map(mineral_map);
+		gen.fill(mineral_map, 2, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR);  gen.save_intermediate_map(mineral_map);
+		gen.clean(mineral_map, 3, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR); gen.save_intermediate_map(mineral_map);
+		gen.fill(mineral_map, 4, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR);  gen.save_intermediate_map(mineral_map); // this is the same as fill(12), but each call has a seperate printout this way
+		gen.fill(mineral_map, 4, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR);  gen.save_intermediate_map(mineral_map);
+		gen.fill(mineral_map, 4, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR);  gen.save_intermediate_map(mineral_map);
 
 		// save the mineral map to disk
 		gen.to_file(mineral_map, C::limestone_terrain_file_location);
@@ -770,15 +770,32 @@ unique_ptr<Room> World::create_room(const int & x, const int & y, const int & z)
 {
 	unique_ptr<Room> room = R::make_unique<Room>();
 
-	// if the room is ground level and the terrain map indicates the room is forest
-	if (z == C::GROUND_INDEX && terrain->operator[](x)[y] == C::FOREST_CHAR)
+	// if the room is ground level
+	if (z == C::GROUND_INDEX)
 	{
-		room->add_item(Craft::make(C::TREE_ID)); // add a tree
-	}
-	// else, check if the room is water (off land or a lake/river)
-	else if (z == C::GROUND_INDEX && terrain->operator[](x)[y] == C::WATER_CHAR)
-	{
-		room->set_water_status(true);
+		// if the terrain map indicates the room is forest
+		if (terrain->operator[](x)[y] == C::FOREST_CHAR)
+		{
+			room->add_item(Craft::make(C::TREE_ID)); // add a tree
+		}
+
+		// if the terrain map indicates the room is water
+		if (terrain->operator[](x)[y] == C::WATER_CHAR)
+		{
+			room->set_water_status(true);
+		}
+
+		// if the iron ore map indicates the room contains iron ore
+		if (iron_ore_map->operator[](x)[y] == C::GENERIC_MINERAL_CHAR)
+		{
+			room->add_item(Craft::make(C::IRON_ORE_ID)); // add an iron ore item
+		}
+
+		// if the limestone map indicates the room contains limestone
+		if (limestone_map->operator[](x)[y] == C::GENERIC_MINERAL_CHAR)
+		{
+			room->add_item(Craft::make(C::LIMESTONE_ID)); // add a limestone item
+		}
 	}
 
 	return room;
