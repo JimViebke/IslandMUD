@@ -141,7 +141,10 @@ bool Room::contains_item(const string & item_id, const unsigned & count) const
 	// there is not a sufficient count of items in the room
 	return false;
 }
-bool Room::is_observed_by(const string & actor_id) const { return R::contains(viewing_actor_ids, actor_id); }
+bool Room::is_observed_by(const string & actor_id) const
+{
+	return R::contains(viewing_actor_ids, actor_id);
+}
 bool Room::is_water() const
 {
 	return water;
@@ -149,6 +152,12 @@ bool Room::is_water() const
 bool Room::is_forest() const
 {
 	return this->contains_item(C::TREE_ID);
+}
+bool Room::has_mineral() const
+{
+	// determine if a room contains iron or limestone
+	return contents.find(C::IRON_ORE_ID) != contents.cend() ||
+		contents.find(C::LIMESTONE_ID) != contents.cend();
 }
 
 // chests

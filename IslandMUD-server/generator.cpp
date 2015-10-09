@@ -40,7 +40,8 @@ vector<vector<char_type>> Generator::generate_biome_map(const char_type & defaul
 
 	return biome_map; // this will be used for the next generation step
 }
-vector<vector<char_type>> Generator::generate_static_using_biome_map(const vector<vector<char_type>> & biome_map, const int & biome_size)
+vector<vector<char_type>> Generator::generate_static_using_biome_map(const vector<vector<char_type>> & biome_map, const int & biome_size,
+	const char_type & empty_char, const char_type & fill_char)
 {
 	vector<vector<char_type>> v(C::WORLD_X_DIMENSION, vector<char_type>(C::WORLD_Y_DIMENSION,
 #ifdef _WIN32
@@ -60,15 +61,15 @@ vector<vector<char_type>> Generator::generate_static_using_biome_map(const vecto
 				v[x][y] = C::WATER_CHAR;
 			}
 			// if the biome map contains a land char
-			else if (biome_map[x / biome_size][y / biome_size] == C::LAND_CHAR)
+			else if (biome_map[x / biome_size][y / biome_size] == empty_char)
 			{
-				v[x][y] = C::LAND_CHAR;
+				v[x][y] = empty_char;
 			}
 			// the biome map contains a forest char, generate forest/land
 			else
 			{
 				// push back forest or land (again, hardcoding static here)
-				v[x][y] = (rand() % 4) ? C::LAND_CHAR : C::FOREST_CHAR;
+				v[x][y] = (rand() % 4) ? empty_char : fill_char;
 			}
 		}
 	}
@@ -77,7 +78,7 @@ vector<vector<char_type>> Generator::generate_static_using_biome_map(const vecto
 }
 
 // different pass types to call manually
-void Generator::game_of_life(vector<vector<char_type>> & original, const int & iterations)
+void Generator::game_of_life(vector<vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char)
 {
 	vector<vector<char_type>> working = original; // copy to start
 
@@ -98,16 +99,16 @@ void Generator::game_of_life(vector<vector<char_type>> & original, const int & i
 				// for every land cell, count its forest neighours (sp?)
 				int live_neighbors = 0;
 				// count the row above
-				if (original[i - 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (original[i - 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (original[i - 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i - 1][j - 1] == fill_char) { ++live_neighbors; }
+				if (original[i - 1][j] == fill_char) { ++live_neighbors; }
+				if (original[i - 1][j + 1] == fill_char) { ++live_neighbors; }
 				// count the left and right neighers
-				if (original[i][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (original[i][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i][j - 1] == fill_char) { ++live_neighbors; }
+				if (original[i][j + 1] == fill_char) { ++live_neighbors; }
 				// count the row below
-				if (original[i + 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (original[i + 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (original[i + 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i + 1][j - 1] == fill_char) { ++live_neighbors; }
+				if (original[i + 1][j] == fill_char) { ++live_neighbors; }
+				if (original[i + 1][j + 1] == fill_char) { ++live_neighbors; }
 
 				/* Wikipedia:
 				Any live cell with fewer than two live neighbours dies, as if caused by under-population.
@@ -116,16 +117,16 @@ void Generator::game_of_life(vector<vector<char_type>> & original, const int & i
 				Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 				*/
 
-				if (working[i][j] == C::FOREST_CHAR) // any living cell...
+				if (working[i][j] == fill_char) // any living cell...
 				{
 					if (live_neighbors < 2 || live_neighbors > 3) // ...with <2 or >3 neighbors...
 					{
-						working[i][j] = C::LAND_CHAR; // ...dies
+						working[i][j] = empty_char; // ...dies
 					}
 				}
 				else if (live_neighbors == 3) // a dead cell with 3 neighbors...
 				{
-					working[i][j] = C::FOREST_CHAR; // ...is born
+					working[i][j] = fill_char; // ...is born
 				}
 			}
 		}
@@ -137,7 +138,7 @@ void Generator::game_of_life(vector<vector<char_type>> & original, const int & i
 	// save
 	generator_pattern << iterations << "C+";
 }
-void Generator::clean(vector<vector<char_type>> & original, const int & iterations)
+void Generator::clean(vector<vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char)
 {
 	vector<vector<char_type>> working = original; // copy to start
 
@@ -158,20 +159,20 @@ void Generator::clean(vector<vector<char_type>> & original, const int & iteratio
 				// for every land cell, count its forest neighours (sp?)
 				int live_neighbors = 0;
 				// count the row above
-				if (original[i - 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (original[i - 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (original[i - 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i - 1][j - 1] == fill_char) { ++live_neighbors; }
+				if (original[i - 1][j] == fill_char) { ++live_neighbors; }
+				if (original[i - 1][j + 1] == fill_char) { ++live_neighbors; }
 				// count the left and right neighers
-				if (original[i][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (original[i][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i][j - 1] == fill_char) { ++live_neighbors; }
+				if (original[i][j + 1] == fill_char) { ++live_neighbors; }
 				// count the row below
-				if (original[i + 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (original[i + 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (original[i + 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i + 1][j - 1] == fill_char) { ++live_neighbors; }
+				if (original[i + 1][j] == fill_char) { ++live_neighbors; }
+				if (original[i + 1][j + 1] == fill_char) { ++live_neighbors; }
 
 				if (live_neighbors < 2)
 				{
-					working[i][j] = C::LAND_CHAR; // dies
+					working[i][j] = empty_char; // dies
 				}
 			}
 		}
@@ -183,7 +184,7 @@ void Generator::clean(vector<vector<char_type>> & original, const int & iteratio
 		generator_pattern << "C";
 	}
 }
-void Generator::fill(vector<vector<char_type>> & original, const int & iterations)
+void Generator::fill(vector<vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char)
 {
 	vector<vector<char_type>> working = original; // copy to start
 
@@ -204,20 +205,20 @@ void Generator::fill(vector<vector<char_type>> & original, const int & iteration
 				// for every land cell, count its forest neighours (sp?)
 				int live_neighbors = 0;
 				// count the row above
-				if (original[i - 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (original[i - 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (original[i - 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i - 1][j - 1] == fill_char) { ++live_neighbors; }
+				if (original[i - 1][j] == fill_char) { ++live_neighbors; }
+				if (original[i - 1][j + 1] == fill_char) { ++live_neighbors; }
 				// count the left and right neighers
-				if (original[i][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (original[i][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i][j - 1] == fill_char) { ++live_neighbors; }
+				if (original[i][j + 1] == fill_char) { ++live_neighbors; }
 				// count the row below
-				if (original[i + 1][j - 1] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (original[i + 1][j] == C::FOREST_CHAR) { ++live_neighbors; }
-				if (original[i + 1][j + 1] == C::FOREST_CHAR) { ++live_neighbors; }
+				if (original[i + 1][j - 1] == fill_char) { ++live_neighbors; }
+				if (original[i + 1][j] == fill_char) { ++live_neighbors; }
+				if (original[i + 1][j + 1] == fill_char) { ++live_neighbors; }
 
 				if (live_neighbors > 3)
 				{
-					working[i][j] = C::FOREST_CHAR; // birth or survival
+					working[i][j] = fill_char; // birth or survival
 				}
 			}
 		}

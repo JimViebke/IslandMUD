@@ -24,12 +24,13 @@ public:
 		const int & fill_ratio, const int & default_ratio, const int & biome_size);
 
 	// generate a full size map using static inside of each biome
-	vector<vector<char_type>> generate_static_using_biome_map(const vector<vector<char_type>> & biome_map, const int & biome_size);
+	vector<vector<char_type>> generate_static_using_biome_map(const vector<vector<char_type>> & biome_map, const int & biome_size,
+		const char_type & empty_char, const char_type & fill_char);
 
 	// different pass types, all return by reference
-	void game_of_life(vector<vector<char_type>> & original, const int & iterations);
-	void clean(vector<vector<char_type>> & original, const int & iterations);
-	void fill(vector<vector<char_type>> & original, const int & iterations);
+	void game_of_life(vector<vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char);
+	void clean(vector<vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char);
+	void fill(vector<vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char);
 
 	// save intermediate generated maps to /gen_[timestamp]/[pattern].txt
 	void save_intermediate_map(const vector<vector<char_type>> & v) const;
