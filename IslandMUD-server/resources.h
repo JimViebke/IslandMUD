@@ -17,11 +17,9 @@ Feb 14, 2015 */
 #ifdef _WIN32
 #include <direct.h>
 #else
-#include <sys/stat.h>
-#endif
-
 #include <stdlib.h>
 #include <stdio.h>
+#endif
 
 #include "constants.h"
 
