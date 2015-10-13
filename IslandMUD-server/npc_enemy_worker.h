@@ -54,7 +54,7 @@ private:
 	};
 
 	// used during fortress outer wall generation
-	enum Area_Type { structure, fortress_interior, fortress_exterior };
+	enum class Area_Type { structure, fortress_interior, fortress_exterior };
 };
 
 #endif

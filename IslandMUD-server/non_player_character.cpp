@@ -47,13 +47,13 @@ NPC::Coordinate::Coordinate(const int & set_x, const int & set_y, const int & se
 // objective creating and deletion
 void NPC::add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const string & purpose)
 {
-	(priority == high_priority) ?
+	(priority == Objective_Priority::high_priority) ?
 		objectives.push_front(Objective(verb, noun, purpose)) :
 		objectives.push_back(Objective(verb, noun, purpose));
 }
 void NPC::add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z)
 {
-	(priority == high_priority) ?
+	(priority == Objective_Priority::high_priority) ?
 		objectives.push_front(Objective(verb, noun, x, y, z)) :
 		objectives.push_back(Objective(verb, noun, x, y, z));
 }
@@ -208,7 +208,7 @@ bool NPC::crafting_requirements_met(const string & item_ID, const World & world)
 // objective planning
 void NPC::plan_to_get(const string & item_id)
 {
-	add_objective(high_priority, C::AI_OBJECTIVE_ACQUIRE, item_id, item_id);
+	add_objective(Objective_Priority::high_priority, C::AI_OBJECTIVE_ACQUIRE, item_id, item_id);
 }
 void NPC::plan_to_craft(const string & item_id)
 {
@@ -226,14 +226,14 @@ void NPC::plan_to_craft(const string & item_id)
 	{
 		for (int i = 0; i < requirement.second; ++i)
 		{
-			add_objective(high_priority, C::AI_OBJECTIVE_GOTO, requirement.first, item_id);
+			add_objective(Objective_Priority::high_priority, C::AI_OBJECTIVE_GOTO, requirement.first, item_id);
 		}
 	}
 	for (const pair<string, int> & requirement : recipes.get_recipe(item_id).local_remove)
 	{
 		for (int i = 0; i < requirement.second; ++i)
 		{
-			add_objective(high_priority, C::AI_OBJECTIVE_GOTO, requirement.first, item_id);
+			add_objective(Objective_Priority::high_priority, C::AI_OBJECTIVE_GOTO, requirement.first, item_id);
 		}
 	}
 
@@ -242,14 +242,14 @@ void NPC::plan_to_craft(const string & item_id)
 	{
 		for (int i = 0; i < requirement.second; ++i)
 		{
-			add_objective(high_priority, C::AI_OBJECTIVE_ACQUIRE, requirement.first, item_id);
+			add_objective(Objective_Priority::high_priority, C::AI_OBJECTIVE_ACQUIRE, requirement.first, item_id);
 		}
 	}
 	for (const pair<string, int> & requirement : recipes.get_recipe(item_id).inventory_remove)
 	{
 		for (int i = 0; i < requirement.second; ++i)
 		{
-			add_objective(high_priority, C::AI_OBJECTIVE_ACQUIRE, requirement.first, item_id);
+			add_objective(Objective_Priority::high_priority, C::AI_OBJECTIVE_ACQUIRE, requirement.first, item_id);
 		}
 	}
 }

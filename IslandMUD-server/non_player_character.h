@@ -38,7 +38,7 @@ protected:
 		Objective(const string & verb, const string & noun, const string & material, const string & direction, const int & objective_x, const int & objective_y, const int & objective_z, const bool & modifier);
 	};
 
-	enum Objective_Priority { low_priority, high_priority };
+	enum class Objective_Priority { low_priority, high_priority };
 
 	class Coordinate
 	{
