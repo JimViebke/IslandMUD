@@ -153,11 +153,11 @@ bool Room::is_forest() const
 {
 	return this->contains_item(C::TREE_ID);
 }
-bool Room::has_mineral() const
+bool Room::has_mineral_deposit() const
 {
-	// determine if a room contains iron or limestone
-	return contents.find(C::IRON_ORE_ID) != contents.cend() ||
-		contents.find(C::LIMESTONE_ID) != contents.cend();
+	// determine if a room contains an iron or limestone deposit
+	return contents.find(C::IRON_DEPOSIT_ID) != contents.cend() ||
+		contents.find(C::LIMESTONE_DEPOSIT_ID) != contents.cend();
 }
 
 // chests

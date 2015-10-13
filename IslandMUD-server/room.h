@@ -48,7 +48,7 @@ public:
 	bool is_observed_by(const string & actor_id) const;
 	bool is_water() const;
 	bool is_forest() const;
-	bool has_mineral() const;
+	bool has_mineral_deposit() const;
 
 	// chests
 	void add_chest(const string & set_faction_id);

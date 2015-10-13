@@ -200,7 +200,7 @@ void World::load_or_generate_terrain_and_mineral_maps()
 	}
 
 	// generate a new iron ore mineral map if needed
-	if (load_existing_iron_ore_map())
+	if (load_existing_iron_deposit_map())
 	{
 		cout << "\nLoaded existing iron ore mineral map...";
 	}
@@ -223,13 +223,13 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		gen.fill(mineral_map, 4, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR);  gen.save_intermediate_map(mineral_map);
 
 		// save the mineral map to disk
-		gen.to_file(mineral_map, C::iron_ore_terrain_file_location);
+		gen.to_file(mineral_map, C::iron_deposit_map_file_location);
 
-		this->iron_ore_map = R::make_unique<vector<vector<char_type>>>(mineral_map);
+		this->iron_deposit_map = R::make_unique<vector<vector<char_type>>>(mineral_map);
 	}
 
 	// generate a new limestone mineral map if needed
-	if (load_existing_limestone_map())
+	if (load_existing_limestone_deposit_map())
 	{
 		cout << "\nLoaded existing limestone mineral map...";
 	}
@@ -252,9 +252,9 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		gen.fill(mineral_map, 4, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR);  gen.save_intermediate_map(mineral_map);
 
 		// save the mineral map to disk
-		gen.to_file(mineral_map, C::limestone_terrain_file_location);
+		gen.to_file(mineral_map, C::limestone_deposit_map_file_location);
 
-		this->limestone_map = R::make_unique<vector<vector<char_type>>>(mineral_map);
+		this->limestone_deposit_map = R::make_unique<vector<vector<char_type>>>(mineral_map);
 	}
 }
 
@@ -311,15 +311,15 @@ bool World::load_existing_world_terrain()
 
 	return terrain_loaded_from_file_good;
 }
-bool World::load_existing_iron_ore_map()
+bool World::load_existing_iron_deposit_map()
 {
 	// load the contents of the terrain file, if it exists
 	{
 		vector<vector<char_type>> temp_terrain;
-		if (R::file_exists(C::iron_ore_terrain_file_location))
+		if (R::file_exists(C::iron_deposit_map_file_location))
 		{
 			fstream terrain_file;
-			terrain_file.open(C::iron_ore_terrain_file_location);
+			terrain_file.open(C::iron_deposit_map_file_location);
 			string row;
 			while (getline(terrain_file, row)) // for each row
 			{
@@ -342,17 +342,17 @@ bool World::load_existing_iron_ore_map()
 			}
 		}
 
-		this->iron_ore_map = R::make_unique<vector<vector<char_type>>>(temp_terrain);
+		this->iron_deposit_map = R::make_unique<vector<vector<char_type>>>(temp_terrain);
 	}
 
 	// test if the loaded terrain is the correct dimensions
 	bool terrain_loaded_from_file_good = false;
-	if (iron_ore_map->size() == C::WORLD_X_DIMENSION)
+	if (iron_deposit_map->size() == C::WORLD_X_DIMENSION)
 	{
 		terrain_loaded_from_file_good = true;
-		for (unsigned i = 0; i < iron_ore_map->size(); ++i)
+		for (unsigned i = 0; i < iron_deposit_map->size(); ++i)
 		{
-			if (iron_ore_map->operator[](i).size() != C::WORLD_Y_DIMENSION)
+			if (iron_deposit_map->operator[](i).size() != C::WORLD_Y_DIMENSION)
 			{
 				terrain_loaded_from_file_good = false;
 				break;
@@ -362,15 +362,15 @@ bool World::load_existing_iron_ore_map()
 
 	return terrain_loaded_from_file_good;
 }
-bool World::load_existing_limestone_map()
+bool World::load_existing_limestone_deposit_map()
 {
 	// load the contents of the terrain file, if it exists
 	{
 		vector<vector<char_type>> temp_terrain;
-		if (R::file_exists(C::limestone_terrain_file_location))
+		if (R::file_exists(C::limestone_deposit_map_file_location))
 		{
 			fstream terrain_file;
-			terrain_file.open(C::limestone_terrain_file_location);
+			terrain_file.open(C::limestone_deposit_map_file_location);
 			string row;
 			while (getline(terrain_file, row)) // for each row
 			{
@@ -393,17 +393,17 @@ bool World::load_existing_limestone_map()
 			}
 		}
 
-		this->limestone_map = R::make_unique<vector<vector<char_type>>>(temp_terrain);
+		this->limestone_deposit_map = R::make_unique<vector<vector<char_type>>>(temp_terrain);
 	}
 
 	// test if the loaded terrain is the correct dimensions
 	bool terrain_loaded_from_file_good = false;
-	if (limestone_map->size() == C::WORLD_X_DIMENSION)
+	if (limestone_deposit_map->size() == C::WORLD_X_DIMENSION)
 	{
 		terrain_loaded_from_file_good = true;
-		for (unsigned i = 0; i < limestone_map->size(); ++i)
+		for (unsigned i = 0; i < limestone_deposit_map->size(); ++i)
 		{
-			if (limestone_map->operator[](i).size() != C::WORLD_Y_DIMENSION)
+			if (limestone_deposit_map->operator[](i).size() != C::WORLD_Y_DIMENSION)
 			{
 				terrain_loaded_from_file_good = false;
 				break;
@@ -785,16 +785,16 @@ unique_ptr<Room> World::create_room(const int & x, const int & y, const int & z)
 			room->set_water_status(true);
 		}
 
-		// if the iron ore map indicates the room contains iron ore
-		if (iron_ore_map->operator[](x)[y] == C::GENERIC_MINERAL_CHAR)
+		// if the iron ore map indicates the room contains an iron deposit
+		if (iron_deposit_map->operator[](x)[y] == C::GENERIC_MINERAL_CHAR)
 		{
-			room->add_item(Craft::make(C::IRON_ORE_ID)); // add an iron ore item
+			room->add_item(Craft::make(C::IRON_DEPOSIT_ID)); // add an iron deposit item
 		}
 
 		// if the limestone map indicates the room contains limestone
-		if (limestone_map->operator[](x)[y] == C::GENERIC_MINERAL_CHAR)
+		if (limestone_deposit_map->operator[](x)[y] == C::GENERIC_MINERAL_CHAR)
 		{
-			room->add_item(Craft::make(C::LIMESTONE_ID)); // add a limestone item
+			room->add_item(Craft::make(C::LIMESTONE_DEPOSIT_ID)); // add a limestone item
 		}
 	}
 

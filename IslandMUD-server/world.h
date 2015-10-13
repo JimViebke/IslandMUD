@@ -23,8 +23,8 @@ public:
 private:
 	// 2d terrain (biome) map
 	unique_ptr<vector<vector<char_type>>> terrain;
-	unique_ptr<vector<vector<char_type>>> iron_ore_map;
-	unique_ptr<vector<vector<char_type>>> limestone_map;
+	unique_ptr<vector<vector<char_type>>> iron_deposit_map;
+	unique_ptr<vector<vector<char_type>>> limestone_deposit_map;
 
 	vector<unique_ptr<Room>> world;
 
@@ -67,8 +67,8 @@ private:
 	// three functions for loading and verifying the world map and the two mineral maps
 
 	bool load_existing_world_terrain();
-	bool load_existing_iron_ore_map();
-	bool load_existing_limestone_map();
+	bool load_existing_iron_deposit_map();
+	bool load_existing_limestone_deposit_map();
 	
 	// a room at x,y,z does not exist on the disk; create it
 	void generate_room_at(const int & x, const int & y, const int & z);

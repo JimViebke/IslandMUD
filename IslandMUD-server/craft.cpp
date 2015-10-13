@@ -19,8 +19,10 @@ shared_ptr<Item> Craft::make(const string & item_ID)
 	else if (item_ID == C::DEBRIS_ID) { return make_shared<Debris>(); }
 	else if (item_ID == C::FORGE_ID) { return make_shared<Forge>(); }
 	else if (item_ID == C::HAMMER_ID) { return make_shared<Hammer>(); }
-	else if (item_ID == C::IRON_ORE_ID) { return make_shared<Iron_Ore>(); }
+	else if (item_ID == C::IRON_ID) { return make_shared<Iron>(); }
+	else if (item_ID == C::IRON_DEPOSIT_ID) { return make_shared<Iron_Deposit>(); }
 	else if (item_ID == C::LIMESTONE_ID) { return make_shared<Limestone>(); }
+	else if (item_ID == C::LIMESTONE_DEPOSIT_ID) { return make_shared<Limestone_Deposit>(); }
 	else if (item_ID == C::LOG_ID) { return make_shared<Log>(); }
 	else if (item_ID == C::SMELTER_ID) { return make_shared<Smelter>(); }
 	else if (item_ID == C::STAFF_ID) { return make_shared<Staff>(); }

@@ -26,7 +26,7 @@ protected:
 
 	int health = 100;
 
-	Item(string item_name, bool is_takable, int health = C::DEFAULT_ITEM_MAX_HEALTH) :
+	Item(const string & item_name, const bool & is_takable, const int & health = C::DEFAULT_ITEM_MAX_HEALTH) :
 		name(item_name), takable(is_takable), health(health) {}
 
 	virtual ~Item() {}
@@ -35,13 +35,13 @@ public:
 
 	bool is_takable() const { return takable; }
 	int get_health() const { return health; }
-	void set_health(int set_health)
+	void set_health(const int & set_health)
 	{
 		// if the passed value is out of bounds, set health to max_health, otherwise set to the passed value
 		health = ((set_health > C::DEFAULT_ITEM_MAX_HEALTH || set_health < C::DEFAULT_ITEM_MIN_HEALTH)
 			? C::DEFAULT_ITEM_MAX_HEALTH : set_health);
 	}
-	void update_health(int update_health)
+	void update_health(const int & update_health)
 	{
 		// subtract the passed amount from the current health
 		health -= update_health;
@@ -224,16 +224,40 @@ public:
 	Log() : Item(C::LOG_ID, false) {}
 };
 
-class Iron_Ore : public Item
+class Mineral_Deposit : public Item
 {
-public:
-	Iron_Ore() : Item(C::IRON_ORE_ID, false) {}
+protected:
+	Mineral_Deposit(const string & mineral_ID) : Item(mineral_ID, false) {}
 };
 
-class Limestone : public Item
+class Mineral : public Material
+{
+protected:
+	Mineral(const string & mineral_ID) : Material(mineral_ID) {}
+};
+
+class Iron_Deposit : public Mineral_Deposit
 {
 public:
-	Limestone() : Item(C::LIMESTONE_ID, false) {}
+	Iron_Deposit() : Mineral_Deposit(C::IRON_DEPOSIT_ID) {}
+};
+
+class Limestone_Deposit : public Mineral_Deposit
+{
+public:
+	Limestone_Deposit() : Mineral_Deposit(C::LIMESTONE_DEPOSIT_ID) {}
+};
+
+class Iron : public Mineral
+{
+public:
+	Iron() : Mineral(C::IRON_ID) {}
+};
+
+class Limestone : public Mineral
+{
+public:
+	Limestone() : Mineral(C::LIMESTONE_ID) {}
 };
 
 #endif

@@ -227,7 +227,7 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 			"\nlegend" +
 			"\nrecipes" +
 			"\nmove [compass direction]" +
-			"\ntake / drop / craft / equip / dequip / chop / smash [item]" +
+			"\ntake / drop / craft / mine / equip / dequip / chop / smash [item]" +
 			"\nequipped" +
 			"\nadd / place / put / drop [item] into chest" +
 			"\ntake [item] from chest" +
@@ -243,6 +243,7 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 			"\n " + C::FOREST_CHAR + "     forest" +
 			"\n " + C::WATER_CHAR + "     water" +
 			"\n " + C::LAND_CHAR + "     land" +
+			"\n " + C::GENERIC_MINERAL_CHAR + "     a mineral field" +
 			"\n" +
 			"\n " + C::PLAYER_CHAR + "     you" +
 			"\n 1     number of militants" +
@@ -273,6 +274,10 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 	}
 	// crafting: "craft sword"
 	else if (command.size() == 2 && command[0] == C::CRAFT_COMMAND)
+	{
+		return actors.find(actor_id)->second->craft(command[1], world); // (item_id, world)
+	}
+	else if (command.size() == 2 && command[0] == C::MINE_COMMAND)
 	{
 		return actors.find(actor_id)->second->craft(command[1], world); // (item_id, world)
 	}

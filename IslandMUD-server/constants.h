@@ -41,8 +41,8 @@ public:
 	static const string
 		game_directory,
 		world_terrain_file_location,
-		iron_ore_terrain_file_location,
-		limestone_terrain_file_location,
+		iron_deposit_map_file_location,
+		limestone_deposit_map_file_location,
 		room_directory,
 		user_data_directory;
 
@@ -102,8 +102,14 @@ public:
 		HAMMER_ID,
 
 		// item IDs -> rocks and minerals
-		IRON_ORE_ID,
+		IRON_DEPOSIT_ID, // when they are in the ground
+		LIMESTONE_DEPOSIT_ID,
+
+		IRON_ID, // once they are out of the ground
 		LIMESTONE_ID,
+
+		// none of these are actual item IDs, they exist for the parser to work with multi-word IDs
+		KEYWORD_DEPOSIT,
 
 		// commands
 		BAD_COMMAND,
@@ -114,6 +120,7 @@ public:
 		HELP_COMMAND,
 		LEGEND_COMMAND,
 		CRAFT_COMMAND,
+		MINE_COMMAND,
 		TAKE_COMMAND,
 		EQUIP_COMMAND,
 		ITEM_COMMAND, // view equipped item
