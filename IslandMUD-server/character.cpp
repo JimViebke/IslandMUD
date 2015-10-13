@@ -588,7 +588,7 @@ string Character::move(const string & direction_ID, World & world)
 }
 string Character::craft(const string & craft_item_id, World & world)
 {
-	// check for special cast
+	// check for special case
 	if (craft_item_id == C::CHEST_ID)
 	{
 		if (world.room_at(x, y, z)->has_chest())
