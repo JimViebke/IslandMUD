@@ -243,7 +243,7 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 			"\n " + C::FOREST_CHAR + "     forest" +
 			"\n " + C::WATER_CHAR + "     water" +
 			"\n " + C::LAND_CHAR + "     land" +
-			"\n " + C::GENERIC_MINERAL_CHAR + "     a mineral field" +
+			"\n " + C::GENERIC_MINERAL_CHAR + "     a mineral deposit" +
 			"\n" +
 			"\n " + C::PLAYER_CHAR + "     you" +
 			"\n 1     number of militants" +
