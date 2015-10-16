@@ -1,44 +1,44 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Non_Player_Character" Collapsed="true">
-    <Position X="5.25" Y="2.25" Width="1.75" />
+    <Position X="6.25" Y="2.25" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>BABAAgIAAsCAgAAgRQAAAAAAAAAABBACAAKAAAAkIgg=</HashCode>
+      <HashCode>BABAAgIAAoCAgAAgRAACAAAgAAAAFBACAAqAAAAkIgg=</HashCode>
       <FileName>non_player_character.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hostile_NPC" Collapsed="true">
-    <Position X="3.75" Y="3.75" Width="1.5" />
+    <Position X="5.25" Y="3.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAEAAA=</HashCode>
       <FileName>npc_enemy.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Neutral_NPC" Collapsed="true">
-    <Position X="7.25" Y="3.75" Width="1.5" />
+    <Position X="10" Y="3.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
       <FileName>npc_unaffiliated.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hostile_NPC_Fighter" Collapsed="true">
-    <Position X="2.25" Y="5.25" Width="1.75" />
+    <Position X="5" Y="5.25" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
       <FileName>npc_enemy_fighter.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hostile_NPC_Worker" Collapsed="true">
-    <Position X="4.75" Y="5.25" Width="1.75" />
+    <Position X="7.5" Y="5.25" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAwAAAAAAAAIAAAAAAAAAAAAAEIQA=</HashCode>
       <FileName>npc_enemy_worker.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Character" Collapsed="true">
-    <Position X="3" Y="1" Width="1.5" />
+    <Position X="5.25" Y="1" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>hQgAAAJAAAAAggGkEAAxQAUAAAQOACECgIDoIQADvgI=</HashCode>
+      <HashCode>hQgAAAJAAAAAggGkEAAxQAUAAAQOACkCgIDoIQADvgI=</HashCode>
       <FileName>character.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -47,6 +47,13 @@
     <TypeIdentifier>
       <HashCode>EAQBAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>player_character.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Hostile_NPC_Bodyguard" Collapsed="true">
+    <Position X="2.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>npc_enemy_bodyguard.h</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

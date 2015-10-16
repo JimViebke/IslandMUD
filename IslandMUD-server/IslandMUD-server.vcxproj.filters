@@ -78,6 +78,9 @@
     <ClCompile Include="npc_enemy_worker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="npc_enemy_bodyguard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="message.h">
@@ -146,6 +149,9 @@
     <ClInclude Include="npc_enemy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="npc_enemy_bodyguard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="npc_enemy_fighter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -162,9 +168,9 @@
     <None Include="ClassDiagram - Items.cd">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="ClassDiagram - NPCs.cd">
+    <None Include="..\Rakefile" />
+    <None Include="ClassDiagram - Characters.cd">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\Rakefile" />
   </ItemGroup>
 </Project>

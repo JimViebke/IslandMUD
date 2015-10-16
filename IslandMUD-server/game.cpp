@@ -9,7 +9,7 @@ void Game::main_test_loop() // debugging
 {
 	{
 		// create a player character
-		PC player("dev", C::PC_FACTION_ID);
+		PC player("dev");
 		// load the player's data and place the player in the world
 		player.login(world);
 		// add the character to the actor registry
@@ -33,7 +33,7 @@ void Game::main_test_loop() // debugging
 		}*/
 
 	{
-		Hostile_NPC_Worker bob("Bob", C::NPC_HOSTILE_FACTION_ID);
+		Hostile_NPC_Worker bob("Bob");
 		bob.login(world);
 		actors.insert(make_pair(bob.name, make_shared<Hostile_NPC_Worker>(bob)));
 	}
