@@ -45,6 +45,7 @@ protected:
 	public:
 		int _x, _y, _z;
 		Coordinate(const int & set_x, const int & set_y, const int & set_z = -1);
+		void reset() { _x = _y = _z = -1; }
 	};
 
 	deque<Objective> objectives;
