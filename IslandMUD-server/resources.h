@@ -219,11 +219,16 @@ public:
 	// random utils
 	static int random_int_from(const int & min, const int & max)
 	{
-		// #ifdef _WIN32
-		return min + (rand() % (int)(max - min + 1));
-		// #else           
-		// return min + (rand() % (int)(max - min + 1));
-		// #endif
+		return min + (rand() % (max - min + 1));
+	}
+	static unsigned random_int_from(const unsigned & min, const unsigned & max)
+	{
+		return min + (rand() % (max - min + 1));
+	}
+	template <typename T> static inline T random_element_from(const vector<T> & v)
+	{
+		// this will crash if v is empty
+		return v[R::random_int_from(0u, unsigned(v.size() - 1))];
 	}
 
 	// time
