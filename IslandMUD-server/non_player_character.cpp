@@ -278,7 +278,7 @@ bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world)
 	open_list.push_back(Node(this->x, this->y, ""));
 
 	// calculate current room's costs. G cost starts at 0.
-	open_list[0].set_g_h_f(0, R::diagonal_distance(x_dest, y_dest, this->x, this->y));
+	open_list[0].set_g_h_f(0, R::diagonal_movement_cost(x_dest, y_dest, this->x, this->y));
 
 	// Do
 	do
@@ -334,7 +334,7 @@ bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world)
 				// use the g- and h-score to set the g-, h-, and f-score.
 				adjacent_room.set_g_h_f(
 					current_room.g + move_cost,
-					R::diagonal_distance(x_dest, y_dest, adjacent_room.x, adjacent_room.y));
+					R::diagonal_movement_cost(x_dest, y_dest, adjacent_room.x, adjacent_room.y));
 			}
 			// else the room is on the open list
 			else
@@ -371,7 +371,7 @@ bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world)
 					// use the g- and h-score to set the g-, h-, and f-score.
 					adjacent_room.set_g_h_f(
 						current_room.g + move_cost,
-						R::diagonal_distance(x_dest, y_dest, adjacent_room.x, adjacent_room.y));
+						R::diagonal_movement_cost(x_dest, y_dest, adjacent_room.x, adjacent_room.y));
 				}
 			}
 
@@ -631,7 +631,7 @@ bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
 	open_list.push_back(Node(this->x, this->y, ""));
 
 	// calculate current room's costs. G cost starts at 0.
-	open_list[0].set_g_h_f(0, R::diagonal_distance(x_dest, y_dest, this->x, this->y));
+	open_list[0].set_g_h_f(0, R::diagonal_movement_cost(x_dest, y_dest, this->x, this->y));
 
 	// Do
 	do
@@ -687,7 +687,7 @@ bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
 				// use the g- and h-score to set the g-, h-, and f-score.
 				adjacent_room.set_g_h_f(
 					current_room.g + move_cost,
-					R::diagonal_distance(x_dest, y_dest, adjacent_room.x, adjacent_room.y));
+					R::diagonal_movement_cost(x_dest, y_dest, adjacent_room.x, adjacent_room.y));
 			}
 			// else the room is on the open list
 			else
@@ -724,7 +724,7 @@ bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
 					// use the g- and h-score to set the g-, h-, and f-score.
 					adjacent_room.set_g_h_f(
 						current_room.g + move_cost,
-						R::diagonal_distance(x_dest, y_dest, adjacent_room.x, adjacent_room.y));
+						R::diagonal_movement_cost(x_dest, y_dest, adjacent_room.x, adjacent_room.y));
 				}
 			}
 

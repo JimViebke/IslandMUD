@@ -203,6 +203,15 @@ public:
 	}
 	static int diagonal_distance(const int & x1, const int & y1, const int & x2, const int & y2)
 	{
+		return max(difference(x1, x2), difference(x2, y2));
+	}
+	static int difference(const int & a, const int & b)
+	{
+		return (a - b > 0) ? (a - b) : (b - a);
+	}
+
+	static int diagonal_movement_cost(const int & x1, const int & y1, const int & x2, const int & y2)
+	{
 		// Because this uses different movement costs, this works for AI pathfinding, but
 		// not so much for determining if a coordinate is visible from another coordinate.
 
@@ -210,10 +219,6 @@ public:
 		int dx = abs(x1 - x2);
 		int dy = abs(y1 - y2);
 		return C::AI_MOVEMENT_COST * (dx + dy) + (C::AI_MOVEMENT_COST_DIAGONAL - 2 * C::AI_MOVEMENT_COST) * min(dx, dy);
-	}
-	static int difference(const int & a, const int & b)
-	{
-		return (a - b > 0) ? (a - b) : (b - a);
 	}
 
 	// random utils
