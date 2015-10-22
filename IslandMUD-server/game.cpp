@@ -33,9 +33,16 @@ void Game::main_test_loop() // debugging
 		}*/
 
 	{
-		Hostile_NPC_Worker bob("Bob");
-		bob.login(world);
-		actors.insert(make_pair(bob.name, make_shared<Hostile_NPC_Worker>(bob)));
+		shared_ptr<Hostile_NPC_Worker> bob = make_shared<Hostile_NPC_Worker>("Bob");
+		bob->login(world);
+		actors.insert(make_pair(bob->name, bob));
+	}
+
+	{
+		shared_ptr<Hostile_NPC_Bodyguard> bill = make_shared<Hostile_NPC_Bodyguard>("Bill", "Bob");
+		bill->login(world);
+		// bill->set_target
+		actors.insert(make_pair(bill->name, bill));
 	}
 
 
@@ -62,9 +69,9 @@ void Game::main_test_loop() // debugging
 	while (true) // play indefinitely
 	{
 		// print out
-		if (R::is<PC>(actors.find("dev")->second))
+		if (U::is<PC>(actors.find("dev")->second))
 		{
-			shared_ptr<PC> dev = R::convert_to<PC>(actors.find("dev")->second);
+			shared_ptr<PC> dev = U::convert_to<PC>(actors.find("dev")->second);
 
 			if (auto_advance == 0)
 			{
@@ -140,7 +147,7 @@ void Game::main_test_loop() // debugging
 		cout << "\nDEBUG sending to Parse::tokenize(): " << input << endl;
 		vector<string> tokenized_input = Parse::tokenize(input);
 		cout << "\nDEBUG parsed input: ";
-		R::print(tokenized_input);
+		U::print(tokenized_input);
 
 		// hardcoding for development purposes
 		if (tokenized_input.size() > 1 && tokenized_input[0] == C::WAIT_COMMAND)
@@ -160,17 +167,23 @@ void Game::main_test_loop() // debugging
 		{
 			// execute processed command against game world
 			// only count loaded rooms if total room count is less than or equal to 100K (100*100*10)
-			cout << "\nDEBUG Entering execute_command(), rooms loaded: " << ((C::WORLD_X_DIMENSION*C::WORLD_Y_DIMENSION*C::WORLD_Z_DIMENSION <= 100000) ? R::to_string(world.count_loaded_rooms()) : "(too large to count)") << "...";
+			cout << "\nDEBUG Entering execute_command(), rooms loaded: " << ((C::WORLD_X_DIMENSION*C::WORLD_Y_DIMENSION*C::WORLD_Z_DIMENSION <= 100000) ? U::to_string(world.count_loaded_rooms()) : "(too large to count)") << "...";
 			output = execute_command("dev", tokenized_input);
-			cout << "\nDEBUG Exited execute_command(), rooms loaded: " << ((C::WORLD_X_DIMENSION*C::WORLD_Y_DIMENSION*C::WORLD_Z_DIMENSION <= 100000) ? R::to_string(world.count_loaded_rooms()) : "(too large to count)") << "...";
+			cout << "\nDEBUG Exited execute_command(), rooms loaded: " << ((C::WORLD_X_DIMENSION*C::WORLD_Y_DIMENSION*C::WORLD_Z_DIMENSION <= 100000) ? U::to_string(world.count_loaded_rooms()) : "(too large to count)") << "...";
+		}
+
+		{
+			shared_ptr<Character> bob = actors.find("Bob")->second;
+			shared_ptr<Character> bill = actors.find("Bill")->second;
+			cout << "DEBUG: Distance between bodyguard and worker before update : " << U::diagonal_distance(bob->x, bob->y, bill->x, bill->y) << endl;
 		}
 
 		// now execute updates for all NPCs
 		for (pair<const string, shared_ptr<Character>> & actor : actors)
 		{
-			if (R::is<NPC>(actor.second))
+			if (U::is<NPC>(actor.second))
 			{
-				shared_ptr<NPC> npc = R::convert_to<NPC>(actor.second);
+				shared_ptr<NPC> npc = U::convert_to<NPC>(actor.second);
 
 				if (auto_advance == 0)
 				{
@@ -188,7 +201,11 @@ void Game::main_test_loop() // debugging
 			}
 		}
 
-
+		{
+			shared_ptr<Character> bob = actors.find("Bob")->second;
+			shared_ptr<Character> bill = actors.find("Bill")->second;
+			cout << "DEBUG: Distance between bodyguard and worker after update : " << U::diagonal_distance(bob->x, bob->y, bill->x, bill->y) << endl;
+		}
 	}
 }
 
@@ -258,7 +275,7 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 	}
 	// moving: "move northeast" OR "northeast"
 	else if ((command.size() == 2 && command[0] == C::MOVE_COMMAND)
-		|| command.size() == 1 && R::contains(C::direction_ids, command[0]))
+		|| command.size() == 1 && U::contains(C::direction_ids, command[0]))
 	{
 		return actors.find(actor_id)->second->move(command[command.size() - 1], world); // passes direction (last element in command) and world
 	}
@@ -307,13 +324,13 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 		return Character::recipes.get_recipes(); // (item_id, world)
 	}
 	// the player is attacking a wall "smash west wall"
-	else if (command.size() >= 3 && command[0] == C::ATTACK_COMMAND && R::contains(C::surface_ids, command[1])
+	else if (command.size() >= 3 && command[0] == C::ATTACK_COMMAND && U::contains(C::surface_ids, command[1])
 		&& command[2] == C::WALL)
 	{
 		return actors.find(actor_id)->second->attack_surface(command[1], world);
 	}
 	// the player is attacking a door "smash west door"
-	else if (command.size() >= 3 && command[0] == C::ATTACK_COMMAND && R::contains(C::surface_ids, command[1])
+	else if (command.size() >= 3 && command[0] == C::ATTACK_COMMAND && U::contains(C::surface_ids, command[1])
 		&& command[2] == C::DOOR)
 	{
 		return actors.find(actor_id)->second->attack_door(command[1], world);
@@ -357,10 +374,10 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 	{
 		// extract the actor
 		const shared_ptr<Character> actor = actors.find(actor_id)->second;
-		if (R::is<PC>(actor)) // if the actor is a Player_Character
+		if (U::is<PC>(actor)) // if the actor is a Player_Character
 		{
 			// convert the actor to a Player_Character
-			return R::convert_to<PC>(actor)->get_equipped_item_id();
+			return U::convert_to<PC>(actor)->get_equipped_item_id();
 		}
 	}
 
