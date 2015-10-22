@@ -153,6 +153,22 @@ bool Room::is_forest() const
 {
 	return this->contains_item(C::TREE_ID);
 }
+bool Room::has_non_mineral_deposit_item() const
+{
+	// for each item in the room
+	for (multimap<string, shared_ptr<Item>>::const_iterator it = contents.cbegin(); it != contents.cend(); ++it)
+	{
+		// if the item is not a mineral deposit
+		if (it->first != C::IRON_DEPOSIT_ID && it->first != C::LIMESTONE_DEPOSIT_ID)
+		{
+			// an item is not a mineral deposit
+			return true;
+		}
+	}
+
+	// any item found was a mineral deposit
+	return false;
+}
 bool Room::has_mineral_deposit() const
 {
 	// determine if a room contains an iron or limestone deposit

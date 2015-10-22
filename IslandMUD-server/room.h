@@ -48,6 +48,7 @@ public:
 	bool is_observed_by(const string & actor_id) const;
 	bool is_water() const;
 	bool is_forest() const;
+	bool has_non_mineral_deposit_item() const;
 	bool has_mineral_deposit() const;
 
 	// chests
