@@ -52,7 +52,7 @@
   <Class Name="Hostile_NPC_Bodyguard" Collapsed="true">
     <Position X="2.75" Y="5.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <HashCode>AAAAABCAAAAAACAAQCAAAAAAAACAAAAAAQAIAAgEAAA=</HashCode>
       <FileName>npc_enemy_bodyguard.h</FileName>
     </TypeIdentifier>
   </Class>

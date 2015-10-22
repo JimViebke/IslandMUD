@@ -43,15 +43,17 @@ void Hostile_NPC_Bodyguard::update(World & world, map<string, shared_ptr<Charact
 			// if the kill target is visible
 			if (attempt_update_kill_target_last_known_location(kill_target))
 			{
-				// if the path is empty or going to the wrong destination
-				if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_kill_target)
+				// if the path is empty or going the wrong direction, or the target has moved
+				if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_kill_target ||
+					kill_target->x != path.back()._x ||
+					kill_target->y != path.back()._y)
 				{
 					// generate a new path
 					save_path_to(kill_target->x, kill_target->y, world);
 					stored_path_type = Stored_Path_Type::to_kill_target;
 				}
 
-				// make the next 
+				// make the next movement
 				make_path_movement(world);
 				return; // action was used
 			}
@@ -80,39 +82,29 @@ void Hostile_NPC_Bodyguard::update(World & world, map<string, shared_ptr<Charact
 					return; // action was used
 				}
 
-				// else I am at the last known location and cannot see the target
-				kill_target_last_known_location.reset();
-				pathfind(protect_target->x, protect_target->y, world);
-
-				// if the path is empty or going to the wrong destination
-				if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_protect_target)
-				{
-					// generate a new path
-					save_path_to(protect_target->x, protect_target->y, world);
-					stored_path_type = Stored_Path_Type::to_protect_target;
-				}
-
-				// make the next 
-				make_path_movement(world);
-
-				// if the kill target is (now) visible
-				if (attempt_update_kill_target_last_known_location(kill_target))
-				{
-					path.clear(); // erase any existing path
-					save_path_to(kill_target_last_known_location._x, kill_target_last_known_location._y, world); // save a new path
-					stored_path_type = Stored_Path_Type::to_kill_target; // update the stored path type
-				}
-
-				return; // action was used
+				// else I am at the last known location and cannot see the target (this condition is handled in the next block)
 			}
 
 			// kill target is not visible and I don't have a last known location for the kill target
+			kill_target_last_known_location.reset();
 
-			// return to protect_target
-			pathfind(protect_target->x, protect_target->y, world);
+			// if the path is empty or going to the wrong destination
+			if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_protect_target)
+			{
+				// generate a new path
+				save_path_to(protect_target->x, protect_target->y, world);
+				stored_path_type = Stored_Path_Type::to_protect_target;
+			}
+
+			// make the next movement
+			make_path_movement(world);
 
 			// if the kill target is (now) visible
-			attempt_update_kill_target_last_known_location(kill_target);
+			if (attempt_update_kill_target_last_known_location(kill_target))
+			{
+				save_path_to(kill_target_last_known_location._x, kill_target_last_known_location._y, world); // save a new path
+				stored_path_type = Stored_Path_Type::to_kill_target; // update the stored path type
+			}
 
 			return; // action was used
 		}
@@ -123,17 +115,36 @@ void Hostile_NPC_Bodyguard::update(World & world, map<string, shared_ptr<Charact
 	// if I am out of guard range of my protect_target
 	if (U::diagonal_distance(x, y, protect_target->x, protect_target->y) > guard_radius)
 	{
-		// pathfind to protect target
-		pathfind(protect_target->x, protect_target->y, world);
-		return;
+		// if the path is empty or going to the wrong destination
+		if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_protect_target)
+		{
+			// generate a new path
+			save_path_to(protect_target->x, protect_target->y, world);
+			stored_path_type = Stored_Path_Type::to_protect_target;
+		}
+
+		// make the next movement
+		make_path_movement(world);
+
+		return; // action was used
 	}
 
-	// i am in range of my protect target, check for a new kill target
+	// the NPC is in range of the protect target, check for a new kill target
 
 	// if a new kill target can be found
 	if (attempt_set_new_kill_target(world, actors))
 	{
-		pathfind(kill_target_last_known_location._x, kill_target_last_known_location._y, world);
+		// if the path is empty or going to the wrong destination
+		if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_kill_target)
+		{
+			// generate a new path
+			save_path_to(kill_target_last_known_location._x, kill_target_last_known_location._y, world);
+			stored_path_type = Stored_Path_Type::to_kill_target;
+		}
+
+		// make the next movement
+		make_path_movement(world);
+
 		return; // action was used
 	}
 
@@ -190,6 +201,7 @@ bool Hostile_NPC_Bodyguard::attempt_set_new_kill_target(World & world, map<strin
 }
 bool Hostile_NPC_Bodyguard::attempt_update_kill_target_last_known_location(const shared_ptr<Character> & kill_target)
 {
+	// if the NPC can see the kill_target
 	if (U::diagonal_distance(x, y, kill_target->x, kill_target->y) <= C::VIEW_DISTANCE)
 	{
 		// update kill_target_last_known_location
@@ -199,5 +211,6 @@ bool Hostile_NPC_Bodyguard::attempt_update_kill_target_last_known_location(const
 		return true;
 	}
 
+	// the NPC cannot see the kill target, the last_known_location was not updated
 	return false;
 }
