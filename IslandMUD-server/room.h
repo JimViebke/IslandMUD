@@ -7,7 +7,7 @@ Feb 14, 2015 */
 #include <map> // for room contents multimap
 #include <set> // playerlist
 
-#include "resources.h"
+#include "utilities.h"
 #include "constants.h"
 #include "item.h"
 #include "room_side.h" // walls, floor, or ceiling

@@ -85,13 +85,13 @@ protected:
 			for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 			{
 				// skip this room if it is out of bounds
-				if (!R::bounds_check(cx, cy)) { continue; }
+				if (!U::bounds_check(cx, cy)) { continue; }
 
 				// for each actor in the room
 				for (const string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
 				{
 					// if the character is the type of character we're looking for
-					if (R::is<ACTOR_TYPE>(actors.find(actor_ID)->second))
+					if (U::is<ACTOR_TYPE>(actors.find(actor_ID)->second))
 					{
 						// count one more
 						++players_in_range;

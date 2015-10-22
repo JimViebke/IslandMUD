@@ -8,7 +8,6 @@ Feb 14, 2015 */
 #include <string>
 #include <map>
 
-#include "resources.h"
 #include "parse.h"
 
 using namespace std;

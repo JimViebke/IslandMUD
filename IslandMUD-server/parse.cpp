@@ -102,12 +102,12 @@ vector<string> Parse::tokenize(const string & s)
 	const istream_iterator<string> begin(ss);
 	vector<string> strings(begin, istream_iterator<string>());
 
-	R::print(strings); // debugging
+	U::print(strings); // debugging
 
 	for (string & word : strings) // for each word
 	{
 		// convert the word to lowercase
-		R::to_lower_case(word);
+		U::to_lower_case(word);
 
 		// replace the word with the engine keyword, or C::BAD_COMMAND
 		word = (dict.find(word) != dict.end()) ? dict.find(word)->second : C::BAD_COMMAND;

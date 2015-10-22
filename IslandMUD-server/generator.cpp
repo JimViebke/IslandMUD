@@ -8,8 +8,8 @@ Generator::Generator(const string & map_type)
 	cout << "\nGenerating new " << map_type << "...";
 
 	// create the timestamped directory
-	generated_terrain_dir = C::game_directory + "/gen_" + R::to_string(R::current_time_in_ms());
-	R::create_path_if_not_exists(generated_terrain_dir);
+	generated_terrain_dir = C::game_directory + "/gen_" + U::to_string(U::current_time_in_ms());
+	U::create_path_if_not_exists(generated_terrain_dir);
 }
 
 vector<vector<char_type>> Generator::generate_biome_map(const char_type & default_char, const char_type & fill_char, const int & fill_ratio, const int & default_ratio, const int & biome_size)
@@ -28,7 +28,7 @@ vector<vector<char_type>> Generator::generate_biome_map(const char_type & defaul
 		for (int j = 0; j < (C::WORLD_Y_DIMENSION / biome_size); ++j)
 		{
 			biome_map[i][j] = (
-				(R::random_int_from(1, max(1, fill_ratio + default_ratio)) <= fill_ratio) ? fill_char : default_char);
+				(U::random_int_from(1, max(1, fill_ratio + default_ratio)) <= fill_ratio) ? fill_char : default_char);
 		}
 	}
 
@@ -56,7 +56,7 @@ vector<vector<char_type>> Generator::generate_static_using_biome_map(const vecto
 		for (unsigned y = 0; y < v[0].size(); ++y)
 		{
 			// if the coordinates are not within the islands radius
-			if (R::euclidean_distance(x, y, x_center, y_center) > island_radius)
+			if (U::euclidean_distance(x, y, x_center, y_center) > island_radius)
 			{
 				v[x][y] = C::WATER_CHAR;
 			}

@@ -223,7 +223,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				int adjacent_x = x, adjacent_y = y;
 				{ // temporary scope to get rid of the extraneous z value as soon as possible
 					int throwaway_z;
-					R::assign_movement_deltas(objective_it->direction, adjacent_x, adjacent_y, throwaway_z);
+					U::assign_movement_deltas(objective_it->direction, adjacent_x, adjacent_y, throwaway_z);
 				}
 
 				// if an opposing surface exists, don't construct a surface here.
@@ -654,17 +654,17 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 void Hostile_NPC_Worker::plan_fortress()
 {
 	// generate the x and y dimensions of the fortress
-	const int FORTRESS_HEIGHT = R::random_int_from(C::FORTRESS_MIN_X, C::FORTRESS_MAX_X),
-		FORTRESS_WIDTH = R::random_int_from(C::FORTRESS_MIN_Y, C::FORTRESS_MAX_Y);
+	const int FORTRESS_HEIGHT = U::random_int_from(C::FORTRESS_MIN_X, C::FORTRESS_MAX_X),
+		FORTRESS_WIDTH = U::random_int_from(C::FORTRESS_MIN_Y, C::FORTRESS_MAX_Y);
 
 	int fortress_x = 0, fortress_y = 0;
 
 	// generate the fortress coordinates until the center of the fortress is on land
 	do
 	{
-		fortress_x = R::random_int_from(0, C::WORLD_X_DIMENSION);
-		fortress_y = R::random_int_from(0, C::WORLD_Y_DIMENSION);
-	} while (R::euclidean_distance(C::WORLD_X_DIMENSION / 2, C::WORLD_Y_DIMENSION / 2,
+		fortress_x = U::random_int_from(0, C::WORLD_X_DIMENSION);
+		fortress_y = U::random_int_from(0, C::WORLD_Y_DIMENSION);
+	} while (U::euclidean_distance(C::WORLD_X_DIMENSION / 2, C::WORLD_Y_DIMENSION / 2,
 		fortress_x + (FORTRESS_HEIGHT / 2),
 		fortress_y + (FORTRESS_WIDTH / 2)) >= C::WORLD_X_DIMENSION * 0.45);
 
@@ -685,7 +685,7 @@ void Hostile_NPC_Worker::plan_fortress()
 		for (unsigned i = 0; i < partitions.size(); ++i)
 		{
 			// draw a 50/50 chance of attemping a horizontal or vertical split
-			if (R::random_int_from(0, 1) == 1)
+			if (U::random_int_from(0, 1) == 1)
 			{
 				// horizontal split
 
@@ -695,7 +695,7 @@ void Hostile_NPC_Worker::plan_fortress()
 					partition_divided_on_last_pass = true; // a split is about to be made
 
 					// calculate the amount to remove from the existing partition
-					const int split = R::random_int_from(C::FORTRESS_PARTITION_MIN_SIZE, partitions[i].height - C::FORTRESS_PARTITION_MIN_SIZE);
+					const int split = U::random_int_from(C::FORTRESS_PARTITION_MIN_SIZE, partitions[i].height - C::FORTRESS_PARTITION_MIN_SIZE);
 
 					// remove the amount from the existing partition
 					partitions[i].height -= split;
@@ -717,7 +717,7 @@ void Hostile_NPC_Worker::plan_fortress()
 					partition_divided_on_last_pass = true; // a split is about to be made
 
 					// calculate the amount to remove from the existing partition
-					const int split = R::random_int_from(C::FORTRESS_PARTITION_MIN_SIZE, partitions[i].width - C::FORTRESS_PARTITION_MIN_SIZE);
+					const int split = U::random_int_from(C::FORTRESS_PARTITION_MIN_SIZE, partitions[i].width - C::FORTRESS_PARTITION_MIN_SIZE);
 
 					// remvoe the amount from the existing partition
 					partitions[i].width -= split;
@@ -739,16 +739,16 @@ void Hostile_NPC_Worker::plan_fortress()
 	{
 		// this is used to determine if the structure will be smaller than the partition
 		// in the x dimension, or the y dimension
-		const bool reduction_toggle = (R::random_int_from(0, 1) == 1);
+		const bool reduction_toggle = (U::random_int_from(0, 1) == 1);
 
 		// the height and width are at no smaller than the minimum partition size minus 1, and are no larger than
 		// the dimensions of the host partition, minus 1 or 0 depending on the toggle flag.
-		const int structure_height = R::random_int_from(C::FORTRESS_PARTITION_MIN_SIZE - 1, partition.height - ((reduction_toggle) ? 1 : 0));
-		const int structure_width = R::random_int_from(C::FORTRESS_PARTITION_MIN_SIZE - 1, partition.width - ((reduction_toggle) ? 0 : 1));
+		const int structure_height = U::random_int_from(C::FORTRESS_PARTITION_MIN_SIZE - 1, partition.height - ((reduction_toggle) ? 1 : 0));
+		const int structure_width = U::random_int_from(C::FORTRESS_PARTITION_MIN_SIZE - 1, partition.width - ((reduction_toggle) ? 0 : 1));
 
 		// the structure can be placed anywhere inside of the partition
-		const int structure_x = R::random_int_from(partition.x, (partition.x + partition.height) - structure_height);
-		const int structure_y = R::random_int_from(partition.y, (partition.y + partition.width) - structure_width);
+		const int structure_x = U::random_int_from(partition.x, (partition.x + partition.height) - structure_height);
+		const int structure_y = U::random_int_from(partition.y, (partition.y + partition.width) - structure_width);
 
 		// create a new structure using the generated parameters
 		structures.push_back(Structure(structure_x, structure_y, structure_height, structure_width));
@@ -900,7 +900,7 @@ void Hostile_NPC_Worker::plan_fortress_outer_wall(const int & fortress_x, const 
 				{
 					// add an objective to construct an outer wall here
 					objectives.push_front(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::NORTH, fortress_x + node._x - 2, fortress_y + node._y - 2, C::GROUND_INDEX,
-						R::random_int_from(1, 6) == 1));
+						U::random_int_from(1, 6) == 1));
 				}
 			}
 			if (node._x + 1 < (int)area.size() && !exterior_visited[node._x + 1][node._y]) // south
@@ -913,7 +913,7 @@ void Hostile_NPC_Worker::plan_fortress_outer_wall(const int & fortress_x, const 
 				else
 				{
 					objectives.push_front(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::SOUTH, fortress_x + node._x - 2, fortress_y + node._y - 2, C::GROUND_INDEX,
-						R::random_int_from(1, 6) == 1));
+						U::random_int_from(1, 6) == 1));
 				}
 			}
 			if (node._y - 1 >= 0 && !exterior_visited[node._x][node._y - 1]) // west
@@ -926,7 +926,7 @@ void Hostile_NPC_Worker::plan_fortress_outer_wall(const int & fortress_x, const 
 				else
 				{
 					objectives.push_front(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::WEST, fortress_x + node._x - 2, fortress_y + node._y - 2, C::GROUND_INDEX,
-						R::random_int_from(1, 6) == 1));
+						U::random_int_from(1, 6) == 1));
 				}
 			}
 			if (node._y + 1 < (int)area.size() && !exterior_visited[node._x][node._y + 1]) // east
@@ -939,7 +939,7 @@ void Hostile_NPC_Worker::plan_fortress_outer_wall(const int & fortress_x, const 
 				else
 				{
 					objectives.push_front(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::EAST, fortress_x + node._x - 2, fortress_y + node._y - 2, C::GROUND_INDEX,
-						R::random_int_from(1, 6) == 1));
+						U::random_int_from(1, 6) == 1));
 				}
 			}
 		}
@@ -966,7 +966,7 @@ void Hostile_NPC_Worker::Structure_Objectives::plan_doors(const World & world)
 		int _x = structure_surface_objectives[i].objective_x, _y = structure_surface_objectives[i].objective_y;
 
 		// find the coordinates of the adjacent room
-		R::assign_movement_deltas(structure_surface_objectives[i].direction, _x, _y);
+		U::assign_movement_deltas(structure_surface_objectives[i].direction, _x, _y);
 
 		// determine if the adjacent room has an opposing wall
 		if (world.room_at(_x, _y, C::GROUND_INDEX)->has_surface(C::opposite_surface_id.find(structure_surface_objectives[i].direction)->second))
@@ -982,18 +982,18 @@ void Hostile_NPC_Worker::Structure_Objectives::plan_doors(const World & world)
 	}
 
 	// all building have at least one door
-	structure_surface_objectives[R::random_int_from(0, (int)structure_surface_objectives.size() - 1)].modifier = true;
+	structure_surface_objectives[U::random_int_from(0, (int)structure_surface_objectives.size() - 1)].modifier = true;
 
 	// half of buildings may have a second door
-	if (R::random_int_from(1, 10) > 5)
+	if (U::random_int_from(1, 10) > 5)
 	{
-		structure_surface_objectives[R::random_int_from(0, (int)structure_surface_objectives.size() - 1)].modifier = true;
+		structure_surface_objectives[U::random_int_from(0, (int)structure_surface_objectives.size() - 1)].modifier = true;
 	}
 
 	// an eight of buildings may have a third door 
-	if (R::random_int_from(1, 10) > 8)
+	if (U::random_int_from(1, 10) > 8)
 	{
-		structure_surface_objectives[R::random_int_from(0, (int)structure_surface_objectives.size() - 1)].modifier = true;
+		structure_surface_objectives[U::random_int_from(0, (int)structure_surface_objectives.size() - 1)].modifier = true;
 	}
 }
 

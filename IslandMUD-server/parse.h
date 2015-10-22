@@ -11,7 +11,7 @@ user input parsing */
 #include <map>
 #include <algorithm>
 
-#include "resources.h"
+#include "utilities.h"
 #include "constants.h"
 
 class Parse; // forward declaring

@@ -22,7 +22,7 @@ void World::load()
 // access a room given coordinates
 unique_ptr<Room>::pointer World::room_at(const int & x, const int & y, const int & z)
 {
-	if (!R::bounds_check(x, y, z))
+	if (!U::bounds_check(x, y, z))
 	{
 		return world.begin()->get();
 	}
@@ -31,7 +31,7 @@ unique_ptr<Room>::pointer World::room_at(const int & x, const int & y, const int
 }
 const unique_ptr<Room>::pointer World::room_at(const int & x, const int & y, const int & z) const
 {
-	if (!R::bounds_check(x, y, z))
+	if (!U::bounds_check(x, y, z))
 	{
 		return world.cbegin()->get();
 	}
@@ -78,7 +78,7 @@ void World::load_view_radius_around(const int & x, const int & y, const string &
 		for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 		{
 			// if the coordinates are not within world bounds
-			if (!R::bounds_check(cx, cy))
+			if (!U::bounds_check(cx, cy))
 			{
 				continue; // go to next coordinate
 			}
@@ -100,7 +100,7 @@ void World::load_view_radius_around(const int & x, const int & y, const string &
 void World::remove_viewer_and_attempt_unload(const int & x, const int & y, const int & z, const string & viewer_ID)
 {
 	// if the referenced room is out of bounds
-	if (!R::bounds_check(x, y, z))
+	if (!U::bounds_check(x, y, z))
 	{
 		return; // nothing to remove or unload
 	}
@@ -141,7 +141,7 @@ void World::unload_room(const int & x, const int & y, const int & z)
 bool World::room_has_surface(const int & x, const int & y, const int & z, const string & direction_ID) const
 {
 	// if the room is outside of bounds
-	if (!R::bounds_check(x, y, z)) { return false; }
+	if (!U::bounds_check(x, y, z)) { return false; }
 
 	// if the room is not loaded
 	if (room_at(x, y, z) == nullptr) { return false; }
@@ -196,7 +196,7 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		// save the final terrain to disk
 		gen.to_file(world_map, C::world_terrain_file_location);
 
-		this->terrain = R::make_unique<vector<vector<char_type>>>(world_map);
+		this->terrain = U::make_unique<vector<vector<char_type>>>(world_map);
 	}
 
 	// generate a new iron ore mineral map if needed
@@ -225,7 +225,7 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		// save the mineral map to disk
 		gen.to_file(mineral_map, C::iron_deposit_map_file_location);
 
-		this->iron_deposit_map = R::make_unique<vector<vector<char_type>>>(mineral_map);
+		this->iron_deposit_map = U::make_unique<vector<vector<char_type>>>(mineral_map);
 	}
 
 	// generate a new limestone mineral map if needed
@@ -254,7 +254,7 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		// save the mineral map to disk
 		gen.to_file(mineral_map, C::limestone_deposit_map_file_location);
 
-		this->limestone_deposit_map = R::make_unique<vector<vector<char_type>>>(mineral_map);
+		this->limestone_deposit_map = U::make_unique<vector<vector<char_type>>>(mineral_map);
 	}
 }
 
@@ -265,7 +265,7 @@ bool World::load_existing_world_terrain()
 	// load the contents of the terrain file, if it exists
 	{
 		vector<vector<char_type>> temp_terrain;
-		if (R::file_exists(C::world_terrain_file_location))
+		if (U::file_exists(C::world_terrain_file_location))
 		{
 			fstream terrain_file;
 			terrain_file.open(C::world_terrain_file_location);
@@ -291,7 +291,7 @@ bool World::load_existing_world_terrain()
 			}
 		}
 
-		this->terrain = R::make_unique<vector<vector<char_type>>>(temp_terrain);
+		this->terrain = U::make_unique<vector<vector<char_type>>>(temp_terrain);
 	}
 
 	// test if the loaded terrain is the correct dimensions
@@ -316,7 +316,7 @@ bool World::load_existing_iron_deposit_map()
 	// load the contents of the terrain file, if it exists
 	{
 		vector<vector<char_type>> temp_terrain;
-		if (R::file_exists(C::iron_deposit_map_file_location))
+		if (U::file_exists(C::iron_deposit_map_file_location))
 		{
 			fstream terrain_file;
 			terrain_file.open(C::iron_deposit_map_file_location);
@@ -342,7 +342,7 @@ bool World::load_existing_iron_deposit_map()
 			}
 		}
 
-		this->iron_deposit_map = R::make_unique<vector<vector<char_type>>>(temp_terrain);
+		this->iron_deposit_map = U::make_unique<vector<vector<char_type>>>(temp_terrain);
 	}
 
 	// test if the loaded terrain is the correct dimensions
@@ -367,7 +367,7 @@ bool World::load_existing_limestone_deposit_map()
 	// load the contents of the terrain file, if it exists
 	{
 		vector<vector<char_type>> temp_terrain;
-		if (R::file_exists(C::limestone_deposit_map_file_location))
+		if (U::file_exists(C::limestone_deposit_map_file_location))
 		{
 			fstream terrain_file;
 			terrain_file.open(C::limestone_deposit_map_file_location);
@@ -393,7 +393,7 @@ bool World::load_existing_limestone_deposit_map()
 			}
 		}
 
-		this->limestone_deposit_map = R::make_unique<vector<vector<char_type>>>(temp_terrain);
+		this->limestone_deposit_map = U::make_unique<vector<vector<char_type>>>(temp_terrain);
 	}
 
 	// test if the loaded terrain is the correct dimensions
@@ -418,23 +418,23 @@ bool World::load_existing_limestone_deposit_map()
 void World::generate_room_at(const int & x, const int & y, const int & z)
 {
 	// ensure the folder exists
-	string z_stack_path = C::room_directory + "/" + R::to_string(x);
-	R::create_path_if_not_exists(z_stack_path);
+	string z_stack_path = C::room_directory + "/" + U::to_string(x);
+	U::create_path_if_not_exists(z_stack_path);
 
 	// extend the path to include the file
-	z_stack_path += "/" + R::to_string(x) + "-" + R::to_string(y) + ".xml";
+	z_stack_path += "/" + U::to_string(x) + "-" + U::to_string(y) + ".xml";
 
 	// create an XML document to store the Z stack
 	xml_document z_stack;
 
 	// if the file exists
-	if (R::file_exists(z_stack_path))
+	if (U::file_exists(z_stack_path))
 	{
 		// load the z-stack to the document
 		load_vertical_rooms_to_XML(x, y, z_stack);
 
 		// attempt to extract the specified room
-		const xml_node room_node = z_stack.child(("room-" + R::to_string(z)).c_str());
+		const xml_node room_node = z_stack.child(("room-" + U::to_string(z)).c_str());
 
 		// if the specified room is not in the stack
 		if (!room_node)
@@ -475,8 +475,8 @@ void World::generate_room_at(const int & x, const int & y, const int & z)
 void World::load_vertical_rooms_to_XML(const int & ix, const int & iy, xml_document & vertical_rooms)
 {
 	// convert integers to strings, since they'll be used multiple times
-	const string x = R::to_string(ix);
-	const string y = R::to_string(iy);
+	const string x = U::to_string(ix);
+	const string y = U::to_string(iy);
 
 	// populate the document using the file for the vertical stack of rooms at x,y
 	vertical_rooms.load_file((C::room_directory + "/" + x + "/" + x + "-" + y + ".xml").c_str());
@@ -486,7 +486,7 @@ void World::load_vertical_rooms_to_XML(const int & ix, const int & iy, xml_docum
 void World::add_room_to_world(xml_node & room_node, const int & x, const int & y, const int & z)
 {
 	// create an empty room
-	unique_ptr<Room> room(R::make_unique<Room>());
+	unique_ptr<Room> room(U::make_unique<Room>());
 
 	// set whether or not the room is water (off-island or river/lake)
 	room->set_water_status(room_node.attribute(C::XML_IS_WATER.c_str()).as_bool());
@@ -555,7 +555,7 @@ void World::add_room_to_world(xml_node & room_node, const int & x, const int & y
 		for (const xml_node & equipment_item_node : chest_node.child(C::XML_CHEST_EQUIPMENT.c_str()).children())
 		{
 			// create the equipment item
-			shared_ptr<Equipment> equipment = R::convert_to<Equipment>(Craft::make(equipment_item_node.name()));
+			shared_ptr<Equipment> equipment = U::convert_to<Equipment>(Craft::make(equipment_item_node.name()));
 
 			// add the equipment to the equipment multimap
 			equipment_contents.insert(make_pair(equipment->name, equipment));
@@ -567,7 +567,7 @@ void World::add_room_to_world(xml_node & room_node, const int & x, const int & y
 		for (const xml_node & material_item_node : chest_node.child(C::XML_CHEST_MATERIALS.c_str()).children())
 		{
 			// create the material item
-			shared_ptr<Material> material = R::convert_to<Material>(Craft::make(material_item_node.name()));
+			shared_ptr<Material> material = U::convert_to<Material>(Craft::make(material_item_node.name()));
 
 			// set the amount
 			material->amount = material_item_node.attribute(C::XML_CHEST_MATERIALS_COUNT.c_str()).as_int();
@@ -602,12 +602,12 @@ void World::load_room_to_world(const int & x, const int & y, const int & z)
 	xml_document vertical_rooms;
 
 	// get the path to the z_stack
-	const string str_x = R::to_string(x);
-	const string str_y = R::to_string(y);
+	const string str_x = U::to_string(x);
+	const string str_y = U::to_string(y);
 	const string z_stack_path = C::room_directory + "/" + str_x + "/" + str_x + "-" + str_y + ".xml";
 
 	// if the z_stack does not exist
-	if (!R::file_exists(z_stack_path))
+	if (!U::file_exists(z_stack_path))
 	{
 		// generate the room (adds it to disk and the world)
 		generate_room_at(x, y, z);
@@ -618,7 +618,7 @@ void World::load_room_to_world(const int & x, const int & y, const int & z)
 	vertical_rooms.load_file(z_stack_path.c_str());
 
 	// attempt to extract the room from the file
-	xml_node room_node = vertical_rooms.child(("room-" + R::to_string(z)).c_str());
+	xml_node room_node = vertical_rooms.child(("room-" + U::to_string(z)).c_str());
 
 	// if the room nodes exists in the file
 	if (room_node)
@@ -639,11 +639,11 @@ void World::unload_room(const int & x, const int & y, const int & z, const uniqu
 	// Unloads passed room. Can be called even if the room doesn't exist in the world structure
 
 	// ensure the path exists up to \x
-	string room_path = (C::room_directory + "/" + R::to_string(x) + "/");
-	R::create_path_if_not_exists(room_path);
+	string room_path = (C::room_directory + "/" + U::to_string(x) + "/");
+	U::create_path_if_not_exists(room_path);
 
 	// ensure the path exists up to \x-y.xml
-	room_path += (R::to_string(x) + "-" + R::to_string(y) + ".xml");
+	room_path += (U::to_string(x) + "-" + U::to_string(y) + ".xml");
 
 	// create an XML document to represent the stack of rooms
 	xml_document z_stack;
@@ -662,10 +662,10 @@ void World::unload_room(const int & x, const int & y, const int & z, const uniqu
 void World::add_room_to_z_stack(const int & z, const unique_ptr<Room>::pointer room, xml_document & z_stack) const
 {
 	// delete the room node if it already exists
-	z_stack.remove_child(("room-" + R::to_string(z)).c_str());
+	z_stack.remove_child(("room-" + U::to_string(z)).c_str());
 
 	// create a new node for the room
-	xml_node room_node = z_stack.append_child(("room-" + R::to_string(z)).c_str());
+	xml_node room_node = z_stack.append_child(("room-" + U::to_string(z)).c_str());
 
 	// add a boolean representing if the room is water (off-island or a lake/river)
 	room_node.append_attribute(C::XML_IS_WATER.c_str()).set_value(room->is_water());
@@ -768,7 +768,7 @@ void World::add_room_to_z_stack(const int & z, const unique_ptr<Room>::pointer r
 // create a new empty room given its coordinates and the world terrain
 unique_ptr<Room> World::create_room(const int & x, const int & y, const int & z) const
 {
-	unique_ptr<Room> room = R::make_unique<Room>();
+	unique_ptr<Room> room = U::make_unique<Room>();
 
 	// if the room is ground level
 	if (z == C::GROUND_INDEX)

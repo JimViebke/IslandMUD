@@ -9,7 +9,7 @@ April 14, 2015 */
 #include <ctime>
 
 #include "constants.h"
-#include "resources.h"
+#include "utilities.h"
 
 using namespace std;
 

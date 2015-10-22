@@ -127,7 +127,7 @@ bool Room::contains_item(const string & item_id, const unsigned & count) const
 		it != contents.cend(); ++it)
 	{
 		// if the item is a material
-		if (shared_ptr<Material> material_item = R::convert_to<Material>(it->second))
+		if (shared_ptr<Material> material_item = U::convert_to<Material>(it->second))
 		{
 			// if the amount greater than or equal to count
 			if (material_item->amount >= count)
@@ -143,7 +143,7 @@ bool Room::contains_item(const string & item_id, const unsigned & count) const
 }
 bool Room::is_observed_by(const string & actor_id) const
 {
-	return R::contains(viewing_actor_ids, actor_id);
+	return U::contains(viewing_actor_ids, actor_id);
 }
 bool Room::is_water() const
 {
@@ -298,7 +298,7 @@ bool Room::damage_item(const string & item_id, const int & amount)
 void Room::add_surface(const string & surface_ID, const string & material_ID)
 {
 	// if the surface ID is valid
-	if (R::contains(C::surface_ids, surface_ID))
+	if (U::contains(C::surface_ids, surface_ID))
 	{
 		// create a new Room_Side and add it to room_sides
 		room_sides.insert(pair<string, Room_Side>(surface_ID, Room_Side(material_ID)));
@@ -310,7 +310,7 @@ void Room::add_surface(const string & surface_ID, const string & material_ID, co
 	// create a surface with a given health (used for loading rooms from disk that may be damaged)
 
 	// if the surface ID is valid
-	if (R::contains(C::surface_ids, surface_ID))
+	if (U::contains(C::surface_ids, surface_ID))
 	{
 		// create a new Room_Side and add it to room_sides
 		room_sides.insert(pair<string, Room_Side>(surface_ID, Room_Side(material_ID)));
@@ -353,7 +353,7 @@ void Room::add_door(const string & directon_ID, const int & health, const string
 string Room::damage_surface(const string & surface_ID, const shared_ptr<Item> & equipped_item)
 {
 	// test if the surface is valid
-	if (!R::contains(C::surface_ids, surface_ID))
+	if (!U::contains(C::surface_ids, surface_ID))
 	{
 		return surface_ID + " is not a valid surface.";
 	}
@@ -442,7 +442,7 @@ string Room::damage_surface(const string & surface_ID, const shared_ptr<Item> & 
 string Room::damage_door(const string & surface_ID, const shared_ptr<Item> & equipped_item)
 {
 	// test if the surface is valid
-	if (!R::contains(C::surface_ids, surface_ID))
+	if (!U::contains(C::surface_ids, surface_ID))
 	{
 		return surface_ID + " is not a valid surface.";
 	}
@@ -523,22 +523,22 @@ string Room::damage_door(const string & surface_ID, const shared_ptr<Item> & equ
 // add and remove actors
 void Room::add_actor(const string & actor_id)
 {
-	if (!R::contains(actor_ids, actor_id)) // if the actor is not already in the list of actors
+	if (!U::contains(actor_ids, actor_id)) // if the actor is not already in the list of actors
 	{
 		actor_ids.push_back(actor_id); // add the actor
 	}
 }
 void Room::remove_actor(const string & actor_id)
 {
-	if (R::contains(actor_ids, actor_id)) // if the character exists here
+	if (U::contains(actor_ids, actor_id)) // if the character exists here
 	{
-		R::erase_element_from_vector(actor_ids, actor_id);
+		U::erase_element_from_vector(actor_ids, actor_id);
 	}
 }
 void Room::add_viewing_actor(const string & actor_id)
 {
 	// if the passed actor_ID is not already able to view the room
-	if (!R::contains(viewing_actor_ids, actor_id))
+	if (!U::contains(viewing_actor_ids, actor_id))
 	{
 		// add the actor ID to viewing_actor_ids
 		viewing_actor_ids.push_back(actor_id);
@@ -549,9 +549,9 @@ void Room::remove_viewing_actor(const string & actor_id)
 	// A room is unloaded when no player can see the room.
 	// To this end, a list of PCs and NPCs who can see this room is maintained.
 
-	if (R::contains(viewing_actor_ids, actor_id)) // if the character can see this room
+	if (U::contains(viewing_actor_ids, actor_id)) // if the character can see this room
 	{
-		R::erase_element_from_vector(viewing_actor_ids, actor_id); // remove the character
+		U::erase_element_from_vector(viewing_actor_ids, actor_id); // remove the character
 	}
 }
 
