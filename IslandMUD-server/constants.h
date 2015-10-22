@@ -16,16 +16,14 @@ using char_type = char;
 using char_type = string;
 #endif
 
-class Constants; // forward declaring...
+namespace Constants {} // "forward declaring"...
 
-using C = Constants; // ...in order to put this up here
+namespace C = Constants; // ...to do this here
 
-class Constants
+namespace Constants
 {
-public:
-
 	// general
-	const static int
+	extern const int
 		GROUND_INDEX,
 		VIEW_DISTANCE,
 
@@ -38,7 +36,7 @@ public:
 		DEFAULT_SPAWN_Z;
 
 	// game data locations
-	static const string
+	extern const string
 		game_directory,
 		world_terrain_file_location,
 		iron_deposit_map_file_location,
@@ -47,12 +45,12 @@ public:
 		user_data_directory;
 
 	// faction IDs
-	const static string PC_FACTION_ID; // players ("PCs")
-	const static string NPC_NEUTRAL_FACTION_ID; // neutral island inhabitants
-	const static string NPC_HOSTILE_FACTION_ID; // antagonists
+	extern const string PC_FACTION_ID; // players ("PCs")
+	extern const string NPC_NEUTRAL_FACTION_ID; // neutral island inhabitants
+	extern const string NPC_HOSTILE_FACTION_ID; // antagonists
 
 	// map symbols
-	const static char_type
+	extern const char_type
 		OUT_OF_BOUNDS_CHAR,
 		ERROR_CHAR,
 		PLAYER_CHAR,
@@ -65,7 +63,7 @@ public:
 		CHEST_CHAR,
 		RUBBLE_CHAR;
 
-	const static string
+	extern const string
 		// engine signals
 		GOOD_SIGNAL,
 		BAD_SIGNAL,
@@ -196,28 +194,28 @@ public:
 		XML_CURRENT_HEALTH;
 
 	// item health/integrity
-	static const int
+	extern const int
 		DEFAULT_ITEM_MIN_HEALTH,
 		DEFAULT_ITEM_MAX_HEALTH;
 
 	// int to char_type conversion
-	static const vector<char_type> numbers;
+	extern const vector<char_type> numbers;
 
 	// surface information
-	static const vector<string> surface_ids;
-	static const vector<string> direction_ids;
-	static const vector<string> primary_direction_ids; // NESW
-	static const map<string, string> opposite_surface_id;
-	static const map<string, string> opposite_direction_id;
+	extern const vector<string> surface_ids;
+	extern const vector<string> direction_ids;
+	extern const vector<string> primary_direction_ids; // NESW
+	extern const map<string, string> opposite_surface_id;
+	extern const map<string, string> opposite_direction_id;
 
 	// maps material IDs to the material count required to make a surface
 	// therefore also acts as the list of valid construction surfaces (see implementation)
-	const static map<string, unsigned> SURFACE_REQUIREMENTS;
-	const static map<string, unsigned> DOOR_REQUIREMENTS;
+	extern const map<string, unsigned> SURFACE_REQUIREMENTS;
+	extern const map<string, unsigned> DOOR_REQUIREMENTS;
 
 	// box drawing (more explaination at implementation)
 
-	const static char_type
+	extern const char_type
 		NW_CORNER,
 		NE_CORNER,
 		SW_CORNER,
@@ -238,22 +236,22 @@ public:
 
 	// more box drawing
 
-	const static vector<char_type> CORNERS;
+	extern const vector<char_type> CORNERS;
 
 	// walls, ceiling, and floor - min and max health
 
-	const static int
+	extern const int
 		MIN_SURFACE_HEALTH,
 		MAX_SURFACE_HEALTH,
 		MAX_DOOR_HEALTH;
 
-	const static map<string, map<string, int>> damage_tables;
+	extern const map<string, map<string, int>> damage_tables;
 
 	// AI constants
-	const static int
+	extern const int
 		AI_MAX_OBJECTIVE_ATTEMPTS; // the point at which an AI must return control
 
-	const static int
+	extern const int
 		// AI movement costs
 		AI_MOVEMENT_COST,
 		AI_MOVEMENT_COST_DIAGONAL,
@@ -272,21 +270,21 @@ public:
 		FULL_HEALTH_MAX;
 
 	// AI objective keywords
-	const static string
+	extern const string
 		AI_OBJECTIVE_ACQUIRE,
 		AI_OBJECTIVE_GOTO,
 		AI_OBJECTIVE_CONSTRUCT;
 
-	const static int
+	extern const int
 		MAX_CHEST_HEALTH;
 
 	// fortress generation bounds
-	const static int
+	extern const int
 		FORTRESS_PARTITION_MIN_SIZE,
 		FORTRESS_MIN_X,
 		FORTRESS_MAX_X,
 		FORTRESS_MIN_Y,
 		FORTRESS_MAX_Y;
-};
+}
 
 #endif
