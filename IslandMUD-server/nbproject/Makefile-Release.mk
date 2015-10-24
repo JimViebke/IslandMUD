@@ -45,6 +45,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/non_player_character.o \
 	${OBJECTDIR}/npc_enemy.o \
+	${OBJECTDIR}/npc_enemy_bodyguard.o \
 	${OBJECTDIR}/npc_enemy_fighter.o \
 	${OBJECTDIR}/npc_enemy_worker.o \
 	${OBJECTDIR}/npc_unaffiliated.o \
@@ -52,9 +53,9 @@ OBJECTFILES= \
 	${OBJECTDIR}/player_character.o \
 	${OBJECTDIR}/pugixml.o \
 	${OBJECTDIR}/recipes.o \
-	${OBJECTDIR}/resources.o \
 	${OBJECTDIR}/room.o \
 	${OBJECTDIR}/room_side.o \
+	${OBJECTDIR}/utilities.o \
 	${OBJECTDIR}/world.o
 
 
@@ -132,6 +133,11 @@ ${OBJECTDIR}/npc_enemy.o: npc_enemy.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/npc_enemy.o npc_enemy.cpp
 
+${OBJECTDIR}/npc_enemy_bodyguard.o: npc_enemy_bodyguard.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/npc_enemy_bodyguard.o npc_enemy_bodyguard.cpp
+
 ${OBJECTDIR}/npc_enemy_fighter.o: npc_enemy_fighter.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -167,11 +173,6 @@ ${OBJECTDIR}/recipes.o: recipes.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/recipes.o recipes.cpp
 
-${OBJECTDIR}/resources.o: resources.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/resources.o resources.cpp
-
 ${OBJECTDIR}/room.o: room.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -181,6 +182,11 @@ ${OBJECTDIR}/room_side.o: room_side.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/room_side.o room_side.cpp
+
+${OBJECTDIR}/utilities.o: utilities.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/utilities.o utilities.cpp
 
 ${OBJECTDIR}/world.o: world.cpp 
 	${MKDIR} -p ${OBJECTDIR}
