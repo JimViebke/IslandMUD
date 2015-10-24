@@ -1,20 +1,21 @@
 <html style="">
 <head>
 	<title>IslandMUD</title>
+	<!-- Thanks for the font, Google. -->
+	<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400" rel="stylesheet" type="text/css">
 	<style type="text/css">
 		#map {
 			white-space: pre;
-			font-family: "Courier New", Courier, monospace;
+			font-family: 'Source Code Pro', Monaco, 'Courier New', Courier, monospace;
 			color: #00ff00;
 			background-color: black;
-			line-height: 95%;
+			line-height: 97%;
 		}
 	</style>
-	<style type="text/css"></style>
 </head>
 <body>
 	<time></time>
-	<div id="map">Waiting for server...</div>
+	<div id="map">Waiting for IslandMUD server...</div>
 	<script src="socket.io/socket.io.js"></script>
 	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script>
@@ -25,7 +26,9 @@
 		socket.on('notification', function (data)
 		{
 			var _data = JSON.parse(data);
+			// redraw the map
 			$('#map').html(_data.test.sample);
+			// update the time
 			$('time').html(new Date());
 		});
 	</script>
