@@ -164,7 +164,7 @@ void World::create_world_container()
 }
 void World::load_or_generate_terrain_and_mineral_maps()
 {
-	// terrain adn mineral maps are only used to generate rooms that do not already exist on disk
+	// terrain and mineral maps are only used to generate rooms that do not already exist on disk
 
 	cout << "\nLoading world terrain and mineral maps...";
 
