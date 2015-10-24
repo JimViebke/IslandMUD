@@ -7,7 +7,7 @@ Feb 14, 2015 */
 #include <map>
 #include <queue> // for queues
 
-#include "resources.h"
+#include "utilities.h"
 #include "constants.h"
 #include "character.h"
 #include "player_character.h"
@@ -15,6 +15,7 @@ Feb 14, 2015 */
 #include "npc_enemy.h"
 #include "npc_enemy_fighter.h"
 #include "npc_enemy_worker.h"
+#include "npc_enemy_bodyguard.h"
 #include "npc_unaffiliated.h"
 #include "parse.h"
 #include "world.h"

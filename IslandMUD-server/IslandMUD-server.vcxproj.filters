@@ -27,9 +27,6 @@
     <ClCompile Include="pugixml.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="resources.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="room.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -78,6 +75,12 @@
     <ClCompile Include="npc_enemy_worker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="npc_enemy_bodyguard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="message.h">
@@ -99,9 +102,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resources.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="room.h">
@@ -146,10 +146,16 @@
     <ClInclude Include="npc_enemy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="npc_enemy_bodyguard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="npc_enemy_fighter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="npc_enemy_worker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -162,9 +168,9 @@
     <None Include="ClassDiagram - Items.cd">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="ClassDiagram - NPCs.cd">
+    <None Include="..\Rakefile" />
+    <None Include="ClassDiagram - Characters.cd">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\Rakefile" />
   </ItemGroup>
 </Project>

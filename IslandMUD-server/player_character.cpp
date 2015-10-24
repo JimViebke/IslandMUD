@@ -71,7 +71,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 		const int i = cx - (x - (C::VIEW_DISTANCE + 1));
 		for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 		{
-			if (R::bounds_check(cx, cy))
+			if (U::bounds_check(cx, cy))
 			{
 				forest_grid[i][cy - (y - (C::VIEW_DISTANCE + 1))] = world.room_at(cx, cy, C::GROUND_INDEX)->contains_item(C::TREE_ID);
 			}
@@ -87,7 +87,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 		for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 		{
 			// if the room is out of bounds
-			if (!R::bounds_check(cx, cy, C::GROUND_INDEX))
+			if (!U::bounds_check(cx, cy, C::GROUND_INDEX))
 			{
 				// draw the "room"
 				a.push_back(C::LAND_CHAR); a.push_back(C::LAND_CHAR); a.push_back(C::LAND_CHAR);
@@ -201,11 +201,11 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				for (const string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
 				{
 					// if the actor is a hostile NPC
-					if (R::is<Hostile_NPC>(actors.find(actor_ID)->second))
+					if (U::is<Hostile_NPC>(actors.find(actor_ID)->second))
 					{
 						++enemy_count; // count one more enemy NPC in the room
 					}
-					else if (R::is<Neutral_NPC>(actors.find(actor_ID)->second))
+					else if (U::is<Neutral_NPC>(actors.find(actor_ID)->second))
 					{
 						++neutral_count; // count one more neutral NPC in the room
 					}
@@ -228,7 +228,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 					// in order for this corner to render, there must be one adjacent local wall OR two adjacent remote walls
 					if (wte || wts || (wtn && wtw))
 					{
-						nw_corner = R::corner_char(wtn, wte, wts, wtw);
+						nw_corner = U::corner_char(wtn, wte, wts, wtw);
 					}
 				}
 				{
@@ -240,7 +240,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 
 					if (wtw || wts || (wtn && wte))
 					{
-						ne_corner = R::corner_char(wtn, wte, wts, wtw);
+						ne_corner = U::corner_char(wtn, wte, wts, wtw);
 					}
 				}
 				{
@@ -252,7 +252,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 
 					if (wtn || wtw || (wts && wte))
 					{
-						se_corner = R::corner_char(wtn, wte, wts, wtw);
+						se_corner = U::corner_char(wtn, wte, wts, wtw);
 					}
 				}
 				{
@@ -264,7 +264,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 
 					if (wtn || wte || (wts && wtw))
 					{
-						sw_corner = R::corner_char(wtn, wte, wts, wtw);
+						sw_corner = U::corner_char(wtn, wte, wts, wtw);
 					}
 				}
 
@@ -274,8 +274,8 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				a.push_back(ne_corner);
 
 				b.push_back(((wr) ? C::RUBBLE_CHAR : ((wd) ? C::NS_DOOR : ((w) ? C::NS_WALL : C::LAND_CHAR))));
-				// if the current coordinates are the player's, draw an @ icon, else if there is an enemy, draw enemy count, else if there are nuetrals, draw neutral count, else if there is a chest, draw a chest, else if there is no item, draw a land char, else if there is a mineral, draw a mineral char, else draw an item char
-				b.push_back(((cx == x && cy == y) ? C::PLAYER_CHAR : ((enemy_count > 0) ? R::to_char_type(enemy_count) : ((neutral_count > 0) ? C::NPC_NEUTRAL_CHAR : ((world.room_at(cx, cy, C::GROUND_INDEX)->has_chest()) ? C::CHEST_CHAR : ((world.room_at(cx, cy, C::GROUND_INDEX)->contains_no_items()) ? C::LAND_CHAR : ((world.room_at(cx, cy, C::GROUND_INDEX)->has_mineral()) ? C::GENERIC_MINERAL_CHAR : C::ITEM_CHAR)))))));
+				// if the current coordinates are the player's, draw an @ icon, else if there is an enemy, draw enemy count, else if there are neutrals, draw neutral count, else if there is a chest, draw a chest, else if there is a non-mineral deposit item, draw an item char, else if there is a mineral deposit, draw a mineral char, else draw a land char
+				b.push_back(((cx == x && cy == y) ? C::PLAYER_CHAR : ((enemy_count > 0) ? U::to_char_type(enemy_count) : ((neutral_count > 0) ? C::NPC_NEUTRAL_CHAR : ((world.room_at(cx, cy, C::GROUND_INDEX)->has_chest()) ? C::CHEST_CHAR : ((world.room_at(cx, cy, C::GROUND_INDEX)->has_non_mineral_deposit_item()) ? C::ITEM_CHAR : ((world.room_at(cx, cy, C::GROUND_INDEX)->has_mineral_deposit()) ? C::GENERIC_MINERAL_CHAR : C::LAND_CHAR)))))));
 				b.push_back(((er) ? C::RUBBLE_CHAR : ((ed) ? C::NS_DOOR : ((e) ? C::NS_WALL : C::LAND_CHAR))));
 
 				c.push_back(sw_corner);

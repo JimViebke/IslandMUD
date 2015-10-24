@@ -27,6 +27,7 @@ void Parse::initialize()
 		P::dict["item"] = C::ITEM_COMMAND; // viewing equipped item
 		P::dict["dequip"] = P::dict["deequip"] = P::dict["unequip"] = P::dict["unwield"] = P::dict["unweild"] = P::dict["store"] = P::dict["sheathe"] = P::dict["sheath"] = C::DEQUIP_COMMAND;
 		P::dict["craft"] = P::dict["make"] = P::dict["create"] = P::dict["fashion"] = C::CRAFT_COMMAND;
+		P::dict["mine"] = C::MINE_COMMAND;
 		P::dict["drop"] = P::dict["release"] = P::dict["unhand"] = P::dict["add"] = P::dict["place"] = P::dict["put"] = C::DROP_COMMAND;
 		P::dict["into"] = P::dict["in"] = P::dict["to"] = P::dict["within"] = C::INSERT_COMMAND;
 		P::dict["from"] = P::dict["form"] = C::FROM_COMMAND;
@@ -61,6 +62,13 @@ void Parse::initialize()
 		P::dict["sword"] = C::SWORD_ID;
 		P::dict["hammer"] = C::HAMMER_ID;
 
+		// items -> minerals
+		P::dict["iron"] = C::IRON_ID;
+		P::dict["limestone"] = C::LIMESTONE_ID;
+
+		// items -> mineral keywords (partial IDs for compound mineral names)
+		P::dict["deposit"] = C::KEYWORD_DEPOSIT;
+
 		// directions
 		P::dict["n"] = P::dict["north"] = C::NORTH;
 		P::dict["ne"] = P::dict["northeast"] = C::NORTH_EAST;
@@ -94,12 +102,12 @@ vector<string> Parse::tokenize(const string & s)
 	const istream_iterator<string> begin(ss);
 	vector<string> strings(begin, istream_iterator<string>());
 
-	R::print(strings); // debugging
+	U::print(strings); // debugging
 
 	for (string & word : strings) // for each word
 	{
 		// convert the word to lowercase
-		R::to_lower_case(word);
+		U::to_lower_case(word);
 
 		// replace the word with the engine keyword, or C::BAD_COMMAND
 		word = (dict.find(word) != dict.end()) ? dict.find(word)->second : C::BAD_COMMAND;

@@ -7,7 +7,7 @@ Feb 14, 2015 */
 #include <map> // for room contents multimap
 #include <set> // playerlist
 
-#include "resources.h"
+#include "utilities.h"
 #include "constants.h"
 #include "item.h"
 #include "room_side.h" // walls, floor, or ceiling
@@ -48,7 +48,8 @@ public:
 	bool is_observed_by(const string & actor_id) const;
 	bool is_water() const;
 	bool is_forest() const;
-	bool has_mineral() const;
+	bool has_non_mineral_deposit_item() const;
+	bool has_mineral_deposit() const;
 
 	// chests
 	void add_chest(const string & set_faction_id);

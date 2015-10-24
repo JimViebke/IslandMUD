@@ -54,7 +54,7 @@ void Hostile_NPC_Fighter::update(World & world, map<string, shared_ptr<Character
 			{
 			for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 			{
-			if (!R::bounds_check(cx, cy)) { continue; } // skip if out of bounds
+			if (!U::bounds_check(cx, cy)) { continue; } // skip if out of bounds
 
 			if (world.room_at(cx, cy, z)->contains_item(objective_iterator->noun))
 			{
@@ -151,13 +151,13 @@ void Hostile_NPC_Fighter::update(World & world, map<string, shared_ptr<Character
 			for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 			{
 				// skip this room if it is out of bounds
-				if (!R::bounds_check(cx, cy)) { continue; }
+				if (!U::bounds_check(cx, cy)) { continue; }
 
 				// for each actor in the room
 				for (const string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
 				{
 					// if the character is a player character
-					if (R::is<PC>(actors.find(actor_ID)->second))
+					if (U::is<PC>(actors.find(actor_ID)->second))
 					{
 						// [target acquired]
 						pathfind(cx, cy, world);

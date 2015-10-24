@@ -10,8 +10,7 @@ Aug 15 2015 */
 class Hostile_NPC_Fighter : public Hostile_NPC
 {
 public:
-	Hostile_NPC_Fighter(const string & name, const string & faction_ID) :
-		Hostile_NPC(name, faction_ID) {}
+	Hostile_NPC_Fighter(const string & name) : Hostile_NPC(name) {}
 
 	void update(World & world, map<string, shared_ptr<Character>> & actors);
 };

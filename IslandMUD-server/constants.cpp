@@ -22,8 +22,8 @@ const string C::game_directory = "C:/IslandMUD"; // Windows path
 const string C::game_directory = "/home/IslandMUD"; // Linux path
 #endif
 const string C::world_terrain_file_location = C::game_directory + "/world_terrain.txt";
-const string C::iron_ore_terrain_file_location = C::game_directory + "/iron_ore_map.txt";
-const string C::limestone_terrain_file_location = C::game_directory + "/limestone_map.txt";
+const string C::iron_deposit_map_file_location = C::game_directory + "/iron_deposit_map.txt";
+const string C::limestone_deposit_map_file_location = C::game_directory + "/limestone_deposit_map.txt";
 const string C::room_directory = C::game_directory + "/rooms";
 const string C::user_data_directory = C::game_directory + "/user_data";
 
@@ -41,7 +41,7 @@ const char_type C::NPC_NEUTRAL_CHAR = '+';
 const char_type C::WATER_CHAR = '~';
 const char_type C::LAND_CHAR = ' ';
 const char_type C::FOREST_CHAR = '%';
-const char_type C::GENERIC_MINERAL_CHAR = char(177); // extended ascii 177
+const char_type C::GENERIC_MINERAL_CHAR = char(176); // extended ascii 176
 const char_type C::ITEM_CHAR = '?';
 const char_type C::CHEST_CHAR = char(220); // extended ascii 220
 const char_type C::RUBBLE_CHAR = '#';
@@ -52,8 +52,8 @@ const char_type C::PLAYER_CHAR = "@";
 const char_type C::NPC_NEUTRAL_CHAR = "+";
 const char_type C::WATER_CHAR = "~";
 const char_type C::LAND_CHAR = " ";
+const char_type C::GENERIC_MINERAL_CHAR = "░";
 const char_type C::FOREST_CHAR = "%";
-const char_type C::GENERIC_MINERAL_CHAR = "▒"
 const char_type C::ITEM_CHAR = "?";
 const char_type C::CHEST_CHAR = "▄"; // extended ascii 220
 const char_type C::RUBBLE_CHAR = "#";
@@ -95,8 +95,14 @@ const string C::TORCH_ID = "torch";
 const string C::HAMMER_ID = "hammer";
 
 // item IDs -> rocks and minerals
-const string C::IRON_ORE_ID = "iron ore";
+const string C::IRON_DEPOSIT_ID = "iron deposit"; // when they are in the ground
+const string C::LIMESTONE_DEPOSIT_ID = "limestone deposit";
+
+const string C::IRON_ID = "iron"; // once they are out of the ground
 const string C::LIMESTONE_ID = "limestone";
+
+// none of these are actual item IDs, they exist for the parser to work with multi-word IDs
+const string C::KEYWORD_DEPOSIT = "deposit";
 
 // commands
 const string C::BAD_COMMAND = "unknown_command";
@@ -111,6 +117,7 @@ const string C::EQUIP_COMMAND = "equip";
 const string C::ITEM_COMMAND = "item"; // view equipped item
 const string C::DEQUIP_COMMAND = "dequip";
 const string C::CRAFT_COMMAND = "craft";
+const string C::MINE_COMMAND = "mine";
 const string C::MOVE_COMMAND = "move";
 const string C::DROP_COMMAND = "drop";
 const string C::INSERT_COMMAND = "insert";

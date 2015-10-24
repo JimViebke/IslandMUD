@@ -160,6 +160,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="non_player_character.cpp" />
     <ClCompile Include="npc_enemy.cpp" />
+    <ClCompile Include="npc_enemy_bodyguard.cpp" />
     <ClCompile Include="npc_enemy_fighter.cpp" />
     <ClCompile Include="npc_enemy_worker.cpp" />
     <ClCompile Include="npc_unaffiliated.cpp" />
@@ -167,9 +168,9 @@
     <ClCompile Include="player_character.cpp" />
     <ClCompile Include="pugixml.cpp" />
     <ClCompile Include="recipes.cpp" />
-    <ClCompile Include="resources.cpp" />
     <ClCompile Include="room.cpp" />
     <ClCompile Include="room_side.cpp" />
+    <ClCompile Include="utilities.cpp" />
     <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -183,6 +184,7 @@
     <ClInclude Include="message.h" />
     <ClInclude Include="non_player_character.h" />
     <ClInclude Include="npc_enemy.h" />
+    <ClInclude Include="npc_enemy_bodyguard.h" />
     <ClInclude Include="npc_enemy_fighter.h" />
     <ClInclude Include="npc_enemy_worker.h" />
     <ClInclude Include="npc_unaffiliated.h" />
@@ -193,7 +195,7 @@
     <ClInclude Include="recipe.h" />
     <ClInclude Include="recipes.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="resources.h" />
+    <ClInclude Include="utilities.h" />
     <ClInclude Include="room.h" />
     <ClInclude Include="room_side.h" />
     <ClInclude Include="world.h" />
@@ -204,7 +206,7 @@
   <ItemGroup>
     <None Include="..\Rakefile" />
     <None Include="ClassDiagram - Items.cd" />
-    <None Include="ClassDiagram - NPCs.cd" />
+    <None Include="ClassDiagram - Characters.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

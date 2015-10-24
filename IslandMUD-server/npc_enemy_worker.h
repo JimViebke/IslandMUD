@@ -27,8 +27,7 @@ private:
 	deque<Structure_Objectives> planned_structures;
 
 public:
-	Hostile_NPC_Worker(const string & name, const string & faction_ID) :
-		Hostile_NPC(name, faction_ID) {}
+	Hostile_NPC_Worker(const string & name) : Hostile_NPC(name) {}
 
 	void update(World & world, map<string, shared_ptr<Character>> & actors);
 
@@ -54,7 +53,7 @@ private:
 	};
 
 	// used during fortress outer wall generation
-	enum Area_Type { structure, fortress_interior, fortress_exterior };
+	enum class Area_Type { structure, fortress_interior, fortress_exterior };
 };
 
 #endif

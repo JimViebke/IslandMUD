@@ -30,7 +30,7 @@ private:
 
 public:
 	int x = C::DEFAULT_SPAWN_X; // location coordinates
-	int y = C::DEFAULT_SPAWN_Y;
+	int y = C::DEFAULT_SPAWN_Y; // it's handy to have these signed for validation reasons
 	int z = C::DEFAULT_SPAWN_Z;
 	string name;
 

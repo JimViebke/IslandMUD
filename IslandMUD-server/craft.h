@@ -13,7 +13,7 @@ class Craft
 {
 public:
 
-	Craft()	{ }
+	Craft()	{}
 
 	static shared_ptr<Item> make(const string & item_ID);
 };
