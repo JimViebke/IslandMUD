@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=IslandMUD-server
+PROJECTNAME=IslandMUD
 
 # Active Configuration
 DEFAULTCONF=Debug
