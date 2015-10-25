@@ -86,7 +86,7 @@ void Game::main_test_loop() // debugging
 				pugi::xml_document document;
 
 				// load the file from the disk into the xml_document in memory
-				document.load_file(string("/home/IslandMUD/example.xml").c_str());
+				document.load_file(string("./server-files/example.xml").c_str());
 
 				// select the root/test node, create it if it does not exist
 				xml_node root_node = document.child(string("test").c_str());
@@ -119,7 +119,7 @@ void Game::main_test_loop() // debugging
 				root_node.append_child(string("sample").c_str()).append_child(node_pcdata).set_value(oss.str().c_str());
 
 				// save the document
-				document.save_file(string("/home/IslandMUD/example.xml").c_str()); // returns an unused boolean
+				document.save_file(string("./server-files/example.xml").c_str()); // returns an unused boolean
 #endif
 
 			}
