@@ -13,12 +13,12 @@ This contains NPC members and functionality that is common for hostile and neutr
 
 class Non_Player_Character; // forward-declaring...
 
-typedef Non_Player_Character NPC; // ...in order to put this here
+using NPC = Non_Player_Character; // ...in order to put this here
 
 class Non_Player_Character : public Character
 {
 public:
-	// hostile and neutral NPCs override this in their respective classes
+	// hostile and neutral NPCs override this in their child classes
 	virtual void update(World & world, map<string, shared_ptr<Character>> & actors) = 0;
 
 	// objective debugging
@@ -29,34 +29,45 @@ protected:
 	{
 	public:
 		// "get [] [] axe", "construct north stone surface", "construct north stone door"
-		string verb, direction, material, noun;
 		int objective_x, objective_y, objective_z;
-		string purpose; // "sword" (the reason this objective was added
-		bool already_planning_to_craft = false;
-		Objective(const string & verb, const string & noun, const string & purpose) :
-			verb(verb), noun(noun), purpose(purpose) {}
-		Objective(const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z) :
-			verb(verb), noun(noun), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z) {}
+		bool modifier, already_planning_to_craft = false;
+		string verb, direction, material, noun, purpose; // purpose is the reason this objective was added
+
+		Objective(const string & verb, const string & noun, const string & purpose);
+		Objective(const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z);
+		Objective(const string & verb, const string & noun, const string & material, const string & direction, const int & objective_x, const int & objective_y, const int & objective_z, const bool & modifier);
 	};
-	enum Objective_Priority { low_priority, high_priority };
+
+	enum class Objective_Priority { low_priority, high_priority };
+
+	class Coordinate
+	{
+	public:
+		int _x, _y, _z;
+		Coordinate(const int & set_x, const int & set_y, const int & set_z = -1);
+		void reset() { _x = _y = _z = -1; }
+	};
 
 	deque<Objective> objectives;
+	deque<Coordinate> path;
 
 	// this can only be instantiated by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
-	Non_Player_Character(const string & name, const string & faction_ID) : Character(name, faction_ID) {}
+	Non_Player_Character(const string & name, const string & faction_ID);
 
 	// objective creating and deletion
 	void add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const string & purpose);
 	void add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z);
 	void erase_objective(const deque<Objective>::iterator & objective_iterator);
 	void erase_objectives_matching_purpose(const string purpose);
+	void erase_goto_objective_matching(const string & purpose);
+	void erase_acquire_objective_matching(const string & noun);
 
 	// objective information
-	string the_item_im_looking_for() const;
 	bool one_can_craft(const string & item_id) const;
 	bool i_have(const string & item_id) const;
 	bool i_dont_have(const string & item_id) const;
 	bool im_planning_to_acquire(const string & item_ID) const;
+	bool crafting_requirements_met(const string & item_ID, const World & world) const;
 
 	// objective planning
 	void plan_to_get(const string & item_id);
@@ -74,13 +85,13 @@ protected:
 			for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 			{
 				// skip this room if it is out of bounds
-				if (!R::bounds_check(cx, cy)) { continue; }
+				if (!U::bounds_check(cx, cy)) { continue; }
 
 				// for each actor in the room
 				for (const string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
 				{
 					// if the character is the type of character we're looking for
-					if (R::is<ACTOR_TYPE>(actors.find(actor_ID)->second))
+					if (U::is<ACTOR_TYPE>(actors.find(actor_ID)->second))
 					{
 						// count one more
 						++players_in_range;
@@ -95,6 +106,9 @@ protected:
 
 	// returns true if successful
 	bool pathfind(const int & x_dest, const int & y_dest, World & world);
+	bool pathfind_to_closest_item(const string & item_id, World & world);
+	bool save_path_to(const int & x_dest, const int & y_dest, World & world);
+	bool make_path_movement(World & world);
 
 private:
 
@@ -112,11 +126,11 @@ private:
 			h = 0, g = 0, f = 0;
 		string direction_from_parent;
 
-		Node() {}
-		Node(const int & x, const int & y, const string & dir) : x(x), y(y), direction_from_parent(dir) {}
+		Node();
+		Node(const int & set_x, const int & set_y, const string & dir);
 
-		// Node member setter
 		void set_g_h_f(const int & set_g, const int & set_h);
+		void set_g(const int & set_g);
 	};
 
 	// pathfinding node utilities

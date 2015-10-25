@@ -17,23 +17,34 @@ void Parse::initialize()
 		P::dict["recipe"] = P::dict["recipes"] = C::PRINT_RECIPES_COMMAND;
 
 		// verbs
-		P::dict["help"] = P::dict["h"] = P::dict["q"] = P::dict["?"] = P::dict["assist"] = C::HELP_COMMAND;
+		P::dict["help"] = P::dict["h"] = P::dict["q"] = P::dict["?"] = P::dict["assist"] = P::dict["command"] = P::dict["commands"] = C::HELP_COMMAND;
+		P::dict["legend"] = C::LEGEND_COMMAND;
 		// P::dict["login"] = C::LOGIN_COMMAND; // not used yet
-		P::dict["logout"] = P::dict["quit"] = P::dict["leave"] = C::LOGOUT_COMMAND;
-		P::dict["move"] = P::dict["m"] = P::dict["walk"] = P::dict["run"] = P::dict["head"] = P::dict["go"] = P::dict["continue"] = C::MOVE_COMMAND;
+		P::dict["logout"] = P::dict["quit"] = P::dict["leave"] = P::dict["exit"] = C::LOGOUT_COMMAND;
+		P::dict["move"] = P::dict["m"] = P::dict["walk"] = P::dict["run"] = P::dict["head"] = P::dict["go"] = P::dict["continue"] = P::dict["work"] = C::MOVE_COMMAND;
 		P::dict["take"] = P::dict["get"] = P::dict["pick"] = P::dict["choose"] = P::dict["grab"] = P::dict["acquire"] = C::TAKE_COMMAND;
-		P::dict["equip"] = P::dict["weild"] = P::dict["wield"] = C::EQUIP_COMMAND;
-		P::dict["dequip"] = P::dict["deequip"] = P::dict["unequip"] = C::DEQUIP_COMMAND;
-		P::dict["craft"] = P::dict["forge"] = P::dict["make"] = P::dict["create"] = P::dict["fashion"] = C::CRAFT_COMMAND;
-		P::dict["drop"] = P::dict["release"] = P::dict["unhand"] = C::DROP_COMMAND;
-		P::dict["wait"] = P::dict["pause"] = P::dict["consider"] = P::dict["delay"] = C::WAIT_COMMAND;
+		P::dict["equip"] = P::dict["equipped"] = P::dict["weild"] = P::dict["wield"] = P::dict["ready"] = P::dict["draw"] = C::EQUIP_COMMAND;
+		P::dict["item"] = C::ITEM_COMMAND; // viewing equipped item
+		P::dict["dequip"] = P::dict["deequip"] = P::dict["unequip"] = P::dict["unwield"] = P::dict["unweild"] = P::dict["store"] = P::dict["sheathe"] = P::dict["sheath"] = C::DEQUIP_COMMAND;
+		P::dict["craft"] = P::dict["make"] = P::dict["create"] = P::dict["fashion"] = C::CRAFT_COMMAND;
+		P::dict["mine"] = C::MINE_COMMAND;
+		P::dict["drop"] = P::dict["release"] = P::dict["unhand"] = P::dict["add"] = P::dict["place"] = P::dict["put"] = C::DROP_COMMAND;
+		P::dict["into"] = P::dict["in"] = P::dict["to"] = P::dict["within"] = C::INSERT_COMMAND;
+		P::dict["from"] = P::dict["form"] = C::FROM_COMMAND;
+		P::dict["wait"] = P::dict["pause"] = P::dict["consider"] = P::dict["delay"] = P::dict["advance"] = C::WAIT_COMMAND;
+		P::dict["with"] = C::WITH_COMMAND;
 		P::dict["construct"] = P::dict["build"] = P::dict["erect"] = C::CONSTRUCT_COMMAND;
-		P::dict["attack"] = P::dict["smash"] = P::dict["strike"] = P::dict["bash"] = P::dict["break"] = P::dict["damage"] = P::dict["stab"] = P::dict["slash"] = C::ATTACK_COMMAND;
-		
+		P::dict["attack"] = P::dict["smash"] = P::dict["strike"] = P::dict["bash"] = P::dict["break"] = P::dict["damage"] = P::dict["stab"] = P::dict["slash"] = P::dict["chop"] = C::ATTACK_COMMAND;
+
 		// items
-		P::dict["tree"] = C::TREE_ID;
+
+		// items -> other
+		P::dict["smelter"] = C::SMELTER_ID;
 		P::dict["forge"] = C::FORGE_ID;
 		P::dict["anvil"] = C::ANVIL_ID;
+		P::dict["tree"] = C::TREE_ID;
+		P::dict["chest"] = P::dict["crate"] = C::CHEST_ID;
+		P::dict["log"] = C::LOG_ID;
 
 		// items -> materials
 		P::dict["stone"] = P::dict["rock"] = C::STONE_ID;
@@ -42,13 +53,21 @@ void Parse::initialize()
 		P::dict["vine"] = C::VINE_ID;
 		P::dict["arrow"] = C::ARROW_ID;
 		P::dict["arrowhead"] = C::ARROWHEAD_ID;
+		P::dict["board"] = P::dict["boards"] = P::dict["plank"] = P::dict["planks"] = C::BOARD_ID;
 
 		// items -> tools
 		P::dict["bow"] = C::BOW_ID;
 		P::dict["staff"] = C::STAFF_ID;
-		P::dict["axe"] = C::AXE_ID;
+		P::dict["axe"] = P::dict["ax"] = C::AXE_ID;
 		P::dict["sword"] = C::SWORD_ID;
 		P::dict["hammer"] = C::HAMMER_ID;
+
+		// items -> minerals
+		P::dict["iron"] = C::IRON_ID;
+		P::dict["limestone"] = C::LIMESTONE_ID;
+
+		// items -> mineral keywords (partial IDs for compound mineral names)
+		P::dict["deposit"] = C::KEYWORD_DEPOSIT;
 
 		// directions
 		P::dict["n"] = P::dict["north"] = C::NORTH;
@@ -78,19 +97,19 @@ vector<string> Parse::tokenize(const string & s)
 
 	cout << "\nDEBUG inside parse.tokenize: "; // debugging
 
-	// convert the (space-delimited) user input to a vector of strings (one word per element)
+	// convert the space-delimited user input to a vector of strings (one word per string)
 	stringstream ss(s);
-	istream_iterator<string> begin(ss);
-	istream_iterator<string> end;
-	vector<string> strings(begin, end);
+	const istream_iterator<string> begin(ss);
+	vector<string> strings(begin, istream_iterator<string>());
 
-	R::print(strings); // debugging
-
-	R::to_lower_case(strings); // convert all input to lower case
+	U::print(strings); // debugging
 
 	for (string & word : strings) // for each word
 	{
-		// replace each word with the engine keyword, or C::BAD_COMMAND
+		// convert the word to lowercase
+		U::to_lower_case(word);
+
+		// replace the word with the engine keyword, or C::BAD_COMMAND
 		word = (dict.find(word) != dict.end()) ? dict.find(word)->second : C::BAD_COMMAND;
 	}
 

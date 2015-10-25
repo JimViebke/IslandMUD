@@ -12,29 +12,32 @@ April 1, 2014 */
 
 #include "room.h"
 #include "generator.h"
-// #include "character.h"
 
 using namespace std;
 using namespace pugi;
 
 class World
 {
-private:
-	// x, y, and z dimensions repectively
-	vector<vector<vector<shared_ptr<Room>>>> world;
+public:
 
+private:
 	// 2d terrain (biome) map
-	shared_ptr<vector<vector<char>>> terrain;
+	unique_ptr<vector<vector<char_type>>> terrain;
+	unique_ptr<vector<vector<char_type>>> iron_deposit_map;
+	unique_ptr<vector<vector<char_type>>> limestone_deposit_map;
+
+	vector<unique_ptr<Room>> world;
 
 public:
 
-	World() {}
+	World();
 
 	void load();
 
-	// return shared_ptr to a room at a location
-	shared_ptr<Room> room_at(const int & x, const int & y, const int & z) const;
-	shared_ptr<Room> & room_at(const int & x, const int & y, const int & z);
+	// access a room given coordinates
+	unique_ptr<Room>::pointer room_at(const int & x, const int & y, const int & z);
+	const unique_ptr<Room>::pointer room_at(const int & x, const int & y, const int & z) const;
+	unique_ptr<Room> & room_pointer_at(const int & x, const int & y, const int & z);
 
 	// debugging
 	unsigned count_loaded_rooms() const;
@@ -58,10 +61,15 @@ public:
 
 private:
 
-	void load_terrain_map();
+	void create_world_container();
+	void load_or_generate_terrain_and_mineral_maps();
 
-	void load_world_container();
+	// three functions for loading and verifying the world map and the two mineral maps
 
+	bool load_existing_world_terrain();
+	bool load_existing_iron_deposit_map();
+	bool load_existing_limestone_deposit_map();
+	
 	// a room at x,y,z does not exist on the disk; create it
 	void generate_room_at(const int & x, const int & y, const int & z);
 
@@ -75,13 +83,16 @@ private:
 	void load_room_to_world(const int & x, const int & y, const int & z);
 
 	// move a passed room to disk
-	void unload_room(const int & x, const int & y, const int & z, shared_ptr<Room> & room);
+	void unload_room(const int & x, const int & y, const int & z, const unique_ptr<Room>::pointer room);
 
 	// add a room to a z_stack at a given index
-	void add_room_to_z_stack(const int & z, const shared_ptr<Room> & room, xml_document & z_stack) const;
+	void add_room_to_z_stack(const int & z, const unique_ptr<Room>::pointer room, xml_document & z_stack) const;
 
 	// create a new empty room given its coordinates and the world terrain
-	shared_ptr<Room> create_room(const int & x, const int & y, const int & z) const;
+	unique_ptr<Room> create_room(const int & x, const int & y, const int & z) const;
+
+	// remove a room from memory
+	void erase_room_from_memory(const int & x, const int & y, const int & z);
 };
 
 #endif

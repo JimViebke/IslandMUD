@@ -127,7 +127,7 @@ bool Room::contains_item(const string & item_id, const unsigned & count) const
 		it != contents.cend(); ++it)
 	{
 		// if the item is a material
-		if (shared_ptr<Material> material_item = R::convert_to<Material>(it->second))
+		if (shared_ptr<Material> material_item = U::convert_to<Material>(it->second))
 		{
 			// if the amount greater than or equal to count
 			if (material_item->amount >= count)
@@ -141,7 +141,10 @@ bool Room::contains_item(const string & item_id, const unsigned & count) const
 	// there is not a sufficient count of items in the room
 	return false;
 }
-bool Room::is_observed_by(const string & actor_id) const { return R::contains(viewing_actor_ids, actor_id); }
+bool Room::is_observed_by(const string & actor_id) const
+{
+	return U::contains(viewing_actor_ids, actor_id);
+}
 bool Room::is_water() const
 {
 	return water;
@@ -150,8 +153,117 @@ bool Room::is_forest() const
 {
 	return this->contains_item(C::TREE_ID);
 }
+bool Room::has_non_mineral_deposit_item() const
+{
+	// for each item in the room
+	for (multimap<string, shared_ptr<Item>>::const_iterator it = contents.cbegin(); it != contents.cend(); ++it)
+	{
+		// if the item is not a mineral deposit
+		if (it->first != C::IRON_DEPOSIT_ID && it->first != C::LIMESTONE_DEPOSIT_ID)
+		{
+			// an item is not a mineral deposit
+			return true;
+		}
+	}
 
-// add and remove items
+	// any item found was a mineral deposit
+	return false;
+}
+bool Room::has_mineral_deposit() const
+{
+	// determine if a room contains an iron or limestone deposit
+	return contents.find(C::IRON_DEPOSIT_ID) != contents.cend() ||
+		contents.find(C::LIMESTONE_DEPOSIT_ID) != contents.cend();
+}
+
+// chests
+void Room::add_chest(const string & set_faction_id)
+{
+	updated = true;
+
+	chest = make_shared<Chest>(set_faction_id);
+}
+bool Room::has_chest() const
+{
+	return chest != nullptr;
+}
+string Room::get_chest_faction_id() const
+{
+	// return the chest's faction, or "" if there is no chest (indicating a validation failure in the calling function)
+	return (has_chest()) ? chest->get_faction_id() : "";
+}
+int Room::chest_health() const
+{
+	// return the chest's health, or 0 if there is no chest (indicating a validation failure in the calling function)
+	return (has_chest()) ? chest->get_health() : 0;
+}
+void Room::add_item_to_chest(const shared_ptr<Item> & item)
+{
+	updated = true;
+
+	chest->add(item);
+}
+string Room::chest_contents(const string & faction_ID) const
+{
+	// if no chest exists in this room
+	if (!has_chest())
+	{
+		return "There is no chest here.";
+	}
+
+	// if the chest was crafted by another faction
+	if (chest->get_faction_id() != faction_ID)
+	{
+		return "This chest has an unfamiliar lock.";
+	}
+
+	// return the contents of the chest
+	return chest->contents();
+
+}
+void Room::damage_chest()
+{
+	updated = true;
+
+	// use equipped weapon and damage tables
+
+
+}
+bool Room::chest_has(const string & item_id) const
+{
+	// if there is no hchest here
+	if (!has_chest())
+	{
+		return false;
+	}
+
+	return chest->has(item_id);
+}
+shared_ptr<Item> Room::remove_from_chest(const string & item_id)
+{
+	updated = true;
+
+	// manifest a stone if a chest does not exist
+	// (this would indicate an validation failure in the calling function)
+	if (!has_chest())
+	{
+		return Craft::make(C::STONE_ID);
+	}
+
+	return chest->take(item_id);
+}
+shared_ptr<Chest> Room::get_chest() const
+{
+	return chest;
+}
+void Room::set_chest(const shared_ptr<Chest> & set_chest)
+{
+	// only used at load time, so the "update" flag will not be set to true
+
+	this->chest = set_chest;
+}
+
+// items
 void Room::add_item(const shared_ptr<Item> item) // pass a copy rather than a reference
 {
 	/* This doesn't stack materials.
@@ -171,12 +283,38 @@ void Room::remove_item(const string & item_id, const int & count)
 
 	updated = true;
 }
+bool Room::damage_item(const string & item_id, const int & amount)
+{
+	// return a boolean indicating if the target item was destroyed
+
+	// if the item will be destroyed
+	if (contents.find(item_id)->second->get_health() - amount <= C::DEFAULT_ITEM_MIN_HEALTH)
+	{
+		// remove the item from the room
+		remove_item(item_id);
+
+		// if the removed item was a tree
+		if (item_id == C::TREE_ID)
+		{
+			// add a log
+			add_item(Craft::make(C::LOG_ID));
+		}
+
+		return true;
+	}
+	else // the item will not be destroyed, just reduce its health
+	{
+		contents.find(item_id)->second->update_health(amount);
+
+		return false;
+	}
+}
 
 // add surfaces and doors
 void Room::add_surface(const string & surface_ID, const string & material_ID)
 {
 	// if the surface ID is valid
-	if (R::contains(C::surface_ids, surface_ID))
+	if (U::contains(C::surface_ids, surface_ID))
 	{
 		// create a new Room_Side and add it to room_sides
 		room_sides.insert(pair<string, Room_Side>(surface_ID, Room_Side(material_ID)));
@@ -188,7 +326,7 @@ void Room::add_surface(const string & surface_ID, const string & material_ID, co
 	// create a surface with a given health (used for loading rooms from disk that may be damaged)
 
 	// if the surface ID is valid
-	if (R::contains(C::surface_ids, surface_ID))
+	if (U::contains(C::surface_ids, surface_ID))
 	{
 		// create a new Room_Side and add it to room_sides
 		room_sides.insert(pair<string, Room_Side>(surface_ID, Room_Side(material_ID)));
@@ -231,7 +369,7 @@ void Room::add_door(const string & directon_ID, const int & health, const string
 string Room::damage_surface(const string & surface_ID, const shared_ptr<Item> & equipped_item)
 {
 	// test if the surface is valid
-	if (!R::contains(C::surface_ids, surface_ID))
+	if (!U::contains(C::surface_ids, surface_ID))
 	{
 		return surface_ID + " is not a valid surface.";
 	}
@@ -320,7 +458,7 @@ string Room::damage_surface(const string & surface_ID, const shared_ptr<Item> & 
 string Room::damage_door(const string & surface_ID, const shared_ptr<Item> & equipped_item)
 {
 	// test if the surface is valid
-	if (!R::contains(C::surface_ids, surface_ID))
+	if (!U::contains(C::surface_ids, surface_ID))
 	{
 		return surface_ID + " is not a valid surface.";
 	}
@@ -401,22 +539,22 @@ string Room::damage_door(const string & surface_ID, const shared_ptr<Item> & equ
 // add and remove actors
 void Room::add_actor(const string & actor_id)
 {
-	if (!R::contains(actor_ids, actor_id)) // if the actor is not already in the list of actors
+	if (!U::contains(actor_ids, actor_id)) // if the actor is not already in the list of actors
 	{
 		actor_ids.push_back(actor_id); // add the actor
 	}
 }
 void Room::remove_actor(const string & actor_id)
 {
-	if (R::contains(actor_ids, actor_id)) // if the character exists here
+	if (U::contains(actor_ids, actor_id)) // if the character exists here
 	{
-		R::erase_element_from_vector(actor_ids, actor_id);
+		U::erase_element_from_vector(actor_ids, actor_id);
 	}
 }
 void Room::add_viewing_actor(const string & actor_id)
 {
 	// if the passed actor_ID is not already able to view the room
-	if (!R::contains(viewing_actor_ids, actor_id))
+	if (!U::contains(viewing_actor_ids, actor_id))
 	{
 		// add the actor ID to viewing_actor_ids
 		viewing_actor_ids.push_back(actor_id);
@@ -427,9 +565,9 @@ void Room::remove_viewing_actor(const string & actor_id)
 	// A room is unloaded when no player can see the room.
 	// To this end, a list of PCs and NPCs who can see this room is maintained.
 
-	if (R::contains(viewing_actor_ids, actor_id)) // if the character can see this room
+	if (U::contains(viewing_actor_ids, actor_id)) // if the character can see this room
 	{
-		R::erase_element_from_vector(viewing_actor_ids, actor_id); // remove the character
+		U::erase_element_from_vector(viewing_actor_ids, actor_id); // remove the character
 	}
 }
 
@@ -503,14 +641,46 @@ string Room::summary(const string & player_ID) const
 	// report on the items in the room
 	if (contents.size() > 0) // if there are items present
 	{
-		summary_stream << "\n\nYou look around and notice ";
-		// for each item
+		// create a map of <item id, item count>
+		map<string, int> stacked_contents;
 		for (multimap<string, shared_ptr<Item>>::const_iterator it = contents.cbegin();
 			it != contents.cend(); ++it)
 		{
-			// append the id (?) of the item
-			summary_stream << it->first << " ";
+			stacked_contents[it->first]++;
 		}
+
+		// save an iterator to the last item
+		const map<string, int>::const_iterator last_item_it = --stacked_contents.cend();
+
+		summary_stream << "\n\nHere there is";
+		// for each item
+		for (map<string, int>::const_iterator item_it = stacked_contents.cbegin();
+			item_it != stacked_contents.cend(); ++item_it)
+		{
+			// if there is more than one instance of the item here
+			if (item_it->second > 1)
+			{
+				// append the item_id followed by the count
+				summary_stream << " " << item_it->first << " (x" << item_it->second << ")";
+			}
+			else
+			{
+				// don't append the count
+				summary_stream << " a(n) " << item_it->first;
+			}
+
+			// conditionally append a comma
+			summary_stream << ((item_it == last_item_it) ? "" : ",");
+		}
+
+		summary_stream << ".";
+	}
+
+	// if the room contains a chest
+	if (has_chest())
+	{
+		// append a sentence to the current paragraph
+		summary_stream << " There is a chest here.";
 	}
 
 	if (actor_ids.size() > 1)

@@ -7,3 +7,6 @@
 *.sdf
 *.suo
 *.tlog
+*.user
+*.exe
+IslandMUD-server/nbproject/private/

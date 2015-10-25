@@ -7,13 +7,31 @@ Jeb 16 2015 */
 
 Recipes Character::recipes;
 
+// Character constructor
+Character::Character(const string & name, const string & set_faction_ID) : name(name)
+{
+	// if the faction is valid
+	if (set_faction_ID == C::PC_FACTION_ID ||
+		set_faction_ID == C::NPC_NEUTRAL_FACTION_ID ||
+		set_faction_ID == C::NPC_HOSTILE_FACTION_ID)
+	{
+		// set the actor's faction
+		this->faction_ID = set_faction_ID;
+	}
+	else // the faction is not valid
+	{
+		// Raise an error in the console
+		cout << "ERROR: attempted to create character with invalid faction: [" << set_faction_ID << "]\n";
+	}
+}
+
 string Character::login(World & world)
 {
 	// create a document to load the player's data
 	xml_document user_data_xml;
 
 	// load the player's data to user_data_xml
-	user_data_xml.load_file((C::user_data_directory + "\\" + this->name + ".xml").c_str());
+	user_data_xml.load_file((C::user_data_directory + "/" + this->name + ".xml").c_str());
 
 
 
@@ -21,19 +39,19 @@ string Character::login(World & world)
 	int loaded_x = -1, loaded_y = -1, loaded_z = -1;
 
 	// load the three values from the node
-	xml_node location_node = user_data_xml.child(C::XML_USER_LOCATION.c_str());
+	const xml_node location_node = user_data_xml.child(C::XML_USER_LOCATION.c_str());
 
 	// extract the attributes as well as the values for the attributes
-	xml_attribute x_attribute = location_node.attribute(string("x").c_str());
-	xml_attribute y_attribute = location_node.attribute(string("y").c_str());
-	xml_attribute z_attribute = location_node.attribute(string("z").c_str());
+	const xml_attribute x_attribute = location_node.attribute(string("x").c_str());
+	const xml_attribute y_attribute = location_node.attribute(string("y").c_str());
+	const xml_attribute z_attribute = location_node.attribute(string("z").c_str());
 	loaded_x = x_attribute.as_int();
 	loaded_y = y_attribute.as_int();
 	loaded_z = z_attribute.as_int();
 
 	// if any of the attributes are empty or the extracted values fail bounds-checking
 	if (x_attribute.empty() || y_attribute.empty() || z_attribute.empty() ||
-		!R::bounds_check(loaded_x, loaded_y, loaded_z))
+		!U::bounds_check(loaded_x, loaded_y, loaded_z))
 	{
 		// set the player to the default spawn
 		this->x = C::DEFAULT_SPAWN_X;
@@ -54,16 +72,14 @@ string Character::login(World & world)
 	// spawn in the player
 	world.room_at(x, y, z)->add_actor(this->name);
 
-
-
 	// select the level node
-	xml_node level_node = user_data_xml.child(C::XML_USER_LEVELS.c_str());
+	const xml_node level_node = user_data_xml.child(C::XML_USER_LEVELS.c_str());
 
 	// select each level attribute
-	xml_attribute swordsmanship_level_attribute = level_node.attribute(C::XML_LEVEL_SWORDSMANSHIP.c_str());
-	xml_attribute archery_level_attribute = level_node.attribute(C::XML_LEVEL_ARCHERY.c_str());
-	xml_attribute forest_visibility_level_attribute = level_node.attribute(C::XML_LEVEL_FOREST_VISIBILITY.c_str());
-	xml_attribute full_health_level_attribute = level_node.attribute(C::XML_LEVEL_HEALTH_MAX.c_str());
+	const xml_attribute swordsmanship_level_attribute = level_node.attribute(C::XML_LEVEL_SWORDSMANSHIP.c_str());
+	const xml_attribute archery_level_attribute = level_node.attribute(C::XML_LEVEL_ARCHERY.c_str());
+	const xml_attribute forest_visibility_level_attribute = level_node.attribute(C::XML_LEVEL_FOREST_VISIBILITY.c_str());
+	const xml_attribute full_health_level_attribute = level_node.attribute(C::XML_LEVEL_HEALTH_MAX.c_str());
 
 	// if an attribute is non-empty, load its level value
 	if (!swordsmanship_level_attribute.empty())
@@ -84,10 +100,10 @@ string Character::login(World & world)
 	}
 
 	// select status node (just holds current_health at this time)
-	xml_node status_node = user_data_xml.child(C::XML_USER_STATUS.c_str());
+	const xml_node status_node = user_data_xml.child(C::XML_USER_STATUS.c_str());
 
 	// if current_health is non-empty, set current health
-	xml_attribute current_health_attribute = status_node.attribute(C::XML_USER_STATUS_CURRENT_HEALTH.c_str());
+	const xml_attribute current_health_attribute = status_node.attribute(C::XML_USER_STATUS_CURRENT_HEALTH.c_str());
 	if (!current_health_attribute.empty())
 	{
 		this->set_current_health(current_health_attribute.as_int());
@@ -99,22 +115,23 @@ string Character::login(World & world)
 
 
 	// for each item node of the equipment node
-	for (const xml_node & equipment : user_data_xml.child(C::XML_USER_EQUIPMENT.c_str()).children())
+	for (const xml_node & equipment_node : user_data_xml.child(C::XML_USER_EQUIPMENT.c_str()).children())
 	{
-		// use the name of the node to create an equipment object and add it to the player's equipment inventory
-		equipment_inventory.insert(pair<string, shared_ptr<Equipment>>(
-			equipment.name(),
-			R::convert_to<Equipment>(Craft::make(equipment.name()))
-			));
+		// create the item
+		shared_ptr<Equipment> equipment = U::convert_to<Equipment>(Craft::make(equipment_node.name()));
+
+		// extract the value of the health attribute and use it to set the item's health
+		equipment->set_health(equipment_node.attribute(C::XML_ITEM_HEALTH.c_str()).as_int());
+
+		// add the item to the player's inventory
+		equipment_inventory.insert(pair<string, shared_ptr<Equipment>>(equipment->name, equipment));
 	}
-
-
 
 	// for each item in the material node
 	for (const xml_node & material : user_data_xml.child(C::XML_USER_MATERIALS.c_str()).children())
 	{
 		// use the name of the material node to create a new materail object
-		shared_ptr<Material> item = R::convert_to<Material>(Craft::make(material.name()));
+		shared_ptr<Material> item = U::convert_to<Material>(Craft::make(material.name()));
 
 		// extract the amount from the item's attribute
 		item->amount = material.attribute(C::XML_USER_MATERIAL_COUNT.c_str()).as_uint();
@@ -130,6 +147,9 @@ string Character::login(World & world)
 }
 string Character::logout()
 {
+	// if an item is equipped, move it back to the player's inventory
+	this->unequip();
+
 	// create a document to save the user's info
 	xml_document user_data_xml;
 
@@ -160,6 +180,9 @@ string Character::logout()
 	{
 		// save the equipment to a new node under the equipment node
 		xml_node equipment = equipment_node.append_child(it->first.c_str());
+
+		// append a health attribute to the equipment node and set its value to the health of the equipment
+		equipment.append_attribute(C::XML_ITEM_HEALTH.c_str()).set_value(it->second->get_health());
 	}
 
 	// for each material in the user's inventory
@@ -175,7 +198,7 @@ string Character::logout()
 	}
 
 	// save the user_data to disk
-	user_data_xml.save_file((C::user_data_directory + "\\" + this->name + ".xml").c_str()); // returns an unused boolean
+	user_data_xml.save_file((C::user_data_directory + "/" + this->name + ".xml").c_str()); // returns an unused boolean
 
 	return "You have logged out.";
 }
@@ -268,6 +291,7 @@ bool Character::has(const string & item_name, const unsigned & item_count) const
 	if (item_count == 1) // only one instance is required
 	{
 		return
+			((equipped_item != nullptr) ? equipped_item->name : "") == item_name ||
 			equipment_inventory.find(item_name) != equipment_inventory.cend() ||
 			material_inventory.find(item_name) != material_inventory.cend();
 	}
@@ -303,7 +327,7 @@ string Character::get_inventory() const // debugging
 void Character::add(const shared_ptr<Item> & item)
 {
 	// if the item is a material and is therefore stackable
-	if (R::is<Material>(item))
+	if (U::is<Material>(item))
 	{
 		// check if the player already has an instance of the item
 		if (this->has(item->name))
@@ -314,27 +338,29 @@ void Character::add(const shared_ptr<Item> & item)
 		else
 		{
 			// if not, give the player a new instance of the item
-			this->material_inventory.insert(pair<string, shared_ptr<Material>>(item->name, R::convert_to<Material>(Craft::make(item->name))));
+			this->material_inventory.insert(pair<string, shared_ptr<Material>>(item->name, U::convert_to<Material>(Craft::make(item->name))));
 		}
 	}
 	else // the item is not a material and is therefore an Equipment type
 	{
 		// insert the new item
-		this->equipment_inventory.insert(pair<string, shared_ptr<Equipment>>(item->name, R::convert_to<Equipment>(item)));
+		this->equipment_inventory.insert(pair<string, shared_ptr<Equipment>>(item->name, U::convert_to<Equipment>(item)));
 	}
 }
 void Character::remove(const string & item_id, const unsigned & count)
 {
 	// WARNING - for materials this assumes the player has [count] instances
 
+	// if the player is holding the item
+	if (this->equipped_item != nullptr && this->equipped_item->name == item_id)
+	{
+		this->equipped_item = nullptr; // erase the item
+	}
 	// remove or reduce the item in the player's inventory
-	if (equipment_inventory.find(item_id) != equipment_inventory.cend())
+	else if (equipment_inventory.find(item_id) != equipment_inventory.cend())
 	{
 		for (unsigned i = 0; i < count; ++i)
 		{
-			// this deals with erase([key]) erroneously removing all instances of the item
-			// multimap<string, shared_ptr<Equipment>>::iterator equipment_it = equipment_inventory.find(item_id);
-
 			equipment_inventory.erase(equipment_inventory.find(item_id));
 		}
 	}
@@ -348,7 +374,7 @@ void Character::remove(const string & item_id, const unsigned & count)
 	}
 	else
 	{
-		// The player does not have the item
+		// the player does not have the item
 	}
 }
 string Character::equip(const string & item_ID)
@@ -362,6 +388,12 @@ string Character::equip(const string & item_ID)
 	if (!this->has(item_ID))
 	{
 		return string("You do not have a(n) ") + item_ID + " to equip.";
+	}
+
+	if (equipment_inventory.find(item_ID) == equipment_inventory.cend() &&
+		material_inventory.find(item_ID) == material_inventory.cend())
+	{
+		return string("You are holding a(n) ") + item_ID + " and don't have another one to equip.";
 	}
 
 	// create a stringstream to accumulate feedback
@@ -389,7 +421,18 @@ string Character::equip(const string & item_ID)
 	}
 
 	// remove or reduce the item in the player's inventory
-	this->remove(item_ID);
+	if (equipment_inventory.find(item_ID) != equipment_inventory.cend())
+	{
+		equipment_inventory.erase(equipment_inventory.find(item_ID));
+	}
+	else if (material_inventory.find(item_ID) != material_inventory.cend()) // the item is present in the material inventory
+	{
+		material_inventory.find(item_ID)->second->amount--; // decrement the material count in the player's inventory
+		if (material_inventory.find(item_ID)->second->amount < 1)
+		{
+			material_inventory.erase(material_inventory.find(item_ID));
+		}
+	}
 
 	// if the stringstream is empty (no item was previously equipped)
 	if (output.str().length() == 0)
@@ -404,13 +447,16 @@ string Character::equip(const string & item_ID)
 	}
 
 }
-string Character::unequip(const string & item_ID)
+string Character::unequip()
 {
 	// test if no item is equipped
 	if (this->equipped_item == nullptr)
 	{
 		return "You aren't holding anything.";
 	}
+
+	// save the ID of the currently equipped item
+	const string item_ID = equipped_item->name;
 
 	// save the existing the item to the player's inventory
 	this->add(equipped_item);
@@ -427,10 +473,10 @@ string Character::move(const string & direction_ID, World & world)
 	// movement deltas
 	int dx = 0, dy = 0, dz = 0;
 
-	R::assign_movement_deltas(direction_ID, dx, dy, dz);
+	U::assign_movement_deltas(direction_ID, dx, dy, dz);
 
 	// validate movement deltas
-	if (!R::bounds_check(x + dx, y + dy, z + dz))
+	if (!U::bounds_check(x + dx, y + dy, z + dz))
 	{
 		return "You can't go there.";
 	}
@@ -439,7 +485,7 @@ string Character::move(const string & direction_ID, World & world)
 	// world.load_room_to_world(x + dx, y + dy, z + dz);
 
 	// test if the environment (structures) allow the player to move in a given direction
-	string validate_movement = this->validate_movement(x, y, z, direction_ID, dx, dy, dz, world);
+	const string validate_movement = this->validate_movement(x, y, z, direction_ID, dx, dy, dz, world);
 
 	// if the validation failed for any reason
 	if (validate_movement != C::GOOD_SIGNAL)
@@ -467,7 +513,7 @@ string Character::move(const string & direction_ID, World & world)
 	else if (direction_ID == C::WEST || direction_ID == C::EAST)
 	{
 		// logic is the same as above, but in rotated axes (axes is plural of axis)
-		int ry = (direction_ID == C::WEST) ? y + C::VIEW_DISTANCE : y - C::VIEW_DISTANCE;
+		const int ry = (direction_ID == C::WEST) ? y + C::VIEW_DISTANCE : y - C::VIEW_DISTANCE;
 		for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 		{
 			world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
@@ -483,7 +529,7 @@ string Character::move(const string & direction_ID, World & world)
 
 		if (direction_ID == C::NORTH_WEST || direction_ID == C::NORTH_EAST) // moving north, parse south row
 		{
-			int rx = x + C::VIEW_DISTANCE;
+			const int rx = x + C::VIEW_DISTANCE;
 			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
 			{
 				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
@@ -492,7 +538,7 @@ string Character::move(const string & direction_ID, World & world)
 
 		if (direction_ID == C::NORTH_EAST || direction_ID == C::SOUTH_EAST) // moving east, parse west row
 		{
-			int ry = y - C::VIEW_DISTANCE;
+			const int ry = y - C::VIEW_DISTANCE;
 			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 			{
 				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
@@ -501,7 +547,7 @@ string Character::move(const string & direction_ID, World & world)
 
 		if (direction_ID == C::SOUTH_EAST || direction_ID == C::SOUTH_WEST) // moving south, parse north row
 		{
-			int rx = x - C::VIEW_DISTANCE;
+			const int rx = x - C::VIEW_DISTANCE;
 			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
 			{
 				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
@@ -510,7 +556,7 @@ string Character::move(const string & direction_ID, World & world)
 
 		if (direction_ID == C::SOUTH_WEST || direction_ID == C::NORTH_WEST) // moving west, parse east row
 		{
-			int ry = y + C::VIEW_DISTANCE;
+			const int ry = y + C::VIEW_DISTANCE;
 			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 			{
 				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
@@ -542,8 +588,17 @@ string Character::move(const string & direction_ID, World & world)
 }
 string Character::craft(const string & craft_item_id, World & world)
 {
-	// finish crafting if the recipe does not exist
-	if (!Character::recipes.has_recipe_for(craft_item_id)) { return "Can't craft " + craft_item_id; }
+	// check for special case
+	if (craft_item_id == C::CHEST_ID)
+	{
+		if (world.room_at(x, y, z)->has_chest())
+		{
+			return "There is already a chest here.";
+		}
+	}
+
+	// return if the recipe does not exist
+	if (!Character::recipes.has_recipe_for(craft_item_id)) { return "There is no way to craft a(n) " + craft_item_id + "."; }
 
 	// get the recipe
 	const Recipe recipe = Character::recipes.get_recipe(craft_item_id);
@@ -551,19 +606,19 @@ string Character::craft(const string & craft_item_id, World & world)
 	// verify the conditions for the recipe are present
 	for (map<string, int>::const_iterator it = recipe.inventory_need.cbegin(); it != recipe.inventory_need.cend(); ++it)
 	{
-		if (it->first != "" && this->does_not_have(it->first)) { return craft_item_id + " requires " + ((it->second > 0) ? "a(n)" : R::to_string(it->second)) + " " + it->first; }
+		if (it->first != "" && !this->has(it->first, it->second)) { return craft_item_id + " requires " + ((it->second == 1) ? "a(n)" : U::to_string(it->second)) + " " + it->first; }
 	}
 	for (map<string, int>::const_iterator it = recipe.inventory_remove.cbegin(); it != recipe.inventory_remove.cend(); ++it)
 	{
-		if (it->first != "" && this->does_not_have(it->first)) { return craft_item_id + " uses " + ((it->second > 0) ? "a(n)" : R::to_string(it->second)) + " " + it->first; }
+		if (it->first != "" && !this->has(it->first, it->second)) { return craft_item_id + " uses " + ((it->second == 1) ? "a(n)" : U::to_string(it->second)) + " " + it->first; }
 	}
 	for (map<string, int>::const_iterator it = recipe.local_need.cbegin(); it != recipe.local_need.cend(); ++it)
 	{
-		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return craft_item_id + " requires " + ((it->second > 0) ? "a" : R::to_string(it->second)) + " nearby " + it->first; }
+		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return craft_item_id + " requires " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first; }
 	}
 	for (map<string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
 	{
-		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return craft_item_id + " uses " + ((it->second > 0) ? "a" : R::to_string(it->second)) + " nearby " + it->first; }
+		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return craft_item_id + " uses " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first; }
 	}
 
 	// remove ingredients from inventory
@@ -576,6 +631,14 @@ string Character::craft(const string & craft_item_id, World & world)
 	for (map<string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
 	{
 		this->remove(it->first, it->second); // ID, count
+	}
+
+	// special test cast for chests
+	if (craft_item_id == C::CHEST_ID)
+	{
+		// add a chest to the room
+		world.room_at(x, y, z)->add_chest(this->faction_ID);
+		return "You craft a chest.";
 	}
 
 	// for each item to be given to the player
@@ -604,7 +667,7 @@ string Character::craft(const string & craft_item_id, World & world)
 		// "You now have a(n) sword. " OR "You now have a(n) sword (x5). "
 		response += "You now have a(n) " + it->first
 			+ string((it->second > 1)
-			? (" (x" + R::to_string(it->second) + ")") : "")
+			? (" (x" + U::to_string(it->second) + ")") : "")
 			+ ". ";
 	}
 
@@ -633,24 +696,106 @@ string Character::take(const string & take_item_id, World & world)
 }
 string Character::drop(const string & drop_item_id, World & world)
 {
-	if (!this->has(drop_item_id)) // if the player does not have the item specified
+	// if the player is holding the item specified
+	if (this->equipped_item != nullptr && this->equipped_item->name == drop_item_id)
 	{
-		// the item does not exist in the player's inventory
-		return "You don't have a(n) " + drop_item_id + " to drop.";
+		// add the item to the world
+		world.room_at(x, y, z)->add_item(this->equipped_item);
 	}
+	else
+	{
+		if (!this->has(drop_item_id)) // if the player does not have the item specified
+		{
+			// the item does not exist in the player's inventory
+			return "You don't have a(n) " + drop_item_id + " to drop.";
+		}
 
-	// add the item to the world
-	world.room_at(x, y, z)->add_item(
-		(equipment_inventory.find(drop_item_id) != equipment_inventory.end()) ? R::convert_to<Item>( // determine where to get the item from
-		equipment_inventory.find(drop_item_id)->second) : // upcast one of the items to an <Item> type
-		material_inventory.find(drop_item_id)->second
-		);
+		// add the item to the world
+		world.room_at(x, y, z)->add_item(
+			(equipment_inventory.find(drop_item_id) != equipment_inventory.end()) ? U::convert_to<Item>( // determine where to get the item from
+			equipment_inventory.find(drop_item_id)->second) : // upcast one of the items to an <Item> type
+			material_inventory.find(drop_item_id)->second
+			);
+	}
 
 	/// remove item
 	this->remove(drop_item_id);
 
 	// success reply
 	return "You drop a(n) " + drop_item_id + ".";
+}
+string Character::add_to_chest(const string & insert_item_id, World & world)
+{
+	// if this room does not have a chest
+	if (!world.room_at(x, y, z)->has_chest())
+	{
+		return "There is no chest here.";
+	}
+
+	// if the chest was crafted by another faction
+	if (world.room_at(x, y, z)->get_chest_faction_id() != this->faction_ID)
+	{
+		return "This chest has an unfamiliar lock.";
+	}
+
+	// if the player doesn't have the item
+	if (!this->has(insert_item_id))
+	{
+		return "You don't have a(n) " + insert_item_id + ".";
+	}
+
+	// if the item is equipped
+	if (equipped_item != nullptr && equipped_item->name == insert_item_id)
+	{
+		world.room_at(x, y, z)->add_item_to_chest(equipped_item);
+	}
+	// if the item is a piece of equipment
+	else if (equipment_inventory.find(insert_item_id) != equipment_inventory.cend())
+	{
+		// add the item
+		world.room_at(x, y, z)->add_item_to_chest(equipment_inventory.find(insert_item_id)->second);
+	}
+	else // the item is a material that the user may have 1 or more
+	{
+		// create a new instance to add the the chest
+		world.room_at(x, y, z)->add_item_to_chest(Craft::make(insert_item_id));
+	}
+
+	// remove it from the player's inventory (this works for materials too)
+	this->remove(insert_item_id);
+
+	// You place the sword into the chest.
+	return "You place the " + insert_item_id + " into the chest.";
+}
+string Character::take_from_chest(const string & take_item_id, World & world)
+{
+	// if this room does not have a chest
+	if (!world.room_at(x, y, z)->has_chest())
+	{
+		return "There is no chest here.";
+	}
+
+	// if the chest was crafted by another faction
+	if (world.room_at(x, y, z)->get_chest_faction_id() != this->faction_ID)
+	{
+		return "This chest has an unfamiliar lock.";
+	}
+
+	// if the player doesn't have the item
+	if (!world.room_at(x, y, z)->chest_has(take_item_id))
+	{
+		return "The chest does not contain a(n) " + take_item_id + ".";
+	}
+
+	this->add(world.room_at(x, y, z)->remove_from_chest(take_item_id));
+
+	// You place the sword into the chest.
+	return "You take the " + take_item_id + " from the chest.";
+}
+string Character::look_inside_chest(const World & world) const
+{
+	// validation within
+	return world.room_at(x, y, z)->chest_contents(faction_ID);
 }
 string Character::construct_surface(const string & material_id, const string & surface_id, World & world)
 {
@@ -682,13 +827,13 @@ string Character::construct_surface(const string & material_id, const string & s
 	}
 
 	// check that the surface to construct is a wall, ceiling, or floor
-	if (!R::contains(C::surface_ids, surface_id))
+	if (!U::contains(C::surface_ids, surface_id))
 	{
 		return "Construct a wall, ceiling or floor.";
 	}
 
 	// if the surface is a ceiling, check that any intact wall exists
-	if (surface_id == C::CEILING && // the user is construction a ceiling
+	if (surface_id == C::CEILING && // the user is constructing a ceiling
 		!world.room_at(x, y, z)->has_standing_wall()) // the room does not have a wall
 	{
 		return "You need at least one standing wall to support a ceiling.";
@@ -704,18 +849,11 @@ string Character::construct_surface(const string & material_id, const string & s
 	if (this->material_inventory.find(material_id)->second->amount < C::SURFACE_REQUIREMENTS.find(material_id)->second)
 	{
 		// "You need 5 wood to continue construction."
-		return "You need " + R::to_string(C::SURFACE_REQUIREMENTS.find(material_id)->second) + " " + material_id + " to continue construction.";
+		return "You need " + U::to_string(C::SURFACE_REQUIREMENTS.find(material_id)->second) + " " + material_id + " to continue construction.";
 	}
 
-	// decrement the required supplies from the player's inventory
-	this->material_inventory.find(material_id)->second->amount -= C::SURFACE_REQUIREMENTS.find(material_id)->second;
-
-	// if the player has less that one of the material remaining
-	if (this->material_inventory.find(material_id)->second->amount < 1)
-	{
-		// remove the object from the player's inventory
-		this->material_inventory.erase(material_id);
-	}
+	// remove the number of materials from the player's inventory
+	this->remove(material_id, C::SURFACE_REQUIREMENTS.find(material_id)->second);
 
 	// create a Room_Side and add it to Room::room_side using the surface ID
 	world.room_at(x, y, z)->add_surface(surface_id, material_id);
@@ -726,66 +864,121 @@ string Character::construct_surface(const string & material_id, const string & s
 		" wall to your " + surface_id : // wall to your [direction]
 		" " + surface_id); // ceiling/floor
 }
-string Character::construct_door(const string & material_ID, const string & surface_ID, World & world)
+string Character::construct_surface_with_door(const string & surface_material_id, const string & surface_id, const string & door_material_id, World & world)
 {
-	// check that the surface is valid
-	if (!R::contains(C::surface_ids, surface_ID))
+	// Part 1: validate that a surface can be constructed
+
+
+
+	if (world.room_at(x, y, z)->is_forest())
 	{
-		return surface_ID + " is not a surface.";
+		return "You are in a forest and cannot build a structure here.";
 	}
 
-	// check that this room has the surface specified
-	if (!world.room_at(x, y, z)->has_surface(surface_ID))
+	// make sure the material can be used to construct a surface
+	if (C::SURFACE_REQUIREMENTS.find(surface_material_id) == C::SURFACE_REQUIREMENTS.end())
 	{
-		//  no ceiling here / no west wall here
-		return "There is no " + surface_ID + ((surface_ID == C::CEILING || surface_ID == C::FLOOR) ? "" : " wall") + " here to have a door.";
+		return "You can't build a structure's surface out of " + surface_material_id + ".";
 	}
 
-	// check if the wall is standing
-	if (!world.room_at(x, y, z)->is_standing_wall(surface_ID))
+	// check if the surface already exists
+	if (world.room_at(x, y, z)->has_surface(surface_id)) // bounds checking not necissary because the player is standing here
 	{
-		return "A pile of rubble prevents construction.";
-	}
-
-	// check if a door already exists
-	if (world.room_at(x, y, z)->get_room_sides().find(surface_ID)->second.has_door())
-	{
-		// test if the door is rubble or intact
-		if (world.room_at(x, y, z)->get_room_sides().find(surface_ID)->second.get_door()->is_rubble())
+		// test if construction is prevented by an intact wall or a pile of rubble
+		if (world.room_at(x, y, z)->get_room_sides().find(surface_id)->second.is_rubble())
 		{
-			return "A pile of rubble in the doorway prevents construction.";
+			return "A pile of rubble prevents construction.";
 		}
-		else // the door is intact
+		else // the surface is intact
 		{
-			// ...in the ceiling / ...in the east wall
-			return "There is already a door in the " + surface_ID + ((surface_ID == C::CEILING || surface_ID == C::FLOOR) ? "." : " wall.");
+			return ((surface_id == C::CEILING || surface_id == C::FLOOR) ?
+				"A " + surface_id + " already exists here." : // ceiling or floor
+				"A(n) " + surface_id + " wall already exists here."); // any wall
 		}
 	}
+
+	// check that the surface to construct is a wall, ceiling, or floor
+	if (!U::contains(C::surface_ids, surface_id))
+	{
+		return "Construct a wall, ceiling or floor.";
+	}
+
+	// if the surface is a ceiling, check that any intact wall exists
+	if (surface_id == C::CEILING && // the user is construction a ceiling
+		!world.room_at(x, y, z)->has_standing_wall()) // the room does not have a wall
+	{
+		return "You need at least one standing wall to support a ceiling.";
+	}
+
+	// check that the player has the item
+	if (this->material_inventory.find(surface_material_id) == material_inventory.end())
+	{
+		return "You don't have " + surface_material_id + ".";
+	}
+
+	// check that the player has enough of the item to construct
+	if (this->material_inventory.find(surface_material_id)->second->amount < C::SURFACE_REQUIREMENTS.find(surface_material_id)->second)
+	{
+		// "You need 5 wood to continue construction of the wall."
+		return "You need " + U::to_string(C::SURFACE_REQUIREMENTS.find(surface_material_id)->second) + " " + surface_material_id + " to continue construction of the wall.";
+	}
+
+
+
+	// Part 2: Validate that a door can be constructed
+
+
 
 	// check that there exist requirements for making a door of the specified type
-	if (C::DOOR_REQUIREMENTS.find(material_ID) == C::DOOR_REQUIREMENTS.cend())
+	if (C::DOOR_REQUIREMENTS.find(door_material_id) == C::DOOR_REQUIREMENTS.cend())
 	{
-		return "ERROR: No material requirements available to construct door using " + material_ID;
+		return "You cannot construct a door using " + door_material_id + ".";
 	}
 
 	// extract the amount of materials required to make a door of the specified type
-	const unsigned MATERIAL_COUNT_REQUIRED = C::DOOR_REQUIREMENTS.find(material_ID)->second;
+	const unsigned DOOR_MATERIAL_COUNT_REQUIRED = C::DOOR_REQUIREMENTS.find(door_material_id)->second;
 
 	// check that the player has the required materials
-	if (!this->has(material_ID, MATERIAL_COUNT_REQUIRED))
+	if (!this->has(door_material_id, DOOR_MATERIAL_COUNT_REQUIRED))
 	{
 		// "A stone door requires 5 stone."
-		return "A " + material_ID + " door requires " + R::to_string(MATERIAL_COUNT_REQUIRED) + " " + material_ID + ".";
+		return "A " + door_material_id + " door requires " + U::to_string(DOOR_MATERIAL_COUNT_REQUIRED) + " " + door_material_id + ".";
 	}
 
+
+	// Part 3: Build the surface
+
+
+
+	// remove the materials to construct the surface
+	this->remove(surface_material_id, C::SURFACE_REQUIREMENTS.find(surface_material_id)->second);
+
+	// add the surface to the room
+	world.room_at(x, y, z)->add_surface(surface_id, surface_material_id);
+
+
+
+	// Part 4: Add the door to the surface
+
+
+
+	// remove the materials to construct the door
+	this->remove(door_material_id, C::DOOR_REQUIREMENTS.find(door_material_id)->second);
+
 	// add a door to the surface in the room
-	world.room_at(x, y, z)->add_door(surface_ID, C::MAX_SURFACE_HEALTH, material_ID, this->faction_ID);
+	world.room_at(x, y, z)->add_door(surface_id, C::MAX_SURFACE_HEALTH, door_material_id, this->faction_ID);
 
-	// remove the consumed materials from the actor's inventory
-	this->remove(material_ID, MATERIAL_COUNT_REQUIRED);
 
-	// "...door in the ceiling." or "...door in the west wall."
-	return "You construct a " + material_ID + " door in the " + surface_ID + ((surface_ID == C::CEILING || surface_ID == C::FLOOR) ? "." : " wall.");
+
+	// Part 5: the response
+
+
+
+	// "You construct a stone floor with a stone hatch." OR "You construct a stone wall to your north with a branch door."
+	return "You construct a " + surface_material_id + // you construct a [material]
+		((surface_id != C::CEILING && surface_id != C::FLOOR) ?
+		" wall to your " + surface_id + " with a " + door_material_id + " door." : // wall to your [direction]
+		" " + surface_id + " with a " + door_material_id + " hatch."); // ceiling/floor
 }
 string Character::attack_surface(const string & surface_ID, World & world)
 {
@@ -815,7 +1008,7 @@ string Character::attack_surface(const string & surface_ID, World & world)
 	int new_x = x, new_y = y;
 	{
 		int new_z = 0;
-		R::assign_movement_deltas(surface_ID, new_x, new_y, new_z);
+		U::assign_movement_deltas(surface_ID, new_x, new_y, new_z);
 	} // dz falls out of scope to prevent accidental use - we're only working in two dimensions right now
 
 	// if the neighboring room has the opposite surface intact (our west wall borders next room's east wall)
@@ -868,7 +1061,7 @@ string Character::attack_door(const string & surface_ID, World & world)
 	int new_x = x, new_y = y;
 	{
 		int new_z = 0;
-		R::assign_movement_deltas(surface_ID, new_x, new_y, new_z);
+		U::assign_movement_deltas(surface_ID, new_x, new_y, new_z);
 	} // new_z falls out of scope to prevent accidental use - we're only working in two dimensions right now
 
 	// if the neighboring room has the opposite surface intact
@@ -881,6 +1074,65 @@ string Character::attack_door(const string & surface_ID, World & world)
 	// this feedback might not be correct for all cases
 	return "There is no door to your " + surface_ID;
 }
+string Character::attack_item(const string & target_ID, World & world)
+{
+	// if the target isn't here
+	if (!world.room_at(x, y, z)->contains_item(target_ID))
+	{
+		return "There is no " + target_ID + " here.";
+	}
+
+	// if the user has an item equipped
+	if (equipped_item != nullptr)
+	{
+		// if the attacking implement is not in the damage tables
+		if (C::damage_tables.find(equipped_item->name) == C::damage_tables.cend())
+		{
+			return "You can't do that with a(n) " + equipped_item->name + ".";
+		}
+
+		// extract the damage table for the attacking implement
+		const map<string, int> damage_table = C::damage_tables.find(equipped_item->name)->second;
+
+		// if the damage table does not have an entry for the target item ID
+		if (damage_table.find(target_ID) == damage_table.cend())
+		{
+			return "You can't do that to a " + target_ID + ".";
+		}
+
+		// damage the item, return a different message depending of if the item was destroyed or damaged
+		if (world.room_at(x, y, z)->damage_item(target_ID, damage_table.find(target_ID)->second))
+		{
+			return "You destroy the " + target_ID + " using your " + equipped_item->name + ".";
+		}
+		else
+		{
+			return "You damage the " + target_ID + " using your " + equipped_item->name + ".";
+		}
+	}
+	else // the user does not have an item equipped, do a barehanded attack
+	{
+		// extract the damage table for a bare-handed attack
+		const map<string, int> damage_table = C::damage_tables.find(C::ATTACK_COMMAND)->second;
+
+		// if the damage table does not contain an entry for the target
+		if (damage_table.find(target_ID) == damage_table.cend())
+		{
+			return "You can't do that to a " + target_ID + ".";
+		}
+
+		// the damage table does contain an entry for the target
+		if (world.room_at(x, y, z)->damage_item(target_ID, damage_table.find(target_ID)->second))
+		{
+			return "You destroy the " + target_ID + " using your bare hands.";
+		}
+		else
+		{
+			return "You damage the " + target_ID + " using your bare hands.";
+		}
+	}
+
+}
 
 // movement info
 string Character::validate_movement(const int & cx, const int & cy, const int & cz, const string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const
@@ -888,7 +1140,7 @@ string Character::validate_movement(const int & cx, const int & cy, const int & 
 	// determine if a character can move in a given direction (8 compass points, up, or down)
 
 	// validate direction
-	if (!R::contains(C::direction_ids, direction_ID)) { return direction_ID + " is not a direction."; }
+	if (!U::contains(C::direction_ids, direction_ID)) { return direction_ID + " is not a direction."; }
 
 	// if the player wants to move in a primary direction (n/e/s/w)
 	if (direction_ID == C::NORTH || direction_ID == C::EAST ||
@@ -918,8 +1170,8 @@ string Character::validate_movement(const int & cx, const int & cy, const int & 
 		direction_ID == C::NORTH_WEST || direction_ID == C::NORTH_EAST ||
 		direction_ID == C::SOUTH_EAST || direction_ID == C::SOUTH_WEST)
 	{
-		const shared_ptr<Room> current_room = world.room_at(cx, cy, cz);
-		const shared_ptr<Room> destination_room = world.room_at(cx + dx, cy + dy, cz);
+		const unique_ptr<Room>::pointer current_room = world.room_at(cx, cy, cz);
+		const unique_ptr<Room>::pointer destination_room = world.room_at(cx + dx, cy + dy, cz);
 
 		if (direction_ID == C::NORTH_WEST)
 		{

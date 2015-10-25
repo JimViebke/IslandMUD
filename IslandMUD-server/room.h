@@ -7,7 +7,7 @@ Feb 14, 2015 */
 #include <map> // for room contents multimap
 #include <set> // playerlist
 
-#include "resources.h"
+#include "utilities.h"
 #include "constants.h"
 #include "item.h"
 #include "room_side.h" // walls, floor, or ceiling
@@ -16,8 +16,9 @@ class Room
 {
 private:
 	bool updated = false; // has the room been updated since it was loaded?
-	bool water = false; // is this dry land or water
-	map<string, Room_Side> room_sides = {}; // the floor, walls, and ceiling in the room (no key for absent surfaces)
+	bool water = false; // is the room dry land or water?
+	shared_ptr<Chest> chest; // nullptr if the room does not have a chest
+	map<string, Room_Side> room_sides = {}; // the floor, walls, and ceiling in the room (present surfaces only)
 	multimap<string, shared_ptr<Item>> contents = {}; // the items in a room
 	vector<string> viewing_actor_ids = {}; // the PCs and NPCs who can see this room
 	vector<string> actor_ids = {}; // the PCs and NPCs in a room
@@ -47,10 +48,26 @@ public:
 	bool is_observed_by(const string & actor_id) const;
 	bool is_water() const;
 	bool is_forest() const;
+	bool has_non_mineral_deposit_item() const;
+	bool has_mineral_deposit() const;
 
-	// add and remove items
+	// chests
+	void add_chest(const string & set_faction_id);
+	bool has_chest() const;
+	string get_chest_faction_id() const;
+	int chest_health() const;
+	void add_item_to_chest(const shared_ptr<Item> & item);
+	string chest_contents(const string & faction_ID) const;
+	void damage_chest();
+	bool chest_has(const string & item_id) const;
+	shared_ptr<Item> remove_from_chest(const string & item_id);
+	shared_ptr<Chest> get_chest() const;
+	void set_chest(const shared_ptr<Chest> & set_chest);
+
+	// items
 	void add_item(const shared_ptr<Item> item);
 	void remove_item(const string & item_id, const int & count = 1);
+	bool damage_item(const string & item_id, const int & amount);
 
 	// add surfaces and doors
 	void add_surface(const string & surface_ID, const string & material_ID);

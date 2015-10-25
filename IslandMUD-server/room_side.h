@@ -1,7 +1,7 @@
 /* Jim Viebke
 Mar 19 2015
 
-Floors, walls, and ceilings. No doors yet. */
+Floors, walls, and ceilings. */
 
 #ifndef ROOM_SIDE_H
 #define ROOM_SIDE_H

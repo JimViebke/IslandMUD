@@ -8,14 +8,16 @@ Feb 14, 2015 */
 
 class Player_Character;
 
-typedef Player_Character PC;
+using PC = Player_Character;
 
 class Player_Character : public Character
 {
 public:
-	Player_Character(const string & name, const string & faction_ID) : Character(name, faction_ID) {}
+	Player_Character(const string & name) : Character(name, C::PC_FACTION_ID) {}
 
 	string print() const;
+
+	string get_equipped_item_id() const;
 
 	string generate_area_map(const World & world, const map<string, shared_ptr<Character>> & actors) const;
 };

@@ -13,11 +13,18 @@ shared_ptr<Item> Craft::make(const string & item_ID)
 	else if (item_ID == C::ARROW_ID) { return make_shared<Arrow>(); }
 	else if (item_ID == C::ARROWHEAD_ID) { return make_shared<Arrowhead>(); }
 	else if (item_ID == C::AXE_ID) { return make_shared<Axe>(); }
+	else if (item_ID == C::BOARD_ID) { return make_shared<Board>(); }
 	else if (item_ID == C::BOW_ID) { return make_shared<Bow>(); }
 	else if (item_ID == C::BRANCH_ID) { return make_shared<Branch>(); }
 	else if (item_ID == C::DEBRIS_ID) { return make_shared<Debris>(); }
 	else if (item_ID == C::FORGE_ID) { return make_shared<Forge>(); }
 	else if (item_ID == C::HAMMER_ID) { return make_shared<Hammer>(); }
+	else if (item_ID == C::IRON_ID) { return make_shared<Iron>(); }
+	else if (item_ID == C::IRON_DEPOSIT_ID) { return make_shared<Iron_Deposit>(); }
+	else if (item_ID == C::LIMESTONE_ID) { return make_shared<Limestone>(); }
+	else if (item_ID == C::LIMESTONE_DEPOSIT_ID) { return make_shared<Limestone_Deposit>(); }
+	else if (item_ID == C::LOG_ID) { return make_shared<Log>(); }
+	else if (item_ID == C::SMELTER_ID) { return make_shared<Smelter>(); }
 	else if (item_ID == C::STAFF_ID) { return make_shared<Staff>(); }
 	else if (item_ID == C::STICK_ID) { return make_shared<Stick>(); }
 	else if (item_ID == C::STONE_ID) { return make_shared<Rock>(); }

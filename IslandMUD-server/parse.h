@@ -11,24 +11,24 @@ user input parsing */
 #include <map>
 #include <algorithm>
 
-#include "resources.h"
+#include "utilities.h"
 #include "constants.h"
 
 class Parse; // forward declaring
 
-typedef Parse P;
+using P = Parse;
 
 class Parse
 {
+private:
+	Parse() = delete; // deliberately not implemented
+	
 public:
 	static map<string, string> dict; // first string maps to second string
-
-	Parse()	{ }
-
+	
 	static void initialize();
 
 	static vector<string> tokenize(const string & s);
-
 };
 
 #endif

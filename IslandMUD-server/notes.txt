@@ -1,5 +1,7 @@
 
 
+http://www.lostcrafts.com/Blacksmith-Main.html
+
 For some reason, downsizing the world dimensions then restarting the server results in an empty world. (?!)
 	I suspect this is because world.load() attempts to load the terrain file and correctly fails when it can't, but it
 	makes no attempt to load the biome_map. Try perform the same load-then-verify then save-or-recreate as we do for the world_terrain file.
@@ -22,6 +24,6 @@ Item wear. A sword wears with every strike, a bow with every fire, an axe with e
 	While fighing: "You notice your sword [shows use]/[has become mildly worn]/[has become worn]/[is slightly damaged]/[is damaged]/[is badly damaged]/[is damaged beyond use]."
 	While offering: "[name] presents/offers a sword that [is mildly worn]".
 	While equipping: "You draw a [mildy-worn] axe."
-	While returning to inventory: "You sheath your [well-worn] sword."
+	While returning to inventory: "You sheathe your [well-worn] sword."
 
 Security issue for when multiplayer is introduced: user validation / pw encryption
