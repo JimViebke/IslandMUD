@@ -15,34 +15,25 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="craft.cpp">
+    <ClCompile Include="utilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="parse.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pugixml.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="room.cpp">
+    <ClCompile Include="world.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="character.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="chest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="constants.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="recipes.cpp">
+    <ClCompile Include="craft.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="player_character.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="world.cpp">
+    <ClCompile Include="door.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game.cpp">
@@ -51,7 +42,7 @@
     <ClCompile Include="generator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="door.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="non_player_character.cpp">
@@ -60,13 +51,7 @@
     <ClCompile Include="npc_enemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="npc_unaffiliated.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="room_side.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="chest.cpp">
+    <ClCompile Include="npc_enemy_bodyguard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="npc_enemy_fighter.cpp">
@@ -75,30 +60,36 @@
     <ClCompile Include="npc_enemy_worker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="npc_enemy_bodyguard.cpp">
+    <ClCompile Include="npc_unaffiliated.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="utilities.cpp">
+    <ClCompile Include="parse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="player_character.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pugixml.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="recipes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="room.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="room_side.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="non_player_character.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="parse.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="player_character.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pugiconfig.hpp">
+    <ClInclude Include="recipe.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pugixml.hpp">
+    <ClInclude Include="recipes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -110,7 +101,16 @@
     <ClInclude Include="room_side.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="world.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pugiconfig.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pugixml.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="character.h">
@@ -122,6 +122,9 @@
     <ClInclude Include="craft.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="door.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -131,16 +134,10 @@
     <ClInclude Include="item.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="recipe.h">
+    <ClInclude Include="message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="recipes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="door.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="npc_unaffiliated.h">
+    <ClInclude Include="non_player_character.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="npc_enemy.h">
@@ -155,22 +152,24 @@
     <ClInclude Include="npc_enemy_worker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utilities.h">
+    <ClInclude Include="npc_unaffiliated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="notes.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
+    <ClInclude Include="parse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram - Items.cd">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\Rakefile" />
     <None Include="ClassDiagram - Characters.cd">
       <Filter>Resource Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="notes.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
