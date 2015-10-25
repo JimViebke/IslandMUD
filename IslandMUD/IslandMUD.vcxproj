@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3ABD89C7-9609-4D6F-BC63-585542179E11}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>IslandMUD-server</RootNamespace>
-    <ProjectName>IslandMUD-server</ProjectName>
+    <RootNamespace>IslandMUD</RootNamespace>
+    <ProjectName>IslandMUD</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
