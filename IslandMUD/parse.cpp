@@ -4,6 +4,7 @@ Feb 16 2015 */
 #include "parse.h"
 
 map<string, string> Parse::dict; // first string maps to second string
+map<string, string> Parse::articles; // item_ID maps to its article
 
 void Parse::initialize()
 {
@@ -88,6 +89,38 @@ void Parse::initialize()
 		// Look Mr. Frodo! A
 		P::dict["door"] = C::DOOR;
 		P::dict["wall"] = P::dict["surface"] = C::WALL;
+	}
+
+	// map an item ID to its article so we can have "an axe" and "a forge", rather than use "a(n)" for all items
+
+	if (articles.size() == 0)
+	{
+		cout << "\nLoading article dictionary...";
+
+		P::articles[C::ANVIL_ID] =
+			P::articles[C::ARROWHEAD_ID] =
+			P::articles[C::ARROW_ID] =
+			P::articles[C::AXE_ID] =
+			P::articles[C::IRON_ID] =
+			P::articles[C::IRON_DEPOSIT_ID] = "an";
+
+		P::articles[C::BOARD_ID] =
+			P::articles[C::BOW_ID] =
+			P::articles[C::BRANCH_ID] =
+			P::articles[C::FORGE_ID] =
+			P::articles[C::HAMMER_ID] =
+			P::articles[C::LIMESTONE_ID] =
+			P::articles[C::LIMESTONE_DEPOSIT_ID] =
+			P::articles[C::LOG_ID] =
+			P::articles[C::SMELTER_ID] =
+			P::articles[C::STAFF_ID] =
+			P::articles[C::STICK_ID] =
+			P::articles[C::STONE_ID] =
+			P::articles[C::SWORD_ID] =
+			P::articles[C::TORCH_ID] =
+			P::articles[C::TREE_ID] =
+			P::articles[C::VINE_ID] =
+			P::articles[C::WOOD_ID] = "a";
 	}
 }
 

@@ -25,6 +25,7 @@ private:
 	
 public:
 	static map<string, string> dict; // first string maps to second string
+	static map<string, string> articles; // item_ID maps to its article
 	
 	static void initialize();
 
