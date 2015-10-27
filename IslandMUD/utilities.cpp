@@ -24,6 +24,17 @@ void U::to_lower_case(string & word)
 		std::transform(word.begin(), word.end(), word.begin(), ::tolower);
 	}
 }
+string U::capitalize(string & word)
+{
+	// immediately return the string if it is empty
+	if (word.size() == 0) return word;
+
+	// if the first letter is in the range a-z, convert the letter to capital by subtracting 32
+	if (word[0] >= 'a' && word[0] <= 'z')
+		word[0] -= 32;
+
+	return word;
+}
 
 string U::get_article_for(const string & noun)
 {

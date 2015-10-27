@@ -173,6 +173,7 @@ namespace Utilities
 
 	// text formatting
 	void to_lower_case(string & word);
+	string capitalize(string & word);
 
 	// grammar
 	string get_article_for(const string & noun);
