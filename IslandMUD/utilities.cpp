@@ -25,6 +25,15 @@ void U::to_lower_case(string & word)
 	}
 }
 
+string U::get_article_for(const string & noun)
+{
+	// get an iterator to the <key, value> pair for <noun, article>
+	const map<string, string>::const_iterator it = C::articles.find(noun);
+
+	// return the article if the key exists, else return generic "a(n)".
+	return ((it != C::articles.cend()) ? it->second : "a(n)");
+}
+
 // math
 int U::difference(const int & a, const int & b)
 {

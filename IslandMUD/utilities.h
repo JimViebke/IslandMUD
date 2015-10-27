@@ -174,6 +174,9 @@ namespace Utilities
 	// text formatting
 	void to_lower_case(string & word);
 
+	// grammar
+	string get_article_for(const string & noun);
+
 	// math
 	int difference(const int & a, const int & b);
 	int euclidean_distance(const int & x1, const int & y1, const int & x2, const int & y2);
