@@ -114,3 +114,54 @@ string Recipes::get_recipes() const
 	}
 	return output.str();
 }
+string Recipes::get_recipes_matching(const string & item_ID) const
+{
+	stringstream output;
+	for (auto & recipe : recipes)
+	{
+		// skip recipes that don't contain "item_ID" in the key
+		if (recipe.first.find(item_ID) == string::npos)
+			continue;
+
+		output << recipe.first << endl;
+		if (recipe.second.inventory_need.size() > 0)
+		{
+			output << "\tRequired in inventory:\n";
+			for (map<string, int>::const_iterator it = recipe.second.inventory_need.cbegin(); it != recipe.second.inventory_need.cend(); ++it)
+			{
+				output << "\t\t" << it->second << " " << it->first << endl; // 5 stick
+			}
+		}
+		if (recipe.second.inventory_remove.size() > 0)
+		{
+			output << "\tUsed from inventory:\n";
+			for (map<string, int>::const_iterator it = recipe.second.inventory_remove.cbegin(); it != recipe.second.inventory_remove.cend(); ++it)
+			{
+				output << "\t\t" << it->second << " " << it->first << endl; // 5 stick
+			}
+		}
+		if (recipe.second.local_need.size() > 0)
+		{
+			output << "\tLocally required:\n";
+			for (map<string, int>::const_iterator it = recipe.second.local_need.cbegin(); it != recipe.second.local_need.cend(); ++it)
+			{
+				output << "\t\t" << it->second << " " << it->first << endl; // 5 stick
+			}
+		}
+		if (recipe.second.local_remove.size() > 0)
+		{
+			output << "\tLocally consumed:\n";
+			for (map<string, int>::const_iterator it = recipe.second.local_remove.cbegin(); it != recipe.second.local_remove.cend(); ++it)
+			{
+				output << "\t\t" << it->second << " " << it->first << endl; // 5 stick
+			}
+		}
+		output << endl;
+	}
+
+	// copy the result to a string
+	const string result = output.str();
+
+	// if the result is not empty, return it, else return a message
+	return ((result.size() > 0) ? result : "No recipes for \"" + item_ID + "\".");
+}

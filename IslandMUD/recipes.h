@@ -36,6 +36,7 @@ public:
 
 	// debugging
 	string get_recipes() const;
+	string get_recipes_matching(const string & item_ID) const;
 
 };
 

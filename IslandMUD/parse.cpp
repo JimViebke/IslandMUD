@@ -9,6 +9,8 @@ void Parse::initialize()
 {
 	// map various possible user-input strings to the constant ID used throughout the engine
 
+	using P = Parse;
+
 	if (dict.size() == 0)
 	{
 		cout << "\nLoading parse dictionary...";

@@ -243,6 +243,7 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 		return string("help:\n") +
 			"\nlegend" +
 			"\nrecipes" +
+			"\nrecipes [search keyword]" +
 			"\nmove [compass direction]" +
 			"\ntake / drop / craft / mine / equip / dequip / chop / smash [item]" +
 			"\nequipped" +
@@ -322,6 +323,11 @@ string Game::execute_command(const string & actor_id, const vector<string> & com
 	else if (command.size() == 1 && command[0] == C::PRINT_RECIPES_COMMAND)
 	{
 		return Character::recipes.get_recipes(); // (item_id, world)
+	}
+	// print out any recipes where the name of the recipe contains the 2nd command
+	else if (command.size() > 1 && command[0] == C::PRINT_RECIPES_COMMAND)
+	{
+		return Character::recipes.get_recipes_matching(command[1]);
 	}
 	// the player is attacking a wall "smash west wall"
 	else if (command.size() >= 3 && command[0] == C::ATTACK_COMMAND && U::contains(C::surface_ids, command[1])

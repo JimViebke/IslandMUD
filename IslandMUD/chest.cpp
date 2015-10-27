@@ -106,7 +106,7 @@ string Chest::contents() const
 	for (multimap<string, shared_ptr<Equipment>>::const_iterator it = equipment_contents.begin();
 		it != equipment_contents.end(); ++it)
 	{
-		output << " a(n) " << it->second->name;
+		output << " " << U::get_article_for(it->second->name) << " " << it->second->name;
 	}
 	for (map<string, shared_ptr<Material>>::const_iterator it = material_contents.begin();
 		it != material_contents.end(); ++it)

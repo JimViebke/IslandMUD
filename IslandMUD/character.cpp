@@ -387,13 +387,13 @@ string Character::equip(const string & item_ID)
 	// if the player does not have the item specified
 	if (!this->has(item_ID))
 	{
-		return string("You do not have a(n) ") + item_ID + " to equip.";
+		return string("You do not have ") + U::get_article_for(item_ID) + " " + item_ID + " to equip.";
 	}
 
 	if (equipment_inventory.find(item_ID) == equipment_inventory.cend() &&
 		material_inventory.find(item_ID) == material_inventory.cend())
 	{
-		return string("You are holding a(n) ") + item_ID + " and don't have another one to equip.";
+		return string("You are holding ") + U::get_article_for(item_ID) + " " + item_ID + " and don't have another one to equip.";
 	}
 
 	// create a stringstream to accumulate feedback
@@ -402,7 +402,7 @@ string Character::equip(const string & item_ID)
 	// the player does have the item to equip, test if an item is already equipped
 	if (this->equipped_item != nullptr)
 	{
-		output << "You replace your " << equipped_item->name << " with a(n) ";
+		output << "You replace your " << equipped_item->name << " with ";
 
 		// save the existing the item to the player's inventory
 		this->add(equipped_item);
@@ -442,7 +442,7 @@ string Character::equip(const string & item_ID)
 	else
 	{
 		// complete and return the stringstream
-		output << equipped_item->name << ".";
+		output << U::get_article_for(equipped_item->name) << " " << equipped_item->name << ".";
 		return output.str();
 	}
 
@@ -598,7 +598,7 @@ string Character::craft(const string & craft_item_id, World & world)
 	}
 
 	// return if the recipe does not exist
-	if (!Character::recipes.has_recipe_for(craft_item_id)) { return "There is no way to craft a(n) " + craft_item_id + "."; }
+	if (!Character::recipes.has_recipe_for(craft_item_id)) { return "There is no way to craft " + U::get_article_for(craft_item_id) + " " + craft_item_id + "."; }
 
 	// get the recipe
 	const Recipe recipe = Character::recipes.get_recipe(craft_item_id);
@@ -606,19 +606,19 @@ string Character::craft(const string & craft_item_id, World & world)
 	// verify the conditions for the recipe are present
 	for (map<string, int>::const_iterator it = recipe.inventory_need.cbegin(); it != recipe.inventory_need.cend(); ++it)
 	{
-		if (it->first != "" && !this->has(it->first, it->second)) { return craft_item_id + " requires " + ((it->second == 1) ? "a(n)" : U::to_string(it->second)) + " " + it->first; }
+		if (it->first != "" && !this->has(it->first, it->second)) { return U::get_article_for(craft_item_id) + " " + craft_item_id + " requires " + ((it->second == 1) ? U::get_article_for(it->first) : U::to_string(it->second)) + " " + it->first; }
 	}
 	for (map<string, int>::const_iterator it = recipe.inventory_remove.cbegin(); it != recipe.inventory_remove.cend(); ++it)
 	{
-		if (it->first != "" && !this->has(it->first, it->second)) { return craft_item_id + " uses " + ((it->second == 1) ? "a(n)" : U::to_string(it->second)) + " " + it->first; }
+		if (it->first != "" && !this->has(it->first, it->second)) { return U::get_article_for(craft_item_id) + " " + craft_item_id + " uses " + ((it->second == 1) ? U::get_article_for(it->first) : U::to_string(it->second)) + " " + it->first; }
 	}
 	for (map<string, int>::const_iterator it = recipe.local_need.cbegin(); it != recipe.local_need.cend(); ++it)
 	{
-		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return craft_item_id + " requires " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first; }
+		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return U::get_article_for(craft_item_id) + " " + craft_item_id + " requires " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first; }
 	}
 	for (map<string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
 	{
-		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return craft_item_id + " uses " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first; }
+		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return U::get_article_for(craft_item_id) + " " + craft_item_id + " uses " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first; }
 	}
 
 	// remove ingredients from inventory
@@ -665,7 +665,7 @@ string Character::craft(const string & craft_item_id, World & world)
 		}
 
 		// "You now have a(n) sword. " OR "You now have a(n) sword (x5). "
-		response += "You now have a(n) " + it->first
+		response += "You now have " + U::get_article_for(it->first) + " " + it->first
 			+ string((it->second > 1)
 			? (" (x" + U::to_string(it->second) + ")") : "")
 			+ ". ";
@@ -707,7 +707,7 @@ string Character::drop(const string & drop_item_id, World & world)
 		if (!this->has(drop_item_id)) // if the player does not have the item specified
 		{
 			// the item does not exist in the player's inventory
-			return "You don't have a(n) " + drop_item_id + " to drop.";
+			return "You don't have " + U::get_article_for(drop_item_id) + " " + drop_item_id + " to drop.";
 		}
 
 		// add the item to the world
@@ -722,7 +722,7 @@ string Character::drop(const string & drop_item_id, World & world)
 	this->remove(drop_item_id);
 
 	// success reply
-	return "You drop a(n) " + drop_item_id + ".";
+	return "You drop " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".";
 }
 string Character::add_to_chest(const string & insert_item_id, World & world)
 {
@@ -741,7 +741,7 @@ string Character::add_to_chest(const string & insert_item_id, World & world)
 	// if the player doesn't have the item
 	if (!this->has(insert_item_id))
 	{
-		return "You don't have a(n) " + insert_item_id + ".";
+		return "You don't have " + U::get_article_for(insert_item_id) + " " + insert_item_id + ".";
 	}
 
 	// if the item is equipped
@@ -784,7 +784,7 @@ string Character::take_from_chest(const string & take_item_id, World & world)
 	// if the player doesn't have the item
 	if (!world.room_at(x, y, z)->chest_has(take_item_id))
 	{
-		return "The chest does not contain a(n) " + take_item_id + ".";
+		return "The chest does not contain " + U::get_article_for(take_item_id) + " " + take_item_id + ".";
 	}
 
 	this->add(world.room_at(x, y, z)->remove_from_chest(take_item_id));
@@ -822,7 +822,7 @@ string Character::construct_surface(const string & material_id, const string & s
 		{
 			return ((surface_id == C::CEILING || surface_id == C::FLOOR) ?
 				"A " + surface_id + " already exists here." : // ceiling or floor
-				"A(n) " + surface_id + " wall already exists here."); // any wall
+				U::capitalize(U::get_article_for(surface_id)) + " " + surface_id + " wall already exists here."); // any wall
 		}
 	}
 
@@ -893,7 +893,7 @@ string Character::construct_surface_with_door(const string & surface_material_id
 		{
 			return ((surface_id == C::CEILING || surface_id == C::FLOOR) ?
 				"A " + surface_id + " already exists here." : // ceiling or floor
-				"A(n) " + surface_id + " wall already exists here."); // any wall
+				U::capitalize(U::get_article_for(surface_id)) + " " + surface_id + " wall already exists here."); // any wall
 		}
 	}
 
@@ -1088,7 +1088,7 @@ string Character::attack_item(const string & target_ID, World & world)
 		// if the attacking implement is not in the damage tables
 		if (C::damage_tables.find(equipped_item->name) == C::damage_tables.cend())
 		{
-			return "You can't do that with a(n) " + equipped_item->name + ".";
+			return "You can't do that with " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + ".";
 		}
 
 		// extract the damage table for the attacking implement

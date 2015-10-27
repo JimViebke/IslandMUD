@@ -198,6 +198,9 @@ namespace Constants
 		DEFAULT_ITEM_MIN_HEALTH,
 		DEFAULT_ITEM_MAX_HEALTH;
 
+	// map an item ID to its article so we can have "an axe" and "a forge", rather than use "a(n)" for all items
+	extern const map<string, string> articles;
+
 	// int to char_type conversion
 	extern const vector<char_type> numbers;
 

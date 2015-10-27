@@ -1,6 +1,8 @@
 ﻿/* Jim Viebke
 Feb 14, 2015 */
 
+#include <iostream>
+
 #include "constants.h"
 
 // general
@@ -191,6 +193,55 @@ const string C::XML_CURRENT_HEALTH = "current_health";
 // item health/integrity
 const int C::DEFAULT_ITEM_MIN_HEALTH = 0;
 const int C::DEFAULT_ITEM_MAX_HEALTH = 100;
+
+namespace // anonymous namespace to prevent access outside this file
+{
+	map<string, string> generate_articles_map()
+	{
+		cout << "\nLoading article lookup...";
+
+		map<string, string> temp_articles;
+
+		// item IDs
+
+		temp_articles[C::ANVIL_ID] =
+			temp_articles[C::ARROWHEAD_ID] =
+			temp_articles[C::ARROW_ID] =
+			temp_articles[C::AXE_ID] =
+			temp_articles[C::IRON_ID] =
+			temp_articles[C::IRON_DEPOSIT_ID] = "an";
+
+		temp_articles[C::BOARD_ID] =
+			temp_articles[C::BOW_ID] =
+			temp_articles[C::BRANCH_ID] =
+			temp_articles[C::FORGE_ID] =
+			temp_articles[C::HAMMER_ID] =
+			temp_articles[C::LIMESTONE_ID] =
+			temp_articles[C::LIMESTONE_DEPOSIT_ID] =
+			temp_articles[C::LOG_ID] =
+			temp_articles[C::SMELTER_ID] =
+			temp_articles[C::STAFF_ID] =
+			temp_articles[C::STICK_ID] =
+			temp_articles[C::STONE_ID] =
+			temp_articles[C::SWORD_ID] =
+			temp_articles[C::TORCH_ID] =
+			temp_articles[C::TREE_ID] =
+			temp_articles[C::VINE_ID] =
+			temp_articles[C::WOOD_ID] = "a";
+
+		// direction IDs
+
+		temp_articles[C::NORTH] =
+			temp_articles[C::WEST] =
+			temp_articles[C::SOUTH] = "a";
+
+		temp_articles[C::EAST] = "an";
+
+		return temp_articles;
+	}
+}
+
+const map<string, string> C::articles = generate_articles_map();
 
 // efficient int to char conversion
 #ifdef _WIN32

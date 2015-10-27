@@ -14,10 +14,6 @@ user input parsing */
 #include "utilities.h"
 #include "constants.h"
 
-class Parse; // forward declaring
-
-using P = Parse;
-
 class Parse
 {
 private:

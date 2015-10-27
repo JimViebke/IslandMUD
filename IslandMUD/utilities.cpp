@@ -24,6 +24,26 @@ void U::to_lower_case(string & word)
 		std::transform(word.begin(), word.end(), word.begin(), ::tolower);
 	}
 }
+string U::capitalize(string & word)
+{
+	// immediately return the string if it is empty
+	if (word.size() == 0) return word;
+
+	// if the first letter is in the range a-z, convert the letter to capital by subtracting 32
+	if (word[0] >= 'a' && word[0] <= 'z')
+		word[0] -= 32;
+
+	return word;
+}
+
+string U::get_article_for(const string & noun)
+{
+	// get an iterator to the <key, value> pair for <noun, article>
+	const map<string, string>::const_iterator it = C::articles.find(noun);
+
+	// return the article if the key exists, else return generic "a(n)".
+	return ((it != C::articles.cend()) ? it->second : "a(n)");
+}
 
 // math
 int U::difference(const int & a, const int & b)
