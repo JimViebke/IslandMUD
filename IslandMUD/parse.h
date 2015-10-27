@@ -14,10 +14,6 @@ user input parsing */
 #include "utilities.h"
 #include "constants.h"
 
-class Parse; // forward declaring
-
-using P = Parse;
-
 class Parse
 {
 private:
@@ -25,7 +21,6 @@ private:
 	
 public:
 	static map<string, string> dict; // first string maps to second string
-	static map<string, string> articles; // item_ID maps to its article
 	
 	static void initialize();
 
