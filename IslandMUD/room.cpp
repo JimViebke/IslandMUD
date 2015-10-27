@@ -599,7 +599,7 @@ string Room::summary(const string & player_ID) const
 			if (!it->second.is_rubble())
 			{
 				// "a(n) stone ceiling" or "a stone wall to the west"
-				summary_stream << " a(n) " << it->second.get_material_id()
+				summary_stream << " " << U::get_article_for(it->second.get_material_id()) << " " << it->second.get_material_id()
 					<< ((it->first == C::CEILING || it->first == C::FLOOR) ? " " : " wall to the ")
 					<< it->first; // direction_ID
 			}
@@ -666,7 +666,7 @@ string Room::summary(const string & player_ID) const
 			else
 			{
 				// don't append the count
-				summary_stream << " a(n) " << item_it->first;
+				summary_stream << " " << U::get_article_for(item_it->first) << " " << item_it->first;
 			}
 
 			// conditionally append a comma

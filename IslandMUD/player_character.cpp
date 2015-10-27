@@ -43,7 +43,7 @@ string PC::get_equipped_item_id() const
 		return "You don't have anything at the ready.";
 	}
 
-	return "You are wielding a(n) " + this->equipped_item->name + ".";
+	return "You are wielding " + U::get_article_for(this->equipped_item->name) + " " + this->equipped_item->name + ".";
 }
 
 // Build and return a top-down area map around a given coordinate

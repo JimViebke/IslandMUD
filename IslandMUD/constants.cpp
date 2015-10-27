@@ -196,11 +196,13 @@ const int C::DEFAULT_ITEM_MAX_HEALTH = 100;
 
 namespace // anonymous namespace to prevent access outside this file
 {
-	map<string, string> generate_item_articles_map()
+	map<string, string> generate_articles_map()
 	{
-		cout << "\nLoading item_ID article lookup...";
+		cout << "\nLoading article lookup...";
 
 		map<string, string> temp_articles;
+
+		// item IDs
 
 		temp_articles[C::ANVIL_ID] =
 			temp_articles[C::ARROWHEAD_ID] =
@@ -227,11 +229,19 @@ namespace // anonymous namespace to prevent access outside this file
 			temp_articles[C::VINE_ID] =
 			temp_articles[C::WOOD_ID] = "a";
 
+		// direction IDs
+
+		temp_articles[C::NORTH] =
+			temp_articles[C::WEST] =
+			temp_articles[C::SOUTH] = "a";
+
+		temp_articles[C::EAST] = "an";
+
 		return temp_articles;
 	}
 }
 
-const map<string, string> C::articles = generate_item_articles_map();
+const map<string, string> C::articles = generate_articles_map();
 
 // efficient int to char conversion
 #ifdef _WIN32
