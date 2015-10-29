@@ -3,35 +3,46 @@ Feb 16 2014 */
 
 #include "craft.h"
 
+namespace
+{
+	template <typename Item_Type> shared_ptr<Item> create_instance() { return make_shared<Item_Type>(); }
+}
+
 shared_ptr<Item> Craft::make(const string & item_ID)
 {
-	/* This provides an alternative method of the below:
-	http://www.codeguru.com/cpp/cpp/cpp_mfc/article.php/c4067/Switch-on-Strings-in-C.htm */
-
 	// alphabetical based on ID, not object name
-	if (item_ID == C::ANVIL_ID) { return make_shared<Anvil>(); }
-	else if (item_ID == C::ARROW_ID) { return make_shared<Arrow>(); }
-	else if (item_ID == C::ARROWHEAD_ID) { return make_shared<Arrowhead>(); }
-	else if (item_ID == C::AXE_ID) { return make_shared<Axe>(); }
-	else if (item_ID == C::BOARD_ID) { return make_shared<Board>(); }
-	else if (item_ID == C::BOW_ID) { return make_shared<Bow>(); }
-	else if (item_ID == C::BRANCH_ID) { return make_shared<Branch>(); }
-	else if (item_ID == C::DEBRIS_ID) { return make_shared<Debris>(); }
-	else if (item_ID == C::FORGE_ID) { return make_shared<Forge>(); }
-	else if (item_ID == C::HAMMER_ID) { return make_shared<Hammer>(); }
-	else if (item_ID == C::IRON_ID) { return make_shared<Iron>(); }
-	else if (item_ID == C::IRON_DEPOSIT_ID) { return make_shared<Iron_Deposit>(); }
-	else if (item_ID == C::LIMESTONE_ID) { return make_shared<Limestone>(); }
-	else if (item_ID == C::LIMESTONE_DEPOSIT_ID) { return make_shared<Limestone_Deposit>(); }
-	else if (item_ID == C::LOG_ID) { return make_shared<Log>(); }
-	else if (item_ID == C::SMELTER_ID) { return make_shared<Smelter>(); }
-	else if (item_ID == C::STAFF_ID) { return make_shared<Staff>(); }
-	else if (item_ID == C::STICK_ID) { return make_shared<Stick>(); }
-	else if (item_ID == C::STONE_ID) { return make_shared<Stone>(); }
-	else if (item_ID == C::SWORD_ID) { return make_shared<Sword>(); }
-	else if (item_ID == C::TORCH_ID) { return make_shared<Torch>(); }
-	else if (item_ID == C::TREE_ID) { return make_shared<Tree>(); }
-	else if (item_ID == C::VINE_ID) { return make_shared<Vine>(); }
-	else if (item_ID == C::WOOD_ID) { return make_shared<Wood>(); }
-	else { return make_shared<Stone>(); } // something must be returned, so if the item id is invalid a stone manifests itself
+	typedef shared_ptr<Item>(*create_item_pointer)();
+	const static map<string, create_item_pointer> items = {
+		{ C::ANVIL_ID, &create_instance<Anvil> },
+		{ C::ARROW_ID, &create_instance<Arrow> },
+		{ C::ARROWHEAD_ID, &create_instance<Arrowhead> },
+		{ C::AXE_ID, &create_instance<Axe> },
+		{ C::BOARD_ID, &create_instance<Board> },
+		{ C::BOW_ID, &create_instance<Bow> },
+		{ C::BRANCH_ID, &create_instance<Branch> },
+		{ C::DEBRIS_ID, &create_instance<Debris> },
+		{ C::FORGE_ID, &create_instance<Forge> },
+		{ C::HAMMER_ID, &create_instance<Hammer> },
+		{ C::IRON_ID, &create_instance<Iron> },
+		{ C::IRON_DEPOSIT_ID, &create_instance<Iron_Deposit> },
+		{ C::LIMESTONE_ID, &create_instance<Limestone> },
+		{ C::LIMESTONE_DEPOSIT_ID, &create_instance<Limestone_Deposit> },
+		{ C::LOG_ID, &create_instance<Log> },
+		{ C::SMELTER_ID, &create_instance<Smelter> },
+		{ C::STAFF_ID, &create_instance<Staff> },
+		{ C::STICK_ID, &create_instance<Stick> },
+		{ C::STONE_ID, &create_instance<Stone> },
+		{ C::SWORD_ID, &create_instance<Sword> },
+		{ C::TORCH_ID, &create_instance<Torch> },
+		{ C::TREE_ID, &create_instance<Tree> },
+		{ C::VINE_ID, &create_instance<Vine> },
+		{ C::WOOD_ID, &create_instance<Wood> }
+	};
+
+	// extract the corresponding entry in the map
+	const map<string, create_item_pointer>::const_iterator pair = items.find(item_ID);
+
+	// craft a new instance of the specified item by calling the function pointer,
+	// creating a new stone if the key (item ID) was not in the map
+	return (pair != items.cend()) ? pair->second() : make_shared<Stone>();
 }
