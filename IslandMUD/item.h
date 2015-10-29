@@ -60,10 +60,10 @@ protected:
 	Material(const string & cust_name) : Item(cust_name, true) {} // all materials are takable
 };
 
-class Rock : public Material
+class Stone : public Material
 {
 public:
-	Rock() : Material(C::STONE_ID) {}
+	Stone() : Material(C::STONE_ID) {}
 };
 
 class Stick : public Material
