@@ -12,10 +12,10 @@ Feb 14, 2015 */
 class Craft
 {
 public:
-
-	Craft()	{}
-
 	static shared_ptr<Item> make(const string & item_ID);
+
+private:
+	Craft() = delete;
 };
 
 #endif
