@@ -179,7 +179,7 @@ namespace Utilities
 	string get_article_for(const string & noun);
 
 	// math
-	int difference(const int & a, const int & b);
+	inline int difference(const int & a, const int & b);
 	int euclidean_distance(const int & x1, const int & y1, const int & x2, const int & y2);
 	int diagonal_distance(const int & x1, const int & y1, const int & x2, const int & y2);
 
