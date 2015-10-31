@@ -5,7 +5,9 @@ Feb 14, 2015 */
 #define GAME_H
 
 #include <map>
-#include <queue> // for queues
+#include <queue>
+#include <thread>
+#include <mutex>
 
 #include "utilities.h"
 #include "constants.h"
@@ -27,9 +29,13 @@ public:
 	World world; // the game world object
 	map<string, shared_ptr<Character>> actors; // active/online PC and NPC ids
 
-	queue<pair<string, string>> player_input_queue; // (player_id, command) input queue (raw input)
-	queue<pair<string, string>> command_queue; // (player_id, command) syntactially valid commands to attempt execution against the game world
-	queue<pair<string, string>> player_response_queue; // (player_id, response) output queue (responses to players)
+	// user ID, command
+	queue<pair<string, string>> input_queue; // contains user commands to execute against the game world
+	mutex input_queue_mutex;
+
+	// user ID, message
+	queue<pair<string, string>> output_queue; // contains outbound messages to players
+	mutex output_queue_mutex;
 
 	Game() {}
 
