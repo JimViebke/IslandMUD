@@ -134,9 +134,6 @@
     <ClInclude Include="item.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="non_player_character.h">
       <Filter>Header Files</Filter>
     </ClInclude>
