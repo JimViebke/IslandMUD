@@ -220,19 +220,11 @@ void Game::load()
 	// load the world
 	world.load();
 
-	// accept incoming signals to the network, and adds then to the raw input queue
-	// thread accept_input_thread;
+	// thread accept_input; // capture incoming messages and add them to input_queue
 
-	// destructively removes input from raw input queue, parses into a lowercase synonym-replaced syntatically correct command, adds to command queue
-	// also checks the user's timestamp
-	// thread parse_input_thread;
+	// thread process_input; // executes commands from input_queue against the game world, write messages to output_queue
 
-	// attempts to execute commands against the game world (attack, buy, sell). Writes update message to output queue for PCs only.
-	// NPCs write directly to PROCESS_COMMAND_THREAD
-	// thread process_commands_thread;
-
-	// destructively takes update messages, sends to correct user
-	// thread dispatch_output_thread;
+	// thread dispatch_output; // sends update messages to the correct user
 }
 
 string Game::execute_command(const string & actor_id, const vector<string> & command)
