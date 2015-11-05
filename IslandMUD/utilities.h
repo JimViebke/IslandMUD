@@ -50,6 +50,7 @@ namespace Utilities
 	}
 	inline char_type to_char_type(const unsigned & val)
 	{
+		// crashes for numbers not in the range of 0-9 inclusive
 		return C::numbers[val];
 	}
 
