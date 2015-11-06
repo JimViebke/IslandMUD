@@ -25,8 +25,8 @@ protected:
 
 	int health = 100;
 
-	Item(const string & item_name, const bool & is_takable, const int & health = C::DEFAULT_ITEM_MAX_HEALTH) :
-		name(item_name), takable(is_takable), health(health) {}
+	Item(const string & item_name, const bool & is_takable, const int & set_health = C::DEFAULT_ITEM_MAX_HEALTH) :
+		name(item_name), takable(is_takable), health(set_health) {}
 
 	virtual ~Item() {}
 
@@ -139,7 +139,7 @@ class Equipment : public Item
 	// other members represent quality, health
 
 protected:
-	Equipment(string cust_name) : Item(cust_name, true) {} // all equipment is takable
+	Equipment(const string & set_name) : Item(set_name, true) {} // all equipment is takable
 };
 
 class Staff : public Equipment
