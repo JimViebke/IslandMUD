@@ -122,6 +122,19 @@ public:
 
 class Forge : public Item
 {
+private:
+	unique_ptr<Equipment> workpiece;
+	time_t workpiece_insert_time; // the time that the current workpiece placed in the forge
+
+	// These three fields store the amount of fuel in the forge for a given point in time,
+	// and a boolean indicating if the forge was lit at that time.
+	// These fields update every time the forge is observed.
+	unsigned fuel_units_remaining = 0;
+	time_t fuel_time;
+	bool lit = false;
+
+	// add something to indicate fuel type, which will be used to determine the temperature of the fire 
+
 public:
 	Forge() : Item(C::FORGE_ID, false) {}
 };
