@@ -35,7 +35,7 @@ namespace Utilities
 	// debugging output
 	template <typename T> inline void print(const vector<T> & v)
 	{
-		for (T element : v)
+		for (const T & element : v)
 		{
 			cout << element << " ";
 		}
