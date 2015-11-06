@@ -178,26 +178,24 @@ bool Hostile_NPC_Bodyguard::attempt_set_new_kill_target(World & world, map<strin
 		}
 	}
 
-	// if any player characters are in range
-	if (hostile_ids.size() > 0)
-	{
-		// pick a random player character, save their ID
-		this->kill_target_id = U::random_element_from(hostile_ids);
-
-		// create a pointer to the player
-		shared_ptr<Character> kill_target = actors.find(kill_target_id)->second;
-
-		// save the player's current location as the player's last know location (in case they walk out of visible range)
-		kill_target_last_known_location._x = kill_target->x;
-		kill_target_last_known_location._y = kill_target->y;
-		kill_target_last_known_location._z = kill_target->z;
-
-		// we have a target
-		return true;
-	}
-
 	// no players are visible, no target was found
-	return false;
+	if (hostile_ids.size() == 0) { return false; }
+
+	// at least one player character is in range
+
+	// pick a random player character, save their ID
+	this->kill_target_id = U::random_element_from(hostile_ids);
+
+	// create a pointer to the player
+	shared_ptr<Character> kill_target = actors.find(kill_target_id)->second;
+
+	// save the player's current location as the player's last know location (in case they walk out of visible range)
+	kill_target_last_known_location._x = kill_target->x;
+	kill_target_last_known_location._y = kill_target->y;
+	kill_target_last_known_location._z = kill_target->z;
+
+	// we have a target
+	return true;
 }
 bool Hostile_NPC_Bodyguard::attempt_update_kill_target_last_known_location(const shared_ptr<Character> & kill_target)
 {
