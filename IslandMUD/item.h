@@ -120,6 +120,22 @@ public:
 	Smelter() : Item(C::SMELTER_ID, false) {}
 };
 
+class Anvil : public Item
+{
+public:
+	Anvil() : Item(C::ANVIL_ID, false) {}
+};
+
+class Equipment : public Item
+{
+	// string equipment_material; // stone, iron, wood, etc
+	// string handle_material; // wood, etc
+	// other members represent quality, health
+
+protected:
+	Equipment(const string & set_name) : Item(set_name, true) {} // all equipment is takable
+};
+
 class Forge : public Item
 {
 private:
@@ -137,22 +153,6 @@ private:
 
 public:
 	Forge() : Item(C::FORGE_ID, false) {}
-};
-
-class Anvil : public Item
-{
-public:
-	Anvil() : Item(C::ANVIL_ID, false) {}
-};
-
-class Equipment : public Item
-{
-	// string equipment_material; // stone, iron, wood, etc
-	// string handle_material; // wood, etc
-	// other members represent quality, health
-
-protected:
-	Equipment(const string & set_name) : Item(set_name, true) {} // all equipment is takable
 };
 
 class Staff : public Equipment
