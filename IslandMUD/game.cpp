@@ -5,6 +5,24 @@ May 15 2015 */
 
 using std::cout;
 
+Game::Game()
+{
+	// load crafting recipes lookup
+	Character::recipes.load();
+
+	// load the parse dictionary
+	Parse::initialize();
+
+	// load the world
+	world.load();
+
+	// thread accept_input; // capture incoming messages and add them to input_queue
+
+	// thread process_input; // executes commands from input_queue against the game world, write messages to output_queue
+
+	// thread dispatch_output; // sends update messages to the correct user
+}
+
 void Game::main_test_loop() // debugging
 {
 	{
@@ -207,24 +225,6 @@ void Game::main_test_loop() // debugging
 			cout << "DEBUG: Distance between bodyguard and worker after update : " << U::diagonal_distance(bob->x, bob->y, bill->x, bill->y) << endl;
 		}
 	}
-}
-
-void Game::load()
-{
-	// load crafting recipes lookup
-	Character::recipes.load();
-
-	// load the parse dictionary
-	Parse::initialize();
-
-	// load the world
-	world.load();
-
-	// thread accept_input; // capture incoming messages and add them to input_queue
-
-	// thread process_input; // executes commands from input_queue against the game world, write messages to output_queue
-
-	// thread dispatch_output; // sends update messages to the correct user
 }
 
 string Game::execute_command(const string & actor_id, const vector<string> & command)

@@ -24,7 +24,7 @@ Feb 14, 2015 */
 
 class Game
 {
-public:
+private:
 
 	World world; // the game world object
 	map<string, shared_ptr<Character>> actors; // active/online PC and NPC ids
@@ -37,7 +37,9 @@ public:
 	queue<pair<string, string>> output_queue; // contains outbound messages to players
 	mutex output_queue_mutex;
 
-	Game() {}
+public:
+
+	Game();
 
 	/*
 
@@ -94,8 +96,7 @@ public:
 
 	void main_test_loop();
 
-	void load();
-
+private:
 	string execute_command(const string & actor_id, const vector<string> & command);
 };
 
