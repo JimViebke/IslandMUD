@@ -491,9 +491,6 @@ void World::add_room_to_world(xml_node & room_node, const int & x, const int & y
 	// set whether or not the room is water (off-island or river/lake)
 	room->set_water_status(room_node.attribute(C::XML_IS_WATER.c_str()).as_bool());
 
-	// add a boolean representing if the room is water (off-island or a lake/river)
-	room_node.append_attribute(C::XML_IS_WATER.c_str()).as_bool(room->is_water());
-
 	// for each item in the room
 	for (const xml_node & item_node : room_node.children(C::XML_ITEM.c_str()))
 	{
