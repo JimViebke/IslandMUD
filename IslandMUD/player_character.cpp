@@ -35,7 +35,7 @@ string PC::print() const
 		"You aren't carrying anything."); // return generic "no items" message
 }
 
-string PC::get_equipped_item_id() const
+string PC::get_equipped_item_info() const
 {
 	// if the player does not have anything equipped
 	if (this->equipped_item == nullptr)

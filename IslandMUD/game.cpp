@@ -378,7 +378,7 @@ Update_Messages Game::execute_command(const string & actor_id, const vector<stri
 		if (U::is<PC>(actor)) // if the actor is a Player_Character
 		{
 			// convert the actor to a Player_Character
-			return Update_Messages(U::convert_to<PC>(actor)->get_equipped_item_id());
+			return Update_Messages(U::convert_to<PC>(actor)->get_equipped_item_info());
 		}
 	}
 
