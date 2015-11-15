@@ -1,7 +1,7 @@
 
 /* Jim Viebke
 
-Based on Samvel Khalatyan's "queue" released the MIT license. See the bottom of this file. */
+Based on Samvel Khalatyan's "queue" released under the MIT license. See the bottom of this file. */
 
 #ifndef THREADSAFE_QUEUE_H
 #define THREADSAFE_QUEUE_H
