@@ -10,8 +10,6 @@ Feb 14, 2015 */
 
 #include "parse.h"
 
-using namespace std;
-
 class Item
 {
 private:

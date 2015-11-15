@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="95">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
-    <logicalFolder name="f1" displayName="source" projectFiles="true" kind="ROOT">
+    <logicalFolder name="f1" displayName="source" projectFiles="true">
       <itemPath>character.cpp</itemPath>
       <itemPath>character.h</itemPath>
       <itemPath>chest.cpp</itemPath>
@@ -17,7 +17,6 @@
       <itemPath>generator.h</itemPath>
       <itemPath>item.h</itemPath>
       <itemPath>main.cpp</itemPath>
-      <itemPath>message.h</itemPath>
       <itemPath>non_player_character.cpp</itemPath>
       <itemPath>non_player_character.h</itemPath>
       <itemPath>npc_enemy.cpp</itemPath>
@@ -110,8 +109,6 @@
       <item path="item.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="message.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="non_player_character.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -229,8 +226,6 @@
       <item path="item.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="message.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="non_player_character.cpp" ex="false" tool="1" flavor2="0">
       </item>

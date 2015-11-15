@@ -24,8 +24,6 @@ Feb 14, 2015 */
 
 #include "constants.h"
 
-using namespace std;
-
 namespace Utilities {} // "forward delcaring"...
 
 namespace U = Utilities; // ...to do this here

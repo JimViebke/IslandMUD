@@ -12,8 +12,6 @@ Feb 14, 2015 */
 #include "world.h"
 #include "recipes.h"
 
-using namespace std;
-
 class Character
 {
 private:

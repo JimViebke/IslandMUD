@@ -16,10 +16,9 @@ namespace threadsafe
 	private:
 		std::map<A, B> map_a_b;
 		std::map<B, A> map_b_a;
-
-	public:
 		mutable std::mutex mutex; // this mutex can be locked by constant member functions
 
+	public:
 		bidirectional_map()
 		{
 			static_assert(!is_same<A, B>::value, "");
@@ -78,7 +77,6 @@ namespace threadsafe
 			std::unique_lock<std::mutex> lock(mutex);
 			return map_b_a.find(b)->second;
 		}
-
 	};
 }
 

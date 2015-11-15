@@ -19,7 +19,7 @@ void Parse::initialize()
 		P::dict["recipe"] = P::dict["recipes"] = C::PRINT_RECIPES_COMMAND;
 
 		// verbs
-		P::dict["help"] = P::dict["h"] = P::dict["q"] = P::dict["?"] = P::dict["assist"] = P::dict["command"] = P::dict["commands"] = C::HELP_COMMAND;
+		P::dict["help"] = P::dict["h"] = P::dict["q"] = P::dict["?"] = P::dict["assist"] = P::dict["command"] = P::dict["commands"] = C::SHOW_HELP_COMMAND;
 		P::dict["legend"] = C::LEGEND_COMMAND;
 		// P::dict["login"] = C::LOGIN_COMMAND; // not used yet
 		P::dict["logout"] = P::dict["quit"] = P::dict["leave"] = P::dict["exit"] = C::LOGOUT_COMMAND;

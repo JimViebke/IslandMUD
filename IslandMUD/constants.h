@@ -8,13 +8,16 @@ Feb 14, 2015 */
 #include <map>
 #include <vector>
 
-using namespace std;
-
 #ifdef _WIN32
 using char_type = char;
 #else
 using char_type = string;
 #endif
+
+namespace
+{
+	using namespace std;
+}
 
 namespace Constants {} // "forward declaring"...
 
@@ -33,7 +36,9 @@ namespace Constants
 
 		DEFAULT_SPAWN_X,
 		DEFAULT_SPAWN_Y,
-		DEFAULT_SPAWN_Z;
+		DEFAULT_SPAWN_Z,
+		
+		GAME_PORT_NUMBER;
 
 	// game data locations
 	extern const string
@@ -115,7 +120,7 @@ namespace Constants
 		// action commands
 		LOGIN_COMMAND,
 		LOGOUT_COMMAND,
-		HELP_COMMAND,
+		SHOW_HELP_COMMAND,
 		LEGEND_COMMAND,
 		CRAFT_COMMAND,
 		MINE_COMMAND,

@@ -196,7 +196,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				}
 
 				// count the enemies standing at a coordinate
-				unsigned enemy_count = 0, neutral_count = 0;
+				unsigned enemy_count = 0, neutral_count = 0, friendly_count = 0;
 				// for each actor in the room
 				for (const string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
 				{
@@ -208,6 +208,10 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 					else if (U::is<Neutral_NPC>(actors.find(actor_ID)->second))
 					{
 						++neutral_count; // count one more neutral NPC in the room
+					}
+					else if (U::is<PC>(actors.find(actor_ID)->second))
+					{
+						++friendly_count;
 					}
 				}
 				// reduce enemy count to a single-digit number
@@ -276,6 +280,8 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				b.push_back(((wr) ? C::RUBBLE_CHAR : ((wd) ? C::NS_DOOR : ((w) ? C::NS_WALL : C::LAND_CHAR))));
 				// if the current coordinates are the player's, draw an @ icon
 				b.push_back(((cx == x && cy == y) ? C::PLAYER_CHAR
+					// else if there is another player, draw an @ icron
+					: ((friendly_count > 0) ? C::PLAYER_CHAR
 					// else if there is an enemy, draw enemy count
 					: ((enemy_count > 0) ? U::to_char_type(enemy_count)
 					// else if there are neutrals, draw neutral count
@@ -287,7 +293,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 					// else if there is a mineral deposit, draw a mineral char
 					: ((world.room_at(cx, cy, C::GROUND_INDEX)->has_mineral_deposit()) ? C::GENERIC_MINERAL_CHAR
 					// else draw a land char
-					: C::LAND_CHAR)))))));
+					: C::LAND_CHAR))))))));
 				b.push_back(((er) ? C::RUBBLE_CHAR : ((ed) ? C::NS_DOOR : ((e) ? C::NS_WALL : C::LAND_CHAR))));
 
 				c.push_back(sw_corner);

@@ -11,8 +11,6 @@ April 14, 2015 */
 #include "constants.h"
 #include "utilities.h"
 
-using namespace std;
-
 class Generator
 {
 public:

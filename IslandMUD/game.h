@@ -9,6 +9,17 @@ Feb 14, 2015 */
 #include <thread>
 #include <mutex>
 
+#ifdef WIN32
+#include <WinSock2.h>
+#include <Windows.h>
+#pragma comment (lib, "Ws2_32.lib")
+#else
+#include <sys/socket.h>
+#include <netinet/ip.h>
+#include <unistd.h>
+#include <cstring>
+#endif
+
 #include "utilities.h"
 #include "constants.h"
 #include "character.h"
@@ -21,83 +32,48 @@ Feb 14, 2015 */
 #include "npc_unaffiliated.h"
 #include "parse.h"
 #include "world.h"
+#include "threadsafe_queue.h"
+#include "threadsafe_bidirectional_map.h"
+#include "message.h"
 
 class Game
 {
 private:
+	threadsafe::queue<Message> inbound_queue; // <socket_ID, message>
+	threadsafe::queue<Message> outbound_queue; // <socket_ID, message>
+
+	threadsafe::bidirectional_map<SOCKET, string> clients; // <socket_ID, user_ID>
+	
+	map<string, shared_ptr<Character>> actors; // active/online PC and NPC ids
+	std::mutex actors_mutex; // serves for both of the above types
 
 	World world; // the game world object
-	map<string, shared_ptr<Character>> actors; // active/online PC and NPC ids
-
-	// user ID, command
-	queue<pair<string, string>> input_queue; // contains user commands to execute against the game world
-	mutex input_queue_mutex;
-
-	// user ID, message
-	queue<pair<string, string>> output_queue; // contains outbound messages to players
-	mutex output_queue_mutex;
 
 public:
 
 	Game();
 
-	/*
-
-
-
-	while (true) // PROCESS_COMMAND_THREAD
-	{
-	-- sleep 1/10 second (prevent high CPU while waiting for commands)
-
-	-- while commands.size() > 0
-	-- -- destructively take command from front of queue
-	-- -- -- attempt to execute against game world
-
-	}
-
-	Every time a user performs an action:	agent.timestamp = current_time + action_cost
-	I don't really like that. Condsider revisiting it.
-
-	*/
-
-	/*void play() // loops forever
-	{
-	vector<thread> thread_vec;
-
-	// this probably won't help
-	thread_vec.reserve(3);
-
-	thread_vec.push_back(thread(acceptorLoop));
-	this_thread::sleep_for(chrono::milliseconds(1000));
-
-	thread_vec.push_back(thread(requestLoop));
-	this_thread::sleep_for(chrono::milliseconds(1000));
-
-	thread_vec.push_back(thread(responseLoop));
-	this_thread::sleep_for(chrono::milliseconds(1000));
-
-
-	// now the game runs
-
-
-	// wait for all threads to exit (should only occur on shutdown
-	for (thread & thread : thread_vec)
-	{
-	if (thread.joinable())
-	{
-	thread.join();
-	}
-	}
-
-	cout << "Game ended.\n";
-	cin.ignore();
-	}*/
-
+	void login(const string & user_id);
 
 	void main_test_loop();
 
+	Update_Messages execute_command(const string & actor_id, const vector<string> & command);
+
+	void networking_thread();
+
 private:
-	string execute_command(const string & actor_id, const vector<string> & command);
+
+	// capture incoming data and write it to the input queue
+	void client_thread(SOCKET client_ID);
+
+	// process data, moving it from the input queue to the output queue
+	void processing_thread();
+
+	// remove data from the outbound queue and send it the to specified client
+	void outbound_thread();
+
+	// close a socket, platform independent
+	void close_socket(SOCKET socket);
 };
 
 #endif
