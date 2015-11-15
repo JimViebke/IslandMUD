@@ -390,6 +390,7 @@ string Character::equip(const string & item_ID)
 		return string("You do not have ") + U::get_article_for(item_ID) + " " + item_ID + " to equip.";
 	}
 
+	// the player has at least one instance of the item, check if the player does not have another one to equip
 	if (equipment_inventory.find(item_ID) == equipment_inventory.cend() &&
 		material_inventory.find(item_ID) == material_inventory.cend())
 	{
