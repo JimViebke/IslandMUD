@@ -349,12 +349,12 @@ Update_Messages Game::execute_command(const string & actor_id, const vector<stri
 	// equip [item]
 	else if (command.size() == 2 && command[0] == C::EQUIP_COMMAND)
 	{
-		return Update_Messages(actors.find(actor_id)->second->equip(command[1]));
+		return actors.find(actor_id)->second->equip(command[1]);
 	}
 	// dequip (2nd arg is optional and ignored)
 	else if ((command.size() == 1 || command.size() == 2) && command[0] == C::DEQUIP_COMMAND)
 	{
-		return Update_Messages(actors.find(actor_id)->second->unequip());
+		return actors.find(actor_id)->second->unequip();
 	}
 	// put item in chest
 	else if (command.size() == 4 && command[0] == C::DROP_COMMAND && command[2] == C::INSERT_COMMAND && command[3] == C::CHEST_ID)
@@ -528,6 +528,22 @@ void Game::processing_thread()
 
 		// create an outbound message to the client in question
 		outbound_queue.put(Message(inbound_message.user_socket_ID, user_ID + ": " + action_result.str()));
+
+		if (update_messages.to_room != nullptr) // determine if a message needs to be sent to all other player characters in the room
+		{
+			// get a list of all players in the room
+			const vector<string> area_actor_ids = world.room_at(character->x, character->y, character->z)->get_actor_ids();
+
+			for (const string & actor_id : area_actor_ids) // for each player in the room
+			{
+				// if the player is not "self" and the player is a human
+				if (actor_id != user_ID && U::is<PC>(actors.find(actor_id)->second))
+				{
+					// send the room update to the player
+					outbound_queue.put(Message(clients.find(actor_id)->second, *update_messages.to_room));
+				}
+			}
+		}
 	}
 }
 

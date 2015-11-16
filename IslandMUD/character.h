@@ -11,6 +11,7 @@ Feb 14, 2015 */
 #include "room.h"
 #include "world.h"
 #include "recipes.h"
+#include "message.h"
 
 class Character
 {
@@ -75,8 +76,8 @@ public:
 	// inventory manipulation
 	void add(const shared_ptr<Item> & item);
 	void remove(const string & item_id, const unsigned & count = 1);
-	string equip(const string & item_ID);
-	string unequip();
+	Update_Messages equip(const string & item_ID);
+	Update_Messages unequip();
 
 	// actions
 	string craft(const string & craft_item_id, World & world);
