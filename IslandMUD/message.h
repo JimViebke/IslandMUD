@@ -19,6 +19,8 @@ Nov 14 2015 */
 #include <cstring>
 #endif
 
+#include "utilities.h"
+
 class Message
 {
 public:
@@ -35,6 +37,15 @@ public:
 	std::unique_ptr<std::string> to_area; // an update may be sent to all players in the area
 
 	explicit Update_Messages(const std::string & user_message) : to_user(user_message) {}
+	explicit Update_Messages(const std::string & user_message, const std::string & room_message) : to_user(user_message)
+	{
+		to_room = U::make_unique<std::string>(room_message);
+	}
+	explicit Update_Messages(const std::string & user_message, const std::string & room_message, const std::string & area_message) : to_user(user_message)
+	{
+		to_room = U::make_unique<std::string>(room_message);
+		to_area = U::make_unique<std::string>(area_message);
+	}
 };
 
 #endif
