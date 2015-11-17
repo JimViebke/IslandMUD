@@ -113,7 +113,7 @@ const string C::BAD_COMMAND = "unknown_command";
 
 // action commands
 const string C::LOGIN_COMMAND = "login";
-const string C::LOGOUT_COMMAND = "logout";
+const string C::SAVE_COMMAND = "save";
 const string C::SHOW_HELP_COMMAND = "help";
 const string C::LEGEND_COMMAND = "legend";
 const string C::TAKE_COMMAND = "take";

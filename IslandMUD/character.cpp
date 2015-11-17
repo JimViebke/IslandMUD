@@ -145,7 +145,7 @@ string Character::login(World & world)
 	// notify success
 	return "You have logged in to IslandMUD!";
 }
-string Character::logout()
+string Character::save()
 {
 	// if an item is equipped, move it back to the player's inventory
 	this->unequip();
@@ -200,7 +200,7 @@ string Character::logout()
 	// save the user_data to disk
 	user_data_xml.save_file((C::user_data_directory + "/" + this->name + ".xml").c_str()); // returns an unused boolean
 
-	return "You have logged out.";
+	return "Player info saved.";
 }
 
 // levels

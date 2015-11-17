@@ -341,10 +341,10 @@ Update_Messages Game::execute_command(const string & actor_id, const vector<stri
 	{
 		return Update_Messages(actors.find(actor_id)->second->attack_item(command[1], world));
 	}
-	// logout
-	else if (command.size() == 1 && command[0] == C::LOGOUT_COMMAND)
+	// save
+	else if (command.size() == 1 && command[0] == C::SAVE_COMMAND)
 	{
-		return Update_Messages(actors.find(actor_id)->second->logout());
+		return Update_Messages(actors.find(actor_id)->second->save());
 	}
 	// equip [item]
 	else if (command.size() == 2 && command[0] == C::EQUIP_COMMAND)
@@ -475,7 +475,7 @@ void Game::client_thread(SOCKET client_ID)
 			std::lock_guard<std::mutex> lock(actors_mutex); // gain exclusive hold of the client map for modification
 			close_socket(client_ID); // close socket (platform-independent)
 			const std::string user_ID = clients.find(client_ID)->second; // find username
-			actors.find(user_ID)->second->logout(); // logout the user
+			actors.find(user_ID)->second->save(); // save the user's data
 			actors.erase(user_ID); // erase the user
 			clients.erase(client_ID); // erase the client record
 			return; // the client's personal thread is destroyed

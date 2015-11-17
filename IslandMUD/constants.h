@@ -119,7 +119,7 @@ namespace Constants
 
 		// action commands
 		LOGIN_COMMAND,
-		LOGOUT_COMMAND,
+		SAVE_COMMAND,
 		SHOW_HELP_COMMAND,
 		LEGEND_COMMAND,
 		CRAFT_COMMAND,

@@ -57,7 +57,7 @@ protected:
 public:
 
 	string login(World & world);
-	string logout();
+	string save();
 
 	// levels
 	void set_swordsmanship_level(const int & level_value);
