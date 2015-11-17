@@ -26,20 +26,20 @@ namespace threadsafe
 
 		void insert(const std::pair<A, B> & data)
 		{
-			std::unique_lock<std::mutex> lock(mutex);
+			std::lock_guard<std::mutex> lock(mutex);
 			map_a_b[data.first] = data.second;
 			map_b_a[data.second] = data.first;
 		}
 		void insert(const std::pair<B, A> & data)
 		{
-			std::unique_lock<std::mutex> lock(mutex);
+			std::lock_guard<std::mutex> lock(mutex);
 			map_a_b[data.second] = data.first;
 			map_b_a[data.first] = data.second;
 		}
 
 		void erase(const A & a)
 		{
-			std::unique_lock<std::mutex> lock(mutex);
+			std::lock_guard<std::mutex> lock(mutex);
 
 			const B b = map_a_b.find(a)->second;
 
@@ -48,7 +48,7 @@ namespace threadsafe
 		}
 		void erase(const B & b)
 		{
-			std::unique_lock<std::mutex> lock(mutex);
+			std::lock_guard<std::mutex> lock(mutex);
 
 			const A a = map_b_a.find(b)->second;
 
@@ -58,23 +58,23 @@ namespace threadsafe
 
 		typename map<A, B>::const_iterator find(const A & a) const
 		{
-			std::unique_lock<std::mutex> lock(mutex);
+			std::lock_guard<std::mutex> lock(mutex);
 			return map_a_b.find(a);
 		}
 		typename map<B, A>::const_iterator find(const B & b) const
 		{
-			std::unique_lock<std::mutex> lock(mutex);
+			std::lock_guard<std::mutex> lock(mutex);
 			return map_b_a.find(b);
 		}
 
 		B get(const A & a) const
 		{
-			std::unique_lock<std::mutex> lock(mutex);
+			std::lock_guard<std::mutex> lock(mutex);
 			return map_a_b.find(a)->second;
 		}
 		A get(const B & b) const
 		{
-			std::unique_lock<std::mutex> lock(mutex);
+			std::lock_guard<std::mutex> lock(mutex);
 			return map_b_a.find(b)->second;
 		}
 	};

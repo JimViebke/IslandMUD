@@ -21,14 +21,14 @@ namespace threadsafe
 
 		void put(const T & value)
 		{
-			std::unique_lock<std::mutex> lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			_queue.push(value);
 			_cv.notify_one();
 		}
 
 		void get(T & dest) // blocking
 		{
-			std::unique_lock<std::mutex> lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			_cv.wait(lock, [this] { return !_queue.empty(); });
 			dest = _queue.front();
 			_queue.pop();
@@ -45,13 +45,13 @@ namespace threadsafe
 
 		bool empty() const
 		{
-			std::unique_lock<std::mutex> lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			return _queue.empty();
 		}
 
 		size_t size() const
 		{
-			std::unique_lock<std::mutex> lock(_mutex);
+			std::lock_guard<std::mutex> lock(_mutex);
 			return _queue.size();
 		}
 

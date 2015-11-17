@@ -452,7 +452,7 @@ void Game::client_thread(SOCKET client_ID)
 		clients.insert(make_pair(client_ID, user_ID));
 
 		// log the player in
-		std::unique_lock<std::mutex> lock(actors_mutex); // lock the actors structure while we modify it
+		std::lock_guard<std::mutex> lock(actors_mutex); // lock the actors structure while we modify it
 		shared_ptr<PC> player = make_shared<PC>(user_ID);
 		player->login(world);
 		actors.insert(make_pair(user_ID, player));
@@ -472,7 +472,7 @@ void Game::client_thread(SOCKET client_ID)
 		// check if reading the socket failed
 		if (data_read == 0 || data_read == -1) // graceful disconnect, less graceful disconnect (respectively)
 		{
-			std::unique_lock<std::mutex> lock(actors_mutex); // gain exclusive hold of the client map for modification
+			std::lock_guard<std::mutex> lock(actors_mutex); // gain exclusive hold of the client map for modification
 			close_socket(client_ID); // close socket (platform-independent)
 			const std::string user_ID = clients.find(client_ID)->second; // find username
 			actors.find(user_ID)->second->logout(); // logout the user
@@ -504,7 +504,7 @@ void Game::processing_thread()
 		action_result << "\n\n";
 
 		// don't allow the actors structure to be modified
-		const std::unique_lock<mutex> lock(actors_mutex);
+		const std::lock_guard<mutex> lock(actors_mutex);
 
 		// extract a copy of the user
 		const shared_ptr<Character> character = actors.find(user_ID)->second;
