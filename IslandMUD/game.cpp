@@ -273,7 +273,7 @@ Update_Messages Game::execute_command(const string & actor_id, const vector<stri
 	else if ((command.size() == 2 && command[0] == C::MOVE_COMMAND)
 		|| command.size() == 1 && U::contains(C::direction_ids, command[0]))
 	{
-		return Update_Messages(actors.find(actor_id)->second->move(command[command.size() - 1], world)); // passes direction (last element in command) and world
+		return actors.find(actor_id)->second->move(command[command.size() - 1], world); // passes direction (last element in command) and world
 	}
 	// take: "take branch"
 	else if (command.size() == 2 && command[0] == C::TAKE_COMMAND)

@@ -475,7 +475,7 @@ Update_Messages Character::unequip()
 }
 
 // actions
-string Character::move(const string & direction_ID, World & world)
+Update_Messages Character::move(const string & direction_ID, World & world)
 {
 	// movement deltas
 	int dx = 0, dy = 0, dz = 0;
@@ -485,7 +485,7 @@ string Character::move(const string & direction_ID, World & world)
 	// validate movement deltas
 	if (!U::bounds_check(x + dx, y + dy, z + dz))
 	{
-		return "You can't go there.";
+		return Update_Messages("You can't go there.");
 	}
 
 	// copy the destination from disk to memory
@@ -498,7 +498,7 @@ string Character::move(const string & direction_ID, World & world)
 	if (validate_movement != C::GOOD_SIGNAL)
 	{
 		// return that reason movement validation failed
-		return validate_movement;
+		return Update_Messages(validate_movement);
 	}
 
 	// the movement validated, load the radius for the destination
@@ -526,8 +526,8 @@ string Character::move(const string & direction_ID, World & world)
 			world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
 		}
 	}
-	else if (direction_ID == C::UP) { return "[moving up not available yet]"; }
-	else if (direction_ID == C::DOWN) { return "[moving down not available yet]"; }
+	else if (direction_ID == C::UP) { return Update_Messages("[moving up not available yet]"); }
+	else if (direction_ID == C::DOWN) { return Update_Messages("[moving down not available yet]"); }
 	else
 	{
 		/* The direction is a secondary compass direction.
@@ -590,8 +590,11 @@ string Character::move(const string & direction_ID, World & world)
 	// add character id to new area using the new x and y coordinates
 	world.room_at(x, y, z)->add_actor(this->name);
 
-	// reply success
-	return "You move " + direction_ID + ".";
+	// prepare responses
+	return Update_Messages("You move " + direction_ID + ".",
+		// "Jeb arrives from the south [wielding an axe]."
+		this->name + " arrives from the " + C::opposite_direction_id.find(direction_ID)->second +
+		((this->equipped_item == nullptr) ? "." : (" wielding " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + ".")));
 }
 string Character::craft(const string & craft_item_id, World & world)
 {
