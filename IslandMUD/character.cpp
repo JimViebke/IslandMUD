@@ -683,26 +683,27 @@ string Character::craft(const string & craft_item_id, World & world)
 
 	return response;
 }
-string Character::take(const string & take_item_id, World & world)
+Update_Messages Character::take(const string & take_item_id, World & world)
 {
 	// check if the item is not in the player's vicinity
 	if (!world.room_at(x, y, z)->contains_item(take_item_id))
 	{
-		return "There is no " + take_item_id + " here.";
+		return Update_Messages("There is no " + take_item_id + " here.");
 	}
 
 	// check if the item is not takable
 	if (!world.room_at(x, y, z)->get_contents().find(take_item_id)->second->is_takable())
 	{
 		// return failure
-		return "You can't take the " + take_item_id + ".";
+		return Update_Messages("You can't take the " + take_item_id + ".");
 	}
 
 	// the item is takable
 	this->add(world.room_at(x, y, z)->get_contents().find(take_item_id)->second); // copy the item to the player
 	world.room_at(x, y, z)->remove_item(take_item_id); // remove the item from the world
 
-	return "You take the " + take_item_id + ".";
+	return Update_Messages("You take " + U::get_article_for(take_item_id) + " " + take_item_id + ".",
+		this->name + " takes " + U::get_article_for(take_item_id) + " " + take_item_id + ".");
 }
 string Character::drop(const string & drop_item_id, World & world)
 {

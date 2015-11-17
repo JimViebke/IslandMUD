@@ -278,7 +278,7 @@ Update_Messages Game::execute_command(const string & actor_id, const vector<stri
 	// take: "take branch"
 	else if (command.size() == 2 && command[0] == C::TAKE_COMMAND)
 	{
-		return Update_Messages(actors.find(actor_id)->second->take(command[1], world)); // (item, worlds)
+		return actors.find(actor_id)->second->take(command[1], world); // (item, worlds)
 	}
 	// dropping item: "drop staff"
 	else if (command.size() == 2 && command[0] == C::DROP_COMMAND)
