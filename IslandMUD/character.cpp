@@ -377,102 +377,6 @@ void Character::remove(const string & item_id, const unsigned & count)
 		// the player does not have the item
 	}
 }
-Update_Messages Character::equip(const string & item_ID)
-{
-	/*
-	You ready your [item_id].
-	You replace your [item_id] with a(n) [item_id];
-	*/
-
-	// if the player does not have the item specified
-	if (!this->has(item_ID))
-	{
-		return Update_Messages("You do not have " + U::get_article_for(item_ID) + " " + item_ID + " to equip.");
-	}
-
-	// the player has at least one instance of the item, check if the player does not have another one to equip
-	if (equipment_inventory.find(item_ID) == equipment_inventory.cend() &&
-		material_inventory.find(item_ID) == material_inventory.cend())
-	{
-		return Update_Messages("You are holding " + U::get_article_for(item_ID) + " " + item_ID + " and don't have another one to equip.");
-	}
-
-	// create a stringstream to accumulate feedback
-	stringstream user_update;
-	stringstream room_update;
-
-	// the player does have the item to equip, test if an item is already equipped
-	if (this->equipped_item != nullptr)
-	{
-		user_update << "You replace your " << equipped_item->name << " with ";
-		room_update << this->name << " replaces " << U::get_article_for(equipped_item->name) << " " << equipped_item->name << " with ";
-
-		// save the existing the item to the player's inventory
-		this->add(equipped_item);
-		// erase the existing item
-		this->equipped_item = nullptr;
-	}
-
-	// set the equipped item to the specified item from whichever inventory we find it in
-	if (this->equipment_inventory.find(item_ID) != equipment_inventory.cend())
-	{
-		equipped_item = equipment_inventory.find(item_ID)->second;
-	}
-	else
-	{
-		equipped_item = material_inventory.find(item_ID)->second;
-	}
-
-	// remove or reduce the item in the player's inventory
-	if (equipment_inventory.find(item_ID) != equipment_inventory.cend())
-	{
-		equipment_inventory.erase(equipment_inventory.find(item_ID));
-	}
-	else if (material_inventory.find(item_ID) != material_inventory.cend()) // the item is present in the material inventory
-	{
-		material_inventory.find(item_ID)->second->amount--; // decrement the material count in the player's inventory
-		if (material_inventory.find(item_ID)->second->amount < 1)
-		{
-			material_inventory.erase(material_inventory.find(item_ID));
-		}
-	}
-
-	// if the stringstream is empty (no item was previously equipped)
-	if (user_update.str().length() == 0)
-	{
-		return Update_Messages(
-			"You equip your " + item_ID + ".",
-			this->name + " equips " + U::get_article_for(item_ID) + " " + item_ID + ".");
-	}
-	else
-	{
-		// complete and return the response message
-		user_update << U::get_article_for(equipped_item->name) << " " << equipped_item->name << ".";
-		room_update << U::get_article_for(equipped_item->name) << " " << equipped_item->name << ".";
-
-		return Update_Messages(user_update.str(), room_update.str());
-	}
-
-}
-Update_Messages Character::unequip()
-{
-	// test if no item is equipped
-	if (this->equipped_item == nullptr)
-	{
-		return Update_Messages("You aren't holding anything.");
-	}
-
-	// save the ID of the currently equipped item
-	const string item_ID = equipped_item->name;
-
-	// save the existing the item to the player's inventory
-	this->add(equipped_item);
-
-	// reset the currently equipped item
-	equipped_item = nullptr;
-
-	return Update_Messages("You put your " + item_ID + " away.", this->name + " lowers the " + item_ID + ".");
-}
 
 // actions
 Update_Messages Character::move(const string & direction_ID, World & world)
@@ -734,6 +638,102 @@ string Character::drop(const string & drop_item_id, World & world)
 
 	// success reply
 	return "You drop " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".";
+}
+Update_Messages Character::equip(const string & item_ID)
+{
+	/*
+	You ready your [item_id].
+	You replace your [item_id] with a(n) [item_id];
+	*/
+
+	// if the player does not have the item specified
+	if (!this->has(item_ID))
+	{
+		return Update_Messages("You do not have " + U::get_article_for(item_ID) + " " + item_ID + " to equip.");
+	}
+
+	// the player has at least one instance of the item, check if the player does not have another one to equip
+	if (equipment_inventory.find(item_ID) == equipment_inventory.cend() &&
+		material_inventory.find(item_ID) == material_inventory.cend())
+	{
+		return Update_Messages("You are holding " + U::get_article_for(item_ID) + " " + item_ID + " and don't have another one to equip.");
+	}
+
+	// create a stringstream to accumulate feedback
+	stringstream user_update;
+	stringstream room_update;
+
+	// the player does have the item to equip, test if an item is already equipped
+	if (this->equipped_item != nullptr)
+	{
+		user_update << "You replace your " << equipped_item->name << " with ";
+		room_update << this->name << " replaces " << U::get_article_for(equipped_item->name) << " " << equipped_item->name << " with ";
+
+		// save the existing the item to the player's inventory
+		this->add(equipped_item);
+		// erase the existing item
+		this->equipped_item = nullptr;
+	}
+
+	// set the equipped item to the specified item from whichever inventory we find it in
+	if (this->equipment_inventory.find(item_ID) != equipment_inventory.cend())
+	{
+		equipped_item = equipment_inventory.find(item_ID)->second;
+	}
+	else
+	{
+		equipped_item = material_inventory.find(item_ID)->second;
+	}
+
+	// remove or reduce the item in the player's inventory
+	if (equipment_inventory.find(item_ID) != equipment_inventory.cend())
+	{
+		equipment_inventory.erase(equipment_inventory.find(item_ID));
+	}
+	else if (material_inventory.find(item_ID) != material_inventory.cend()) // the item is present in the material inventory
+	{
+		material_inventory.find(item_ID)->second->amount--; // decrement the material count in the player's inventory
+		if (material_inventory.find(item_ID)->second->amount < 1)
+		{
+			material_inventory.erase(material_inventory.find(item_ID));
+		}
+	}
+
+	// if the stringstream is empty (no item was previously equipped)
+	if (user_update.str().length() == 0)
+	{
+		return Update_Messages(
+			"You equip your " + item_ID + ".",
+			this->name + " equips " + U::get_article_for(item_ID) + " " + item_ID + ".");
+	}
+	else
+	{
+		// complete and return the response message
+		user_update << U::get_article_for(equipped_item->name) << " " << equipped_item->name << ".";
+		room_update << U::get_article_for(equipped_item->name) << " " << equipped_item->name << ".";
+
+		return Update_Messages(user_update.str(), room_update.str());
+	}
+
+}
+Update_Messages Character::unequip()
+{
+	// test if no item is equipped
+	if (this->equipped_item == nullptr)
+	{
+		return Update_Messages("You aren't holding anything.");
+	}
+
+	// save the ID of the currently equipped item
+	const string item_ID = equipped_item->name;
+
+	// save the existing the item to the player's inventory
+	this->add(equipped_item);
+
+	// reset the currently equipped item
+	equipped_item = nullptr;
+
+	return Update_Messages("You put your " + item_ID + " away.", this->name + " lowers the " + item_ID + ".");
 }
 string Character::add_to_chest(const string & insert_item_id, World & world)
 {

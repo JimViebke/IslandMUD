@@ -76,14 +76,14 @@ public:
 	// inventory manipulation
 	void add(const shared_ptr<Item> & item);
 	void remove(const string & item_id, const unsigned & count = 1);
-	Update_Messages equip(const string & item_ID);
-	Update_Messages unequip();
 
 	// actions
 	string craft(const string & craft_item_id, World & world);
 	Update_Messages move(const string & direction, World & world);
 	Update_Messages take(const string & item_id, World & world);
 	string drop(const string & drop_item_id, World & world);
+	Update_Messages equip(const string & item_ID);
+	Update_Messages unequip();
 	string add_to_chest(const string & insert_item_id, World & world);
 	string take_from_chest(const string & take_item_id, World & world);
 	string look_inside_chest(const World & world) const;
