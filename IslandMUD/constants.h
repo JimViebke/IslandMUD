@@ -114,9 +114,6 @@ namespace Constants
 		// none of these are actual item IDs, they exist for the parser to work with multi-word IDs
 		KEYWORD_DEPOSIT,
 
-		// commands
-		BAD_COMMAND,
-
 		// action commands
 		LOGIN_COMMAND,
 		SAVE_COMMAND,

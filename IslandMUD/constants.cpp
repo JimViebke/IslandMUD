@@ -108,9 +108,6 @@ const string C::LIMESTONE_ID = "limestone";
 // none of these are actual item IDs, they exist for the parser to work with multi-word IDs
 const string C::KEYWORD_DEPOSIT = "deposit";
 
-// commands
-const string C::BAD_COMMAND = "unknown_command";
-
 // action commands
 const string C::LOGIN_COMMAND = "login";
 const string C::SAVE_COMMAND = "save";

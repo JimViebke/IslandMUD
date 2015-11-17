@@ -111,8 +111,12 @@ vector<string> Parse::tokenize(const string & s)
 		// convert the word to lowercase
 		U::to_lower_case(word);
 
-		// replace the word with the engine keyword, or C::BAD_COMMAND
-		word = (dict.find(word) != dict.end()) ? dict.find(word)->second : C::BAD_COMMAND;
+		// replace the typed word with the engine keyword if one exists
+		const map<string, string>::const_iterator dict_it = dict.find(word);
+		if (dict_it != dict.cend())
+		{
+			word = dict_it->second;
+		}
 	}
 
 	return strings;
