@@ -213,6 +213,7 @@ namespace // anonymous namespace to prevent access outside this file
 		temp_articles[C::BOARD_ID] =
 			temp_articles[C::BOW_ID] =
 			temp_articles[C::BRANCH_ID] =
+			temp_articles[C::CHEST_ID] =
 			temp_articles[C::FORGE_ID] =
 			temp_articles[C::HAMMER_ID] =
 			temp_articles[C::LIMESTONE_ID] =
