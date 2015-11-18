@@ -238,9 +238,46 @@ namespace // anonymous namespace to prevent access outside this file
 
 		return temp_articles;
 	}
+
+	map<string, string> generate_plurals_map()
+	{
+		cout << "\nLoading plurals lookup...";
+
+		map<string, string> temp_plurals;
+
+		// item IDs
+
+		temp_plurals[C::ANVIL_ID] = "anvils";
+		temp_plurals[C::ARROWHEAD_ID] = "arrowheads";
+		temp_plurals[C::ARROW_ID] = "arrows";
+		temp_plurals[C::AXE_ID] = "axes";
+		// temp_plurals[C::IRON_ID] = "";
+		// temp_plurals[C::IRON_DEPOSIT_ID] = "an";
+
+		temp_plurals[C::BOARD_ID] = "boards";
+		temp_plurals[C::BOW_ID] = "bows";
+		temp_plurals[C::BRANCH_ID] = "branches";
+		temp_plurals[C::FORGE_ID] = "forges";
+		temp_plurals[C::HAMMER_ID] = "hammers";
+		// temp_plurals[C::LIMESTONE_ID] = "";
+		// temp_plurals[C::LIMESTONE_DEPOSIT_ID] = "";
+		temp_plurals[C::LOG_ID] = "logs";
+		temp_plurals[C::SMELTER_ID] = "smelters";
+		temp_plurals[C::STAFF_ID] = "staves";
+		temp_plurals[C::STICK_ID] = "sticks";
+		temp_plurals[C::STONE_ID] = "stones";
+		temp_plurals[C::SWORD_ID] = "swords";
+		temp_plurals[C::TORCH_ID] = "torches";
+		temp_plurals[C::TREE_ID] = "trees";
+		temp_plurals[C::VINE_ID] = "vines";
+		// temp_plurals[C::WOOD_ID] = "";
+
+		return temp_plurals;
+	}
 }
 
 const map<string, string> C::articles = generate_articles_map();
+const map<string, string> C::plurals = generate_plurals_map();
 
 // efficient int to char conversion
 #ifdef _WIN32

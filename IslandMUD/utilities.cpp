@@ -59,6 +59,15 @@ string U::get_article_for(const string & noun)
 	return ((it != C::articles.cend()) ? it->second : "a(n)");
 }
 
+string U::get_plural_for(const string & noun)
+{
+	// get an iterator to the <key, value> pair for <noun, article>
+	const map<string, string>::const_iterator it = C::plurals.find(noun);
+
+	// return the article if the key exists, else return the original noun
+	return ((it != C::plurals.cend()) ? it->second : noun);
+}
+
 // math
 int U::difference(const int & a, const int & b)
 {

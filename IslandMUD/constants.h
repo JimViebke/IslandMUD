@@ -203,6 +203,9 @@ namespace Constants
 	// map an item ID to its article so we can have "an axe" and "a forge", rather than use "a(n)" for all items
 	extern const map<string, string> articles;
 
+	// map an item ID to its plural
+	extern const map<string, string> plurals;
+
 	// int to char_type conversion
 	extern const vector<char_type> numbers;
 

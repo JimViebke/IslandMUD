@@ -177,6 +177,7 @@ namespace Utilities
 
 	// grammar
 	string get_article_for(const string & noun);
+	string get_plural_for(const string & noun);
 
 	// math
 	inline int difference(const int & a, const int & b);
