@@ -8,7 +8,7 @@ Generator::Generator(const string & map_type)
 	cout << "\nGenerating new " << map_type << "...";
 
 	// create the timestamped directory
-	generated_terrain_dir = C::game_directory + "/gen_" + U::to_string(U::current_time_in_ms());
+	generated_terrain_dir = C::game_directory + "/gen_" + U::to_string(U::current_time_in_ms()) + " (" + map_type + ")";
 	U::create_path_if_not_exists(generated_terrain_dir);
 }
 
