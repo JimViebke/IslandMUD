@@ -288,11 +288,11 @@ Update_Messages Game::execute_command(const string & actor_id, const vector<stri
 	// crafting: "craft sword"
 	else if (command.size() == 2 && command[0] == C::CRAFT_COMMAND)
 	{
-		return Update_Messages(actors.find(actor_id)->second->craft(command[1], world)); // (item_id, world)
+		return actors.find(actor_id)->second->craft(command[1], world); // (item_id, world)
 	}
 	else if (command.size() == 2 && command[0] == C::MINE_COMMAND)
 	{
-		return Update_Messages(actors.find(actor_id)->second->craft(command[1], world)); // (item_id, world)
+		return actors.find(actor_id)->second->craft(command[1], world); // (item_id, world)
 	}
 	// making ceiling/floor: "construct stone floor/ceiling"
 	else if (command.size() == 3 && command[0] == C::CONSTRUCT_COMMAND)

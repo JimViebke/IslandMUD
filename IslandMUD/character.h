@@ -78,7 +78,7 @@ public:
 	void remove(const string & item_id, const unsigned & count = 1);
 
 	// actions
-	string craft(const string & craft_item_id, World & world);
+	Update_Messages craft(const string & craft_item_id, World & world);
 	Update_Messages move(const string & direction, World & world);
 	Update_Messages take(const string & item_id, World & world);
 	string drop(const string & drop_item_id, World & world);

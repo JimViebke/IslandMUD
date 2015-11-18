@@ -500,19 +500,19 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 		this->name + " arrives from the " + C::opposite_direction_id.find(direction_ID)->second +
 		((this->equipped_item == nullptr) ? "." : (" wielding " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + ".")));
 }
-string Character::craft(const string & craft_item_id, World & world)
+Update_Messages Character::craft(const string & craft_item_id, World & world)
 {
 	// check for special case
 	if (craft_item_id == C::CHEST_ID)
 	{
 		if (world.room_at(x, y, z)->has_chest())
 		{
-			return "There is already a chest here.";
+			return Update_Messages("There is already a chest here.");
 		}
 	}
 
 	// return if the recipe does not exist
-	if (!Character::recipes.has_recipe_for(craft_item_id)) { return "There is no way to craft " + U::get_article_for(craft_item_id) + " " + craft_item_id + "."; }
+	if (!Character::recipes.has_recipe_for(craft_item_id)) { return Update_Messages("There is no way to craft " + U::get_article_for(craft_item_id) + " " + craft_item_id + "."); }
 
 	// get the recipe
 	const Recipe recipe = Character::recipes.get_recipe(craft_item_id);
@@ -520,19 +520,19 @@ string Character::craft(const string & craft_item_id, World & world)
 	// verify the conditions for the recipe are present
 	for (map<string, int>::const_iterator it = recipe.inventory_need.cbegin(); it != recipe.inventory_need.cend(); ++it)
 	{
-		if (it->first != "" && !this->has(it->first, it->second)) { return U::get_article_for(craft_item_id) + " " + craft_item_id + " requires " + ((it->second == 1) ? U::get_article_for(it->first) : U::to_string(it->second)) + " " + it->first; }
+		if (it->first != "" && !this->has(it->first, it->second)) { return Update_Messages(U::get_article_for(craft_item_id) + " " + craft_item_id + " requires " + ((it->second == 1) ? U::get_article_for(it->first) : U::to_string(it->second)) + " " + it->first); }
 	}
 	for (map<string, int>::const_iterator it = recipe.inventory_remove.cbegin(); it != recipe.inventory_remove.cend(); ++it)
 	{
-		if (it->first != "" && !this->has(it->first, it->second)) { return U::get_article_for(craft_item_id) + " " + craft_item_id + " uses " + ((it->second == 1) ? U::get_article_for(it->first) : U::to_string(it->second)) + " " + it->first; }
+		if (it->first != "" && !this->has(it->first, it->second)) { return Update_Messages(U::get_article_for(craft_item_id) + " " + craft_item_id + " uses " + ((it->second == 1) ? U::get_article_for(it->first) : U::to_string(it->second)) + " " + it->first); }
 	}
 	for (map<string, int>::const_iterator it = recipe.local_need.cbegin(); it != recipe.local_need.cend(); ++it)
 	{
-		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return U::get_article_for(craft_item_id) + " " + craft_item_id + " requires " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first; }
+		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return Update_Messages(U::get_article_for(craft_item_id) + " " + craft_item_id + " requires " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first); }
 	}
 	for (map<string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
 	{
-		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return U::get_article_for(craft_item_id) + " " + craft_item_id + " uses " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first; }
+		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return Update_Messages(U::get_article_for(craft_item_id) + " " + craft_item_id + " uses " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first); }
 	}
 
 	// remove ingredients from inventory
@@ -547,21 +547,22 @@ string Character::craft(const string & craft_item_id, World & world)
 		this->remove(it->first, it->second); // ID, count
 	}
 
-	// special test cast for chests
-	if (craft_item_id == C::CHEST_ID)
-	{
-		// add a chest to the room
-		world.room_at(x, y, z)->add_chest(this->faction_ID);
-		return "You craft a chest.";
-	}
+	stringstream player_update, room_update;
 
 	// for each item to be given to the player
-	string response = "";
 	for (map<string, int>::const_iterator it = recipe.yields.cbegin(); it != recipe.yields.cend(); ++it)
 	{
 		// for as many times as the item is to be given to the player
 		for (int i = 0; i < it->second; ++i)
 		{
+			// special test cast for chests
+			if (craft_item_id == C::CHEST_ID)
+			{
+				// add a chest to the room
+				world.room_at(x, y, z)->add_chest(this->faction_ID);
+				continue;
+			}
+
 			// craft the item
 			shared_ptr<Item> item = Craft::make(it->first);
 
@@ -578,14 +579,22 @@ string Character::craft(const string & craft_item_id, World & world)
 			}
 		}
 
-		// "You now have a(n) sword. " OR "You now have a(n) sword (x5). "
-		response += "You now have " + U::get_article_for(it->first) + " " + it->first
-			+ string((it->second > 1)
-			? (" (x" + U::to_string(it->second) + ")") : "")
-			+ ". ";
+		player_update << "You craft ";
+		room_update << this->name << " crafts ";
+
+		if (it->second > 1) // ... 3 arrowheads.
+		{
+			player_update << it->second << " " << U::get_plural_for(it->first) << ".";
+			room_update << it->second << " " << U::get_plural_for(it->first) << ".";
+		}
+		else // ... an arrowhead.
+		{
+			player_update << U::get_article_for(it->first) << " " << it->first << ".";
+			room_update << U::get_article_for(it->first) << " " << it->first << ".";
+		}
 	}
 
-	return response;
+	return Update_Messages(player_update.str(), room_update.str());
 }
 Update_Messages Character::take(const string & take_item_id, World & world)
 {
