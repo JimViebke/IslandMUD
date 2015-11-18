@@ -40,9 +40,9 @@ string U::capitalize(const string & word)
 	// immediately return the string if it is empty
 	if (word.size() == 0) return word;
 
-    // copy 'word' to a string that can be modified
-    string result = word;
-    
+	// copy 'word' to a string that can be modified
+	string result = word;
+
 	// if the first letter is in the range a-z, convert the letter to capital by subtracting 32
 	if (result[0] >= 'a' && result[0] <= 'z')
 		result[0] -= 32;
