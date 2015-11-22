@@ -81,7 +81,7 @@ public:
 	Update_Messages craft(const string & craft_item_id, World & world);
 	Update_Messages move(const string & direction, World & world);
 	Update_Messages take(const string & item_id, World & world);
-	string drop(const string & drop_item_id, World & world);
+	Update_Messages drop(const string & drop_item_id, World & world);
 	Update_Messages equip(const string & item_ID);
 	Update_Messages unequip();
 	string add_to_chest(const string & insert_item_id, World & world);

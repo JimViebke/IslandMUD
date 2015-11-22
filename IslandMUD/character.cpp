@@ -642,7 +642,7 @@ Update_Messages Character::take(const string & take_item_id, World & world)
 	return Update_Messages("You take " + U::get_article_for(take_item_id) + " " + take_item_id + ".",
 		this->name + " takes " + U::get_article_for(take_item_id) + " " + take_item_id + ".");
 }
-string Character::drop(const string & drop_item_id, World & world)
+Update_Messages Character::drop(const string & drop_item_id, World & world)
 {
 	// if the player is holding the item specified
 	if (this->equipped_item != nullptr && this->equipped_item->name == drop_item_id)
@@ -650,12 +650,12 @@ string Character::drop(const string & drop_item_id, World & world)
 		// add the item to the world
 		world.room_at(x, y, z)->add_item(this->equipped_item);
 	}
-	else
+	else // the player is not holding the item, check if the item is in the player's inventory
 	{
 		if (!this->has(drop_item_id)) // if the player does not have the item specified
 		{
 			// the item does not exist in the player's inventory
-			return "You don't have " + U::get_article_for(drop_item_id) + " " + drop_item_id + " to drop.";
+			return Update_Messages("You don't have " + U::get_article_for(drop_item_id) + " " + drop_item_id + " to drop.");
 		}
 
 		// add the item to the world
@@ -669,8 +669,8 @@ string Character::drop(const string & drop_item_id, World & world)
 	// remove item
 	this->remove(drop_item_id);
 
-	// success reply
-	return "You drop " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".";
+	return Update_Messages("You drop " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".",
+		this->name + " drops " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".");
 }
 Update_Messages Character::equip(const string & item_ID)
 {
