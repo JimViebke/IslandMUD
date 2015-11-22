@@ -421,7 +421,7 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 		for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
 		{
 			// Skip this room if it is not loaded. This occurs when a player moves diagonally, and both room unload passes overlap at the corner of the map.
-			if (world.room_at(rx, ry, C::GROUND_INDEX) != nullptr) continue;
+			if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
 		
 			U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids()); // save any users in the room
 
@@ -435,7 +435,7 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 		const int ry = (direction_ID == C::WEST) ? y + C::VIEW_DISTANCE : y - C::VIEW_DISTANCE;
 		for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 		{
-			if (world.room_at(rx, ry, C::GROUND_INDEX) != nullptr) continue;
+			if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
 			U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
 			world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
 		}
@@ -453,7 +453,7 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 			const int rx = x + C::VIEW_DISTANCE;
 			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
 			{
-				if (world.room_at(rx, ry, C::GROUND_INDEX) != nullptr) continue;
+				if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
 				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
 				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
 			}
@@ -464,7 +464,7 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 			const int ry = y - C::VIEW_DISTANCE;
 			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 			{
-				if (world.room_at(rx, ry, C::GROUND_INDEX) != nullptr) continue;
+				if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
 				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
 				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
 			}
@@ -475,7 +475,7 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 			const int rx = x - C::VIEW_DISTANCE;
 			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
 			{
-				if (world.room_at(rx, ry, C::GROUND_INDEX) != nullptr) continue;
+				if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
 				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
 				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
 			}
@@ -486,7 +486,7 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 			const int ry = y + C::VIEW_DISTANCE;
 			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 			{
-				if (world.room_at(rx, ry, C::GROUND_INDEX) != nullptr) continue;
+				if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
 				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
 				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
 			}
@@ -666,7 +666,7 @@ string Character::drop(const string & drop_item_id, World & world)
 			);
 	}
 
-	/// remove item
+	// remove item
 	this->remove(drop_item_id);
 
 	// success reply
