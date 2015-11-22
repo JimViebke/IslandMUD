@@ -449,7 +449,7 @@ void Game::client_thread(SOCKET client_ID)
 		const std::string user_ID = ss.str();
 
 		// add client to the lookup
-		clients.set_map_socket(user_ID, client_ID);
+		clients.set_socket(user_ID, client_ID);
 
 		// log the player in
 		std::lock_guard<std::mutex> lock(actors_mutex); // lock the actors structure while we modify it
@@ -535,26 +535,6 @@ void Game::processing_thread()
 		// add the update message to the end of the outbound message
 		action_result << update_messages.to_user;
 
-		// create an outbound message to the client in question
-		outbound_queue.put(Message(inbound_message.user_socket_ID, user_ID + ": " + action_result.str()));
-
-		// if a message needs to be sent to all other player characters in the room
-		if (update_messages.to_room != nullptr)
-		{
-			// get a list of all players in the room
-			const vector<string> area_actor_ids = world.room_at(character->x, character->y, character->z)->get_actor_ids();
-
-			for (const string & actor_id : area_actor_ids) // for each player in the room
-			{
-				// if the player is not "self" and the player is a human
-				if (actor_id != user_ID && U::is<PC>(actors.find(actor_id)->second))
-				{
-					// send the room update to the player
-					outbound_queue.put(Message(clients.get_socket(actor_id), *update_messages.to_room));
-				}
-			}
-		}
-
 		// if a map update is required for all players within view distance
 		if (update_messages.map_update_required)
 		{
@@ -601,6 +581,26 @@ void Game::processing_thread()
 
 				// generate an area map from the current player's perspective, send it to the correct socket
 				outbound_queue.put(Message(outbound_socket, player->generate_area_map(world, actors)));
+			}
+		}
+
+		// create an outbound message to the client in question
+		outbound_queue.put(Message(inbound_message.user_socket_ID, user_ID + ": " + action_result.str()));
+
+		// if a message needs to be sent to all other player characters in the room
+		if (update_messages.to_room != nullptr)
+		{
+			// get a list of all players in the room
+			const vector<string> area_actor_ids = world.room_at(character->x, character->y, character->z)->get_actor_ids();
+
+			for (const string & actor_id : area_actor_ids) // for each player in the room
+			{
+				// if the player is not "self" and the player is a human
+				if (actor_id != user_ID && U::is<PC>(actors.find(actor_id)->second))
+				{
+					// send the room update to the player
+					outbound_queue.put(Message(clients.get_socket(actor_id), *update_messages.to_room));
+				}
 			}
 		}
 	}
