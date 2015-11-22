@@ -385,6 +385,8 @@ Update_Messages Game::execute_command(const string & actor_id, const vector<stri
 	return Update_Messages("Nothing happens.");
 }
 
+
+
 void Game::networking_thread()
 {
 	cout << "\nStarting the server...";
@@ -438,8 +440,6 @@ void Game::networking_thread()
 #endif
 }
 
-
-
 void Game::client_thread(SOCKET client_ID)
 {
 	{
@@ -448,8 +448,8 @@ void Game::client_thread(SOCKET client_ID)
 		ss << "User_" << client_ID;
 		const std::string user_ID = ss.str();
 
-		// add client to clients list
-		clients.insert(make_pair(client_ID, user_ID));
+		// add client to the lookup
+		clients.set_map_socket(user_ID, client_ID);
 
 		// log the player in
 		std::lock_guard<std::mutex> lock(actors_mutex); // lock the actors structure while we modify it
@@ -474,10 +474,12 @@ void Game::client_thread(SOCKET client_ID)
 		{
 			std::lock_guard<std::mutex> lock(actors_mutex); // gain exclusive hold of the client map for modification
 			close_socket(client_ID); // close socket (platform-independent)
-			const std::string user_ID = clients.find(client_ID)->second; // find username
+
+			const std::string user_ID = clients.get_user_ID(client_ID); // find username
+			if (user_ID == "") return; // should never happen
 			actors.find(user_ID)->second->save(); // save the user's data
 			actors.erase(user_ID); // erase the user
-			clients.erase(client_ID); // erase the client record
+			clients.erase(user_ID); // erase the client record
 			return; // the client's personal thread is destroyed
 		}
 
@@ -497,7 +499,7 @@ void Game::processing_thread()
 		const Message inbound_message = inbound_queue.get(); // user return by reference (blocking) to get the next message in the inbound_queue
 
 		// get the user ID for the inbound socket
-		const string user_ID = clients.get(inbound_message.user_socket_ID);
+		const string user_ID = clients.get_user_ID(inbound_message.user_socket_ID);
 
 		// create a stringstream to assemble the return message
 		stringstream action_result;
@@ -512,10 +514,17 @@ void Game::processing_thread()
 		// execute the user's parsed command against the world
 		const Update_Messages update_messages = execute_command(user_ID, Parse::tokenize(inbound_message.data));
 
+		// create these to save the player's coordinates if a map update is required
+		int player_x = -1, player_y = -1;
+
 		// gather some more information to add to the response message
 		if (U::is<PC>(character))
 		{
 			const shared_ptr<PC> player = U::convert_to<PC>(character);
+
+			// save the player's coordinates in case a map update is required
+			player_x = player->x;
+			player_y = player->y;
 
 			action_result << player->generate_area_map(this->world, this->actors) << endl // a top down map
 				<< "Your coordinates are " << player->x << ", " << player->y << " (index " << player->z << ")"
@@ -529,7 +538,8 @@ void Game::processing_thread()
 		// create an outbound message to the client in question
 		outbound_queue.put(Message(inbound_message.user_socket_ID, user_ID + ": " + action_result.str()));
 
-		if (update_messages.to_room != nullptr) // determine if a message needs to be sent to all other player characters in the room
+		// if a message needs to be sent to all other player characters in the room
+		if (update_messages.to_room != nullptr)
 		{
 			// get a list of all players in the room
 			const vector<string> area_actor_ids = world.room_at(character->x, character->y, character->z)->get_actor_ids();
@@ -540,8 +550,57 @@ void Game::processing_thread()
 				if (actor_id != user_ID && U::is<PC>(actors.find(actor_id)->second))
 				{
 					// send the room update to the player
-					outbound_queue.put(Message(clients.find(actor_id)->second, *update_messages.to_room));
+					outbound_queue.put(Message(clients.get_socket(actor_id), *update_messages.to_room));
 				}
+			}
+		}
+
+		// if a map update is required for all players within view distance
+		if (update_messages.map_update_required)
+		{
+			// for each room within view distance
+			for (int cx = player_x - (int)C::VIEW_DISTANCE; cx <= player_x + (int)C::VIEW_DISTANCE; ++cx)
+			{
+				for (int cy = player_y - (int)C::VIEW_DISTANCE; cy <= player_y + (int)C::VIEW_DISTANCE; ++cy)
+				{
+					// get a list of the users in the room
+					const vector<string> users_in_range = world.room_at(cx, cy, C::GROUND_INDEX)->get_actor_ids();
+					// for each user in the room
+					for (const string & user : users_in_range)
+					{
+						// if the user is a player character
+						if (const shared_ptr<PC> player = U::convert_to<PC>(actors.find(user)->second))
+						{
+							// get the player's map socket
+							SOCKET outbound_socket = clients.get_map_socket(user);
+							// if the player does not have a map socket, send the map to the player's main socket
+							if (outbound_socket == -1) outbound_socket = clients.get_socket(user);
+
+							// generate an area map from the current player's perspective, send it to the correct socket
+							outbound_queue.put(Message(outbound_socket, player->generate_area_map(world, actors)));
+						}
+					}
+				}
+			}
+		}
+
+		// if the update requires a map update for one or more players
+		if (update_messages.additional_map_update_users != nullptr)
+		{
+			// for each player that requires an update
+			for (auto player_it = (*update_messages.additional_map_update_users).cbegin();
+				player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
+			{
+				// extract the player
+				const shared_ptr<PC> player = U::convert_to<PC>(actors.find(*player_it)->second);
+
+				// get the player's map socket
+				SOCKET outbound_socket = clients.get_map_socket(*player_it);
+				// if the player does not have a map socket, send the map to the player's main socket
+				if (outbound_socket == -1) outbound_socket = clients.get_socket(*player_it);
+
+				// generate an area map from the current player's perspective, send it to the correct socket
+				outbound_queue.put(Message(outbound_socket, player->generate_area_map(world, actors)));
 			}
 		}
 	}
@@ -555,7 +614,7 @@ void Game::outbound_thread()
 
 		// dispatch data to the user (nonblocking) (because we're using TCP, data is lossless unless total failure occurs)
 		send(message.user_socket_ID, message.data.c_str(), message.data.size(), 0);
-	}
+}
 }
 
 void Game::close_socket(SOCKET socket)

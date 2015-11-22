@@ -408,6 +408,9 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 	// the movement validated, load the radius for the destination
 	world.load_view_radius_around(x + dx, y + dy, this->name);
 
+	// maintain a list of users that are falling out of view that will also need a map update
+	vector<string> additional_users_to_notify;
+
 	// remove viewing ID from rooms leaving view
 	if (direction_ID == C::NORTH || direction_ID == C::SOUTH)
 	{
@@ -417,6 +420,11 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 		// each room to try unload from from x,(y-view) to (x,y+view)
 		for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
 		{
+			// Skip this room if it is not loaded. This occurs when a player moves diagonally, and both room unload passes overlap at the corner of the map.
+			if (world.room_at(rx, ry, C::GROUND_INDEX) != nullptr) continue;
+		
+			U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids()); // save any users in the room
+
 			// remove the character from the room's viewer list, trying to unload the room in the process
 			world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name); // bounds checking takes place in here
 		}
@@ -427,6 +435,8 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 		const int ry = (direction_ID == C::WEST) ? y + C::VIEW_DISTANCE : y - C::VIEW_DISTANCE;
 		for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 		{
+			if (world.room_at(rx, ry, C::GROUND_INDEX) != nullptr) continue;
+			U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
 			world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
 		}
 	}
@@ -443,6 +453,8 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 			const int rx = x + C::VIEW_DISTANCE;
 			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
 			{
+				if (world.room_at(rx, ry, C::GROUND_INDEX) != nullptr) continue;
+				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
 				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
 			}
 		}
@@ -452,6 +464,8 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 			const int ry = y - C::VIEW_DISTANCE;
 			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 			{
+				if (world.room_at(rx, ry, C::GROUND_INDEX) != nullptr) continue;
+				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
 				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
 			}
 		}
@@ -461,6 +475,8 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 			const int rx = x - C::VIEW_DISTANCE;
 			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
 			{
+				if (world.room_at(rx, ry, C::GROUND_INDEX) != nullptr) continue;
+				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
 				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
 			}
 		}
@@ -470,6 +486,8 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 			const int ry = y + C::VIEW_DISTANCE;
 			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 			{
+				if (world.room_at(rx, ry, C::GROUND_INDEX) != nullptr) continue;
+				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
 				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
 			}
 		}
@@ -495,10 +513,16 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 	world.room_at(x, y, z)->add_actor(this->name);
 
 	// prepare responses
-	return Update_Messages("You move " + direction_ID + ".",
+	Update_Messages updates("You move " + direction_ID + ".",
 		// "Jeb arrives from the south [wielding an axe]."
 		this->name + " arrives from the " + C::opposite_direction_id.find(direction_ID)->second +
-		((this->equipped_item == nullptr) ? "." : (" wielding " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + ".")));
+		((this->equipped_item == nullptr) ? "." : (" wielding " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + ".")),
+		true); // update required for all users in sight range
+
+	// users that have fallen out of view won't recieve a map update unless we send one to them explicitly
+	updates.additional_map_update_users = make_shared<vector<string>>(std::move(additional_users_to_notify));
+
+	return updates;
 }
 Update_Messages Character::craft(const string & craft_item_id, World & world)
 {

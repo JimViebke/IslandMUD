@@ -33,7 +33,7 @@ Feb 14, 2015 */
 #include "parse.h"
 #include "world.h"
 #include "threadsafe_queue.h"
-#include "threadsafe_bidirectional_map.h"
+#include "threadsafe_socket_lookup.h"
 #include "message.h"
 
 class Game
@@ -42,7 +42,7 @@ private:
 	threadsafe::queue<Message> inbound_queue; // <socket_ID, message>
 	threadsafe::queue<Message> outbound_queue; // <socket_ID, message>
 
-	threadsafe::bidirectional_map<SOCKET, string> clients; // <socket_ID, user_ID>
+	threadsafe::socket_lookup clients;
 	
 	map<string, shared_ptr<Character>> actors; // active/online PC and NPC ids
 	std::mutex actors_mutex; // serves for both of the above types

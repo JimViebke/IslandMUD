@@ -146,6 +146,10 @@ namespace Utilities
 	{
 		vec.erase(find(vec.begin(), vec.end(), erase_element));
 	}
+	template <typename T> void append_b_to_a(vector<T> & dest, const vector<T> & source)
+	{
+		dest.insert(dest.end(), source.begin(), source.end());
+	}
 
 	// file utilities
 	inline bool file_exists(const string & path)

@@ -161,10 +161,10 @@
     <ClInclude Include="threadsafe_queue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="threadsafe_bidirectional_map.h">
+    <ClInclude Include="message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="message.h">
+    <ClInclude Include="threadsafe_socket_lookup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
