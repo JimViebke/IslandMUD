@@ -150,8 +150,16 @@ string Character::save()
 	// if an item is equipped, move it back to the player's inventory
 	this->unequip();
 
-	// create a document to save the user's info
+	// load the existing document to save the user's info
 	xml_document user_data_xml;
+	user_data_xml.load_file((C::user_data_directory + "/" + this->name + ".xml").c_str());
+
+	// erase the nodes we want to overwrite
+	user_data_xml.remove_child(C::XML_USER_STATUS.c_str());
+	user_data_xml.remove_child(C::XML_USER_LOCATION.c_str());
+	user_data_xml.remove_child(C::XML_USER_LEVELS.c_str());
+	user_data_xml.remove_child(C::XML_USER_EQUIPMENT.c_str());
+	user_data_xml.remove_child(C::XML_USER_MATERIALS.c_str());
 
 	// create nodes to store user equipment and materials
 	xml_node status_node = user_data_xml.append_child(C::XML_USER_STATUS.c_str());

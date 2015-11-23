@@ -440,15 +440,22 @@ void Game::networking_thread()
 #endif
 }
 
-void Game::client_thread(SOCKET client_ID)
-{
-	{
-		// assemble initial username
-		stringstream ss;
-		ss << "User_" << client_ID;
-		const std::string user_ID = ss.str();
 
-		// add client to the lookup
+
+void Game::client_thread(const SOCKET client_ID)
+{
+	outbound_queue.put(Message(client_ID, "Welcome to IslandMUD!\n\n"));
+
+	// allocate a buffer on the stack to store incoming messages
+	char input[1024];
+
+	const string user_ID = login_or_signup(client_ID); // execution stays in here until the user is signed in
+
+	if (user_ID == "") return; // the user disconnected before signing in, the function above already cleaned up
+
+	// finish other login/connection details
+	{
+		// add user to the lookup
 		clients.set_socket(user_ID, client_ID);
 
 		// log the player in
@@ -461,12 +468,9 @@ void Game::client_thread(SOCKET client_ID)
 		outbound_queue.put(Message(client_ID, "Welcome to IslandMUD! Your username is \"" + user_ID + "\".\n\n"));
 	}
 
-	// allocate a buffer on the stack to store incoming messages
-	char input[1024];
-
 	for (;;)
 	{
-		// execution pauses inside of recv() until the user sends data (one of these for each user in their own thread)
+		// execution pauses inside of recv() until the user sends data
 		int data_read = recv(client_ID, input, 1024, 0);
 
 		// check if reading the socket failed
@@ -493,6 +497,8 @@ void Game::client_thread(SOCKET client_ID)
 
 void Game::processing_thread()
 {
+	// the processing thread handles input from users who are already logged in
+
 	for (;;)
 	{
 		// destructively get the next inbound message
@@ -614,14 +620,108 @@ void Game::outbound_thread()
 
 		// dispatch data to the user (nonblocking) (because we're using TCP, data is lossless unless total failure occurs)
 		send(message.user_socket_ID, message.data.c_str(), message.data.size(), 0);
-}
+	}
 }
 
-void Game::close_socket(SOCKET socket)
+void Game::close_socket(const SOCKET socket)
 {
 #ifdef WIN32
 	closesocket(socket);
 #else
 	close(socket);
 #endif
+}
+
+string Game::login_or_signup(const SOCKET client_ID)
+{
+	// return the user_ID of a user after they log in or sign up
+
+	// allocate a buffer on the stack to store incoming messages
+	char input[1024];
+
+	for (;;) // return after the user logs in or creates an account
+	{
+		const string login_instructions =
+			"Type \"username\" \"password\" to log in.\n"
+			"Type \"username\" \"password\" \"repeat password\" to create an account.\n"
+			"*** Password encryption has not yet been implemented. ***";
+
+		// set instructions
+		outbound_queue.put(Message(client_ID, login_instructions));
+
+		// execution pauses inside of recv() until the user sends data (one of these for each user in their own thread)
+		int data_read = recv(client_ID, input, 1024, 0);
+
+		// check if reading the socket failed
+		if (data_read == 0 || data_read == -1) // graceful disconnect, less graceful disconnect (respectively)
+		{
+			close_socket(client_ID); // close socket (platform-independent)
+			return ""; // the user lost connection before logging in
+		}
+
+		// convert user input to parsed vector of words
+		std::stringstream user_input;
+		for (int i = 0; i < data_read; ++i)
+			user_input << input[i];
+		const istream_iterator<string> begin(user_input);
+		const vector<string> input(begin, istream_iterator<string>());
+
+		if (input.size() == 3) // new account
+		{
+			const string user_file = C::user_data_directory + "/" + input[0] + ".xml";
+
+			// check if the username is taken
+			if (U::file_exists(user_file))
+			{
+				outbound_queue.put(Message(client_ID, "User \"" + input[0] + "\" already exists."));
+				continue;
+			}
+
+			// check if the passwords match
+			if (input[1] != input[2])
+			{
+				outbound_queue.put(Message(client_ID, "Passwords don't match."));
+				continue;
+			}
+
+			// the user's file does not exist yet, create it using the username and password
+
+			pugi::xml_document user_data_xml;
+			user_data_xml
+				.append_child(C::XML_USER_ACCOUNT.c_str())
+				.append_attribute(C::XML_USER_PASSWORD.c_str())
+				.set_value(input[1].c_str());
+
+			user_data_xml.save_file(user_file.c_str());
+
+			return input[0]; // account created
+		}
+		else if (input.size() == 2) // returning user
+		{
+			const string user_file = C::user_data_directory + "/" + input[0] + ".xml";
+
+			if (!U::file_exists(user_file))
+			{
+				outbound_queue.put(Message(client_ID, "User \"" + input[0] + "\" does not exist."));
+				continue;
+			}
+
+			pugi::xml_document user_data_xml;
+			user_data_xml.load_file(user_file.c_str());
+
+			if (input[1] != user_data_xml
+				.child(C::XML_USER_ACCOUNT.c_str())
+				.attribute(C::XML_USER_PASSWORD.c_str())
+				.as_string())
+			{
+				outbound_queue.put(Message(client_ID, "Incorrect password for user \"" + input[0] + "\"."));
+				continue;
+			}
+
+			// the password was correct
+			return input[0]; // the username of the user that just logged in or signed up
+		}
+
+		// wrong input length, loop
+	}
 }

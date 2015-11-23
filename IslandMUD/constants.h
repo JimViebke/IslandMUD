@@ -37,7 +37,7 @@ namespace Constants
 		DEFAULT_SPAWN_X,
 		DEFAULT_SPAWN_Y,
 		DEFAULT_SPAWN_Z,
-		
+
 		GAME_PORT_NUMBER;
 
 	// game data locations
@@ -178,6 +178,8 @@ namespace Constants
 		XML_CHEST_MATERIALS_COUNT,
 
 		// user data xml
+		XML_USER_ACCOUNT,
+		XML_USER_PASSWORD,
 		XML_USER_STATUS,
 		XML_USER_STATUS_CURRENT_HEALTH,
 		XML_USER_LOCATION,

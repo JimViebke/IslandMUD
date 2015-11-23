@@ -43,7 +43,7 @@ private:
 	threadsafe::queue<Message> outbound_queue; // <socket_ID, message>
 
 	threadsafe::socket_lookup clients;
-	
+
 	map<string, shared_ptr<Character>> actors; // active/online PC and NPC ids
 	std::mutex actors_mutex; // serves for both of the above types
 
@@ -72,8 +72,17 @@ private:
 	// remove data from the outbound queue and send it the to specified client
 	void outbound_thread();
 
+
+
+	// helper functions
+
+
+
 	// close a socket, platform independent
 	void close_socket(SOCKET socket);
+
+	// return the user_ID of a user after they log in or sign up
+	string login_or_signup(SOCKET client_ID);
 };
 
 #endif

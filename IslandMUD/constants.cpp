@@ -172,6 +172,8 @@ const string C::XML_CHEST_MATERIALS = "material_contents";
 const string C::XML_CHEST_MATERIALS_COUNT = "count";
 
 // user data xml
+const string C::XML_USER_ACCOUNT = "account";
+const string C::XML_USER_PASSWORD = "password";
 const string C::XML_USER_STATUS = "status";
 const string C::XML_USER_STATUS_CURRENT_HEALTH = "current_health";
 const string C::XML_USER_LOCATION = "location";
