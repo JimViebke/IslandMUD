@@ -43,6 +43,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/game.o \
 	${OBJECTDIR}/generator.o \
 	${OBJECTDIR}/main.o \
+	${OBJECTDIR}/message.o \
 	${OBJECTDIR}/non_player_character.o \
 	${OBJECTDIR}/npc_enemy.o \
 	${OBJECTDIR}/npc_enemy_bodyguard.o \
@@ -63,8 +64,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=
-CXXFLAGS=
+CCFLAGS=-pthread
+CXXFLAGS=-pthread
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -86,112 +87,117 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/islandmud: ${OBJECTFILES}
 ${OBJECTDIR}/character.o: character.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/character.o character.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/character.o character.cpp
 
 ${OBJECTDIR}/chest.o: chest.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/chest.o chest.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/chest.o chest.cpp
 
 ${OBJECTDIR}/constants.o: constants.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/constants.o constants.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/constants.o constants.cpp
 
 ${OBJECTDIR}/craft.o: craft.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/craft.o craft.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/craft.o craft.cpp
 
 ${OBJECTDIR}/door.o: door.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/door.o door.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/door.o door.cpp
 
 ${OBJECTDIR}/game.o: game.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/game.o game.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/game.o game.cpp
 
 ${OBJECTDIR}/generator.o: generator.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/generator.o generator.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/generator.o generator.cpp
 
 ${OBJECTDIR}/main.o: main.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+
+${OBJECTDIR}/message.o: message.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/message.o message.cpp
 
 ${OBJECTDIR}/non_player_character.o: non_player_character.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/non_player_character.o non_player_character.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/non_player_character.o non_player_character.cpp
 
 ${OBJECTDIR}/npc_enemy.o: npc_enemy.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/npc_enemy.o npc_enemy.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/npc_enemy.o npc_enemy.cpp
 
 ${OBJECTDIR}/npc_enemy_bodyguard.o: npc_enemy_bodyguard.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/npc_enemy_bodyguard.o npc_enemy_bodyguard.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/npc_enemy_bodyguard.o npc_enemy_bodyguard.cpp
 
 ${OBJECTDIR}/npc_enemy_fighter.o: npc_enemy_fighter.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/npc_enemy_fighter.o npc_enemy_fighter.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/npc_enemy_fighter.o npc_enemy_fighter.cpp
 
 ${OBJECTDIR}/npc_enemy_worker.o: npc_enemy_worker.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/npc_enemy_worker.o npc_enemy_worker.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/npc_enemy_worker.o npc_enemy_worker.cpp
 
 ${OBJECTDIR}/npc_unaffiliated.o: npc_unaffiliated.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/npc_unaffiliated.o npc_unaffiliated.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/npc_unaffiliated.o npc_unaffiliated.cpp
 
 ${OBJECTDIR}/parse.o: parse.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/parse.o parse.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/parse.o parse.cpp
 
 ${OBJECTDIR}/player_character.o: player_character.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/player_character.o player_character.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/player_character.o player_character.cpp
 
 ${OBJECTDIR}/pugixml.o: pugixml.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pugixml.o pugixml.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pugixml.o pugixml.cpp
 
 ${OBJECTDIR}/recipes.o: recipes.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/recipes.o recipes.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/recipes.o recipes.cpp
 
 ${OBJECTDIR}/room.o: room.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/room.o room.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/room.o room.cpp
 
 ${OBJECTDIR}/room_side.o: room_side.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/room_side.o room_side.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/room_side.o room_side.cpp
 
 ${OBJECTDIR}/utilities.o: utilities.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/utilities.o utilities.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/utilities.o utilities.cpp
 
 ${OBJECTDIR}/world.o: world.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/world.o world.cpp
+	$(COMPILE.cc) -O2 -Werror -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/world.o world.cpp
 
 # Subprojects
 .build-subprojects:

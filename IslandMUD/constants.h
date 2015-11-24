@@ -11,7 +11,7 @@ Feb 14, 2015 */
 #ifdef _WIN32
 using char_type = char;
 #else
-using char_type = string;
+using char_type = std::string;
 #endif
 
 namespace

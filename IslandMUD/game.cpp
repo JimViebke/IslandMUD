@@ -7,7 +7,6 @@ May 15 2015 */
 #include "game.h"
 
 #ifndef WIN32 // define some types and values for Linux builds
-typedef int SOCKET;
 const int INVALID_SOCKET = 0xffff;
 #endif
 
@@ -400,14 +399,22 @@ void Game::networking_thread()
 
 	if (socket_1 == INVALID_SOCKET)
 	{
-		std::cout << "invalid socket: " << WSAGetLastError() << std::endl;
+#ifdef WIN32
+		std::cout << "invalid socket, error code: " << WSAGetLastError() << std::endl;
+#else
+		std::cout << "invalid socket, error code: " << errno << std::endl;
+#endif
 	}
 
 	sockaddr_in name;
 	memset(&name, 0, sizeof(sockaddr_in));
 	name.sin_family = AF_INET;
 	name.sin_port = htons(C::GAME_PORT_NUMBER);
+#ifdef WIN32
 	name.sin_addr.S_un.S_addr = 0; // open port on all network interfaces
+#else
+	name.sin_addr.s_addr = 0;
+#endif
 
 	// bind the socket
 	::bind(socket_1, (sockaddr*)&name, sizeof(sockaddr_in));

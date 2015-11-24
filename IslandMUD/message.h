@@ -17,6 +17,8 @@ Nov 14 2015 */
 #include <netinet/ip.h>
 #include <unistd.h>
 #include <cstring>
+#include <errno.h>
+using SOCKET = unsigned int;
 #endif
 
 #include "utilities.h"
