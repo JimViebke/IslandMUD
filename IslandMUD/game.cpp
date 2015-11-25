@@ -469,7 +469,7 @@ void Game::client_thread(const SOCKET client_ID)
 		actors.insert(make_pair(user_ID, player));
 
 		// send a welcome message through the outbound queue
-		outbound_queue.put(Message(client_ID, "Welcome to IslandMUD! Your username is \"" + user_ID + "\".\n\n"));
+		outbound_queue.put(Message(client_ID, "Welcome to IslandMUD! You are playing as \"" + user_ID + "\".\n\n"));
 	}
 
 	for (;;)
