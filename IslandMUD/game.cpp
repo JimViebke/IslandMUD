@@ -15,9 +15,6 @@ Game::Game()
 	// load crafting recipes lookup
 	Character::recipes.load();
 
-	// load the parse dictionary
-	Parse::initialize();
-
 	// load the world
 	world.load();
 }

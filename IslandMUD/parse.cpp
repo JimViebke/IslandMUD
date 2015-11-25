@@ -99,6 +99,8 @@ vector<string> Parse::tokenize(const string & s)
 
 	cout << "\nDEBUG inside parse.tokenize: "; // debugging
 
+	if (Parse::dict.size() == 0) Parse::initialize();
+
 	// convert the space-delimited user input to a vector of strings (one word per string)
 	stringstream ss(s);
 	const istream_iterator<string> begin(ss);
