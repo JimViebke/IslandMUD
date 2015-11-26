@@ -11,8 +11,7 @@ Feb 14, 2015 */
 #include "room.h"
 #include "world.h"
 #include "recipes.h"
-
-using namespace std;
+#include "message.h"
 
 class Character
 {
@@ -58,7 +57,7 @@ protected:
 public:
 
 	string login(World & world);
-	string logout();
+	string save();
 
 	// levels
 	void set_swordsmanship_level(const int & level_value);
@@ -77,14 +76,14 @@ public:
 	// inventory manipulation
 	void add(const shared_ptr<Item> & item);
 	void remove(const string & item_id, const unsigned & count = 1);
-	string equip(const string & item_ID);
-	string unequip();
 
 	// actions
-	string craft(const string & craft_item_id, World & world);
-	string move(const string & direction, World & world);
-	string take(const string & item_id, World & world);
-	string drop(const string & drop_item_id, World & world);
+	Update_Messages craft(const string & craft_item_id, World & world);
+	Update_Messages move(const string & direction, World & world);
+	Update_Messages take(const string & item_id, World & world);
+	Update_Messages drop(const string & drop_item_id, World & world);
+	Update_Messages equip(const string & item_ID);
+	Update_Messages unequip();
 	string add_to_chest(const string & insert_item_id, World & world);
 	string take_from_chest(const string & take_item_id, World & world);
 	string look_inside_chest(const World & world) const;

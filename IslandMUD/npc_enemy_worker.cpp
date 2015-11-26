@@ -89,9 +89,9 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				if (one_can_craft(objective_iterator->purpose) && crafting_requirements_met(objective_iterator->purpose, world))
 				{
 					// try to craft the item, using obj->purpose if the (obj->verb == GOTO), else use obj->noun (most cases)
-					const string craft_attempt = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
+					const Update_Messages craft_attempt = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
 
-					if (craft_attempt.find("You now have") != string::npos)
+					if (craft_attempt.to_room != nullptr) // find a better way to determine if crafting was successful
 					{
 						// if successful, clear completed objectives
 
@@ -139,8 +139,9 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 			objective_iterator != objectives.end(); ++objective_iterator)
 		{
 			// try to craft the item, using obj->purpose if the (obj->verb == GOTO), else use obj->noun (most cases)
-			const string craft_attempt = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
-			if (craft_attempt.find("You now have") != string::npos)
+			const Update_Messages craft_attempt = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
+			
+			if (craft_attempt.to_room != nullptr) // find a better way to determine if crafting was successful
 			{
 				// if successful, clear completed objectives
 

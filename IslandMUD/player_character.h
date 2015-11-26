@@ -17,7 +17,7 @@ public:
 
 	string print() const;
 
-	string get_equipped_item_id() const;
+	string get_equipped_item_info() const;
 
 	string generate_area_map(const World & world, const map<string, shared_ptr<Character>> & actors) const;
 };

@@ -787,8 +787,14 @@ bool NPC::make_path_movement(World & world)
 	// if the NPC is currently pathfinding to a destination
 	if (!path.empty())
 	{
-		// attempt to move to the next node
-		if (this->move(U::get_movement_direction(x, y, path.begin()->_x, path.begin()->_y), world).find("You move ") != string::npos)
+		// copy current coordinates
+		const int cx = x, cy = y, cz = z;
+
+		// attempt to move
+		this->move(U::get_movement_direction(x, y, path.begin()->_x, path.begin()->_y), world);
+
+		// check to see if the NPC's coordinates have changed
+		if (x != cx || y != cy || z != cz)
 		{
 			// if successful, remove the coordinate that we travelled to
 			path.erase(path.begin());

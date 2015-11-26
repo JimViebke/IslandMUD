@@ -2,15 +2,14 @@
 Feb 14, 2015 */
 
 #include <fstream>
-#include <thread>
 
 #include "craft.h"
 #include "game.h"
 
-using namespace std;
-
 int main()
 {
+	using namespace std;
+		
 	srand((unsigned)time(NULL)); // seed rand
 
 	// write game directories to disk
@@ -28,14 +27,9 @@ int main()
 	// add Linux equivalent?
 #endif
 
-	// create game object
 	Game game;
 
-	// initialize and load everything
-	game.load();
-
-	// For playing using the server as the sole client (development), call main_test_loop().
-	// Execution stays here until the game ends.
-	game.main_test_loop();
+	// instead of spawning a new thread for networking, run it in the main thread
+	game.networking_thread();
 
 }

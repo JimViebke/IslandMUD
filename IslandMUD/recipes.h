@@ -12,8 +12,6 @@ May 15 2015 */
 #include "recipe.h"
 #include "constants.h"
 
-using namespace std;
-
 class Recipes
 {
 public:

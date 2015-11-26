@@ -19,15 +19,15 @@ void Parse::initialize()
 		P::dict["recipe"] = P::dict["recipes"] = C::PRINT_RECIPES_COMMAND;
 
 		// verbs
-		P::dict["help"] = P::dict["h"] = P::dict["q"] = P::dict["?"] = P::dict["assist"] = P::dict["command"] = P::dict["commands"] = C::HELP_COMMAND;
+		P::dict["help"] = P::dict["h"] = P::dict["q"] = P::dict["?"] = P::dict["assist"] = P::dict["command"] = P::dict["commands"] = C::SHOW_HELP_COMMAND;
 		P::dict["legend"] = C::LEGEND_COMMAND;
 		// P::dict["login"] = C::LOGIN_COMMAND; // not used yet
-		P::dict["logout"] = P::dict["quit"] = P::dict["leave"] = P::dict["exit"] = C::LOGOUT_COMMAND;
+		P::dict["save"] = P::dict["logout"] = P::dict["quit"] = P::dict["leave"] = P::dict["exit"] = C::SAVE_COMMAND;
 		P::dict["move"] = P::dict["m"] = P::dict["walk"] = P::dict["run"] = P::dict["head"] = P::dict["go"] = P::dict["continue"] = P::dict["work"] = C::MOVE_COMMAND;
 		P::dict["take"] = P::dict["get"] = P::dict["pick"] = P::dict["choose"] = P::dict["grab"] = P::dict["acquire"] = C::TAKE_COMMAND;
 		P::dict["equip"] = P::dict["equipped"] = P::dict["weild"] = P::dict["wield"] = P::dict["ready"] = P::dict["draw"] = C::EQUIP_COMMAND;
 		P::dict["item"] = C::ITEM_COMMAND; // viewing equipped item
-		P::dict["dequip"] = P::dict["deequip"] = P::dict["unequip"] = P::dict["unwield"] = P::dict["unweild"] = P::dict["store"] = P::dict["sheathe"] = P::dict["sheath"] = C::DEQUIP_COMMAND;
+		P::dict["dequip"] = P::dict["deequip"] = P::dict["unequip"] = P::dict["unwield"] = P::dict["unweild"] = P::dict["store"] = P::dict["sheathe"] = P::dict["sheath"] = P::dict["lower"] = C::DEQUIP_COMMAND;
 		P::dict["craft"] = P::dict["make"] = P::dict["create"] = P::dict["fashion"] = C::CRAFT_COMMAND;
 		P::dict["mine"] = C::MINE_COMMAND;
 		P::dict["drop"] = P::dict["release"] = P::dict["unhand"] = P::dict["add"] = P::dict["place"] = P::dict["put"] = C::DROP_COMMAND;
@@ -99,6 +99,8 @@ vector<string> Parse::tokenize(const string & s)
 
 	cout << "\nDEBUG inside parse.tokenize: "; // debugging
 
+	if (Parse::dict.size() == 0) Parse::initialize();
+
 	// convert the space-delimited user input to a vector of strings (one word per string)
 	stringstream ss(s);
 	const istream_iterator<string> begin(ss);
@@ -111,8 +113,12 @@ vector<string> Parse::tokenize(const string & s)
 		// convert the word to lowercase
 		U::to_lower_case(word);
 
-		// replace the word with the engine keyword, or C::BAD_COMMAND
-		word = (dict.find(word) != dict.end()) ? dict.find(word)->second : C::BAD_COMMAND;
+		// replace the typed word with the engine keyword if one exists
+		const map<string, string>::const_iterator dict_it = dict.find(word);
+		if (dict_it != dict.cend())
+		{
+			word = dict_it->second;
+		}
 	}
 
 	return strings;

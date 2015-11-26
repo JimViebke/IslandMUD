@@ -89,6 +89,7 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="generator.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="message.cpp" />
     <ClCompile Include="non_player_character.cpp" />
     <ClCompile Include="npc_enemy.cpp" />
     <ClCompile Include="npc_enemy_bodyguard.cpp" />
@@ -112,6 +113,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="generator.h" />
     <ClInclude Include="item.h" />
+    <ClInclude Include="message.h" />
     <ClInclude Include="non_player_character.h" />
     <ClInclude Include="npc_enemy.h" />
     <ClInclude Include="npc_enemy_bodyguard.h" />
@@ -127,6 +129,8 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="room.h" />
     <ClInclude Include="room_side.h" />
+    <ClInclude Include="threadsafe_socket_lookup.h" />
+    <ClInclude Include="threadsafe_queue.h" />
     <ClInclude Include="utilities.h" />
     <ClInclude Include="world.h" />
   </ItemGroup>

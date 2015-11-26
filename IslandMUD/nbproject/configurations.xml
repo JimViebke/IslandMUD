@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurationDescriptor version="95">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
-    <logicalFolder name="f1" displayName="source" projectFiles="true" kind="ROOT">
+    <logicalFolder name="f1" displayName="source" projectFiles="true">
       <itemPath>character.cpp</itemPath>
       <itemPath>character.h</itemPath>
       <itemPath>chest.cpp</itemPath>
@@ -17,6 +17,7 @@
       <itemPath>generator.h</itemPath>
       <itemPath>item.h</itemPath>
       <itemPath>main.cpp</itemPath>
+      <itemPath>message.cpp</itemPath>
       <itemPath>message.h</itemPath>
       <itemPath>non_player_character.cpp</itemPath>
       <itemPath>non_player_character.h</itemPath>
@@ -45,6 +46,8 @@
       <itemPath>room.h</itemPath>
       <itemPath>room_side.cpp</itemPath>
       <itemPath>room_side.h</itemPath>
+      <itemPath>threadsafe_queue.h</itemPath>
+      <itemPath>threadsafe_socket_lookup.h</itemPath>
       <itemPath>utilities.cpp</itemPath>
       <itemPath>utilities.h</itemPath>
       <itemPath>world.cpp</itemPath>
@@ -79,6 +82,8 @@
         <ccTool>
           <standard>8</standard>
           <commandlineTool>g++-4.9</commandlineTool>
+          <commandLine>-pthread</commandLine>
+          <warningLevel>3</warningLevel>
         </ccTool>
       </compileType>
       <item path="character.cpp" ex="false" tool="1" flavor2="0">
@@ -110,6 +115,8 @@
       <item path="item.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="message.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="message.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -167,6 +174,10 @@
       </item>
       <item path="room_side.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="threadsafe_queue.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="threadsafe_socket_lookup.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="utilities.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="utilities.h" ex="false" tool="3" flavor2="0">
@@ -192,6 +203,8 @@
           <developmentMode>5</developmentMode>
           <standard>8</standard>
           <commandlineTool>g++-4.9</commandlineTool>
+          <commandLine>-pthread</commandLine>
+          <warningLevel>3</warningLevel>
         </ccTool>
         <fortranCompilerTool>
           <developmentMode>5</developmentMode>
@@ -230,6 +243,8 @@
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="message.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="message.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="non_player_character.cpp" ex="false" tool="1" flavor2="0">
@@ -285,6 +300,10 @@
       <item path="room_side.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="room_side.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="threadsafe_queue.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="threadsafe_socket_lookup.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="utilities.cpp" ex="false" tool="1" flavor2="0">
       </item>

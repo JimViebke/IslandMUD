@@ -8,13 +8,16 @@ Feb 14, 2015 */
 #include <map>
 #include <vector>
 
-using namespace std;
-
 #ifdef _WIN32
 using char_type = char;
 #else
-using char_type = string;
+using char_type = std::string;
 #endif
+
+namespace
+{
+	using namespace std;
+}
 
 namespace Constants {} // "forward declaring"...
 
@@ -33,7 +36,9 @@ namespace Constants
 
 		DEFAULT_SPAWN_X,
 		DEFAULT_SPAWN_Y,
-		DEFAULT_SPAWN_Z;
+		DEFAULT_SPAWN_Z,
+
+		GAME_PORT_NUMBER;
 
 	// game data locations
 	extern const string
@@ -109,13 +114,10 @@ namespace Constants
 		// none of these are actual item IDs, they exist for the parser to work with multi-word IDs
 		KEYWORD_DEPOSIT,
 
-		// commands
-		BAD_COMMAND,
-
 		// action commands
 		LOGIN_COMMAND,
-		LOGOUT_COMMAND,
-		HELP_COMMAND,
+		SAVE_COMMAND,
+		SHOW_HELP_COMMAND,
 		LEGEND_COMMAND,
 		CRAFT_COMMAND,
 		MINE_COMMAND,
@@ -176,6 +178,8 @@ namespace Constants
 		XML_CHEST_MATERIALS_COUNT,
 
 		// user data xml
+		XML_USER_ACCOUNT,
+		XML_USER_PASSWORD,
 		XML_USER_STATUS,
 		XML_USER_STATUS_CURRENT_HEALTH,
 		XML_USER_LOCATION,
@@ -200,6 +204,9 @@ namespace Constants
 
 	// map an item ID to its article so we can have "an axe" and "a forge", rather than use "a(n)" for all items
 	extern const map<string, string> articles;
+
+	// map an item ID to its plural
+	extern const map<string, string> plurals;
 
 	// int to char_type conversion
 	extern const vector<char_type> numbers;

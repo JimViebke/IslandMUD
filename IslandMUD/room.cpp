@@ -122,18 +122,17 @@ bool Room::contains_item(const string & item_id, const unsigned & count) const
 		return true; // return success
 	}
 
-	// for each item in the room
-	for (multimap<string, shared_ptr<Item>>::const_iterator it = contents.cbegin();
-		it != contents.cend(); ++it)
+	// if the item is a material, attempt to extract it
+	const multimap<string, shared_ptr<Item>>::const_iterator it = contents.find(item_id);
+	if (it != contents.cend()) // if the item exist
 	{
-		// if the item is a material
+		// attempt to convert the item to a material type
 		if (shared_ptr<Material> material_item = U::convert_to<Material>(it->second))
 		{
-			// if the amount greater than or equal to count
+			// if the amount is greater than or equal to count
 			if (material_item->amount >= count)
 			{
-				// success
-				return true;
+				return true; // success
 			}
 		}
 	}

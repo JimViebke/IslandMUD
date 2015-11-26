@@ -7,7 +7,10 @@ May 15 2015 */
 #include <map>
 #include <string>
 
-using namespace std;
+namespace
+{
+	using namespace std;
+}
 
 class Recipe
 {

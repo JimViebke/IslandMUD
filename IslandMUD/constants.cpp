@@ -17,6 +17,8 @@ const int C::DEFAULT_SPAWN_X = C::WORLD_X_DIMENSION / 2; // N/S center
 const int C::DEFAULT_SPAWN_Y = C::WORLD_Y_DIMENSION / 2; // E/W center
 const int C::DEFAULT_SPAWN_Z = C::GROUND_INDEX; // ground level spawn
 
+const int C::GAME_PORT_NUMBER = 8050;
+
 // game data locations
 #ifdef _WIN32
 const string C::game_directory = "C:/IslandMUD"; // Windows path
@@ -106,13 +108,10 @@ const string C::LIMESTONE_ID = "limestone";
 // none of these are actual item IDs, they exist for the parser to work with multi-word IDs
 const string C::KEYWORD_DEPOSIT = "deposit";
 
-// commands
-const string C::BAD_COMMAND = "unknown_command";
-
 // action commands
 const string C::LOGIN_COMMAND = "login";
-const string C::LOGOUT_COMMAND = "logout";
-const string C::HELP_COMMAND = "help";
+const string C::SAVE_COMMAND = "save";
+const string C::SHOW_HELP_COMMAND = "help";
 const string C::LEGEND_COMMAND = "legend";
 const string C::TAKE_COMMAND = "take";
 const string C::EQUIP_COMMAND = "equip";
@@ -173,6 +172,8 @@ const string C::XML_CHEST_MATERIALS = "material_contents";
 const string C::XML_CHEST_MATERIALS_COUNT = "count";
 
 // user data xml
+const string C::XML_USER_ACCOUNT = "account";
+const string C::XML_USER_PASSWORD = "password";
 const string C::XML_USER_STATUS = "status";
 const string C::XML_USER_STATUS_CURRENT_HEALTH = "current_health";
 const string C::XML_USER_LOCATION = "location";
@@ -214,6 +215,7 @@ namespace // anonymous namespace to prevent access outside this file
 		temp_articles[C::BOARD_ID] =
 			temp_articles[C::BOW_ID] =
 			temp_articles[C::BRANCH_ID] =
+			temp_articles[C::CHEST_ID] =
 			temp_articles[C::FORGE_ID] =
 			temp_articles[C::HAMMER_ID] =
 			temp_articles[C::LIMESTONE_ID] =
@@ -239,9 +241,46 @@ namespace // anonymous namespace to prevent access outside this file
 
 		return temp_articles;
 	}
+
+	map<string, string> generate_plurals_map()
+	{
+		cout << "\nLoading plurals lookup...";
+
+		map<string, string> temp_plurals;
+
+		// item IDs
+
+		temp_plurals[C::ANVIL_ID] = "anvils";
+		temp_plurals[C::ARROWHEAD_ID] = "arrowheads";
+		temp_plurals[C::ARROW_ID] = "arrows";
+		temp_plurals[C::AXE_ID] = "axes";
+		// temp_plurals[C::IRON_ID] = "";
+		// temp_plurals[C::IRON_DEPOSIT_ID] = "an";
+
+		temp_plurals[C::BOARD_ID] = "boards";
+		temp_plurals[C::BOW_ID] = "bows";
+		temp_plurals[C::BRANCH_ID] = "branches";
+		temp_plurals[C::FORGE_ID] = "forges";
+		temp_plurals[C::HAMMER_ID] = "hammers";
+		// temp_plurals[C::LIMESTONE_ID] = "";
+		// temp_plurals[C::LIMESTONE_DEPOSIT_ID] = "";
+		temp_plurals[C::LOG_ID] = "logs";
+		temp_plurals[C::SMELTER_ID] = "smelters";
+		temp_plurals[C::STAFF_ID] = "staves";
+		temp_plurals[C::STICK_ID] = "sticks";
+		temp_plurals[C::STONE_ID] = "stones";
+		temp_plurals[C::SWORD_ID] = "swords";
+		temp_plurals[C::TORCH_ID] = "torches";
+		temp_plurals[C::TREE_ID] = "trees";
+		temp_plurals[C::VINE_ID] = "vines";
+		// temp_plurals[C::WOOD_ID] = "";
+
+		return temp_plurals;
+	}
 }
 
 const map<string, string> C::articles = generate_articles_map();
+const map<string, string> C::plurals = generate_plurals_map();
 
 // efficient int to char conversion
 #ifdef _WIN32

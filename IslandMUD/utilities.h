@@ -24,8 +24,6 @@ Feb 14, 2015 */
 
 #include "constants.h"
 
-using namespace std;
-
 namespace Utilities {} // "forward delcaring"...
 
 namespace U = Utilities; // ...to do this here
@@ -35,7 +33,7 @@ namespace Utilities
 	// debugging output
 	template <typename T> inline void print(const vector<T> & v)
 	{
-		for (T element : v)
+		for (const T & element : v)
 		{
 			cout << element << " ";
 		}
@@ -50,6 +48,7 @@ namespace Utilities
 	}
 	inline char_type to_char_type(const unsigned & val)
 	{
+		// crashes for numbers not in the range of 0-9 inclusive
 		return C::numbers[val];
 	}
 
@@ -147,6 +146,10 @@ namespace Utilities
 	{
 		vec.erase(find(vec.begin(), vec.end(), erase_element));
 	}
+	template <typename T> void append_b_to_a(vector<T> & dest, const vector<T> & source)
+	{
+		dest.insert(dest.end(), source.begin(), source.end());
+	}
 
 	// file utilities
 	inline bool file_exists(const string & path)
@@ -174,9 +177,11 @@ namespace Utilities
 	// text formatting
 	void to_lower_case(string & word);
 	string capitalize(string & word);
+	string capitalize(const string & word);
 
 	// grammar
 	string get_article_for(const string & noun);
+	string get_plural_for(const string & noun);
 
 	// math
 	inline int difference(const int & a, const int & b);

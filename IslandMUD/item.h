@@ -10,8 +10,6 @@ Feb 14, 2015 */
 
 #include "parse.h"
 
-using namespace std;
-
 class Item
 {
 private:
@@ -25,8 +23,8 @@ protected:
 
 	int health = 100;
 
-	Item(const string & item_name, const bool & is_takable, const int & health = C::DEFAULT_ITEM_MAX_HEALTH) :
-		name(item_name), takable(is_takable), health(health) {}
+	Item(const string & item_name, const bool & is_takable, const int & set_health = C::DEFAULT_ITEM_MAX_HEALTH) :
+		name(item_name), takable(is_takable), health(set_health) {}
 
 	virtual ~Item() {}
 
@@ -120,12 +118,6 @@ public:
 	Smelter() : Item(C::SMELTER_ID, false) {}
 };
 
-class Forge : public Item
-{
-public:
-	Forge() : Item(C::FORGE_ID, false) {}
-};
-
 class Anvil : public Item
 {
 public:
@@ -139,7 +131,26 @@ class Equipment : public Item
 	// other members represent quality, health
 
 protected:
-	Equipment(string cust_name) : Item(cust_name, true) {} // all equipment is takable
+	Equipment(const string & set_name) : Item(set_name, true) {} // all equipment is takable
+};
+
+class Forge : public Item
+{
+private:
+	unique_ptr<Equipment> workpiece;
+	time_t workpiece_insert_time; // the time that the current workpiece placed in the forge
+
+	// These three fields store the amount of fuel in the forge for a given point in time,
+	// and a boolean indicating if the forge was lit at that time.
+	// These fields update every time the forge is observed.
+	unsigned fuel_units_remaining = 0;
+	time_t fuel_time;
+	bool lit = false;
+
+	// add something to indicate fuel type, which will be used to determine the temperature of the fire 
+
+public:
+	Forge() : Item(C::FORGE_ID, false) {}
 };
 
 class Staff : public Equipment

@@ -145,13 +145,21 @@ string Character::login(World & world)
 	// notify success
 	return "You have logged in to IslandMUD!";
 }
-string Character::logout()
+string Character::save()
 {
 	// if an item is equipped, move it back to the player's inventory
 	this->unequip();
 
-	// create a document to save the user's info
+	// load the existing document to save the user's info
 	xml_document user_data_xml;
+	user_data_xml.load_file((C::user_data_directory + "/" + this->name + ".xml").c_str());
+
+	// erase the nodes we want to overwrite
+	user_data_xml.remove_child(C::XML_USER_STATUS.c_str());
+	user_data_xml.remove_child(C::XML_USER_LOCATION.c_str());
+	user_data_xml.remove_child(C::XML_USER_LEVELS.c_str());
+	user_data_xml.remove_child(C::XML_USER_EQUIPMENT.c_str());
+	user_data_xml.remove_child(C::XML_USER_MATERIALS.c_str());
 
 	// create nodes to store user equipment and materials
 	xml_node status_node = user_data_xml.append_child(C::XML_USER_STATUS.c_str());
@@ -200,7 +208,7 @@ string Character::logout()
 	// save the user_data to disk
 	user_data_xml.save_file((C::user_data_directory + "/" + this->name + ".xml").c_str()); // returns an unused boolean
 
-	return "You have logged out.";
+	return "Player info saved.";
 }
 
 // levels
@@ -329,8 +337,8 @@ void Character::add(const shared_ptr<Item> & item)
 	// if the item is a material and is therefore stackable
 	if (U::is<Material>(item))
 	{
-		// check if the player already has an instance of the item
-		if (this->has(item->name))
+		// check if the player already has an instance of the item in their material inventory
+		if (this->material_inventory.find(item->name) != this->material_inventory.cend())
 		{
 			// if so, increment the count
 			this->material_inventory[item->name]->amount++;
@@ -377,7 +385,302 @@ void Character::remove(const string & item_id, const unsigned & count)
 		// the player does not have the item
 	}
 }
-string Character::equip(const string & item_ID)
+
+// actions
+Update_Messages Character::move(const string & direction_ID, World & world)
+{
+	// movement deltas
+	int dx = 0, dy = 0, dz = 0;
+
+	U::assign_movement_deltas(direction_ID, dx, dy, dz);
+
+	// validate movement deltas
+	if (!U::bounds_check(x + dx, y + dy, z + dz))
+	{
+		return Update_Messages("You can't go there.");
+	}
+
+	// copy the destination from disk to memory
+	// world.load_room_to_world(x + dx, y + dy, z + dz);
+
+	// test if the environment (structures) allow the player to move in a given direction
+	const string validate_movement = this->validate_movement(x, y, z, direction_ID, dx, dy, dz, world);
+
+	// if the validation failed for any reason
+	if (validate_movement != C::GOOD_SIGNAL)
+	{
+		// return that reason movement validation failed
+		return Update_Messages(validate_movement);
+	}
+
+	// the movement validated, load the radius for the destination
+	world.load_view_radius_around(x + dx, y + dy, this->name);
+
+	// maintain a list of users that are falling out of view that will also need a map update
+	vector<string> additional_users_to_notify;
+
+	// remove viewing ID from rooms leaving view
+	if (direction_ID == C::NORTH || direction_ID == C::SOUTH)
+	{
+		// if the character is moving north, add the view distance to x to get the x of the row being removed
+		// otherwise (moving south) remove the distance from x
+		int rx = (direction_ID == C::NORTH) ? x + C::VIEW_DISTANCE : x - C::VIEW_DISTANCE;
+		// each room to try unload from from x,(y-view) to (x,y+view)
+		for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
+		{
+			// Skip this room if it is not loaded. This occurs when a player moves diagonally, and both room unload passes overlap at the corner of the map.
+			if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
+		
+			U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids()); // save any users in the room
+
+			// remove the character from the room's viewer list, trying to unload the room in the process
+			world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name); // bounds checking takes place in here
+		}
+	}
+	else if (direction_ID == C::WEST || direction_ID == C::EAST)
+	{
+		// logic is the same as above, but in rotated axes (axes is plural of axis)
+		const int ry = (direction_ID == C::WEST) ? y + C::VIEW_DISTANCE : y - C::VIEW_DISTANCE;
+		for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
+		{
+			if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
+			U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
+			world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
+		}
+	}
+	else if (direction_ID == C::UP) { return Update_Messages("[moving up not available yet]"); }
+	else if (direction_ID == C::DOWN) { return Update_Messages("[moving down not available yet]"); }
+	else
+	{
+		/* The direction is a secondary compass direction.
+		This means execution will alwways enter two of the four below blocks.
+		Functionality here is the same as above. For documentation, scroll up. */
+
+		if (direction_ID == C::NORTH_WEST || direction_ID == C::NORTH_EAST) // moving north, parse south row
+		{
+			const int rx = x + C::VIEW_DISTANCE;
+			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
+			{
+				if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
+				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
+				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
+			}
+		}
+
+		if (direction_ID == C::NORTH_EAST || direction_ID == C::SOUTH_EAST) // moving east, parse west row
+		{
+			const int ry = y - C::VIEW_DISTANCE;
+			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
+			{
+				if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
+				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
+				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
+			}
+		}
+
+		if (direction_ID == C::SOUTH_EAST || direction_ID == C::SOUTH_WEST) // moving south, parse north row
+		{
+			const int rx = x - C::VIEW_DISTANCE;
+			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
+			{
+				if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
+				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
+				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
+			}
+		}
+
+		if (direction_ID == C::SOUTH_WEST || direction_ID == C::NORTH_WEST) // moving west, parse east row
+		{
+			const int ry = y + C::VIEW_DISTANCE;
+			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
+			{
+				if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
+				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
+				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
+			}
+		}
+	}
+
+	// the movement validated, remove character id from area
+	world.room_at(x, y, z)->remove_actor(this->name);
+
+	// test if the room can be unloaded
+	if (world.is_unloadable(x, y, z)) // Why are we trying to unload the room we're moving out of? The player will still be able to see this.
+	{
+		world.unload_room(x, y, z);
+	}
+	// consider moving the above block to world.remove_character(x, y, z, id)
+	// the check to unload could be in one place
+
+	// update character internal coordinates
+	x += dx;
+	y += dy;
+	z += dz;
+
+	// add character id to new area using the new x and y coordinates
+	world.room_at(x, y, z)->add_actor(this->name);
+
+	// prepare responses
+	Update_Messages updates("You move " + direction_ID + ".",
+		// "Jeb arrives from the south [wielding an axe]."
+		this->name + " arrives from the " + C::opposite_direction_id.find(direction_ID)->second +
+		((this->equipped_item == nullptr) ? "." : (" wielding " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + ".")),
+		true); // update required for all users in sight range
+
+	// users that have fallen out of view won't recieve a map update unless we send one to them explicitly
+	updates.additional_map_update_users = make_shared<vector<string>>(std::move(additional_users_to_notify));
+
+	return updates;
+}
+Update_Messages Character::craft(const string & craft_item_id, World & world)
+{
+	// check for special case
+	if (craft_item_id == C::CHEST_ID)
+	{
+		if (world.room_at(x, y, z)->has_chest())
+		{
+			return Update_Messages("There is already a chest here.");
+		}
+	}
+
+	// return if the recipe does not exist
+	if (!Character::recipes.has_recipe_for(craft_item_id)) { return Update_Messages("There is no way to craft " + U::get_article_for(craft_item_id) + " " + craft_item_id + "."); }
+
+	// get the recipe
+	const Recipe recipe = Character::recipes.get_recipe(craft_item_id);
+
+	// verify the conditions for the recipe are present
+	for (map<string, int>::const_iterator it = recipe.inventory_need.cbegin(); it != recipe.inventory_need.cend(); ++it)
+	{
+		if (it->first != "" && !this->has(it->first, it->second)) { return Update_Messages(U::get_article_for(craft_item_id) + " " + craft_item_id + " requires " + ((it->second == 1) ? U::get_article_for(it->first) : U::to_string(it->second)) + " " + it->first); }
+	}
+	for (map<string, int>::const_iterator it = recipe.inventory_remove.cbegin(); it != recipe.inventory_remove.cend(); ++it)
+	{
+		if (it->first != "" && !this->has(it->first, it->second)) { return Update_Messages(U::get_article_for(craft_item_id) + " " + craft_item_id + " uses " + ((it->second == 1) ? U::get_article_for(it->first) : U::to_string(it->second)) + " " + it->first); }
+	}
+	for (map<string, int>::const_iterator it = recipe.local_need.cbegin(); it != recipe.local_need.cend(); ++it)
+	{
+		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return Update_Messages(U::get_article_for(craft_item_id) + " " + craft_item_id + " requires " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first); }
+	}
+	for (map<string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
+	{
+		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return Update_Messages(U::get_article_for(craft_item_id) + " " + craft_item_id + " uses " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first); }
+	}
+
+	// remove ingredients from inventory
+	for (map<string, int>::const_iterator it = recipe.inventory_remove.cbegin(); it != recipe.inventory_remove.cend(); ++it)
+	{
+		this->remove(it->first, it->second); // ID, count
+	}
+
+	// remove ingredients from area
+	for (map<string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
+	{
+		this->remove(it->first, it->second); // ID, count
+	}
+
+	stringstream player_update, room_update;
+
+	// for each item to be given to the player
+	for (map<string, int>::const_iterator it = recipe.yields.cbegin(); it != recipe.yields.cend(); ++it)
+	{
+		// for as many times as the item is to be given to the player
+		for (int i = 0; i < it->second; ++i)
+		{
+			// special test cast for chests
+			if (craft_item_id == C::CHEST_ID)
+			{
+				// add a chest to the room
+				world.room_at(x, y, z)->add_chest(this->faction_ID);
+				continue;
+			}
+
+			// craft the item
+			shared_ptr<Item> item = Craft::make(it->first);
+
+			// if the item can be carried
+			if (item->is_takable())
+			{
+				// add the item to the player's inventory
+				this->add(item);
+			}
+			else // the item can not be taken
+			{
+				// add the item to the room
+				world.room_at(x, y, z)->add_item(item);
+			}
+		}
+
+		player_update << "You craft ";
+		room_update << this->name << " crafts ";
+
+		if (it->second > 1) // ... 3 arrowheads.
+		{
+			player_update << it->second << " " << U::get_plural_for(it->first) << ".";
+			room_update << it->second << " " << U::get_plural_for(it->first) << ".";
+		}
+		else // ... an arrowhead.
+		{
+			player_update << U::get_article_for(it->first) << " " << it->first << ".";
+			room_update << U::get_article_for(it->first) << " " << it->first << ".";
+		}
+	}
+
+	return Update_Messages(player_update.str(), room_update.str());
+}
+Update_Messages Character::take(const string & take_item_id, World & world)
+{
+	// check if the item is not in the player's vicinity
+	if (!world.room_at(x, y, z)->contains_item(take_item_id))
+	{
+		return Update_Messages("There is no " + take_item_id + " here.");
+	}
+
+	// check if the item is not takable
+	if (!world.room_at(x, y, z)->get_contents().find(take_item_id)->second->is_takable())
+	{
+		// return failure
+		return Update_Messages("You can't take the " + take_item_id + ".");
+	}
+
+	// the item is takable
+	this->add(world.room_at(x, y, z)->get_contents().find(take_item_id)->second); // copy the item to the player
+	world.room_at(x, y, z)->remove_item(take_item_id); // remove the item from the world
+
+	return Update_Messages("You take " + U::get_article_for(take_item_id) + " " + take_item_id + ".",
+		this->name + " takes " + U::get_article_for(take_item_id) + " " + take_item_id + ".");
+}
+Update_Messages Character::drop(const string & drop_item_id, World & world)
+{
+	// if the player is holding the item specified
+	if (this->equipped_item != nullptr && this->equipped_item->name == drop_item_id)
+	{
+		// add the item to the world
+		world.room_at(x, y, z)->add_item(this->equipped_item);
+	}
+	else // the player is not holding the item, check if the item is in the player's inventory
+	{
+		if (!this->has(drop_item_id)) // if the player does not have the item specified
+		{
+			// the item does not exist in the player's inventory
+			return Update_Messages("You don't have " + U::get_article_for(drop_item_id) + " " + drop_item_id + " to drop.");
+		}
+
+		// add the item to the world
+		world.room_at(x, y, z)->add_item(
+			(equipment_inventory.find(drop_item_id) != equipment_inventory.end()) ? U::convert_to<Item>( // determine where to get the item from
+			equipment_inventory.find(drop_item_id)->second) : // upcast one of the items to an <Item> type
+			material_inventory.find(drop_item_id)->second
+			);
+	}
+
+	// remove item
+	this->remove(drop_item_id);
+
+	return Update_Messages("You drop " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".",
+		this->name + " drops " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".");
+}
+Update_Messages Character::equip(const string & item_ID)
 {
 	/*
 	You ready your [item_id].
@@ -387,22 +690,25 @@ string Character::equip(const string & item_ID)
 	// if the player does not have the item specified
 	if (!this->has(item_ID))
 	{
-		return string("You do not have ") + U::get_article_for(item_ID) + " " + item_ID + " to equip.";
+		return Update_Messages("You do not have " + U::get_article_for(item_ID) + " " + item_ID + " to equip.");
 	}
 
+	// the player has at least one instance of the item, check if the player does not have another one to equip
 	if (equipment_inventory.find(item_ID) == equipment_inventory.cend() &&
 		material_inventory.find(item_ID) == material_inventory.cend())
 	{
-		return string("You are holding ") + U::get_article_for(item_ID) + " " + item_ID + " and don't have another one to equip.";
+		return Update_Messages("You are holding " + U::get_article_for(item_ID) + " " + item_ID + " and don't have another one to equip.");
 	}
 
 	// create a stringstream to accumulate feedback
-	stringstream output;
+	stringstream user_update;
+	stringstream room_update;
 
 	// the player does have the item to equip, test if an item is already equipped
 	if (this->equipped_item != nullptr)
 	{
-		output << "You replace your " << equipped_item->name << " with ";
+		user_update << "You replace your " << equipped_item->name << " with ";
+		room_update << this->name << " replaces " << U::get_article_for(equipped_item->name) << " " << equipped_item->name << " with ";
 
 		// save the existing the item to the player's inventory
 		this->add(equipped_item);
@@ -435,24 +741,28 @@ string Character::equip(const string & item_ID)
 	}
 
 	// if the stringstream is empty (no item was previously equipped)
-	if (output.str().length() == 0)
+	if (user_update.str().length() == 0)
 	{
-		return "You equip your " + item_ID + ".";
+		return Update_Messages(
+			"You equip your " + item_ID + ".",
+			this->name + " equips " + U::get_article_for(item_ID) + " " + item_ID + ".");
 	}
 	else
 	{
-		// complete and return the stringstream
-		output << U::get_article_for(equipped_item->name) << " " << equipped_item->name << ".";
-		return output.str();
+		// complete and return the response message
+		user_update << U::get_article_for(equipped_item->name) << " " << equipped_item->name << ".";
+		room_update << U::get_article_for(equipped_item->name) << " " << equipped_item->name << ".";
+
+		return Update_Messages(user_update.str(), room_update.str());
 	}
 
 }
-string Character::unequip()
+Update_Messages Character::unequip()
 {
 	// test if no item is equipped
 	if (this->equipped_item == nullptr)
 	{
-		return "You aren't holding anything.";
+		return Update_Messages("You aren't holding anything.");
 	}
 
 	// save the ID of the currently equipped item
@@ -464,265 +774,7 @@ string Character::unequip()
 	// reset the currently equipped item
 	equipped_item = nullptr;
 
-	return "You put your " + item_ID + " away.";
-}
-
-// actions
-string Character::move(const string & direction_ID, World & world)
-{
-	// movement deltas
-	int dx = 0, dy = 0, dz = 0;
-
-	U::assign_movement_deltas(direction_ID, dx, dy, dz);
-
-	// validate movement deltas
-	if (!U::bounds_check(x + dx, y + dy, z + dz))
-	{
-		return "You can't go there.";
-	}
-
-	// copy the destination from disk to memory
-	// world.load_room_to_world(x + dx, y + dy, z + dz);
-
-	// test if the environment (structures) allow the player to move in a given direction
-	const string validate_movement = this->validate_movement(x, y, z, direction_ID, dx, dy, dz, world);
-
-	// if the validation failed for any reason
-	if (validate_movement != C::GOOD_SIGNAL)
-	{
-		// return that reason movement validation failed
-		return validate_movement;
-	}
-
-	// the movement validated, load the radius for the destination
-	world.load_view_radius_around(x + dx, y + dy, this->name);
-
-	// remove viewing ID from rooms leaving view
-	if (direction_ID == C::NORTH || direction_ID == C::SOUTH)
-	{
-		// if the character is moving north, add the view distance to x to get the x of the row being removed
-		// otherwise (moving south) remove the distance from x
-		int rx = (direction_ID == C::NORTH) ? x + C::VIEW_DISTANCE : x - C::VIEW_DISTANCE;
-		// each room to try unload from from x,(y-view) to (x,y+view)
-		for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
-		{
-			// remove the character from the room's viewer list, trying to unload the room in the process
-			world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name); // bounds checking takes place in here
-		}
-	}
-	else if (direction_ID == C::WEST || direction_ID == C::EAST)
-	{
-		// logic is the same as above, but in rotated axes (axes is plural of axis)
-		const int ry = (direction_ID == C::WEST) ? y + C::VIEW_DISTANCE : y - C::VIEW_DISTANCE;
-		for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
-		{
-			world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
-		}
-	}
-	else if (direction_ID == C::UP) { return "[moving up not available yet]"; }
-	else if (direction_ID == C::DOWN) { return "[moving down not available yet]"; }
-	else
-	{
-		/* The direction is a secondary compass direction.
-		This means execution will alwways enter two of the four below blocks.
-		Functionality here is the same as above. For documentation, scroll up. */
-
-		if (direction_ID == C::NORTH_WEST || direction_ID == C::NORTH_EAST) // moving north, parse south row
-		{
-			const int rx = x + C::VIEW_DISTANCE;
-			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
-			{
-				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
-			}
-		}
-
-		if (direction_ID == C::NORTH_EAST || direction_ID == C::SOUTH_EAST) // moving east, parse west row
-		{
-			const int ry = y - C::VIEW_DISTANCE;
-			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
-			{
-				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
-			}
-		}
-
-		if (direction_ID == C::SOUTH_EAST || direction_ID == C::SOUTH_WEST) // moving south, parse north row
-		{
-			const int rx = x - C::VIEW_DISTANCE;
-			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
-			{
-				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
-			}
-		}
-
-		if (direction_ID == C::SOUTH_WEST || direction_ID == C::NORTH_WEST) // moving west, parse east row
-		{
-			const int ry = y + C::VIEW_DISTANCE;
-			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
-			{
-				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
-			}
-		}
-	}
-
-	// the movement validated, remove character id from area
-	world.room_at(x, y, z)->remove_actor(this->name);
-
-	// test if the room can be unloaded
-	if (world.is_unloadable(x, y, z)) // Why are we trying to unload the room we're moving out of? The player will still be able to see this.
-	{
-		world.unload_room(x, y, z);
-	}
-	// consider moving the above block to world.remove_character(x, y, z, id)
-	// the check to unload could be in one place
-
-	// update character internal coordinates
-	x += dx;
-	y += dy;
-	z += dz;
-
-	// add character id to new area using the new x and y coordinates
-	world.room_at(x, y, z)->add_actor(this->name);
-
-	// reply success
-	return "You move " + direction_ID + ".";
-}
-string Character::craft(const string & craft_item_id, World & world)
-{
-	// check for special case
-	if (craft_item_id == C::CHEST_ID)
-	{
-		if (world.room_at(x, y, z)->has_chest())
-		{
-			return "There is already a chest here.";
-		}
-	}
-
-	// return if the recipe does not exist
-	if (!Character::recipes.has_recipe_for(craft_item_id)) { return "There is no way to craft " + U::get_article_for(craft_item_id) + " " + craft_item_id + "."; }
-
-	// get the recipe
-	const Recipe recipe = Character::recipes.get_recipe(craft_item_id);
-
-	// verify the conditions for the recipe are present
-	for (map<string, int>::const_iterator it = recipe.inventory_need.cbegin(); it != recipe.inventory_need.cend(); ++it)
-	{
-		if (it->first != "" && !this->has(it->first, it->second)) { return U::get_article_for(craft_item_id) + " " + craft_item_id + " requires " + ((it->second == 1) ? U::get_article_for(it->first) : U::to_string(it->second)) + " " + it->first; }
-	}
-	for (map<string, int>::const_iterator it = recipe.inventory_remove.cbegin(); it != recipe.inventory_remove.cend(); ++it)
-	{
-		if (it->first != "" && !this->has(it->first, it->second)) { return U::get_article_for(craft_item_id) + " " + craft_item_id + " uses " + ((it->second == 1) ? U::get_article_for(it->first) : U::to_string(it->second)) + " " + it->first; }
-	}
-	for (map<string, int>::const_iterator it = recipe.local_need.cbegin(); it != recipe.local_need.cend(); ++it)
-	{
-		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return U::get_article_for(craft_item_id) + " " + craft_item_id + " requires " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first; }
-	}
-	for (map<string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
-	{
-		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return U::get_article_for(craft_item_id) + " " + craft_item_id + " uses " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first; }
-	}
-
-	// remove ingredients from inventory
-	for (map<string, int>::const_iterator it = recipe.inventory_remove.cbegin(); it != recipe.inventory_remove.cend(); ++it)
-	{
-		this->remove(it->first, it->second); // ID, count
-	}
-
-	// remove ingredients from area
-	for (map<string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
-	{
-		this->remove(it->first, it->second); // ID, count
-	}
-
-	// special test cast for chests
-	if (craft_item_id == C::CHEST_ID)
-	{
-		// add a chest to the room
-		world.room_at(x, y, z)->add_chest(this->faction_ID);
-		return "You craft a chest.";
-	}
-
-	// for each item to be given to the player
-	string response = "";
-	for (map<string, int>::const_iterator it = recipe.yields.cbegin(); it != recipe.yields.cend(); ++it)
-	{
-		// for as many times as the item is to be given to the player
-		for (int i = 0; i < it->second; ++i)
-		{
-			// craft the item
-			shared_ptr<Item> item = Craft::make(it->first);
-
-			// if the item can be carried
-			if (item->is_takable())
-			{
-				// add the item to the player's inventory
-				this->add(item);
-			}
-			else // the item can not be taken
-			{
-				// add the item to the room
-				world.room_at(x, y, z)->add_item(item);
-			}
-		}
-
-		// "You now have a(n) sword. " OR "You now have a(n) sword (x5). "
-		response += "You now have " + U::get_article_for(it->first) + " " + it->first
-			+ string((it->second > 1)
-			? (" (x" + U::to_string(it->second) + ")") : "")
-			+ ". ";
-	}
-
-	return response;
-}
-string Character::take(const string & take_item_id, World & world)
-{
-	// check if the item is not in the player's vicinity
-	if (!world.room_at(x, y, z)->contains_item(take_item_id))
-	{
-		return "There is no " + take_item_id + " here.";
-	}
-
-	// check if the item is not takable
-	if (!world.room_at(x, y, z)->get_contents().find(take_item_id)->second->is_takable())
-	{
-		// return failure
-		return "You can't take the " + take_item_id + ".";
-	}
-
-	// the item is takable
-	this->add(world.room_at(x, y, z)->get_contents().find(take_item_id)->second); // copy the item to the player
-	world.room_at(x, y, z)->remove_item(take_item_id); // remove the item from the world
-
-	return "You take the " + take_item_id + ".";
-}
-string Character::drop(const string & drop_item_id, World & world)
-{
-	// if the player is holding the item specified
-	if (this->equipped_item != nullptr && this->equipped_item->name == drop_item_id)
-	{
-		// add the item to the world
-		world.room_at(x, y, z)->add_item(this->equipped_item);
-	}
-	else
-	{
-		if (!this->has(drop_item_id)) // if the player does not have the item specified
-		{
-			// the item does not exist in the player's inventory
-			return "You don't have " + U::get_article_for(drop_item_id) + " " + drop_item_id + " to drop.";
-		}
-
-		// add the item to the world
-		world.room_at(x, y, z)->add_item(
-			(equipment_inventory.find(drop_item_id) != equipment_inventory.end()) ? U::convert_to<Item>( // determine where to get the item from
-			equipment_inventory.find(drop_item_id)->second) : // upcast one of the items to an <Item> type
-			material_inventory.find(drop_item_id)->second
-			);
-	}
-
-	/// remove item
-	this->remove(drop_item_id);
-
-	// success reply
-	return "You drop " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".";
+	return Update_Messages("You put your " + item_ID + " away.", this->name + " lowers the " + item_ID + ".");
 }
 string Character::add_to_chest(const string & insert_item_id, World & world)
 {

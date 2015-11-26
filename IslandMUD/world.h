@@ -13,14 +13,16 @@ April 1, 2014 */
 #include "room.h"
 #include "generator.h"
 
-using namespace std;
-using namespace pugi;
+namespace
+{
+	using namespace std;
+	using namespace pugi;
+}
 
 class World
 {
-public:
-
 private:
+	
 	// 2d terrain (biome) map
 	unique_ptr<vector<vector<char_type>>> terrain;
 	unique_ptr<vector<vector<char_type>>> iron_deposit_map;
@@ -69,7 +71,7 @@ private:
 	bool load_existing_world_terrain();
 	bool load_existing_iron_deposit_map();
 	bool load_existing_limestone_deposit_map();
-	
+
 	// a room at x,y,z does not exist on the disk; create it
 	void generate_room_at(const int & x, const int & y, const int & z);
 
