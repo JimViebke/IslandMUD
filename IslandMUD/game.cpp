@@ -806,8 +806,18 @@ string Game::login_or_signup(const SOCKET client_ID)
 
 			if (!U::file_exists(user_file))
 			{
-				outbound_queue.put(Message(client_ID, "User \"" + input[0] + "\" does not exist."));
+				outbound_queue.put(Message(client_ID, "User \"" + input[0] + "\" does not exist.\n"));
 				continue;
+			}
+
+			// check if the user is already logged in
+			{ // temporary scope to delete mutex lock
+				std::lock_guard<std::mutex> lock(actors_mutex);
+				if (actors.find(input[0]) != actors.cend())
+				{
+					outbound_queue.put(Message(client_ID, "User \"" + input[0] + "\" already logged in.\n"));
+					continue; // try again
+				}
 			}
 
 			pugi::xml_document user_data_xml;
@@ -818,7 +828,7 @@ string Game::login_or_signup(const SOCKET client_ID)
 				.attribute(C::XML_USER_PASSWORD.c_str())
 				.as_string())
 			{
-				outbound_queue.put(Message(client_ID, "Incorrect password for user \"" + input[0] + "\"."));
+				outbound_queue.put(Message(client_ID, "Incorrect password for user \"" + input[0] + "\".\n"));
 				continue;
 			}
 
