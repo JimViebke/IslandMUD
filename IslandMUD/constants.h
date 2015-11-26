@@ -36,9 +36,11 @@ namespace Constants
 
 		DEFAULT_SPAWN_X,
 		DEFAULT_SPAWN_Y,
-		DEFAULT_SPAWN_Z,
+		DEFAULT_SPAWN_Z;
 
-		GAME_PORT_NUMBER;
+	extern const unsigned
+		GAME_PORT_NUMBER,
+		GAME_MAP_PORT_NUMBER;
 
 	// game data locations
 	extern const string

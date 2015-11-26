@@ -17,7 +17,8 @@ const int C::DEFAULT_SPAWN_X = C::WORLD_X_DIMENSION / 2; // N/S center
 const int C::DEFAULT_SPAWN_Y = C::WORLD_Y_DIMENSION / 2; // E/W center
 const int C::DEFAULT_SPAWN_Z = C::GROUND_INDEX; // ground level spawn
 
-const int C::GAME_PORT_NUMBER = 8050;
+const unsigned C::GAME_PORT_NUMBER = 8050;
+const unsigned C::GAME_MAP_PORT_NUMBER = 8051;
 
 // game data locations
 #ifdef _WIN32
