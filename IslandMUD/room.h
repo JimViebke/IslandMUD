@@ -11,6 +11,7 @@ Feb 14, 2015 */
 #include "constants.h"
 #include "item.h"
 #include "room_side.h" // walls, floor, or ceiling
+#include "message.h"
 
 class Room
 {
@@ -57,7 +58,7 @@ public:
 	string get_chest_faction_id() const;
 	int chest_health() const;
 	void add_item_to_chest(const shared_ptr<Item> & item);
-	string chest_contents(const string & faction_ID) const;
+	Update_Messages chest_contents(const string & faction_ID, const string & username) const;
 	void damage_chest();
 	bool chest_has(const string & item_id) const;
 	shared_ptr<Item> remove_from_chest(const string & item_id);
@@ -75,8 +76,8 @@ public:
 	void add_door(const string & directon_ID, const int & health, const string & material_ID, const string & faction_ID);
 
 	// damage surface
-	string damage_surface(const string & surface_ID, const shared_ptr<Item> & equipped_item);
-	string damage_door(const string & surface_ID, const shared_ptr<Item> & equipped_item);
+	Update_Messages damage_surface(const string & surface_ID, const shared_ptr<Item> & equipped_item, const string & username);
+	Update_Messages damage_door(const string & surface_ID, const shared_ptr<Item> & equipped_item, const string & username);
 
 	// add and remove actors
 	void add_actor(const string & actor_id);

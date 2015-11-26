@@ -331,18 +331,18 @@ Update_Messages Game::execute_command(const string & actor_id, const vector<stri
 	else if (command.size() >= 3 && command[0] == C::ATTACK_COMMAND && U::contains(C::surface_ids, command[1])
 		&& command[2] == C::WALL)
 	{
-		return Update_Messages(actors.find(actor_id)->second->attack_surface(command[1], world));
+		return actors.find(actor_id)->second->attack_surface(command[1], world);
 	}
 	// the player is attacking a door "smash west door"
 	else if (command.size() >= 3 && command[0] == C::ATTACK_COMMAND && U::contains(C::surface_ids, command[1])
 		&& command[2] == C::DOOR)
 	{
-		return Update_Messages(actors.find(actor_id)->second->attack_door(command[1], world));
+		return actors.find(actor_id)->second->attack_door(command[1], world);
 	}
 	// the player is attacking an item
 	else if (command.size() == 2 && command[0] == C::ATTACK_COMMAND)
 	{
-		return Update_Messages(actors.find(actor_id)->second->attack_item(command[1], world));
+		return actors.find(actor_id)->second->attack_item(command[1], world);
 	}
 	// save
 	else if (command.size() == 1 && command[0] == C::SAVE_COMMAND)

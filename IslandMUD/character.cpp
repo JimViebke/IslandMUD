@@ -849,8 +849,7 @@ Update_Messages Character::take_from_chest(const string & take_item_id, World & 
 Update_Messages Character::look_inside_chest(const World & world) const
 {
 	// validation within
-	return Update_Messages(world.room_at(x, y, z)->chest_contents(faction_ID),
-		this->name + " looks into the chest.");
+	return world.room_at(x, y, z)->chest_contents(faction_ID, this->name);
 }
 Update_Messages Character::construct_surface(const string & material_id, const string & surface_id, World & world)
 {
@@ -1053,26 +1052,26 @@ Update_Messages Character::construct_surface_with_door(const string & surface_ma
 	// "You construct a stone floor with a stone hatch." OR "You construct a stone wall to your north with a branch door."
 	return Update_Messages(to_player.str(), to_room.str(), true); // send messages to user and room, and require map update for players in view distance
 }
-string Character::attack_surface(const string & surface_ID, World & world)
+Update_Messages Character::attack_surface(const string & surface_ID, World & world)
 {
 	// get this check out of the way
 	if (surface_ID == C::CEILING || surface_ID == C::FLOOR)
 	{
-		return "Damaging a surface in a room above or below you is not supported yet.";
+		return Update_Messages("Damaging a surface in a room above or below you is not supported yet.");
 	}
 
 	// verify we are working with a primary compass point
 	if (surface_ID != C::NORTH && surface_ID != C::EAST &&
 		surface_ID != C::SOUTH && surface_ID != C::WEST)
 	{
-		return "Only n/s/e/w surfaces can be damaged at this time.";
+		return Update_Messages("Only n/s/e/w surfaces can be damaged at this time.");
 	}
 
 	// if the current room has an intact surface
 	if (world.room_at(x, y, z)->is_standing_wall(surface_ID))
 	{
 		// apply damage to the surface
-		return world.room_at(x, y, z)->damage_surface(surface_ID, this->equipped_item);
+		return world.room_at(x, y, z)->damage_surface(surface_ID, this->equipped_item, this->name);
 	}
 
 	// this room does not have an intact surface, the neighboring room might
@@ -1088,7 +1087,7 @@ string Character::attack_surface(const string & surface_ID, World & world)
 	if (world.room_at(new_x, new_y, z)->is_standing_wall(C::opposite_surface_id.find(surface_ID)->second)) // deliberately using just "z" throughout this block
 	{
 		// inflict damage upon the surface
-		return world.room_at(new_x, new_y, z)->damage_surface(C::opposite_surface_id.find(surface_ID)->second, this->equipped_item);
+		return world.room_at(new_x, new_y, z)->damage_surface(C::opposite_surface_id.find(surface_ID)->second, this->equipped_item, this->name);
 	}
 
 	// neither room has an intact surface
@@ -1097,34 +1096,34 @@ string Character::attack_surface(const string & surface_ID, World & world)
 	if (!world.room_at(x, y, z)->has_surface(surface_ID) &&
 		!world.room_at(new_x, new_y, z)->has_surface(C::opposite_surface_id.find(surface_ID)->second))
 	{
-		return "There is no " + surface_ID + " wall here.";
+		return Update_Messages("There is no " + surface_ID + " wall here.");
 	}
 	else
 	{
 		// any surface that does exist is rubble, and at least one surface exists
-		return "There is only rubble where a wall once was.";
+		return Update_Messages("There is only rubble where a wall once was.");
 	}
 }
-string Character::attack_door(const string & surface_ID, World & world)
+Update_Messages Character::attack_door(const string & surface_ID, World & world)
 {
 	// get this check out of the way
 	if (surface_ID == C::CEILING || surface_ID == C::FLOOR)
 	{
-		return "Damaging above or below you is not supported yet.";
+		return Update_Messages("Damaging above or below you is not supported yet.");
 	}
 
 	// verify we are working with a primary compass point
 	if (surface_ID != C::NORTH && surface_ID != C::EAST &&
 		surface_ID != C::SOUTH && surface_ID != C::WEST)
 	{
-		return "Only doors in n/s/e/w surfaces can be damaged at this time.";
+		return Update_Messages("Only doors in n/s/e/w surfaces can be damaged at this time.");
 	}
 
 	// if the current room has an intact surface with an intact door in it
 	if (world.room_at(x, y, z)->has_surface(surface_ID) && world.room_at(x, y, z)->get_room_sides().find(surface_ID)->second.has_intact_door())
 	{
 		// applied damage to the door
-		return world.room_at(x, y, z)->damage_door(surface_ID, this->equipped_item);
+		return world.room_at(x, y, z)->damage_door(surface_ID, this->equipped_item, this->name);
 	}
 
 	// the current room does not have an intact door in the specified direction,
@@ -1141,18 +1140,18 @@ string Character::attack_door(const string & surface_ID, World & world)
 	if (world.room_at(new_x, new_y, z)->is_standing_wall(C::opposite_surface_id.find(surface_ID)->second)) // deliberately using just "z" throughout this block
 	{
 		// inflict damaage upon the surface or door
-		return world.room_at(new_x, new_y, z)->damage_door(C::opposite_surface_id.find(surface_ID)->second, this->equipped_item);
+		return world.room_at(new_x, new_y, z)->damage_door(C::opposite_surface_id.find(surface_ID)->second, this->equipped_item, this->name);
 	}
 
 	// this feedback might not be correct for all cases
-	return "There is no door to your " + surface_ID;
+	return Update_Messages("There is no door to your " + surface_ID + ".");
 }
-string Character::attack_item(const string & target_ID, World & world)
+Update_Messages Character::attack_item(const string & target_ID, World & world)
 {
 	// if the target isn't here
 	if (!world.room_at(x, y, z)->contains_item(target_ID))
 	{
-		return "There is no " + target_ID + " here.";
+		return Update_Messages("There is no " + target_ID + " here.");
 	}
 
 	// if the user has an item equipped
@@ -1161,7 +1160,7 @@ string Character::attack_item(const string & target_ID, World & world)
 		// if the attacking implement is not in the damage tables
 		if (C::damage_tables.find(equipped_item->name) == C::damage_tables.cend())
 		{
-			return "You can't do that with " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + ".";
+			return Update_Messages("You can't do that with " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + ".");
 		}
 
 		// extract the damage table for the attacking implement
@@ -1170,17 +1169,19 @@ string Character::attack_item(const string & target_ID, World & world)
 		// if the damage table does not have an entry for the target item ID
 		if (damage_table.find(target_ID) == damage_table.cend())
 		{
-			return "You can't do that to a " + target_ID + ".";
+			return Update_Messages("You can't do that to a " + target_ID + ".");
 		}
 
 		// damage the item, return a different message depending of if the item was destroyed or damaged
 		if (world.room_at(x, y, z)->damage_item(target_ID, damage_table.find(target_ID)->second))
 		{
-			return "You destroy the " + target_ID + " using your " + equipped_item->name + ".";
+			return Update_Messages("You destroy the " + target_ID + " using your " + equipped_item->name + ".",
+				this->name + " uses " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + " to destroy " + U::get_article_for(target_ID) + " " + target_ID + ".");
 		}
 		else
 		{
-			return "You damage the " + target_ID + " using your " + equipped_item->name + ".";
+			return Update_Messages("You damage the " + target_ID + " using your " + equipped_item->name + ".",
+				this->name + " uses " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + " to damage " + U::get_article_for(target_ID) + " " + target_ID + ".");
 		}
 	}
 	else // the user does not have an item equipped, do a barehanded attack
@@ -1191,17 +1192,19 @@ string Character::attack_item(const string & target_ID, World & world)
 		// if the damage table does not contain an entry for the target
 		if (damage_table.find(target_ID) == damage_table.cend())
 		{
-			return "You can't do that to a " + target_ID + ".";
+			return Update_Messages("You can't do that to a " + target_ID + ".");
 		}
 
 		// the damage table does contain an entry for the target
 		if (world.room_at(x, y, z)->damage_item(target_ID, damage_table.find(target_ID)->second))
 		{
-			return "You destroy the " + target_ID + " using your bare hands.";
+			return Update_Messages("You destroy the " + target_ID + " using your bare hands.",
+				this->name + " uses bare hands to destroy " + U::get_article_for(target_ID) + " " + target_ID + ".");
 		}
 		else
 		{
-			return "You damage the " + target_ID + " using your bare hands.";
+			return Update_Messages("You damage the " + target_ID + " using your bare hands.",
+				this->name + " uses bare hands to damage " + U::get_article_for(target_ID) + " " + target_ID + ".");
 		}
 	}
 

@@ -202,23 +202,23 @@ void Room::add_item_to_chest(const shared_ptr<Item> & item)
 
 	chest->add(item);
 }
-string Room::chest_contents(const string & faction_ID) const
+Update_Messages Room::chest_contents(const string & faction_ID, const string & username) const
 {
 	// if no chest exists in this room
 	if (!has_chest())
 	{
-		return "There is no chest here.";
+		return Update_Messages("There is no chest here.");
 	}
 
 	// if the chest was crafted by another faction
 	if (chest->get_faction_id() != faction_ID)
 	{
-		return "This chest has an unfamiliar lock.";
+		return Update_Messages("This chest has an unfamiliar lock.",
+			username + " tries the chest's lock.");
 	}
 
 	// return the contents of the chest
-	return chest->contents();
-
+	return Update_Messages(chest->contents(), username + " looks into the chest.");
 }
 void Room::damage_chest()
 {
@@ -365,12 +365,12 @@ void Room::add_door(const string & directon_ID, const int & health, const string
 }
 
 // damage surface
-string Room::damage_surface(const string & surface_ID, const shared_ptr<Item> & equipped_item)
+Update_Messages Room::damage_surface(const string & surface_ID, const shared_ptr<Item> & equipped_item, const string & username)
 {
 	// test if the surface is valid
 	if (!U::contains(C::surface_ids, surface_ID))
 	{
-		return surface_ID + " is not a valid surface.";
+		return Update_Messages(surface_ID + " is not a valid surface.");
 	}
 
 	// test if this room has the surface
@@ -378,18 +378,18 @@ string Room::damage_surface(const string & surface_ID, const shared_ptr<Item> & 
 	{
 		if (surface_ID == C::CEILING || surface_ID == C::FLOOR)
 		{
-			return "There is no " + surface_ID + ".";
+			return Update_Messages("There is no " + surface_ID + ".");
 		}
 		else
 		{
-			return "There is no " + surface_ID + " wall here.";
+			return Update_Messages("There is no " + surface_ID + " wall here.");
 		}
 	}
 
 	// the surface exists, test if the surface is rubble
 	if (room_sides.find(surface_ID)->second.is_rubble())
 	{
-		return "There is only rubble where a wall once was.";
+		return Update_Messages("There is only rubble where a wall once was.");
 	}
 
 	// extract the ID of the attacking implement (ATTACK_COMMAND for bare-hands melee attack)
@@ -398,7 +398,7 @@ string Room::damage_surface(const string & surface_ID, const shared_ptr<Item> & 
 	// check if the player's equipped weapon exists in the damage table
 	if (C::damage_tables.find(equipped_item_id) == C::damage_tables.cend())
 	{
-		return "Error occured: Damage lookup tables contain no info to attack using " + equipped_item_id + ".";
+		return Update_Messages("Error occured: Damage lookup tables contain no info to attack using " + equipped_item_id + ".");
 	}
 
 	// the damage map for this implement exists, copy it here
@@ -411,9 +411,9 @@ string Room::damage_surface(const string & surface_ID, const shared_ptr<Item> & 
 	if (item_damage_table.find(surface_material_ID) == item_damage_table.cend())
 	{
 		// ... contains no info to use staff to damage stone."
-		return "Error occured: Damage lookup tables contain no info to use "
+		return Update_Messages("Error occured: Damage lookup tables contain no info to use "
 			+ equipped_item_id + " to damage "
-			+ surface_material_ID + " wall.";
+			+ surface_material_ID + " wall.");
 	}
 
 	// surface exists, inflict damage*-1
@@ -428,11 +428,22 @@ string Room::damage_surface(const string & surface_ID, const shared_ptr<Item> & 
 	{
 		// the surface holds
 
-		return "You damage the " +
-			((surface_ID == C::CEILING || surface_ID == C::FLOOR) ? surface_ID : "wall")
-			// "...using your sword" or "...using your bare hands"
+		return Update_Messages("You damage the " + // You damage the
+			// ceiling / wall to your west
+			((surface_ID == C::CEILING || surface_ID == C::FLOOR) ? surface_ID : "wall to your " + surface_ID)
+			// using your sword. / using your bare hands.
 			+ " using your " +
-			((equipped_item_id == C::ATTACK_COMMAND) ? "bare hands." : (equipped_item_id + "."));
+			((equipped_item_id == C::ATTACK_COMMAND) ? "bare hands." : (equipped_item_id + ".")),
+
+			// Bob uses
+			username + " uses " +
+			((equipped_item_id == C::ATTACK_COMMAND)
+			// bare hands / an axe
+			? "bare hands" : U::get_article_for(equipped_item_id) + " " + equipped_item_id) +
+			// to damage the
+			" to damage the " +
+			// ceiling. / wall to your west.
+			((surface_ID == C::CEILING || surface_ID == C::FLOOR) ? surface_ID : "wall to your " + surface_ID) + ".");
 	}
 
 	// the surface collapses
@@ -450,16 +461,26 @@ string Room::damage_surface(const string & surface_ID, const shared_ptr<Item> & 
 		this->add_item(Craft::make(C::DEBRIS_ID));
 	}
 
-	return (surface_ID == C::CEILING || surface_ID == C::FLOOR) ?
-		"The " + surface_ID + " collapses." :
-		"The wall collapses.";
+	return Update_Messages(
+		(surface_ID == C::CEILING || surface_ID == C::FLOOR)
+		? "The " + surface_ID + " collapses."
+		: "The wall collapses.",
+
+		// Bob collapses the
+		username + " collapses the " +
+		((surface_ID == C::CEILING || surface_ID == C::FLOOR)
+		// ceiling/floor
+		? surface_ID + "."
+		// wall to your west
+		: "wall to your " + surface_ID + "."),
+		true);
 }
-string Room::damage_door(const string & surface_ID, const shared_ptr<Item> & equipped_item)
+Update_Messages Room::damage_door(const string & surface_ID, const shared_ptr<Item> & equipped_item, const string & username)
 {
 	// test if the surface is valid
 	if (!U::contains(C::surface_ids, surface_ID))
 	{
-		return surface_ID + " is not a valid surface.";
+		return Update_Messages(surface_ID + " is not a valid surface.");
 	}
 
 	// test if this room has the surface
@@ -467,18 +488,18 @@ string Room::damage_door(const string & surface_ID, const shared_ptr<Item> & equ
 	{
 		if (surface_ID == C::CEILING || surface_ID == C::FLOOR)
 		{
-			return "There is no " + surface_ID + ".";
+			return Update_Messages("There is no " + surface_ID + ".");
 		}
 		else
 		{
-			return "There is no " + surface_ID + " wall here.";
+			return Update_Messages("There is no " + surface_ID + " wall here.");
 		}
 	}
 
 	// test if the surface has the door
 	if (!this->room_sides.find(surface_ID)->second.has_door())
 	{
-		return "There is no door here.";
+		return Update_Messages("There is no door here.");
 	}
 
 	// extract the ID of the attacking implement (ATTACK_COMMAND for bare-hands melee attack)
@@ -487,7 +508,7 @@ string Room::damage_door(const string & surface_ID, const shared_ptr<Item> & equ
 	// check if the player's equipped weapon exists in the damage table
 	if (C::damage_tables.find(equipped_item_id) == C::damage_tables.cend())
 	{
-		return "Error occured: Damage lookup tables contain no info to attack using " + equipped_item_id + ".";
+		return Update_Messages("Error occured: Damage lookup tables contain no info to attack using " + equipped_item_id + ".");
 	}
 
 	// the damage map for this implement exists, copy it here
@@ -496,7 +517,7 @@ string Room::damage_door(const string & surface_ID, const shared_ptr<Item> & equ
 	// a wall exists; check if the wall does not have an intact door
 	if (!this->room_sides.find(surface_ID)->second.has_intact_door())
 	{
-		return "There is only a pile of rubble where a door once was.";
+		return Update_Messages("There is only a pile of rubble where a door once was.");
 	}
 
 	// a door exists AND it is intact
@@ -508,9 +529,9 @@ string Room::damage_door(const string & surface_ID, const shared_ptr<Item> & equ
 	if (item_damage_table.find(door_material_ID) == item_damage_table.cend())
 	{
 		// ... contains no info to use staff to damage stone."
-		return "Error occured: Damage lookup tables contain no info to use "
+		return Update_Messages("Error occured: Damage lookup tables contain no info to use "
 			+ equipped_item_id + " to damage "
-			+ door_material_ID + " door.";
+			+ door_material_ID + " door.");
 	}
 
 	// door and damage table entry exist, inflict damage*-1
@@ -524,14 +545,21 @@ string Room::damage_door(const string & surface_ID, const shared_ptr<Item> & equ
 	if (room_sides.find(surface_ID)->second.get_door()->is_rubble())
 	{
 		// the door collapses
-		return "The door breaks and collapses.";
+		return Update_Messages("The door breaks and collapses.", username + " breaks the door.", true);
 	}
 	else
 	{
 		// the door holds
-		// "using your sword" or "using your bare hands"
-		return "You damage the door using your " +
-			((equipped_item_id == C::ATTACK_COMMAND) ? "bare hands." : (equipped_item_id + "."));
+		return Update_Messages("You damage the " + surface_ID + " door using your " +
+			((equipped_item_id == C::ATTACK_COMMAND) ? "bare hands." : (equipped_item_id + ".")),
+
+			// Bob damages the west door with
+			username + " damages the " + surface_ID + " door with " +
+			((equipped_item_id == C::ATTACK_COMMAND)
+			// bare hands. / an axe.
+			? "bare hands." : U::get_article_for(equipped_item_id) + " " + equipped_item_id + "."),
+
+			true);
 	}
 }
 
