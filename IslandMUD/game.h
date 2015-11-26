@@ -57,26 +57,30 @@ public:
 
 	void main_test_loop();
 
+	// execute a command against the game world
 	Update_Messages execute_command(const string & actor_id, const vector<string> & command);
-
-	void networking_thread();
-
-private:
-
-	// capture incoming data and write it to the input queue
-	void client_thread(SOCKET client_ID);
 
 	// process data, moving it from the input queue to the output queue
 	void processing_thread();
 
+private:
+
+	typedef void(Game::*client_thread_type)(SOCKET);
+
+	// Listen on port [listening_port].
+	// When a user connects, start a thread using [client_thread_pointer], passing in the user's unique socket ID
+	void networking_thread(const unsigned & listening_port, client_thread_type client_thread_pointer);
+
+	// capture incoming data and write it to the input queue
+	void client_thread(SOCKET client_ID);
+
+	// send map updates to the user's second client instance
+	void client_map_thread(SOCKET client_ID);
+
 	// remove data from the outbound queue and send it the to specified client
 	void outbound_thread();
 
-
-
 	// helper functions
-
-
 
 	// close a socket, platform independent
 	void close_socket(SOCKET socket);

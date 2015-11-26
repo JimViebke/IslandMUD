@@ -430,7 +430,7 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 		{
 			// Skip this room if it is not loaded. This occurs when a player moves diagonally, and both room unload passes overlap at the corner of the map.
 			if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
-		
+
 			U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids()); // save any users in the room
 
 			// remove the character from the room's viewer list, trying to unload the room in the process
@@ -776,24 +776,24 @@ Update_Messages Character::unequip()
 
 	return Update_Messages("You put your " + item_ID + " away.", this->name + " lowers the " + item_ID + ".");
 }
-string Character::add_to_chest(const string & insert_item_id, World & world)
+Update_Messages Character::add_to_chest(const string & insert_item_id, World & world)
 {
 	// if this room does not have a chest
 	if (!world.room_at(x, y, z)->has_chest())
 	{
-		return "There is no chest here.";
+		return Update_Messages("There is no chest here.");
 	}
 
 	// if the chest was crafted by another faction
 	if (world.room_at(x, y, z)->get_chest_faction_id() != this->faction_ID)
 	{
-		return "This chest has an unfamiliar lock.";
+		return Update_Messages("This chest has an unfamiliar lock.");
 	}
 
 	// if the player doesn't have the item
 	if (!this->has(insert_item_id))
 	{
-		return "You don't have " + U::get_article_for(insert_item_id) + " " + insert_item_id + ".";
+		return Update_Messages("You don't have " + U::get_article_for(insert_item_id) + " " + insert_item_id + ".");
 	}
 
 	// if the item is equipped
@@ -817,49 +817,51 @@ string Character::add_to_chest(const string & insert_item_id, World & world)
 	this->remove(insert_item_id);
 
 	// You place the sword into the chest.
-	return "You place the " + insert_item_id + " into the chest.";
+	return Update_Messages("You place the " + insert_item_id + " into the chest.",
+		this->name + " places " + U::get_article_for(insert_item_id) + " " + insert_item_id + " into the chest.");
 }
-string Character::take_from_chest(const string & take_item_id, World & world)
+Update_Messages Character::take_from_chest(const string & take_item_id, World & world)
 {
 	// if this room does not have a chest
 	if (!world.room_at(x, y, z)->has_chest())
 	{
-		return "There is no chest here.";
+		return Update_Messages("There is no chest here.");
 	}
 
 	// if the chest was crafted by another faction
 	if (world.room_at(x, y, z)->get_chest_faction_id() != this->faction_ID)
 	{
-		return "This chest has an unfamiliar lock.";
+		return Update_Messages("This chest has an unfamiliar lock.");
 	}
 
 	// if the player doesn't have the item
 	if (!world.room_at(x, y, z)->chest_has(take_item_id))
 	{
-		return "The chest does not contain " + U::get_article_for(take_item_id) + " " + take_item_id + ".";
+		return Update_Messages("The chest does not contain " + U::get_article_for(take_item_id) + " " + take_item_id + ".");
 	}
 
 	this->add(world.room_at(x, y, z)->remove_from_chest(take_item_id));
 
 	// You place the sword into the chest.
-	return "You take the " + take_item_id + " from the chest.";
+	return Update_Messages("You take the " + take_item_id + " from the chest.",
+		this->name + " takes " + U::get_article_for(take_item_id) + " " + take_item_id + " from the chest.");
 }
-string Character::look_inside_chest(const World & world) const
+Update_Messages Character::look_inside_chest(const World & world) const
 {
 	// validation within
-	return world.room_at(x, y, z)->chest_contents(faction_ID);
+	return world.room_at(x, y, z)->chest_contents(faction_ID, this->name);
 }
-string Character::construct_surface(const string & material_id, const string & surface_id, World & world)
+Update_Messages Character::construct_surface(const string & material_id, const string & surface_id, World & world)
 {
 	if (world.room_at(x, y, z)->is_forest())
 	{
-		return "You are in a forest and cannot build a structure here.";
+		return Update_Messages("You are in a forest and cannot build a structure here.");
 	}
 
 	// make sure the material can be used to construct a surface
 	if (C::SURFACE_REQUIREMENTS.find(material_id) == C::SURFACE_REQUIREMENTS.end())
 	{
-		return "You can't build a structure's surface out of " + material_id + ".";
+		return Update_Messages("You can't build a structure's surface out of " + material_id + ".");
 	}
 
 	// check if the surface already exists
@@ -868,11 +870,11 @@ string Character::construct_surface(const string & material_id, const string & s
 		// test if construction is prevented by an intact wall or a pile of rubble
 		if (world.room_at(x, y, z)->get_room_sides().find(surface_id)->second.is_rubble())
 		{
-			return "A pile of rubble prevents construction.";
+			return Update_Messages("A pile of rubble prevents construction.");
 		}
 		else // the surface is intact
 		{
-			return ((surface_id == C::CEILING || surface_id == C::FLOOR) ?
+			return Update_Messages((surface_id == C::CEILING || surface_id == C::FLOOR) ?
 				"A " + surface_id + " already exists here." : // ceiling or floor
 				U::capitalize(U::get_article_for(surface_id)) + " " + surface_id + " wall already exists here."); // any wall
 		}
@@ -881,27 +883,27 @@ string Character::construct_surface(const string & material_id, const string & s
 	// check that the surface to construct is a wall, ceiling, or floor
 	if (!U::contains(C::surface_ids, surface_id))
 	{
-		return "Construct a wall, ceiling or floor.";
+		return Update_Messages("Construct a wall, ceiling or floor.");
 	}
 
 	// if the surface is a ceiling, check that any intact wall exists
 	if (surface_id == C::CEILING && // the user is constructing a ceiling
 		!world.room_at(x, y, z)->has_standing_wall()) // the room does not have a wall
 	{
-		return "You need at least one standing wall to support a ceiling.";
+		return Update_Messages("You need at least one standing wall to support a ceiling.");
 	}
 
 	// check that the player has the item
 	if (this->material_inventory.find(material_id) == material_inventory.end())
 	{
-		return "You don't have " + material_id + ".";
+		return Update_Messages("You don't have " + material_id + ".");
 	}
 
 	// check that the player has enough of the item to construct
 	if (this->material_inventory.find(material_id)->second->amount < C::SURFACE_REQUIREMENTS.find(material_id)->second)
 	{
 		// "You need 5 wood to continue construction."
-		return "You need " + U::to_string(C::SURFACE_REQUIREMENTS.find(material_id)->second) + " " + material_id + " to continue construction.";
+		return Update_Messages("You need " + U::to_string(C::SURFACE_REQUIREMENTS.find(material_id)->second) + " " + material_id + " to continue construction.");
 	}
 
 	// remove the number of materials from the player's inventory
@@ -911,12 +913,19 @@ string Character::construct_surface(const string & material_id, const string & s
 	world.room_at(x, y, z)->add_surface(surface_id, material_id);
 
 	// "You construct a stone floor/ceiling." OR "You construct a stone wall to your north."
-	return "You construct a " + material_id + // you construct a [material]
+	return Update_Messages("You construct a " + material_id + // you construct a [material]
 		((surface_id != C::CEILING && surface_id != C::FLOOR) ?
 		" wall to your " + surface_id : // wall to your [direction]
-		" " + surface_id); // ceiling/floor
+		" " + surface_id), // ceiling/floor
+
+		this->name + " constructs a " + material_id + // [name] constructs a [material]
+		((surface_id != C::CEILING && surface_id != C::FLOOR) ?
+		" wall to your " + surface_id : // wall to your [direction]
+		" " + surface_id), // ceiling/floor
+
+		true);
 }
-string Character::construct_surface_with_door(const string & surface_material_id, const string & surface_id, const string & door_material_id, World & world)
+Update_Messages Character::construct_surface_with_door(const string & surface_material_id, const string & surface_id, const string & door_material_id, World & world)
 {
 	// Part 1: validate that a surface can be constructed
 
@@ -924,13 +933,13 @@ string Character::construct_surface_with_door(const string & surface_material_id
 
 	if (world.room_at(x, y, z)->is_forest())
 	{
-		return "You are in a forest and cannot build a structure here.";
+		return Update_Messages("You are in a forest and cannot build a structure here.");
 	}
 
 	// make sure the material can be used to construct a surface
 	if (C::SURFACE_REQUIREMENTS.find(surface_material_id) == C::SURFACE_REQUIREMENTS.end())
 	{
-		return "You can't build a structure's surface out of " + surface_material_id + ".";
+		return Update_Messages("You can't build a structure's surface out of " + surface_material_id + ".");
 	}
 
 	// check if the surface already exists
@@ -939,11 +948,11 @@ string Character::construct_surface_with_door(const string & surface_material_id
 		// test if construction is prevented by an intact wall or a pile of rubble
 		if (world.room_at(x, y, z)->get_room_sides().find(surface_id)->second.is_rubble())
 		{
-			return "A pile of rubble prevents construction.";
+			return Update_Messages("A pile of rubble prevents construction.");
 		}
 		else // the surface is intact
 		{
-			return ((surface_id == C::CEILING || surface_id == C::FLOOR) ?
+			return Update_Messages((surface_id == C::CEILING || surface_id == C::FLOOR) ?
 				"A " + surface_id + " already exists here." : // ceiling or floor
 				U::capitalize(U::get_article_for(surface_id)) + " " + surface_id + " wall already exists here."); // any wall
 		}
@@ -952,27 +961,27 @@ string Character::construct_surface_with_door(const string & surface_material_id
 	// check that the surface to construct is a wall, ceiling, or floor
 	if (!U::contains(C::surface_ids, surface_id))
 	{
-		return "Construct a wall, ceiling or floor.";
+		return Update_Messages("Construct a wall, ceiling or floor.");
 	}
 
 	// if the surface is a ceiling, check that any intact wall exists
 	if (surface_id == C::CEILING && // the user is construction a ceiling
 		!world.room_at(x, y, z)->has_standing_wall()) // the room does not have a wall
 	{
-		return "You need at least one standing wall to support a ceiling.";
+		return Update_Messages("You need at least one standing wall to support a ceiling.");
 	}
 
 	// check that the player has the item
 	if (this->material_inventory.find(surface_material_id) == material_inventory.end())
 	{
-		return "You don't have " + surface_material_id + ".";
+		return Update_Messages("You don't have " + surface_material_id + ".");
 	}
 
 	// check that the player has enough of the item to construct
 	if (this->material_inventory.find(surface_material_id)->second->amount < C::SURFACE_REQUIREMENTS.find(surface_material_id)->second)
 	{
 		// "You need 5 wood to continue construction of the wall."
-		return "You need " + U::to_string(C::SURFACE_REQUIREMENTS.find(surface_material_id)->second) + " " + surface_material_id + " to continue construction of the wall.";
+		return Update_Messages("You need " + U::to_string(C::SURFACE_REQUIREMENTS.find(surface_material_id)->second) + " " + surface_material_id + " to continue construction of the wall.");
 	}
 
 
@@ -984,7 +993,7 @@ string Character::construct_surface_with_door(const string & surface_material_id
 	// check that there exist requirements for making a door of the specified type
 	if (C::DOOR_REQUIREMENTS.find(door_material_id) == C::DOOR_REQUIREMENTS.cend())
 	{
-		return "You cannot construct a door using " + door_material_id + ".";
+		return Update_Messages("You cannot construct a door using " + door_material_id + ".");
 	}
 
 	// extract the amount of materials required to make a door of the specified type
@@ -994,7 +1003,7 @@ string Character::construct_surface_with_door(const string & surface_material_id
 	if (!this->has(door_material_id, DOOR_MATERIAL_COUNT_REQUIRED))
 	{
 		// "A stone door requires 5 stone."
-		return "A " + door_material_id + " door requires " + U::to_string(DOOR_MATERIAL_COUNT_REQUIRED) + " " + door_material_id + ".";
+		return Update_Messages("A " + door_material_id + " door requires " + U::to_string(DOOR_MATERIAL_COUNT_REQUIRED) + " " + door_material_id + ".");
 	}
 
 
@@ -1022,36 +1031,47 @@ string Character::construct_surface_with_door(const string & surface_material_id
 
 
 
-	// Part 5: the response
+	// Part 5: the responses
 
+	stringstream to_player, to_room;
 
+	to_player << "You construct a " << surface_material_id; // you construct a [material]
+	to_room << this->name << " constructs a " << surface_material_id; // you construct a [material]
+
+	if (surface_id == C::CEILING || surface_id == C::FLOOR) // the player constructed a ceiling or floor
+	{
+		to_player << " " << surface_id << " with a " << door_material_id << " hatch.";
+		to_room << " " << surface_id << " with a " << door_material_id << " hatch.";
+	}
+	else // constructing a wall rather than a ceiling or floor
+	{
+		to_player << " wall to your " << surface_id << " with a " << door_material_id << " door.";
+		to_room << " wall to your " << surface_id << " with a " << door_material_id << " door.";
+	}
 
 	// "You construct a stone floor with a stone hatch." OR "You construct a stone wall to your north with a branch door."
-	return "You construct a " + surface_material_id + // you construct a [material]
-		((surface_id != C::CEILING && surface_id != C::FLOOR) ?
-		" wall to your " + surface_id + " with a " + door_material_id + " door." : // wall to your [direction]
-		" " + surface_id + " with a " + door_material_id + " hatch."); // ceiling/floor
+	return Update_Messages(to_player.str(), to_room.str(), true); // send messages to user and room, and require map update for players in view distance
 }
-string Character::attack_surface(const string & surface_ID, World & world)
+Update_Messages Character::attack_surface(const string & surface_ID, World & world)
 {
 	// get this check out of the way
 	if (surface_ID == C::CEILING || surface_ID == C::FLOOR)
 	{
-		return "Damaging a surface in a room above or below you is not supported yet.";
+		return Update_Messages("Damaging a surface in a room above or below you is not supported yet.");
 	}
 
 	// verify we are working with a primary compass point
 	if (surface_ID != C::NORTH && surface_ID != C::EAST &&
 		surface_ID != C::SOUTH && surface_ID != C::WEST)
 	{
-		return "Only n/s/e/w surfaces can be damaged at this time.";
+		return Update_Messages("Only n/s/e/w surfaces can be damaged at this time.");
 	}
 
 	// if the current room has an intact surface
 	if (world.room_at(x, y, z)->is_standing_wall(surface_ID))
 	{
 		// apply damage to the surface
-		return world.room_at(x, y, z)->damage_surface(surface_ID, this->equipped_item);
+		return world.room_at(x, y, z)->damage_surface(surface_ID, this->equipped_item, this->name);
 	}
 
 	// this room does not have an intact surface, the neighboring room might
@@ -1067,7 +1087,7 @@ string Character::attack_surface(const string & surface_ID, World & world)
 	if (world.room_at(new_x, new_y, z)->is_standing_wall(C::opposite_surface_id.find(surface_ID)->second)) // deliberately using just "z" throughout this block
 	{
 		// inflict damage upon the surface
-		return world.room_at(new_x, new_y, z)->damage_surface(C::opposite_surface_id.find(surface_ID)->second, this->equipped_item);
+		return world.room_at(new_x, new_y, z)->damage_surface(C::opposite_surface_id.find(surface_ID)->second, this->equipped_item, this->name);
 	}
 
 	// neither room has an intact surface
@@ -1076,34 +1096,34 @@ string Character::attack_surface(const string & surface_ID, World & world)
 	if (!world.room_at(x, y, z)->has_surface(surface_ID) &&
 		!world.room_at(new_x, new_y, z)->has_surface(C::opposite_surface_id.find(surface_ID)->second))
 	{
-		return "There is no " + surface_ID + " wall here.";
+		return Update_Messages("There is no " + surface_ID + " wall here.");
 	}
 	else
 	{
 		// any surface that does exist is rubble, and at least one surface exists
-		return "There is only rubble where a wall once was.";
+		return Update_Messages("There is only rubble where a wall once was.");
 	}
 }
-string Character::attack_door(const string & surface_ID, World & world)
+Update_Messages Character::attack_door(const string & surface_ID, World & world)
 {
 	// get this check out of the way
 	if (surface_ID == C::CEILING || surface_ID == C::FLOOR)
 	{
-		return "Damaging above or below you is not supported yet.";
+		return Update_Messages("Damaging above or below you is not supported yet.");
 	}
 
 	// verify we are working with a primary compass point
 	if (surface_ID != C::NORTH && surface_ID != C::EAST &&
 		surface_ID != C::SOUTH && surface_ID != C::WEST)
 	{
-		return "Only doors in n/s/e/w surfaces can be damaged at this time.";
+		return Update_Messages("Only doors in n/s/e/w surfaces can be damaged at this time.");
 	}
 
 	// if the current room has an intact surface with an intact door in it
 	if (world.room_at(x, y, z)->has_surface(surface_ID) && world.room_at(x, y, z)->get_room_sides().find(surface_ID)->second.has_intact_door())
 	{
 		// applied damage to the door
-		return world.room_at(x, y, z)->damage_door(surface_ID, this->equipped_item);
+		return world.room_at(x, y, z)->damage_door(surface_ID, this->equipped_item, this->name);
 	}
 
 	// the current room does not have an intact door in the specified direction,
@@ -1120,18 +1140,18 @@ string Character::attack_door(const string & surface_ID, World & world)
 	if (world.room_at(new_x, new_y, z)->is_standing_wall(C::opposite_surface_id.find(surface_ID)->second)) // deliberately using just "z" throughout this block
 	{
 		// inflict damaage upon the surface or door
-		return world.room_at(new_x, new_y, z)->damage_door(C::opposite_surface_id.find(surface_ID)->second, this->equipped_item);
+		return world.room_at(new_x, new_y, z)->damage_door(C::opposite_surface_id.find(surface_ID)->second, this->equipped_item, this->name);
 	}
 
 	// this feedback might not be correct for all cases
-	return "There is no door to your " + surface_ID;
+	return Update_Messages("There is no door to your " + surface_ID + ".");
 }
-string Character::attack_item(const string & target_ID, World & world)
+Update_Messages Character::attack_item(const string & target_ID, World & world)
 {
 	// if the target isn't here
 	if (!world.room_at(x, y, z)->contains_item(target_ID))
 	{
-		return "There is no " + target_ID + " here.";
+		return Update_Messages("There is no " + target_ID + " here.");
 	}
 
 	// if the user has an item equipped
@@ -1140,7 +1160,7 @@ string Character::attack_item(const string & target_ID, World & world)
 		// if the attacking implement is not in the damage tables
 		if (C::damage_tables.find(equipped_item->name) == C::damage_tables.cend())
 		{
-			return "You can't do that with " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + ".";
+			return Update_Messages("You can't do that with " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + ".");
 		}
 
 		// extract the damage table for the attacking implement
@@ -1149,17 +1169,19 @@ string Character::attack_item(const string & target_ID, World & world)
 		// if the damage table does not have an entry for the target item ID
 		if (damage_table.find(target_ID) == damage_table.cend())
 		{
-			return "You can't do that to a " + target_ID + ".";
+			return Update_Messages("You can't do that to a " + target_ID + ".");
 		}
 
 		// damage the item, return a different message depending of if the item was destroyed or damaged
 		if (world.room_at(x, y, z)->damage_item(target_ID, damage_table.find(target_ID)->second))
 		{
-			return "You destroy the " + target_ID + " using your " + equipped_item->name + ".";
+			return Update_Messages("You destroy the " + target_ID + " using your " + equipped_item->name + ".",
+				this->name + " uses " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + " to destroy " + U::get_article_for(target_ID) + " " + target_ID + ".");
 		}
 		else
 		{
-			return "You damage the " + target_ID + " using your " + equipped_item->name + ".";
+			return Update_Messages("You damage the " + target_ID + " using your " + equipped_item->name + ".",
+				this->name + " uses " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + " to damage " + U::get_article_for(target_ID) + " " + target_ID + ".");
 		}
 	}
 	else // the user does not have an item equipped, do a barehanded attack
@@ -1170,17 +1192,19 @@ string Character::attack_item(const string & target_ID, World & world)
 		// if the damage table does not contain an entry for the target
 		if (damage_table.find(target_ID) == damage_table.cend())
 		{
-			return "You can't do that to a " + target_ID + ".";
+			return Update_Messages("You can't do that to a " + target_ID + ".");
 		}
 
 		// the damage table does contain an entry for the target
 		if (world.room_at(x, y, z)->damage_item(target_ID, damage_table.find(target_ID)->second))
 		{
-			return "You destroy the " + target_ID + " using your bare hands.";
+			return Update_Messages("You destroy the " + target_ID + " using your bare hands.",
+				this->name + " uses bare hands to destroy " + U::get_article_for(target_ID) + " " + target_ID + ".");
 		}
 		else
 		{
-			return "You damage the " + target_ID + " using your bare hands.";
+			return Update_Messages("You damage the " + target_ID + " using your bare hands.",
+				this->name + " uses bare hands to damage " + U::get_article_for(target_ID) + " " + target_ID + ".");
 		}
 	}
 

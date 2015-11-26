@@ -17,6 +17,13 @@ Game::Game()
 
 	// load the world
 	world.load();
+
+	// start the threads for listening on port numbers
+	std::thread(&Game::networking_thread, this, C::GAME_PORT_NUMBER, &Game::client_thread).detach();
+	std::thread(&Game::networking_thread, this, C::GAME_MAP_PORT_NUMBER, &Game::client_map_thread).detach();
+
+	// start the thread responsible for dispatching output to connected clients
+	std::thread(&Game::outbound_thread, this).detach();
 }
 
 void Game::login(const string & user_id)
@@ -279,7 +286,7 @@ Update_Messages Game::execute_command(const string & actor_id, const vector<stri
 	// dropping item: "drop staff"
 	else if (command.size() == 2 && command[0] == C::DROP_COMMAND)
 	{
-		return Update_Messages(actors.find(actor_id)->second->drop(command[1], world)); // (item_id, world)
+		return actors.find(actor_id)->second->drop(command[1], world); // (item_id, world)
 	}
 	// crafting: "craft sword"
 	else if (command.size() == 2 && command[0] == C::CRAFT_COMMAND)
@@ -293,17 +300,17 @@ Update_Messages Game::execute_command(const string & actor_id, const vector<stri
 	// making ceiling/floor: "construct stone floor/ceiling"
 	else if (command.size() == 3 && command[0] == C::CONSTRUCT_COMMAND)
 	{
-		return Update_Messages(actors.find(actor_id)->second->construct_surface(command[1], command[2], world)); // material, direction, world
+		return actors.find(actor_id)->second->construct_surface(command[1], command[2], world); // material, direction, world
 	}
 	// making walls: "construct west stone wall"
 	else if (command.size() == 4 && command[0] == C::CONSTRUCT_COMMAND && command[3] == C::WALL)
 	{
-		return Update_Messages(actors.find(actor_id)->second->construct_surface(command[2], command[1], world)); // material, direction, world
+		return actors.find(actor_id)->second->construct_surface(command[2], command[1], world); // material, direction, world
 	}
 	// "construct west stone wall with stick door"
 	else if (command.size() == 7 && command[0] == C::CONSTRUCT_COMMAND && command[3] == C::WALL && command[4] == C::WITH_COMMAND && command[6] == C::DOOR)
 	{
-		return Update_Messages(actors.find(actor_id)->second->construct_surface_with_door(command[2], command[1], command[5], world)); // material, direction, world
+		return actors.find(actor_id)->second->construct_surface_with_door(command[2], command[1], command[5], world); // material, direction, world
 	}
 	// waiting: "wait"
 	else if (command.size() == 1 && command[0] == C::WAIT_COMMAND)
@@ -324,18 +331,18 @@ Update_Messages Game::execute_command(const string & actor_id, const vector<stri
 	else if (command.size() >= 3 && command[0] == C::ATTACK_COMMAND && U::contains(C::surface_ids, command[1])
 		&& command[2] == C::WALL)
 	{
-		return Update_Messages(actors.find(actor_id)->second->attack_surface(command[1], world));
+		return actors.find(actor_id)->second->attack_surface(command[1], world);
 	}
 	// the player is attacking a door "smash west door"
 	else if (command.size() >= 3 && command[0] == C::ATTACK_COMMAND && U::contains(C::surface_ids, command[1])
 		&& command[2] == C::DOOR)
 	{
-		return Update_Messages(actors.find(actor_id)->second->attack_door(command[1], world));
+		return actors.find(actor_id)->second->attack_door(command[1], world);
 	}
 	// the player is attacking an item
 	else if (command.size() == 2 && command[0] == C::ATTACK_COMMAND)
 	{
-		return Update_Messages(actors.find(actor_id)->second->attack_item(command[1], world));
+		return actors.find(actor_id)->second->attack_item(command[1], world);
 	}
 	// save
 	else if (command.size() == 1 && command[0] == C::SAVE_COMMAND)
@@ -355,17 +362,17 @@ Update_Messages Game::execute_command(const string & actor_id, const vector<stri
 	// put item in chest
 	else if (command.size() == 4 && command[0] == C::DROP_COMMAND && command[2] == C::INSERT_COMMAND && command[3] == C::CHEST_ID)
 	{
-		return Update_Messages(actors.find(actor_id)->second->add_to_chest(command[1], world));
+		return actors.find(actor_id)->second->add_to_chest(command[1], world);
 	}
 	// chest
 	else if (command.size() == 1 && command[0] == C::CHEST_ID)
 	{
-		return Update_Messages(actors.find(actor_id)->second->look_inside_chest(world));
+		return actors.find(actor_id)->second->look_inside_chest(world);
 	}
 	// take [item] from chest
 	else if (command.size() == 4 && command[0] == C::TAKE_COMMAND && command[2] == C::FROM_COMMAND && command[3] == C::CHEST_ID)
 	{
-		return Update_Messages(actors.find(actor_id)->second->take_from_chest(command[1], world));
+		return actors.find(actor_id)->second->take_from_chest(command[1], world);
 	}
 	else if (command.size() == 1 && (command[0] == C::EQUIP_COMMAND || command[0] == C::ITEM_COMMAND))
 	{
@@ -381,11 +388,127 @@ Update_Messages Game::execute_command(const string & actor_id, const vector<stri
 	return Update_Messages("Nothing happens.");
 }
 
-
-
-void Game::networking_thread()
+void Game::processing_thread()
 {
-	cout << "\nStarting the server...";
+	// the processing thread handles input from users who are already logged in
+
+	for (;;)
+	{
+		// destructively get the next inbound message
+		const Message inbound_message = inbound_queue.get(); // user return by reference (blocking) to get the next message in the inbound_queue
+
+		// get the user ID for the inbound socket
+		const string user_ID = clients.get_user_ID(inbound_message.user_socket_ID);
+
+		// create a stringstream to assemble the return message
+		stringstream action_result;
+		action_result << "\n\n";
+
+		// don't allow the actors structure to be modified
+		const std::lock_guard<mutex> lock(actors_mutex);
+
+		// extract a copy of the user
+		const shared_ptr<Character> character = actors.find(user_ID)->second;
+
+		// execute the user's parsed command against the world
+		const Update_Messages update_messages = execute_command(user_ID, Parse::tokenize(inbound_message.data));
+
+		// create these to save the player's coordinates if a map update is required
+		int player_x = -1, player_y = -1;
+
+		// gather some more information to add to the response message
+		if (U::is<PC>(character))
+		{
+			const shared_ptr<PC> player = U::convert_to<PC>(character);
+
+			// save the player's coordinates in case a map update is required
+			player_x = player->x;
+			player_y = player->y;
+
+			action_result << "Your coordinates are " << player->x << ", " << player->y << " (index " << player->z << ")"
+				<< this->world.room_at(player->x, player->y, player->z)->summary(player->name) // "You look around and notice..."
+				<< player->print(); // prepend "You have..."
+		}
+
+		// add the update message to the end of the outbound message
+		action_result << update_messages.to_user;
+
+		// if a map update is required for all players within view distance
+		if (update_messages.map_update_required)
+		{
+			// for each room within view distance
+			for (int cx = player_x - (int)C::VIEW_DISTANCE; cx <= player_x + (int)C::VIEW_DISTANCE; ++cx)
+			{
+				for (int cy = player_y - (int)C::VIEW_DISTANCE; cy <= player_y + (int)C::VIEW_DISTANCE; ++cy)
+				{
+					// get a list of the users in the room
+					const vector<string> users_in_range = world.room_at(cx, cy, C::GROUND_INDEX)->get_actor_ids();
+					// for each user in the room
+					for (const string & user : users_in_range)
+					{
+						// if the user is a player character
+						if (const shared_ptr<PC> player = U::convert_to<PC>(actors.find(user)->second))
+						{
+							// get the player's map socket
+							SOCKET outbound_socket = clients.get_map_socket(user);
+							// if the player does not have a map socket, send the map to the player's main socket
+							if (outbound_socket == -1) outbound_socket = clients.get_socket(user);
+
+							// generate an area map from the current player's perspective, send it to the correct socket
+							outbound_queue.put(Message(outbound_socket, "\n\n" + player->generate_area_map(world, actors)));
+						}
+					}
+				}
+			}
+		}
+
+		// if the update requires a map update for one or more players
+		if (update_messages.additional_map_update_users != nullptr)
+		{
+			// for each player that requires an update
+			for (auto player_it = (*update_messages.additional_map_update_users).cbegin();
+				player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
+			{
+				// extract the player
+				const shared_ptr<PC> player = U::convert_to<PC>(actors.find(*player_it)->second);
+
+				// get the player's map socket
+				SOCKET outbound_socket = clients.get_map_socket(*player_it);
+				// if the player does not have a map socket, send the map to the player's main socket
+				if (outbound_socket == -1) outbound_socket = clients.get_socket(*player_it);
+
+				// generate an area map from the current player's perspective, send it to the correct socket
+				outbound_queue.put(Message(outbound_socket, player->generate_area_map(world, actors)));
+			}
+		}
+
+		// create an outbound message to the client in question
+		outbound_queue.put(Message(inbound_message.user_socket_ID, user_ID + ": " + action_result.str()));
+
+		// if a message needs to be sent to all other player characters in the room
+		if (update_messages.to_room != nullptr)
+		{
+			// get a list of all players in the room
+			const vector<string> area_actor_ids = world.room_at(character->x, character->y, character->z)->get_actor_ids();
+
+			for (const string & actor_id : area_actor_ids) // for each player in the room
+			{
+				// if the player is not "self" and the player is a human
+				if (actor_id != user_ID && U::is<PC>(actors.find(actor_id)->second))
+				{
+					// send the room update to the player
+					outbound_queue.put(Message(clients.get_socket(actor_id), *update_messages.to_room));
+				}
+			}
+		}
+	}
+}
+
+// private member functions
+
+void Game::networking_thread(const unsigned & listening_port, client_thread_type client_thread_pointer)
+{
+	cout << "\nStarting a listening thread for port " << listening_port << "...";
 
 #ifdef WIN32
 	WSADATA lpWSAData;
@@ -406,7 +529,7 @@ void Game::networking_thread()
 	sockaddr_in name;
 	memset(&name, 0, sizeof(sockaddr_in));
 	name.sin_family = AF_INET;
-	name.sin_port = htons(C::GAME_PORT_NUMBER);
+	name.sin_port = htons(listening_port);
 #ifdef WIN32
 	name.sin_addr.S_un.S_addr = 0; // open port on all network interfaces
 #else
@@ -423,12 +546,7 @@ void Game::networking_thread()
 	sockaddr_in client_address;
 	memset(&client_address, 0, sizeof(sockaddr_in));
 
-	// start the thread responsible for processing data between the input and output queue
-	std::thread(&Game::processing_thread, this).detach();
-	// start the thread responsible for dispatching output to connected clients
-	std::thread(&Game::outbound_thread, this).detach();
-
-	cout << "\nServer started on port " << C::GAME_PORT_NUMBER << ".";
+	cout << "\nListening for port " << listening_port << ".";
 
 	for (;;)
 	{
@@ -436,7 +554,7 @@ void Game::networking_thread()
 		SOCKET client = accept(socket_1, (sockaddr*)&client_address, NULL); // blocking
 
 		// start a thread to receive messages from this client
-		std::thread(&Game::client_thread, this, client).detach(); // detach() because the thread is responsible for destroying itself
+		std::thread(client_thread_pointer, this, client).detach(); // detach() because the thread is responsible for destroying itself
 	}
 
 #ifdef WIN32
@@ -444,9 +562,7 @@ void Game::networking_thread()
 #endif
 }
 
-
-
-void Game::client_thread(const SOCKET client_ID)
+void Game::client_thread(SOCKET client_ID)
 {
 	outbound_queue.put(Message(client_ID, "Welcome to IslandMUD!\n\n"));
 
@@ -499,119 +615,103 @@ void Game::client_thread(const SOCKET client_ID)
 	}
 }
 
-void Game::processing_thread()
+void Game::client_map_thread(SOCKET client_map_ID)
 {
-	// the processing thread handles input from users who are already logged in
+	outbound_queue.put(Message(client_map_ID, "Welcome to IslandMUD!\n\n"));
 
+	// allocate a buffer on the stack to store incoming messages
+	char input[1024];
+
+	string user_ID;
+
+	// loop in here until the user logs in
 	for (;;)
 	{
-		// destructively get the next inbound message
-		const Message inbound_message = inbound_queue.get(); // user return by reference (blocking) to get the next message in the inbound_queue
+		const string login_instructions =
+			"This is your map view. Log in on your main client, then log in here using \"username\" \"password\".\n"
+			"To create an account or play the game, use port " + U::to_string(C::GAME_PORT_NUMBER) + " in another window.\n\n";
 
-		// get the user ID for the inbound socket
-		const string user_ID = clients.get_user_ID(inbound_message.user_socket_ID);
+		// set instructions
+		outbound_queue.put(Message(client_map_ID, login_instructions));
 
-		// create a stringstream to assemble the return message
-		stringstream action_result;
-		action_result << "\n\n";
+		// execution pauses inside of recv() until the user sends data (one of these for each user in their own thread)
+		int data_read = recv(client_map_ID, input, 1024, 0);
 
-		// don't allow the actors structure to be modified
-		const std::lock_guard<mutex> lock(actors_mutex);
-
-		// extract a copy of the user
-		const shared_ptr<Character> character = actors.find(user_ID)->second;
-
-		// execute the user's parsed command against the world
-		const Update_Messages update_messages = execute_command(user_ID, Parse::tokenize(inbound_message.data));
-
-		// create these to save the player's coordinates if a map update is required
-		int player_x = -1, player_y = -1;
-
-		// gather some more information to add to the response message
-		if (U::is<PC>(character))
+		// check if reading the socket failed
+		if (data_read == 0 || data_read == -1) // graceful disconnect, less graceful disconnect (respectively)
 		{
-			const shared_ptr<PC> player = U::convert_to<PC>(character);
-
-			// save the player's coordinates in case a map update is required
-			player_x = player->x;
-			player_y = player->y;
-
-			action_result << player->generate_area_map(this->world, this->actors) << endl // a top down map
-				<< "Your coordinates are " << player->x << ", " << player->y << " (index " << player->z << ")"
-				<< this->world.room_at(player->x, player->y, player->z)->summary(player->name) // "You look around and notice..."
-				<< player->print(); // prepend "You have..."
+			close_socket(client_map_ID); // close socket (platform-independent)
+			return; // the user lost connection before logging in
 		}
 
-		// add the update message to the end of the outbound message
-		action_result << update_messages.to_user;
+		// convert user input to parsed vector of words
+		std::stringstream user_input;
+		for (int i = 0; i < data_read; ++i)
+			user_input << input[i];
+		const istream_iterator<string> begin(user_input);
+		const vector<string> input(begin, istream_iterator<string>());
 
-		// if a map update is required for all players within view distance
-		if (update_messages.map_update_required)
+		if (input.size() == 2) // only valid input size
 		{
-			// for each room within view distance
-			for (int cx = player_x - (int)C::VIEW_DISTANCE; cx <= player_x + (int)C::VIEW_DISTANCE; ++cx)
-			{
-				for (int cy = player_y - (int)C::VIEW_DISTANCE; cy <= player_y + (int)C::VIEW_DISTANCE; ++cy)
-				{
-					// get a list of the users in the room
-					const vector<string> users_in_range = world.room_at(cx, cy, C::GROUND_INDEX)->get_actor_ids();
-					// for each user in the room
-					for (const string & user : users_in_range)
-					{
-						// if the user is a player character
-						if (const shared_ptr<PC> player = U::convert_to<PC>(actors.find(user)->second))
-						{
-							// get the player's map socket
-							SOCKET outbound_socket = clients.get_map_socket(user);
-							// if the player does not have a map socket, send the map to the player's main socket
-							if (outbound_socket == -1) outbound_socket = clients.get_socket(user);
-
-							// generate an area map from the current player's perspective, send it to the correct socket
-							outbound_queue.put(Message(outbound_socket, player->generate_area_map(world, actors)));
-						}
-					}
-				}
+			{ // temporary scope to destroy mutex as soon as possible
+				std::lock_guard<std::mutex> lock(actors_mutex);
+				if (actors.find(input[0]) == actors.cend()) continue; // repeat message if the user is not logged in
 			}
+
+			const string user_file = C::user_data_directory + "/" + input[0] + ".xml";
+
+			if (!U::file_exists(user_file))
+			{
+				outbound_queue.put(Message(client_map_ID, "User \"" + input[0] + "\" does not exist."));
+				continue;
+			}
+
+			pugi::xml_document user_data_xml;
+			user_data_xml.load_file(user_file.c_str());
+
+			if (input[1] != user_data_xml
+				.child(C::XML_USER_ACCOUNT.c_str())
+				.attribute(C::XML_USER_PASSWORD.c_str())
+				.as_string())
+			{
+				outbound_queue.put(Message(client_map_ID, "Incorrect password for user \"" + input[0] + "\"."));
+				continue;
+			}
+
+			// the password was correct
+			user_ID = input[0];
+			break;
 		}
 
-		// if the update requires a map update for one or more players
-		if (update_messages.additional_map_update_users != nullptr)
+		// wrong input length, loop
+	}
+
+	// finish other login/connection details
+	{
+		// add user to the lookup
+		clients.set_map_socket(user_ID, client_map_ID);
+
+		if (const shared_ptr<PC> player = U::convert_to<PC>(actors.find(user_ID)->second))
 		{
-			// for each player that requires an update
-			for (auto player_it = (*update_messages.additional_map_update_users).cbegin();
-				player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
-			{
-				// extract the player
-				const shared_ptr<PC> player = U::convert_to<PC>(actors.find(*player_it)->second);
-
-				// get the player's map socket
-				SOCKET outbound_socket = clients.get_map_socket(*player_it);
-				// if the player does not have a map socket, send the map to the player's main socket
-				if (outbound_socket == -1) outbound_socket = clients.get_socket(*player_it);
-
-				// generate an area map from the current player's perspective, send it to the correct socket
-				outbound_queue.put(Message(outbound_socket, player->generate_area_map(world, actors)));
-			}
+			// generate an area map from the current player's perspective, send it to the newly connect map socket
+			outbound_queue.put(Message(client_map_ID, "\n\n" + player->generate_area_map(world, actors)));
 		}
+	}
 
-		// create an outbound message to the client in question
-		outbound_queue.put(Message(inbound_message.user_socket_ID, user_ID + ": " + action_result.str()));
+	// loop in here forever
+	for (;;)
+	{
+		outbound_queue.put(Message(client_map_ID, "\n\nThis is your overhead map client. Use your other client on port " + U::to_string(C::GAME_PORT_NUMBER) + " to play."));
 
-		// if a message needs to be sent to all other player characters in the room
-		if (update_messages.to_room != nullptr)
+		// execution pauses inside of recv() until the user sends data
+		int data_read = recv(client_map_ID, input, 1024, 0);
+
+		// check if reading the socket failed
+		if (data_read == 0 || data_read == -1) // graceful disconnect, less graceful disconnect (respectively)
 		{
-			// get a list of all players in the room
-			const vector<string> area_actor_ids = world.room_at(character->x, character->y, character->z)->get_actor_ids();
-
-			for (const string & actor_id : area_actor_ids) // for each player in the room
-			{
-				// if the player is not "self" and the player is a human
-				if (actor_id != user_ID && U::is<PC>(actors.find(actor_id)->second))
-				{
-					// send the room update to the player
-					outbound_queue.put(Message(clients.get_socket(actor_id), *update_messages.to_room));
-				}
-			}
+			close_socket(client_map_ID); // close socket (platform-independent)
+			clients.set_map_socket(user_ID, -1); // reset map socket
+			return; // the client's personal map thread is destroyed
 		}
 	}
 }
@@ -706,8 +806,18 @@ string Game::login_or_signup(const SOCKET client_ID)
 
 			if (!U::file_exists(user_file))
 			{
-				outbound_queue.put(Message(client_ID, "User \"" + input[0] + "\" does not exist."));
+				outbound_queue.put(Message(client_ID, "User \"" + input[0] + "\" does not exist.\n"));
 				continue;
+			}
+
+			// check if the user is already logged in
+			{ // temporary scope to delete mutex lock
+				std::lock_guard<std::mutex> lock(actors_mutex);
+				if (actors.find(input[0]) != actors.cend())
+				{
+					outbound_queue.put(Message(client_ID, "User \"" + input[0] + "\" already logged in.\n"));
+					continue; // try again
+				}
 			}
 
 			pugi::xml_document user_data_xml;
@@ -718,7 +828,7 @@ string Game::login_or_signup(const SOCKET client_ID)
 				.attribute(C::XML_USER_PASSWORD.c_str())
 				.as_string())
 			{
-				outbound_queue.put(Message(client_ID, "Incorrect password for user \"" + input[0] + "\"."));
+				outbound_queue.put(Message(client_ID, "Incorrect password for user \"" + input[0] + "\".\n"));
 				continue;
 			}
 

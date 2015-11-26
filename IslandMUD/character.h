@@ -84,14 +84,14 @@ public:
 	Update_Messages drop(const string & drop_item_id, World & world);
 	Update_Messages equip(const string & item_ID);
 	Update_Messages unequip();
-	string add_to_chest(const string & insert_item_id, World & world);
-	string take_from_chest(const string & take_item_id, World & world);
-	string look_inside_chest(const World & world) const;
-	string construct_surface(const string & material_id, const string & surface_id, World & world);
-	string construct_surface_with_door(const string & material_id, const string & surface_id, const string & door_material_id, World & world);
-	string attack_surface(const string & surface_ID, World & world);
-	string attack_door(const string & surface_ID, World & world);
-	string attack_item(const string & target_ID, World & world);
+	Update_Messages add_to_chest(const string & insert_item_id, World & world);
+	Update_Messages take_from_chest(const string & take_item_id, World & world);
+	Update_Messages look_inside_chest(const World & world) const;
+	Update_Messages construct_surface(const string & material_id, const string & surface_id, World & world);
+	Update_Messages construct_surface_with_door(const string & material_id, const string & surface_id, const string & door_material_id, World & world);
+	Update_Messages attack_surface(const string & surface_ID, World & world);
+	Update_Messages attack_door(const string & surface_ID, World & world);
+	Update_Messages attack_item(const string & target_ID, World & world);
 
 	// movement info
 	string validate_movement(const int & cx, const int & cy, const int & cz, const string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const;

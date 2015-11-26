@@ -140,7 +140,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 		{
 			// try to craft the item, using obj->purpose if the (obj->verb == GOTO), else use obj->noun (most cases)
 			const Update_Messages craft_attempt = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
-			
+
 			if (craft_attempt.to_room != nullptr) // find a better way to determine if crafting was successful
 			{
 				// if successful, clear completed objectives
@@ -266,8 +266,8 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 
 				// construct the surface, with a door if the modifier is true
 				if (((objective_it->modifier) ?
-					(construct_surface_with_door(objective_it->material, objective_it->direction, objective_it->material, world).find("You construct a ")) :
-					(construct_surface(objective_it->material, objective_it->direction, world).find("You construct a ")))
+					(construct_surface_with_door(objective_it->material, objective_it->direction, objective_it->material, world).to_user.find("You construct a ")) :
+					(construct_surface(objective_it->material, objective_it->direction, world).to_user.find("You construct a "))) // find a better way to do this
 					!= string::npos)
 				{
 					// if successful, erase the objective and return
@@ -495,8 +495,8 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 
 				// construct the surface, with a door if the modifier is true
 				if (((objective_it->modifier) ?
-					(construct_surface_with_door(objective_it->material, objective_it->direction, objective_it->material, world).find("You construct a ")) :
-					(construct_surface(objective_it->material, objective_it->direction, world).find("You construct a ")))
+					(construct_surface_with_door(objective_it->material, objective_it->direction, objective_it->material, world).to_user.find("You construct a ")) :
+					(construct_surface(objective_it->material, objective_it->direction, world).to_user.find("You construct a "))) // find a better way to do this
 					!= string::npos)
 				{
 					// if successful, erase the objective
