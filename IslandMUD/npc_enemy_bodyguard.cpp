@@ -164,6 +164,7 @@ Update_Messages Hostile_NPC_Bodyguard::update(World & world, map<string, shared_
 	}
 
 	// else, idle
+	return Update_Messages("");
 }
 
 void Hostile_NPC_Bodyguard::set_protect_target(const string & set_protect_target_id)
