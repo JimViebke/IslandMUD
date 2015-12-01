@@ -12,7 +12,7 @@ class Hostile_NPC_Fighter : public Hostile_NPC
 public:
 	Hostile_NPC_Fighter(const string & name) : Hostile_NPC(name) {}
 
-	void update(World & world, map<string, shared_ptr<Character>> & actors);
+	Update_Messages update(World & world, map<string, shared_ptr<Character>> & actors);
 };
 
 #endif

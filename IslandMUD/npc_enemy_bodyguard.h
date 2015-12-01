@@ -13,7 +13,7 @@ public:
 	Hostile_NPC_Bodyguard(const string & name, const string & set_protect_target_id) : Hostile_NPC(name),
 		protect_target_id(set_protect_target_id), kill_target_last_known_location(-1, -1), guard_radius(5) {}
 
-	void update(World & world, map<string, shared_ptr<Character>> & actors);
+	Update_Messages update(World & world, map<string, shared_ptr<Character>> & actors);
 
 	void set_protect_target(const string & set_protect_target_id);
 

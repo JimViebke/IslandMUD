@@ -12,7 +12,7 @@ class Hostile_NPC : public Non_Player_Character
 protected:
 	Hostile_NPC(const string & name) : Non_Player_Character(name, C::NPC_HOSTILE_FACTION_ID) {}
 
-	virtual void update(World & world, map<string, shared_ptr<Character>> & actors) = 0;
+	virtual Update_Messages update(World & world, map<string, shared_ptr<Character>> & actors) = 0;
 };
 
 #endif

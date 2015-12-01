@@ -6,7 +6,7 @@ Aug 15 2015 */
 
 #include "npc_enemy_worker.h"
 
-void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>> & actors)
 {
 	if (!fortress_planned)
 	{
@@ -27,7 +27,8 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 	}
 
 	// attempt to move to the destination, return if successful
-	if (make_path_movement(world)) { return; }
+	Update_Messages update_messages("");
+	if (make_path_movement(world, update_messages)) { return update_messages; }
 
 	// as an optimizations, only enter the next block if the AI doesn't have an axe
 	if (i_dont_have(C::AXE_ID))
@@ -44,7 +45,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				if (world.room_at(x, y, z)->contains_item(objective_iterator->noun))
 				{
 					// remove the item from the room
-					take(objective_iterator->noun, world);
+					update_messages = take(objective_iterator->noun, world);
 
 					if (objective_iterator->noun == objective_iterator->purpose)
 					{
@@ -57,14 +58,14 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 						erase_objective(objective_iterator);
 					}
 
-					return;
+					return update_messages;
 				}
 
 				// see if the item is reachable
-				if (pathfind_to_closest_item(objective_iterator->noun, world))
+				if (pathfind_to_closest_item(objective_iterator->noun, world, update_messages))
 				{
 					cout << "Found a path to " << objective_iterator->noun << endl; // debugging
-					return;
+					return update_messages;
 				}
 
 				// a path could not be found to the item, plan to craft it if it is craftable and the NPC isn't planning to already
@@ -89,9 +90,9 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				if (one_can_craft(objective_iterator->purpose) && crafting_requirements_met(objective_iterator->purpose, world))
 				{
 					// try to craft the item, using obj->purpose if the (obj->verb == GOTO), else use obj->noun (most cases)
-					const Update_Messages craft_attempt = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
+					update_messages = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
 
-					if (craft_attempt.to_room != nullptr) // find a better way to determine if crafting was successful
+					if (update_messages.to_room != nullptr) // find a better way to determine if crafting was successful
 					{
 						// if successful, clear completed objectives
 
@@ -119,14 +120,14 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 							erase_objective(objective_iterator);
 						}
 
-						return;
+						return update_messages;
 					}
 				}
 				// the item is not craftable, or it is not craftable at this time. Continue to
 				// pathfind to the nearest instance of the item
-				else if (pathfind_to_closest_item(objective_iterator->noun, world))
+				else if (pathfind_to_closest_item(objective_iterator->noun, world, update_messages))
 				{
-					return;
+					return update_messages;
 				}
 			}
 
@@ -139,9 +140,9 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 			objective_iterator != objectives.end(); ++objective_iterator)
 		{
 			// try to craft the item, using obj->purpose if the (obj->verb == GOTO), else use obj->noun (most cases)
-			const Update_Messages craft_attempt = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
+			update_messages = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
 
-			if (craft_attempt.to_room != nullptr) // find a better way to determine if crafting was successful
+			if (update_messages.to_room != nullptr) // find a better way to determine if crafting was successful
 			{
 				// if successful, clear completed objectives
 
@@ -169,7 +170,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					erase_objective(objective_iterator);
 				}
 
-				return;
+				return update_messages;
 			}
 		}
 	}
@@ -185,7 +186,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 		objective_it != objectives.end();)
 	{
 		// limit how many objective attempts the AI can make before control is returned
-		if (++objective_attempts > C::AI_MAX_OBJECTIVE_ATTEMPTS) { return; }
+		if (++objective_attempts > C::AI_MAX_OBJECTIVE_ATTEMPTS) { return Update_Messages(""); }
 
 		// check if the objective is a construction objective
 		if (objective_it->verb == C::AI_OBJECTIVE_CONSTRUCT)
@@ -210,14 +211,11 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					if (equipped_item == nullptr || equipped_item->name != C::AXE_ID)
 					{
 						// equip the axe
-						equip(C::AXE_ID);
-						return; // finished
+						return equip(C::AXE_ID); // finished
 					}
 
 					// chop the tree
-					attack_item(C::TREE_ID, world);
-
-					return; // finished update
+					return attack_item(C::TREE_ID, world); // finished
 				}
 
 				// determine whether the adjacent room has an opposite wall with a door. Neither needs to be intact.
@@ -261,26 +259,27 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 						objective_it = objectives.begin();
 						continue;
 					}
-					return; // there are no more objectives
+					return Update_Messages(""); // there are no more objectives
 				}
 
-				// construct the surface, with a door if the modifier is true
-				if (((objective_it->modifier) ?
-					(construct_surface_with_door(objective_it->material, objective_it->direction, objective_it->material, world).to_user.find("You construct a ")) :
-					(construct_surface(objective_it->material, objective_it->direction, world).to_user.find("You construct a "))) // find a better way to do this
-					!= string::npos)
+				// construct the surface, with a door if the modifier is true				
+				update_messages = ((objective_it->modifier) 
+					? construct_surface_with_door(objective_it->material, objective_it->direction, objective_it->material, world)
+					: construct_surface(objective_it->material, objective_it->direction, world));
+
+				if (update_messages.to_user.find("You construct ") != string::npos) // find a better way to do this
 				{
 					// if successful, erase the objective and return
 					objectives.erase(objective_it);
-					return;
+					return update_messages;
 				}
 			}
 			// the NPC is not at the destination, attempt to pathfind to it
 			else if (save_path_to(objective_it->objective_x, objective_it->objective_y, world))
 			{
 				// make the first move then return
-				make_path_movement(world);
-				return;
+				make_path_movement(world, update_messages);
+				return update_messages;
 			}
 
 			// the NPC could not pathfind to the destination, try to move in the direction of the destination.
@@ -296,7 +295,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					(((y - objective_it->objective_y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y - C::VIEW_DISTANCE)), world))
 				{
 					// attempt to move to the destination, return if successful
-					if (make_path_movement(world)) { return; }
+					if (make_path_movement(world, update_messages)) { return update_messages; }
 				}
 			}
 
@@ -306,7 +305,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					(((x - objective_it->objective_x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x - C::VIEW_DISTANCE)),
 					(((objective_it->objective_y - y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y + C::VIEW_DISTANCE)), world))
 				{
-					if (make_path_movement(world)) { return; }
+					if (make_path_movement(world, update_messages)) { return update_messages; }
 				}
 			}
 
@@ -316,7 +315,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					(((objective_it->objective_x - x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x + C::VIEW_DISTANCE)),
 					(((y - objective_it->objective_y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y - C::VIEW_DISTANCE)), world))
 				{
-					if (make_path_movement(world)) { return; }
+					if (make_path_movement(world, update_messages)) { return update_messages; }
 				}
 			}
 
@@ -326,7 +325,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					(((objective_it->objective_x - x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x + C::VIEW_DISTANCE)),
 					(((objective_it->objective_y - y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y + C::VIEW_DISTANCE)), world))
 				{
-					if (make_path_movement(world)) { return; }
+					if (make_path_movement(world, update_messages)) { return update_messages; }
 				}
 			}
 
@@ -342,8 +341,8 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					if (save_path_to(x - i, y, world))
 					{
 						// make the first move
-						make_path_movement(world);
-						return;
+						make_path_movement(world, update_messages);
+						return update_messages;
 					}
 				}
 			}
@@ -354,8 +353,8 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				{
 					if (save_path_to(x + i, y, world))
 					{
-						make_path_movement(world);
-						return;
+						make_path_movement(world, update_messages);
+						return update_messages;
 					}
 				}
 			}
@@ -366,8 +365,8 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				{
 					if (save_path_to(x, y - i, world))
 					{
-						make_path_movement(world);
-						return;
+						make_path_movement(world, update_messages);
+						return update_messages;
 					}
 				}
 			}
@@ -378,8 +377,8 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				{
 					if (save_path_to(x, y + i, world))
 					{
-						make_path_movement(world);
-						return;
+						make_path_movement(world, update_messages);
+						return update_messages;
 					}
 				}
 			}
@@ -390,7 +389,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 			// if the NPC is already on the last objective and could not pathfind to it
 			if ((--objectives.end()) == objective_it)
 			{
-				return; // give up
+				return Update_Messages(""); // give up
 			}
 
 			// copy the current objective
@@ -447,7 +446,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 			objective_it != structure_it->structure_surface_objectives.end();)
 		{
 			// limit how many objective attempts the AI can make before control is returned
-			if (++objective_attempts > C::AI_MAX_OBJECTIVE_ATTEMPTS) { return; }
+			if (++objective_attempts > C::AI_MAX_OBJECTIVE_ATTEMPTS) { return Update_Messages(""); }
 
 			// if the NPC is at the destination
 			if (x == objective_it->objective_x && y == objective_it->objective_y)
@@ -483,21 +482,19 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					if (equipped_item == nullptr || equipped_item->name != C::AXE_ID)
 					{
 						// equip the axe
-						equip(C::AXE_ID);
-						return; // finished
+						return equip(C::AXE_ID);; // finished
 					}
 
 					// chop the tree
-					attack_item(C::TREE_ID, world);
-
-					return; // finished update
+					return attack_item(C::TREE_ID, world); // finished
 				}
 
-				// construct the surface, with a door if the modifier is true
-				if (((objective_it->modifier) ?
-					(construct_surface_with_door(objective_it->material, objective_it->direction, objective_it->material, world).to_user.find("You construct a ")) :
-					(construct_surface(objective_it->material, objective_it->direction, world).to_user.find("You construct a "))) // find a better way to do this
-					!= string::npos)
+				// construct the surface, with a door if the modifier is true				
+				update_messages = ((objective_it->modifier)
+					? construct_surface_with_door(objective_it->material, objective_it->direction, objective_it->material, world)
+					: construct_surface(objective_it->material, objective_it->direction, world));
+
+				if (update_messages.to_user.find("You construct ") != string::npos) // find a better way to do this
 				{
 					// if successful, erase the objective
 					structure_it->structure_surface_objectives.erase(objective_it);
@@ -508,15 +505,15 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 						planned_structures.erase(structure_it);
 					}
 
-					return;
+					return update_messages;
 				}
 			}
 			// the NPC is not at the destination, attempt to pathfind to it
 			else if (save_path_to(objective_it->objective_x, objective_it->objective_y, world))
 			{
 				// make the first move then return
-				make_path_movement(world);
-				return;
+				make_path_movement(world, update_messages);
+				return update_messages;
 			}
 
 
@@ -534,7 +531,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					(((y - objective_it->objective_y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y - C::VIEW_DISTANCE)), world))
 				{
 					// attempt to move to the destination, return if successful
-					if (make_path_movement(world)) { return; }
+					if (make_path_movement(world, update_messages)) { return update_messages; }
 				}
 			}
 
@@ -544,7 +541,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					(((x - objective_it->objective_x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x - C::VIEW_DISTANCE)),
 					(((objective_it->objective_y - y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y + C::VIEW_DISTANCE)), world))
 				{
-					if (make_path_movement(world)) { return; }
+					if (make_path_movement(world, update_messages)) { return update_messages; }
 				}
 			}
 
@@ -554,7 +551,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					(((objective_it->objective_x - x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x + C::VIEW_DISTANCE)),
 					(((y - objective_it->objective_y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y - C::VIEW_DISTANCE)), world))
 				{
-					if (make_path_movement(world)) { return; }
+					if (make_path_movement(world, update_messages)) { return update_messages; }
 				}
 			}
 
@@ -564,7 +561,7 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					(((objective_it->objective_x - x) <= C::VIEW_DISTANCE) ? (objective_it->objective_x) : (x + C::VIEW_DISTANCE)),
 					(((objective_it->objective_y - y) <= C::VIEW_DISTANCE) ? (objective_it->objective_y) : (y + C::VIEW_DISTANCE)), world))
 				{
-					if (make_path_movement(world)) { return; }
+					if (make_path_movement(world, update_messages)) { return update_messages; }
 				}
 			}
 
@@ -580,14 +577,14 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 					if (save_path_to(x - i, y, world))
 					{
 						// make the first move
-						make_path_movement(world);
+						make_path_movement(world, update_messages);
 
 						if (x == objective_it->objective_x) // if the NPC is parallel with the destination, don't over shoot
 						{
 							path.clear();
 						}
 
-						return;
+						return update_messages;
 					}
 				}
 			}
@@ -598,14 +595,14 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				{
 					if (save_path_to(x + i, y, world))
 					{
-						make_path_movement(world);
+						make_path_movement(world, update_messages);
 
 						if (x == objective_it->objective_x)
 						{
 							path.clear();
 						}
 
-						return;
+						return update_messages;
 					}
 				}
 			}
@@ -616,14 +613,14 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				{
 					if (save_path_to(x, y - i, world))
 					{
-						make_path_movement(world);
+						make_path_movement(world, update_messages);
 
 						if (y == objective_it->objective_y)
 						{
 							path.clear();
 						}
 
-						return;
+						return update_messages;
 					}
 				}
 			}
@@ -634,22 +631,24 @@ void Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>
 				{
 					if (save_path_to(x, y + i, world))
 					{
-						make_path_movement(world);
+						make_path_movement(world, update_messages);
 
 						if (y == objective_it->objective_y)
 						{
 							path.clear();
 						}
 
-						return;
+						return update_messages;
 					}
 				}
 			}
 
 			// a path could not be found
-			return;
+			return Update_Messages("");
 		}
 	}
+
+	return Update_Messages("");
 }
 
 void Hostile_NPC_Worker::plan_fortress()
@@ -705,7 +704,7 @@ void Hostile_NPC_Worker::plan_fortress()
 					// plus the current partition's height. The y position is the same as the current partition.
 					// The height of the new partition is equal to the amount removed from the current partition.
 					// The width of the new partition is the same as the width of the current partition.
-					partitions.push_back(Partition(partitions[i].x + partitions[i].height, partitions[i].y, split, partitions[i].width));
+					partitions.push_back(Partition(partitions[i]._x + partitions[i].height, partitions[i]._y, split, partitions[i].width));
 				}
 			}
 			else
@@ -727,7 +726,7 @@ void Hostile_NPC_Worker::plan_fortress()
 					// The y position is the current partition's y location plus the current partition's width. The height of
 					// the new partition is the same as the height of the existing partition. THe width of the new partition is
 					// equal to the amount removed from the current partition
-					partitions.push_back(Partition(partitions[i].x, partitions[i].y + partitions[i].width, partitions[i].height, split));
+					partitions.push_back(Partition(partitions[i]._x, partitions[i]._y + partitions[i].width, partitions[i].height, split));
 				}
 			}
 		}
@@ -748,8 +747,8 @@ void Hostile_NPC_Worker::plan_fortress()
 		const int structure_width = U::random_int_from(C::FORTRESS_PARTITION_MIN_SIZE - 1, partition.width - ((reduction_toggle) ? 0 : 1));
 
 		// the structure can be placed anywhere inside of the partition
-		const int structure_x = U::random_int_from(partition.x, (partition.x + partition.height) - structure_height);
-		const int structure_y = U::random_int_from(partition.y, (partition.y + partition.width) - structure_width);
+		const int structure_x = U::random_int_from(partition._x, (partition._x + partition.height) - structure_height);
+		const int structure_y = U::random_int_from(partition._y, (partition._y + partition.width) - structure_width);
 
 		// create a new structure using the generated parameters
 		structures.push_back(Structure(structure_x, structure_y, structure_height, structure_width));
@@ -766,8 +765,8 @@ void Hostile_NPC_Worker::plan_fortress()
 		{
 			for (int j = 0; j < structure.width; ++j)
 			{
-				fortress_footprint[(structure.x - fortress_x) + 2 + i][
-					(structure.y - fortress_y) + 2 + j] = true;
+				fortress_footprint[(structure._x - fortress_x) + 2 + i][
+					(structure._y - fortress_y) + 2 + j] = true;
 			}
 		}
 	}
@@ -782,27 +781,27 @@ void Hostile_NPC_Worker::plan_fortress()
 		Structure_Objectives structure_objectives;
 
 		// iterate over the west side of the structure
-		for (int x_coord = structure.x; x_coord <= (structure.x + structure.height) - 1; ++x_coord)
+		for (int x_coord = structure._x; x_coord <= (structure._x + structure.height) - 1; ++x_coord)
 		{
-			structure_objectives.add(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::WEST, x_coord, structure.y, C::GROUND_INDEX, false));
+			structure_objectives.add(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::WEST, x_coord, structure._y, C::GROUND_INDEX, false));
 		}
 
 		// iterate over the south side of the structure
-		for (int y_coord = structure.y; y_coord <= (structure.y + structure.width) - 1; ++y_coord)
+		for (int y_coord = structure._y; y_coord <= (structure._y + structure.width) - 1; ++y_coord)
 		{
-			structure_objectives.add(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::SOUTH, (structure.x + structure.height) - 1, y_coord, C::GROUND_INDEX, false));
+			structure_objectives.add(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::SOUTH, (structure._x + structure.height) - 1, y_coord, C::GROUND_INDEX, false));
 		}
 
 		// iterate over the north side of the structure
-		for (int y_coord = structure.y; y_coord <= (structure.y + structure.width) - 1; ++y_coord)
+		for (int y_coord = structure._y; y_coord <= (structure._y + structure.width) - 1; ++y_coord)
 		{
-			structure_objectives.add(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::NORTH, structure.x, y_coord, C::GROUND_INDEX, false));
+			structure_objectives.add(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::NORTH, structure._x, y_coord, C::GROUND_INDEX, false));
 		}
 
 		// iterate over the east side of the structure
-		for (int x_coord = structure.x; x_coord <= (structure.x + structure.height) - 1; ++x_coord)
+		for (int x_coord = structure._x; x_coord <= (structure._x + structure.height) - 1; ++x_coord)
 		{
-			structure_objectives.add(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::EAST, x_coord, (structure.y + structure.width) - 1, C::GROUND_INDEX, false));
+			structure_objectives.add(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::EAST, x_coord, (structure._y + structure.width) - 1, C::GROUND_INDEX, false));
 		}
 
 		// save the object containing the objectives

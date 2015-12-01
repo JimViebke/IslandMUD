@@ -255,7 +255,7 @@ void NPC::plan_to_craft(const string & item_id)
 }
 
 // returns true if successful
-bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world)
+bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world, Update_Messages & update_messages)
 {
 	// leave this for debugging
 	// cout << "\nSearching for path from " << x << "," << y << " to " << x_dest << "," << y_dest << ".\n";
@@ -405,7 +405,7 @@ bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world)
 		if (parent_room.x == this->x && parent_room.y == this->y)
 		{
 			// move to current_room
-			move(current_room.direction_from_parent, world);
+			update_messages = move(current_room.direction_from_parent, world);
 
 			/* leave this here for debugging
 			cout << endl;
@@ -427,7 +427,7 @@ bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world)
 
 	} while (true);
 }
-bool NPC::pathfind_to_closest_item(const string & item_id, World & world)
+bool NPC::pathfind_to_closest_item(const string & item_id, World & world, Update_Messages & update_messages)
 {
 	// leave this for debugging
 	// cout << "\nSearching for path from " << x << "," << y << " to any " << item_id << ".\n";
@@ -585,7 +585,7 @@ bool NPC::pathfind_to_closest_item(const string & item_id, World & world)
 		if (parent_room.x == this->x && parent_room.y == this->y)
 		{
 			// move to current_room
-			move(current_room.direction_from_parent, world);
+			update_messages = move(current_room.direction_from_parent, world);
 
 			/* leave this here for debugging
 			cout << endl;
@@ -782,7 +782,7 @@ bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
 
 	} while (true);
 }
-bool NPC::make_path_movement(World & world)
+bool NPC::make_path_movement(World & world, Update_Messages & update_messages)
 {
 	// if the NPC is currently pathfinding to a destination
 	if (!path.empty())
@@ -791,7 +791,7 @@ bool NPC::make_path_movement(World & world)
 		const int cx = x, cy = y, cz = z;
 
 		// attempt to move
-		this->move(U::get_movement_direction(x, y, path.begin()->_x, path.begin()->_y), world);
+		update_messages = this->move(U::get_movement_direction(x, y, path.begin()->_x, path.begin()->_y), world);
 
 		// check to see if the NPC's coordinates have changed
 		if (x != cx || y != cy || z != cz)

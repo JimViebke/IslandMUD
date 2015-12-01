@@ -522,9 +522,11 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 
 	// prepare responses
 	Update_Messages updates("You move " + direction_ID + ".",
+		
 		// "Jeb arrives from the south [wielding an axe]."
 		this->name + " arrives from the " + C::opposite_direction_id.find(direction_ID)->second +
 		((this->equipped_item == nullptr) ? "." : (" wielding " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + ".")),
+		
 		true); // update required for all users in sight range
 
 	// users that have fallen out of view won't recieve a map update unless we send one to them explicitly

@@ -77,6 +77,9 @@ private:
 	// send map updates to the user's second client instance
 	void client_map_thread(SOCKET client_ID);
 
+	// handle everything to do with NPCs
+	void NPC_thread();
+
 	// remove data from the outbound queue and send it the to specified client
 	void outbound_thread();
 
@@ -87,6 +90,9 @@ private:
 
 	// return the user_ID of a user after they log in or sign up
 	string login_or_signup(SOCKET client_ID);
+	
+	// use an Update_Messages object to generate outbound messages to players
+	void generate_outbound_messages(const string & user_ID, const Update_Messages & message_updates);
 };
 
 #endif

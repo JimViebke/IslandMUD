@@ -1,19 +1,19 @@
 
 #include "npc_enemy_bodyguard.h"
 
-void Hostile_NPC_Bodyguard::update(World & world, map<string, shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Bodyguard::update(World & world, map<string, shared_ptr<Character>> & actors)
 {
 	// NPC bodyguards cheat by knowing their protect_target's location. Gameplay impact should be negligible.
 
 	// idle if no protect_target has been set
-	if (protect_target_id == "") return;
+	if (protect_target_id == "") return Update_Messages("");
 
 	// if the protect_target does not exist
 	if (actors.find(protect_target_id) == actors.end())
 	{
 		// reset and idle
 		protect_target_id = "";
-		return;
+		return Update_Messages("");
 	}
 
 	// extract protect_target
@@ -35,7 +35,7 @@ void Hostile_NPC_Bodyguard::update(World & world, map<string, shared_ptr<Charact
 			// if I am at the target's location, do combat logic
 			if (kill_target->x == x && kill_target->y == y && kill_target->z == z)
 			{
-				return; // combat logic here
+				return Update_Messages(""); // combat logic here
 			}
 
 			// else the target is online and I am not at the target's location
@@ -54,8 +54,14 @@ void Hostile_NPC_Bodyguard::update(World & world, map<string, shared_ptr<Charact
 				}
 
 				// make the next movement
-				make_path_movement(world);
-				return; // action was used
+				Update_Messages update_messages("");
+				if (!make_path_movement(world, update_messages)) // if the next movement fails, regenerate the path and try again
+				{
+					save_path_to(kill_target->x, kill_target->y, world);
+					make_path_movement(world, update_messages);
+				}
+
+				return update_messages;
 			}
 
 			// else the kill target is not visible
@@ -77,9 +83,15 @@ void Hostile_NPC_Bodyguard::update(World & world, map<string, shared_ptr<Charact
 						stored_path_type = Stored_Path_Type::to_kill_target;
 					}
 
-					// make the next 
-					make_path_movement(world);
-					return; // action was used
+					// make the next move
+					Update_Messages update_messages("");
+					if (!make_path_movement(world, update_messages)) // if the next movement fails, regenerate the path and try again
+					{
+						save_path_to(kill_target_last_known_location._x, kill_target_last_known_location._y, world);
+						make_path_movement(world, update_messages);
+					}
+
+					return update_messages; // action was used
 				}
 
 				// else I am at the last known location and cannot see the target (this condition is handled in the next block)
@@ -97,7 +109,8 @@ void Hostile_NPC_Bodyguard::update(World & world, map<string, shared_ptr<Charact
 			}
 
 			// make the next movement
-			make_path_movement(world);
+			Update_Messages update_messages("");
+			make_path_movement(world, update_messages);
 
 			// if the kill target is (now) visible
 			if (attempt_update_kill_target_last_known_location(kill_target))
@@ -106,7 +119,7 @@ void Hostile_NPC_Bodyguard::update(World & world, map<string, shared_ptr<Charact
 				stored_path_type = Stored_Path_Type::to_kill_target; // update the stored path type
 			}
 
-			return; // action was used
+			return update_messages; // action was used
 		}
 	}
 
@@ -124,9 +137,10 @@ void Hostile_NPC_Bodyguard::update(World & world, map<string, shared_ptr<Charact
 		}
 
 		// make the next movement
-		make_path_movement(world);
+		Update_Messages update_messages("");
+		make_path_movement(world, update_messages);
 
-		return; // action was used
+		return update_messages; // action was used
 	}
 
 	// the NPC is in range of the protect target, check for a new kill target
@@ -143,9 +157,10 @@ void Hostile_NPC_Bodyguard::update(World & world, map<string, shared_ptr<Charact
 		}
 
 		// make the next movement
-		make_path_movement(world);
+		Update_Messages update_messages("");
+		make_path_movement(world, update_messages);
 
-		return; // action was used
+		return update_messages; // action was used
 	}
 
 	// else, idle

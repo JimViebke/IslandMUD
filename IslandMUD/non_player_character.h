@@ -19,7 +19,7 @@ class Non_Player_Character : public Character
 {
 public:
 	// hostile and neutral NPCs override this in their child classes
-	virtual void update(World & world, map<string, shared_ptr<Character>> & actors) = 0;
+	virtual Update_Messages update(World & world, map<string, shared_ptr<Character>> & actors) = 0;
 
 	// objective debugging
 	string get_objectives() const;
@@ -105,10 +105,10 @@ protected:
 	}
 
 	// returns true if successful
-	bool pathfind(const int & x_dest, const int & y_dest, World & world);
-	bool pathfind_to_closest_item(const string & item_id, World & world);
+	bool pathfind(const int & x_dest, const int & y_dest, World & world, Update_Messages & update_messages);
+	bool pathfind_to_closest_item(const string & item_id, World & world, Update_Messages & update_messages);
 	bool save_path_to(const int & x_dest, const int & y_dest, World & world);
-	bool make_path_movement(World & world);
+	bool make_path_movement(World & world, Update_Messages & update_messages);
 
 private:
 
