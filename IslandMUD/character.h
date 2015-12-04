@@ -47,8 +47,8 @@ protected:
 
 public:
 
-	// Item dragging_item; // a character can drag an item if they don't want to carry it.
-	static Recipes recipes; // exists in memory once for all PCs and NPCs
+	// Item dragging_item; // a character can drag an item if they don't want to carry it.	
+	static unique_ptr<Recipes> recipes; // exists in memory once for all PCs and NPCs
 
 protected:
 

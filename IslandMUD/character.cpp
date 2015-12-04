@@ -5,13 +5,15 @@ Jeb 16 2015 */
 #include "character.h"
 #include "world.h"
 
-// Recipes Character::recipes;
-
-Recipes Character::recipes;
+unique_ptr<Recipes> Character::recipes;
 
 // Character constructor
 Character::Character(const string & name, const string & set_faction_ID) : name(name)
 {
+	if (Character::recipes == nullptr)
+	{
+		Character::recipes = U::make_unique<Recipes>();
+	}
 
 	// if the faction is valid
 	if (set_faction_ID == C::PC_FACTION_ID ||
@@ -549,10 +551,10 @@ Update_Messages Character::craft(const string & craft_item_id, World & world)
 	}
 
 	// return if the recipe does not exist
-	if (!Character::recipes.has_recipe_for(craft_item_id)) { return Update_Messages("There is no way to craft " + U::get_article_for(craft_item_id) + " " + craft_item_id + "."); }
+	if (!Character::recipes->has_recipe_for(craft_item_id)) { return Update_Messages("There is no way to craft " + U::get_article_for(craft_item_id) + " " + craft_item_id + "."); }
 
 	// get the recipe
-	const Recipe recipe = Character::recipes.get_recipe(craft_item_id);
+	const Recipe recipe = Character::recipes->get_recipe(craft_item_id);
 
 	// verify the conditions for the recipe are present
 	for (map<string, int>::const_iterator it = recipe.inventory_need.cbegin(); it != recipe.inventory_need.cend(); ++it)

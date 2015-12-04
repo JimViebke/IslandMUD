@@ -121,7 +121,7 @@ void NPC::erase_acquire_objective_matching(const string & noun)
 bool NPC::one_can_craft(const string & item_id) const
 {
 	// if a recipe exists for an item, the item is craftable
-	return recipes.has_recipe_for(item_id);
+	return recipes->has_recipe_for(item_id);
 }
 bool NPC::i_have(const string & item_id) const
 {
@@ -153,7 +153,7 @@ bool NPC::crafting_requirements_met(const string & item_ID, const World & world)
 	// This must also check objectives to ensure the ingredients in the NPC's inventory
 	// aren't for another purpose.
 
-	Recipe recipe = recipes.get_recipe(item_ID);
+	Recipe recipe = recipes->get_recipe(item_ID);
 
 	// check both types of inventory requirements
 	for (map<string, int>::const_iterator inventory_need = recipe.inventory_need.cbegin();
@@ -222,14 +222,14 @@ void NPC::plan_to_craft(const string & item_id)
 	// the inventory requirements should always be completed first.
 
 	// two GOTO objective types
-	for (const pair<string, int> & requirement : recipes.get_recipe(item_id).local_need)
+	for (const pair<string, int> & requirement : recipes->get_recipe(item_id).local_need)
 	{
 		for (int i = 0; i < requirement.second; ++i)
 		{
 			add_objective(Objective_Priority::high_priority, C::AI_OBJECTIVE_GOTO, requirement.first, item_id);
 		}
 	}
-	for (const pair<string, int> & requirement : recipes.get_recipe(item_id).local_remove)
+	for (const pair<string, int> & requirement : recipes->get_recipe(item_id).local_remove)
 	{
 		for (int i = 0; i < requirement.second; ++i)
 		{
@@ -238,14 +238,14 @@ void NPC::plan_to_craft(const string & item_id)
 	}
 
 	// two ACQUIRE objective types
-	for (const pair<string, int> & requirement : recipes.get_recipe(item_id).inventory_need)
+	for (const pair<string, int> & requirement : recipes->get_recipe(item_id).inventory_need)
 	{
 		for (int i = 0; i < requirement.second; ++i)
 		{
 			add_objective(Objective_Priority::high_priority, C::AI_OBJECTIVE_ACQUIRE, requirement.first, item_id);
 		}
 	}
-	for (const pair<string, int> & requirement : recipes.get_recipe(item_id).inventory_remove)
+	for (const pair<string, int> & requirement : recipes->get_recipe(item_id).inventory_remove)
 	{
 		for (int i = 0; i < requirement.second; ++i)
 		{
