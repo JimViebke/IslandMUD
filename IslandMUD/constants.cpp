@@ -5,6 +5,11 @@ Feb 14, 2015 */
 
 #include "constants.h"
 
+namespace
+{
+	using namespace std;
+}
+
 // general
 const int C::GROUND_INDEX = 3; // there are three levels below this
 const int C::VIEW_DISTANCE = 9; // 5+1+5 to a side == 11*11 total area

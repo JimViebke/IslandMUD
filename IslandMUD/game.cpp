@@ -12,9 +12,6 @@ const int INVALID_SOCKET = 0xffff;
 
 Game::Game()
 {
-	// load crafting recipes lookup
-	Character::recipes.load();
-
 	// load the world
 	world.load();
 

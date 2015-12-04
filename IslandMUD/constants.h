@@ -19,14 +19,15 @@ namespace
 	using namespace std;
 }
 
-namespace Constants {} // "forward declaring"...
+class Constants; // "forward declaring"...
 
-namespace C = Constants; // ...to do this here
+typedef Constants C; // ...to do this here
 
-namespace Constants
+class Constants
 {
+public:
 	// general
-	extern const int
+	static const int
 		GROUND_INDEX,
 		VIEW_DISTANCE,
 
@@ -38,12 +39,12 @@ namespace Constants
 		DEFAULT_SPAWN_Y,
 		DEFAULT_SPAWN_Z;
 
-	extern const unsigned
+	static const unsigned
 		GAME_PORT_NUMBER,
 		GAME_MAP_PORT_NUMBER;
 
 	// game data locations
-	extern const string
+	static const string
 		game_directory,
 		world_terrain_file_location,
 		iron_deposit_map_file_location,
@@ -52,12 +53,12 @@ namespace Constants
 		user_data_directory;
 
 	// faction IDs
-	extern const string PC_FACTION_ID; // players ("PCs")
-	extern const string NPC_NEUTRAL_FACTION_ID; // neutral island inhabitants
-	extern const string NPC_HOSTILE_FACTION_ID; // antagonists
+	static const string PC_FACTION_ID; // players ("PCs")
+	static const string NPC_NEUTRAL_FACTION_ID; // neutral island inhabitants
+	static const string NPC_HOSTILE_FACTION_ID; // antagonists
 
 	// map symbols
-	extern const char_type
+	static const char_type
 		OUT_OF_BOUNDS_CHAR,
 		ERROR_CHAR,
 		PLAYER_CHAR,
@@ -70,7 +71,7 @@ namespace Constants
 		CHEST_CHAR,
 		RUBBLE_CHAR;
 
-	extern const string
+	static const string
 		// engine signals
 		GOOD_SIGNAL,
 		BAD_SIGNAL,
@@ -200,34 +201,34 @@ namespace Constants
 		XML_CURRENT_HEALTH;
 
 	// item health/integrity
-	extern const int
+	static const int
 		DEFAULT_ITEM_MIN_HEALTH,
 		DEFAULT_ITEM_MAX_HEALTH;
 
 	// map an item ID to its article so we can have "an axe" and "a forge", rather than use "a(n)" for all items
-	extern const map<string, string> articles;
+	static const map<string, string> articles;
 
 	// map an item ID to its plural
-	extern const map<string, string> plurals;
+	static const map<string, string> plurals;
 
 	// int to char_type conversion
-	extern const vector<char_type> numbers;
+	static const vector<char_type> numbers;
 
 	// surface information
-	extern const vector<string> surface_ids;
-	extern const vector<string> direction_ids;
-	extern const vector<string> primary_direction_ids; // NESW
-	extern const map<string, string> opposite_surface_id;
-	extern const map<string, string> opposite_direction_id;
+	static const vector<string> surface_ids;
+	static const vector<string> direction_ids;
+	static const vector<string> primary_direction_ids; // NESW
+	static const map<string, string> opposite_surface_id;
+	static const map<string, string> opposite_direction_id;
 
 	// maps material IDs to the material count required to make a surface
 	// therefore also acts as the list of valid construction surfaces (see implementation)
-	extern const map<string, unsigned> SURFACE_REQUIREMENTS;
-	extern const map<string, unsigned> DOOR_REQUIREMENTS;
+	static const map<string, unsigned> SURFACE_REQUIREMENTS;
+	static const map<string, unsigned> DOOR_REQUIREMENTS;
 
 	// box drawing (more explaination at implementation)
 
-	extern const char_type
+	static const char_type
 		NW_CORNER,
 		NE_CORNER,
 		SW_CORNER,
@@ -248,22 +249,22 @@ namespace Constants
 
 	// more box drawing
 
-	extern const vector<char_type> CORNERS;
+	static const vector<char_type> CORNERS;
 
 	// walls, ceiling, and floor - min and max health
 
-	extern const int
+	static const int
 		MIN_SURFACE_HEALTH,
 		MAX_SURFACE_HEALTH,
 		MAX_DOOR_HEALTH;
 
-	extern const map<string, map<string, int>> damage_tables;
+	static const map<string, map<string, int>> damage_tables;
 
 	// AI constants
-	extern const int
+	static const int
 		AI_MAX_OBJECTIVE_ATTEMPTS; // the point at which an AI must return control
 
-	extern const int
+	static const int
 		// AI movement costs
 		AI_MOVEMENT_COST,
 		AI_MOVEMENT_COST_DIAGONAL,
@@ -282,21 +283,21 @@ namespace Constants
 		FULL_HEALTH_MAX;
 
 	// AI objective keywords
-	extern const string
+	static const string
 		AI_OBJECTIVE_ACQUIRE,
 		AI_OBJECTIVE_GOTO,
 		AI_OBJECTIVE_CONSTRUCT;
 
-	extern const int
+	static const int
 		MAX_CHEST_HEALTH;
 
 	// fortress generation bounds
-	extern const int
+	static const int
 		FORTRESS_PARTITION_MIN_SIZE,
 		FORTRESS_MIN_X,
 		FORTRESS_MAX_X,
 		FORTRESS_MIN_Y,
 		FORTRESS_MAX_Y;
-}
+};
 
 #endif

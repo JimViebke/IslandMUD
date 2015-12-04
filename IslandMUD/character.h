@@ -6,6 +6,7 @@ Feb 14, 2015 */
 
 #include <map> // for inventory multimap
 
+#include "constants.h"
 #include "item.h"
 #include "craft.h"
 #include "room.h"

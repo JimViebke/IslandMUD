@@ -15,16 +15,7 @@ May 15 2015 */
 class Recipes
 {
 public:
-	map<string, Recipe> recipes; // name, recipe object
-
-	Recipes() {}
-
-	void load();
-
-	// recipe population
-	void add_recipe(const string & name,
-		const map<string, int> & inv_n, const map<string, int> & inv_r,
-		const map<string, int> & loc_n, const map<string, int> & loc_r, const map<string, int> & yields);
+	Recipes();
 
 	// information
 	bool has_recipe_for(const string & name) const;
@@ -36,6 +27,15 @@ public:
 	string get_recipes() const;
 	string get_recipes_matching(const string & item_ID) const;
 
+private:
+	map<string, Recipe> recipes; // name, recipe object
+
+	void load();
+
+	// recipe population
+	void add_recipe(const string & name,
+		const map<string, int> & inv_n, const map<string, int> & inv_r,
+		const map<string, int> & loc_n, const map<string, int> & loc_r, const map<string, int> & yields);
 };
 
 #endif
