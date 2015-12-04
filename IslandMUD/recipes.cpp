@@ -129,8 +129,6 @@ void Recipes::load()
 
 	// add_recipe("recipe name", {}, {}, {}, {}, {});
 
-	cout << "\nStick ID is: \"" << C::STICK_ID << "\".";
-
 	// materials
 	add_recipe(C::STICK_ID, {}, {}, { { C::TREE_ID, 1 } }, {}, { { C::STICK_ID, 1 } });
 	add_recipe(C::BRANCH_ID, {}, {}, { { C::TREE_ID, 1 } }, {}, { { C::BRANCH_ID, 1 } });
