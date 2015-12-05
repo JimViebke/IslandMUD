@@ -280,8 +280,8 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				b.push_back(((wr) ? C::RUBBLE_CHAR : ((wd) ? C::NS_DOOR : ((w) ? C::NS_WALL : C::LAND_CHAR))));
 				// if the current coordinates are the player's, draw an @ icon
 				b.push_back(((cx == x && cy == y) ? C::PLAYER_CHAR
-					// else if there is another player, draw an @ icron
-					: ((friendly_count > 0) ? C::PLAYER_CHAR
+					// else if there is another player, draw a lowercase 'a'
+					: ((friendly_count > 0) ? C::OTHER_PLAYER_CHAR
 					// else if there is an enemy, draw enemy count
 					: ((enemy_count > 0) ? U::to_char_type(enemy_count)
 					// else if there are neutrals, draw neutral count
