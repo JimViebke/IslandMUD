@@ -112,10 +112,28 @@ public:
 	Tree() : Item(C::TREE_ID, false) {}
 };
 
-class Smelter : public Item
+class Fire_Item : public Item
 {
+protected:
+	// These three fields store the amount of fuel in the item for a given point in time,
+	// and a boolean indicating if the item was lit at that time.
+	// These fields update every time the item is observed.
+	unsigned fuel_units_remaining = 0;
+	time_t fuel_time;
+	bool lit = false;
+
+	// add something to indicate fuel type, which will be used to determine the temperature of the fire 
+	// Fuelt_Type
+
+	Fire_Item(const string & item_name, const bool & is_takable) : Item(item_name, is_takable) {}
+};
+
+class Smelter : public Fire_Item
+{
+private:
+
 public:
-	Smelter() : Item(C::SMELTER_ID, false) {}
+	Smelter() : Fire_Item(C::SMELTER_ID, false) {}
 };
 
 class Anvil : public Item
@@ -134,23 +152,14 @@ protected:
 	Equipment(const string & set_name) : Item(set_name, true) {} // all equipment is takable
 };
 
-class Forge : public Item
+class Forge : public Fire_Item
 {
 private:
 	unique_ptr<Equipment> workpiece;
 	time_t workpiece_insert_time; // the time that the current workpiece placed in the forge
 
-	// These three fields store the amount of fuel in the forge for a given point in time,
-	// and a boolean indicating if the forge was lit at that time.
-	// These fields update every time the forge is observed.
-	unsigned fuel_units_remaining = 0;
-	time_t fuel_time;
-	bool lit = false;
-
-	// add something to indicate fuel type, which will be used to determine the temperature of the fire 
-
 public:
-	Forge() : Item(C::FORGE_ID, false) {}
+	Forge() : Fire_Item(C::FORGE_ID, false) {}
 };
 
 class Staff : public Equipment
