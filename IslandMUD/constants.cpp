@@ -78,7 +78,8 @@ const string C::BAD_SIGNAL = "bad";
 // item IDs
 const string C::BAD_ITEM_ID = "bad_item_id";
 
-const string C::SMELTER_ID = "smelter";
+const string C::BLOOMERY_ID = "bloomery";
+const string C::BLOOM_ID = "bloom";
 const string C::FORGE_ID = "forge";
 const string C::ANVIL_ID = "anvil";
 const string C::DEBRIS_ID = "debris";
@@ -220,7 +221,9 @@ namespace // anonymous namespace to prevent access outside this file
 			temp_articles[C::IRON_ID] =
 			temp_articles[C::IRON_DEPOSIT_ID] = "an";
 
-		temp_articles[C::BOARD_ID] =
+		temp_articles[C::BLOOM_ID] =
+			temp_articles[C::BLOOMERY_ID] =
+			temp_articles[C::BOARD_ID] =
 			temp_articles[C::BOW_ID] =
 			temp_articles[C::BRANCH_ID] =
 			temp_articles[C::CHEST_ID] =
@@ -229,7 +232,6 @@ namespace // anonymous namespace to prevent access outside this file
 			temp_articles[C::LIMESTONE_ID] =
 			temp_articles[C::LIMESTONE_DEPOSIT_ID] =
 			temp_articles[C::LOG_ID] =
-			temp_articles[C::SMELTER_ID] =
 			temp_articles[C::STAFF_ID] =
 			temp_articles[C::STICK_ID] =
 			temp_articles[C::STONE_ID] =
@@ -265,6 +267,8 @@ namespace // anonymous namespace to prevent access outside this file
 		// temp_plurals[C::IRON_ID] = "";
 		// temp_plurals[C::IRON_DEPOSIT_ID] = "an";
 
+		temp_plurals[C::BLOOM_ID] = "bloom";
+		temp_plurals[C::BLOOMERY_ID] = "bloomeries";
 		temp_plurals[C::BOARD_ID] = "boards";
 		temp_plurals[C::BOW_ID] = "bows";
 		temp_plurals[C::BRANCH_ID] = "branches";
@@ -273,7 +277,6 @@ namespace // anonymous namespace to prevent access outside this file
 		// temp_plurals[C::LIMESTONE_ID] = "";
 		// temp_plurals[C::LIMESTONE_DEPOSIT_ID] = "";
 		temp_plurals[C::LOG_ID] = "logs";
-		temp_plurals[C::SMELTER_ID] = "smelters";
 		temp_plurals[C::STAFF_ID] = "staves";
 		temp_plurals[C::STICK_ID] = "sticks";
 		temp_plurals[C::STONE_ID] = "stones";

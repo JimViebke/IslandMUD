@@ -80,7 +80,8 @@ public:
 		// item IDs
 		BAD_ITEM_ID,
 
-		SMELTER_ID,
+		BLOOMERY_ID,
+		BLOOM_ID,
 		FORGE_ID,
 		ANVIL_ID,
 		DEBRIS_ID, // collapsed ceilings

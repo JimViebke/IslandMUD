@@ -149,8 +149,8 @@ void Recipes::load()
 	add_recipe(C::LIMESTONE_ID, {}, {}, { { C::LIMESTONE_DEPOSIT_ID, 1 } }, {}, { { C::LIMESTONE_ID, 1 } });
 
 	// other
-	add_recipe(C::FORGE_ID, {}, { { C::STONE_ID, 20 } }, {}, {}, { { C::FORGE_ID, 1 } }); // 20 stones to build a forge (which are immovable)
-	add_recipe(C::SMELTER_ID, {}, { { C::STONE_ID, 30 } }, {}, {}, { { C::SMELTER_ID, 1 } }); // 30 stones to build a smelter (which are immovable)
+	add_recipe(C::FORGE_ID, {}, { { C::STONE_ID, 20 } }, {}, {}, { { C::FORGE_ID, 1 } }); // 20 stones to build a forge (which is immovable)
+	add_recipe(C::BLOOMERY_ID, {}, { { C::STONE_ID, 30 } }, {}, {}, { { C::BLOOMERY_ID, 1 } }); // 30 stones to build a bloomery (which in immovable)
 	add_recipe(C::CHEST_ID, { { C::AXE_ID, 1 } }, { { C::BOARD_ID, 5 } }, {}, {}, { { C::CHEST_ID, 1 } });
 
 }

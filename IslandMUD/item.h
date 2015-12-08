@@ -112,7 +112,7 @@ public:
 	Tree() : Item(C::TREE_ID, false) {}
 };
 
-class Fire_Item : public Item
+class Fire_Container : public Item
 {
 protected:
 	// These three fields store the amount of fuel in the item for a given point in time,
@@ -123,17 +123,39 @@ protected:
 	bool lit = false;
 
 	// add something to indicate fuel type, which will be used to determine the temperature of the fire 
-	// Fuelt_Type
+	// Fuel_Type
 
-	Fire_Item(const string & item_name, const bool & is_takable) : Item(item_name, is_takable) {}
+	Fire_Container(const string & item_name, const bool & is_takable) : Item(item_name, is_takable) {}
 };
 
-class Smelter : public Fire_Item
+class Bloom : public Item
 {
 private:
+	unsigned mass = 0; // arbitrary units
+	unsigned temperature = 0; // for simplicity's sake, assume the entire mass of the bloom is of homogenous temperature
+	unsigned quality; // What percent of the bloom is iron? This value shall be between 0 and 100.
 
 public:
-	Smelter() : Fire_Item(C::SMELTER_ID, false) {}
+	Bloom(const unsigned & set_quality) : quality(set_quality), Item(C::BLOOM_ID, true) {}
+};
+
+class Bloomery : public Fire_Container
+{
+private:
+	unique_ptr<Bloom> bloom;
+
+	class Meltable
+	{
+	public:
+		shared_ptr<Item> item;
+		unsigned temperature;
+		long long insertion_time;
+		Meltable(const shared_ptr<Item> & insert_item) : item(insert_item) { this->insertion_time = U::current_time_in_ms(); }
+	};
+	vector<Meltable> melt_contents; // an item will melt and join the bloom when it reaches temperature and melts
+
+public:
+	Bloomery() : Fire_Container(C::BLOOMERY_ID, false) {}
 };
 
 class Anvil : public Item
@@ -152,14 +174,14 @@ protected:
 	Equipment(const string & set_name) : Item(set_name, true) {} // all equipment is takable
 };
 
-class Forge : public Fire_Item
+class Forge : public Fire_Container
 {
 private:
 	unique_ptr<Equipment> workpiece;
 	time_t workpiece_insert_time; // the time that the current workpiece placed in the forge
 
 public:
-	Forge() : Fire_Item(C::FORGE_ID, false) {}
+	Forge() : Fire_Container(C::FORGE_ID, false) {}
 };
 
 class Staff : public Equipment

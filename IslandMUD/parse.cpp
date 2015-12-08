@@ -41,7 +41,8 @@ void Parse::initialize()
 		// items
 
 		// items -> other
-		P::dict["smelter"] = C::SMELTER_ID;
+		P::dict["bloom"] = C::BLOOM_ID;
+		P::dict["bloomery"] = C::BLOOMERY_ID;
 		P::dict["forge"] = C::FORGE_ID;
 		P::dict["anvil"] = C::ANVIL_ID;
 		P::dict["tree"] = C::TREE_ID;

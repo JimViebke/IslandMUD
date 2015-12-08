@@ -6,8 +6,7 @@ Jul 31 2015 */
 // contents
 void Chest::add(const shared_ptr<Item> & item)
 {
-	// if the item is a material and is therefore stackable
-	if (U::is<Material>(item))
+	if (U::is<Material>(item)) // if the item is a material and is therefore stackable
 	{
 		// check if the player already has an instance of the item
 		if (this->has(item->name))
@@ -21,10 +20,14 @@ void Chest::add(const shared_ptr<Item> & item)
 			this->material_contents.insert(pair<string, shared_ptr<Material>>(item->name, U::convert_to<Material>(Craft::make(item->name))));
 		}
 	}
-	else // the item is not a material and is therefore an Equipment type
+	else if (U::is<Equipment>(item)) // if the item is an Equipment type
 	{
 		// insert the new item
 		this->equipment_contents.insert(pair<string, shared_ptr<Equipment>>(item->name, U::convert_to<Equipment>(item)));
+	}
+	else
+	{
+		// this needs to be handled somehow
 	}
 }
 void Chest::remove(const string & item_id, const unsigned & count)
