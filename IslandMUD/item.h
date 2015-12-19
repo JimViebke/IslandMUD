@@ -7,6 +7,7 @@
 
 #include "item\item.h"
 
+#include "item\misc.h"
 #include "item\equipment.h"
 #include "item\materials.h"
 

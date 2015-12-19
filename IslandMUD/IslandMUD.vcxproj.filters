@@ -176,6 +176,9 @@
     <ClInclude Include="item\equipment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="item\misc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram - Items.cd">

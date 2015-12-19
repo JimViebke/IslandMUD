@@ -116,6 +116,7 @@
     <ClInclude Include="item\equipment.h" />
     <ClInclude Include="Item\item.h" />
     <ClInclude Include="item\materials.h" />
+    <ClInclude Include="item\misc.h" />
     <ClInclude Include="message.h" />
     <ClInclude Include="non_player_character.h" />
     <ClInclude Include="npc_enemy.h" />

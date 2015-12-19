@@ -60,14 +60,6 @@ protected:
 	Material(const std::string & cust_name) : Item(cust_name, true) {} // all materials are takable
 };
 
-
-
-class Tree : public Item
-{
-public:
-	Tree() : Item(C::TREE_ID, false) {}
-};
-
 class Fire_Container : public Item
 {
 protected:
@@ -167,12 +159,6 @@ private:
 	}
 };
 
-class Anvil : public Item
-{
-public:
-	Anvil() : Item(C::ANVIL_ID, false) {}
-};
-
 class Equipment : public Item
 {
 	// string equipment_material; // stone, iron, wood, etc
@@ -191,12 +177,6 @@ private:
 
 public:
 	Forge() : Fire_Container(C::FORGE_ID) {}
-};
-
-class Debris : public Item
-{
-public:
-	Debris() : Item(C::DEBRIS_ID, false) {}
 };
 
 class Chest : public Item
@@ -230,12 +210,6 @@ public:
 
 	// faction ID retrieval
 	std::string get_faction_id() const;
-};
-
-class Log : public Item
-{
-public:
-	Log() : Item(C::LOG_ID, false) {}
 };
 
 class Mineral_Deposit : public Item
