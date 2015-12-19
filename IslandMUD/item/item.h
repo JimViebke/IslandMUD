@@ -79,7 +79,6 @@ protected:
 class Forgeable : public Item
 {
 protected:
-	// contents are 
 	unsigned iron_units; // units are arbitrary, but consistent
 	unsigned carbon_units;
 	unsigned impurity_units;
@@ -89,21 +88,51 @@ protected:
 	unsigned grain_size;
 
 	unsigned self_temperature;
-	long long last_update_timestamp;
+
+	long long last_update_timestamp = U::current_time_in_ms();
 
 	Forgeable(const std::string & item_ID) : Item(item_ID, true) {}
 
+private:
 	void update_specs(const unsigned & ambient_temperature)
 	{
 		// Use the ambient temperature to update the temperature of the forgeable item.
-		// The ambient temperature is the temperature of the fire, forge, or just the air temperature.
+		// The ambient temperature is the temperature of the fire, the forge, or just the air temperature.
 
-		// What factors affect the speed at which the temperature of the forgeable item approaches
-		// the ambient temperature?
-		// Just time and size.
+		// Time and size are the only factors that affect the speed at which the temperature of the forgeable ite
+		// approaches the ambient temperature.
 
-		// So how fast does the temperature of the forgable item approach the ambient temperature?
-		// ... ?
+		// The temperature of the forgeable item approaches the ambient temperature at 10 degrees per second,
+		// or 1 degree per 100 milliseconds.
+		// Using this scale, items reach temperature in about one minute, and cool to room temperature in about one minute as well.
+
+		// first update the timestamp
+		last_update_timestamp = U::current_time_in_ms();
+
+		// don't do anything if the item is already at the ambient temperature
+		if (this->self_temperature == ambient_temperature) return;
+
+		// calculate the time that has elapsed between now and the last update time
+		const long long milliseconds_since_last_update = U::current_time_in_ms() - last_update_timestamp;
+
+		// Calculate how much the item's temperature has changed. This always moves in the direction of the ambient temperature.
+		const long long change_in_degrees = milliseconds_since_last_update / 100; // 1 degree per 100 milliseconds
+
+		// if the temperature has reached the ambient temperature
+		if (change_in_degrees > U::difference(this->self_temperature, ambient_temperature))
+		{
+			// update the item's temperature
+			this->self_temperature = ambient_temperature;
+		}
+		// the temperature has not yet reached the ambient temperature
+		else if (this->self_temperature > ambient_temperature) // test if the item is cooling
+		{
+			this->self_temperature -= change_in_degrees; // decrease the temperature
+		}
+		else // the item is less than the ambient temperature, increase the temperature
+		{
+			this->self_temperature += change_in_degrees;
+		}
 	}
 };
 
@@ -139,7 +168,7 @@ private:
 			this->insertion_time = U::current_time_in_ms();
 		}
 	};
-	
+
 public:
 	void add_mineral_to_bloomery(const std::shared_ptr<Mineral> & mineral)
 	{
@@ -148,7 +177,7 @@ public:
 		melt_contents.push_back(Meltable(mineral));
 	}
 
-private:	
+private:
 	std::unique_ptr<Bloom> bloom; // a bloomery may contain 1 or 0 blooms. The bloom will be a nullptr if there is no bloom.
 
 	std::vector<Meltable> melt_contents; // an item will melt and join the bloom when it reaches temperature and melts
