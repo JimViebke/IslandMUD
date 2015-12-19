@@ -134,9 +134,6 @@
     <ClInclude Include="generator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="item.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="non_player_character.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -165,6 +162,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="threadsafe_socket_lookup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Item\item.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="item.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="item\materials.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="item\equipment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
