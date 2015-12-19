@@ -26,14 +26,14 @@ Game::Game()
 	// std::thread(&Game::NPC_thread, this).detach();
 }
 
-void Game::login(const string & user_id)
+void Game::login(const std::string & user_id)
 {
 	// create a player character
 	PC player(user_id);
 	// load the player's data and place the player in the world
 	player.login(world);
 	// add the character to the actor registry
-	actors.insert(pair<string, shared_ptr<PC>>(player.name, make_shared<PC>(player)));
+	actors.insert(std::pair<std::string, std::shared_ptr<PC>>(player.name, std::make_shared<PC>(player)));
 }
 
 void Game::main_test_loop() // debugging
@@ -57,16 +57,16 @@ void Game::main_test_loop() // debugging
 		}*/
 
 	{
-		shared_ptr<Hostile_NPC_Worker> bob = make_shared<Hostile_NPC_Worker>("Bob");
+		std::shared_ptr<Hostile_NPC_Worker> bob = std::make_shared<Hostile_NPC_Worker>("Bob");
 		bob->login(world);
-		actors.insert(make_pair(bob->name, bob));
+		actors.insert(std::make_pair(bob->name, bob));
 	}
 
 	{
-		shared_ptr<Hostile_NPC_Bodyguard> bill = make_shared<Hostile_NPC_Bodyguard>("Bill", "Bob");
+		std::shared_ptr<Hostile_NPC_Bodyguard> bill = std::make_shared<Hostile_NPC_Bodyguard>("Bill", "Bob");
 		bill->login(world);
 		// bill->set_target
-		actors.insert(make_pair(bill->name, bill));
+		actors.insert(std::make_pair(bill->name, bill));
 	}
 
 
@@ -88,20 +88,20 @@ void Game::main_test_loop() // debugging
 
 	// create some holders to support the main debug loop
 	int auto_advance = 0; // debugging only - idling is default in the final game
-	string input, output = ""; // I/O holders
+	std::string input, output = ""; // I/O holders
 
 	while (true) // play indefinitely
 	{
 		// print out
 		if (U::is<PC>(actors.find("dev")->second))
 		{
-			shared_ptr<PC> dev = U::convert_to<PC>(actors.find("dev")->second);
+			std::shared_ptr<PC> dev = U::convert_to<PC>(actors.find("dev")->second);
 
 			if (auto_advance == 0)
 			{
-				cout << endl
-					<< endl
-					<< dev->generate_area_map(world, actors) << endl // a top down map
+				std::cout << std::endl
+					<< std::endl
+					<< dev->generate_area_map(world, actors) << std::endl // a top down map
 					<< "Your coordinates are " << dev->x << ", " << dev->y << " (index " << dev->z << ")"
 					<< world.room_at(dev->x, dev->y, dev->z)->summary(dev->name) // "You look around and notice..."
 					<< dev->print(); // prepend "You have..."
@@ -150,11 +150,11 @@ void Game::main_test_loop() // debugging
 		}
 
 		// main print out
-		cout << endl
-			<< endl
-			<< "  " << output << endl
-			<< endl
-			<< "> " << flush;
+		std::cout << std::endl
+			<< std::endl
+			<< "  " << output << std::endl
+			<< std::endl
+			<< "> " << std::flush;
 
 		// get or set input
 		if (auto_advance > 0)
@@ -164,25 +164,25 @@ void Game::main_test_loop() // debugging
 		}
 		else // most of the time
 		{
-			getline(cin, input);
+			std::getline(std::cin, input);
 		}
 
 		// process input
-		cout << "\nDEBUG sending to Parse::tokenize(): " << input << endl;
-		vector<string> tokenized_input = Parse::tokenize(input);
-		cout << "\nDEBUG parsed input: ";
+		std::cout << "\nDEBUG sending to Parse::tokenize(): " << input << std::endl;
+		std::vector<std::string> tokenized_input = Parse::tokenize(input);
+		std::cout << "\nDEBUG parsed input: ";
 		U::print(tokenized_input);
 
 		// hardcoding for development purposes
 		if (tokenized_input.size() > 1 && tokenized_input[0] == C::WAIT_COMMAND)
 		{
 			// tokenize the original input to prevent the number from being removed
-			stringstream ss(input);
-			const istream_iterator<string> begin(ss);
-			vector<string> strings(begin, istream_iterator<string>());
+			std::stringstream ss(input);
+			const std::istream_iterator<std::string> begin(ss);
+			std::vector<std::string> strings(begin, std::istream_iterator<std::string>());
 
 			// extract and save the number of turns to delay
-			stringstream auto_advance_count;
+			std::stringstream auto_advance_count;
 			auto_advance_count << strings[1];
 			auto_advance_count >> auto_advance;
 			--auto_advance; // fix a glitch
@@ -191,34 +191,34 @@ void Game::main_test_loop() // debugging
 		{
 			// execute processed command against game world
 			// only count loaded rooms if total room count is less than or equal to 100K (100*100*10)
-			cout << "\nDEBUG Entering execute_command(), rooms loaded: " << ((C::WORLD_X_DIMENSION*C::WORLD_Y_DIMENSION*C::WORLD_Z_DIMENSION <= 100000) ? U::to_string(world.count_loaded_rooms()) : "(too large to count)") << "...";
+			std::cout << "\nDEBUG Entering execute_command(), rooms loaded: " << ((C::WORLD_X_DIMENSION*C::WORLD_Y_DIMENSION*C::WORLD_Z_DIMENSION <= 100000) ? U::to_string(world.count_loaded_rooms()) : "(too large to count)") << "...";
 			Update_Messages updates = execute_command("dev", tokenized_input);
-			cout << "\nDEBUG Exited execute_command(), rooms loaded: " << ((C::WORLD_X_DIMENSION*C::WORLD_Y_DIMENSION*C::WORLD_Z_DIMENSION <= 100000) ? U::to_string(world.count_loaded_rooms()) : "(too large to count)") << "...";
+			std::cout << "\nDEBUG Exited execute_command(), rooms loaded: " << ((C::WORLD_X_DIMENSION*C::WORLD_Y_DIMENSION*C::WORLD_Z_DIMENSION <= 100000) ? U::to_string(world.count_loaded_rooms()) : "(too large to count)") << "...";
 		}
 
 		{
-			shared_ptr<Character> bob = actors.find("Bob")->second;
-			shared_ptr<Character> bill = actors.find("Bill")->second;
-			cout << "DEBUG: Distance between bodyguard and worker before update : " << U::diagonal_distance(bob->x, bob->y, bill->x, bill->y) << endl;
+			std::shared_ptr<Character> bob = actors.find("Bob")->second;
+			std::shared_ptr<Character> bill = actors.find("Bill")->second;
+			std::cout << "DEBUG: Distance between bodyguard and worker before update : " << U::diagonal_distance(bob->x, bob->y, bill->x, bill->y) << std::endl;
 		}
 
 		// now execute updates for all NPCs
-		for (pair<const string, shared_ptr<Character>> & actor : actors)
+		for (std::pair<const std::string, std::shared_ptr<Character>> & actor : actors)
 		{
 			if (U::is<NPC>(actor.second))
 			{
-				shared_ptr<NPC> npc = U::convert_to<NPC>(actor.second);
+				std::shared_ptr<NPC> npc = U::convert_to<NPC>(actor.second);
 
 				if (auto_advance == 0)
 				{
 					// cout << npc->get_objectives() << endl; // debugging (before update)
-					cout << npc->get_inventory() << endl; // debugging (before update)
+					std::cout << npc->get_inventory() << std::endl; // debugging (before update)
 				}
 				npc->update(world, actors);
 				if (auto_advance == 0)
 				{
-					cout << npc->get_objectives() << endl; // debugging (after update)
-					cout << npc->get_inventory() << endl; // debugging (after update)
+					std::cout << npc->get_objectives() << std::endl; // debugging (after update)
+					std::cout << npc->get_inventory() << std::endl; // debugging (after update)
 				}
 
 				actor.second = npc; // make sure to save back
@@ -226,19 +226,19 @@ void Game::main_test_loop() // debugging
 		}
 
 		{
-			shared_ptr<Character> bob = actors.find("Bob")->second;
-			shared_ptr<Character> bill = actors.find("Bill")->second;
-			cout << "DEBUG: Distance between bodyguard and worker after update : " << U::diagonal_distance(bob->x, bob->y, bill->x, bill->y) << endl;
+			std::shared_ptr<Character> bob = actors.find("Bob")->second;
+			std::shared_ptr<Character> bill = actors.find("Bill")->second;
+			std::cout << "DEBUG: Distance between bodyguard and worker after update : " << U::diagonal_distance(bob->x, bob->y, bill->x, bill->y) << std::endl;
 		}
 	}
 }
 
-Update_Messages Game::execute_command(const string & actor_id, const vector<string> & command)
+Update_Messages Game::execute_command(const std::string & actor_id, const std::vector<std::string> & command)
 {
 	// "help"
 	if (command.size() == 1 && command[0] == C::SHOW_HELP_COMMAND)
 	{
-		return Update_Messages(string("help:\n") +
+		return Update_Messages(std::string("help:\n") +
 			"\nlegend" +
 			"\nrecipes" +
 			"\nrecipes [search keyword]" +
@@ -255,7 +255,7 @@ Update_Messages Game::execute_command(const string & actor_id, const vector<stri
 	}
 	else if (command.size() == 1 && command[0] == C::LEGEND_COMMAND)
 	{
-		return Update_Messages(string("legend:\n") +
+		return Update_Messages(std::string("legend:\n") +
 			"\n " + C::FOREST_CHAR + "     forest" +
 			"\n " + C::WATER_CHAR + "     water" +
 			"\n " + C::LAND_CHAR + "     land" +
@@ -377,7 +377,7 @@ Update_Messages Game::execute_command(const string & actor_id, const vector<stri
 	else if (command.size() == 1 && (command[0] == C::EQUIP_COMMAND || command[0] == C::ITEM_COMMAND))
 	{
 		// extract the actor
-		const shared_ptr<Character> actor = actors.find(actor_id)->second;
+		const std::shared_ptr<Character> actor = actors.find(actor_id)->second;
 		if (U::is<PC>(actor)) // if the actor is a Player_Character
 		{
 			// convert the actor to a Player_Character
@@ -398,10 +398,10 @@ void Game::processing_thread()
 		const Message inbound_message = inbound_queue.get(); // user return by reference (blocking) to get the next message in the inbound_queue
 
 		// get the user ID for the inbound socket
-		const string user_ID = clients.get_user_ID(inbound_message.user_socket_ID);
+		const std::string user_ID = clients.get_user_ID(inbound_message.user_socket_ID);
 
 		// don't allow the actors structure to be modified
-		std::unique_lock<mutex> lock(actors_mutex);
+		std::unique_lock<std::mutex> lock(actors_mutex);
 
 		// execute the user's parsed command against the world
 		const Update_Messages update_messages = execute_command(user_ID, Parse::tokenize(inbound_message.data));
@@ -415,7 +415,7 @@ void Game::processing_thread()
 
 void Game::networking_thread(const unsigned & listening_port, client_thread_type client_thread_pointer)
 {
-	cout << "\nStarting a listening thread for port " << listening_port << "...";
+	std::cout << "\nStarting a listening thread for port " << listening_port << "...";
 
 #ifdef WIN32
 	WSADATA lpWSAData;
@@ -453,7 +453,7 @@ void Game::networking_thread(const unsigned & listening_port, client_thread_type
 	sockaddr_in client_address;
 	memset(&client_address, 0, sizeof(sockaddr_in));
 
-	cout << "\nListening for port " << listening_port << ".";
+	std::cout << "\nListening for port " << listening_port << ".";
 
 	for (;;)
 	{
@@ -476,7 +476,7 @@ void Game::client_thread(SOCKET client_ID)
 	// allocate a buffer on the stack to store incoming messages
 	char input[1024];
 
-	const string user_ID = login_or_signup(client_ID); // execution stays in here until the user is signed in
+	const std::string user_ID = login_or_signup(client_ID); // execution stays in here until the user is signed in
 
 	if (user_ID == "") return; // the user disconnected before signing in, the function above already cleaned up
 
@@ -487,9 +487,9 @@ void Game::client_thread(SOCKET client_ID)
 
 		// log the player in
 		std::lock_guard<std::mutex> lock(actors_mutex); // lock the actors structure while we modify it
-		shared_ptr<PC> player = make_shared<PC>(user_ID);
+		std::shared_ptr<PC> player = std::make_shared<PC>(user_ID);
 		player->login(world);
-		actors.insert(make_pair(user_ID, player));
+		actors.insert(std::make_pair(user_ID, player));
 
 		// send a welcome message through the outbound queue
 		outbound_queue.put(Message(client_ID, "Welcome to IslandMUD! You are playing as \"" + user_ID + "\".\n\n"));
@@ -529,12 +529,12 @@ void Game::client_map_thread(SOCKET client_map_ID)
 	// allocate a buffer on the stack to store incoming messages
 	char input[1024];
 
-	string user_ID;
+	std::string user_ID;
 
 	// loop in here until the user logs in
 	for (;;)
 	{
-		const string login_instructions =
+		const std::string login_instructions =
 			"This is your map view. Log in on your main client, then log in here using \"username\" \"password\".\n"
 			"To create an account or play the game, use port " + U::to_string(C::GAME_PORT_NUMBER) + " in another window.\n\n";
 
@@ -555,8 +555,8 @@ void Game::client_map_thread(SOCKET client_map_ID)
 		std::stringstream user_input;
 		for (int i = 0; i < data_read; ++i)
 			user_input << input[i];
-		const istream_iterator<string> begin(user_input);
-		const vector<string> input(begin, istream_iterator<string>());
+		const std::istream_iterator<std::string> begin(user_input);
+		const std::vector<std::string> input(begin, std::istream_iterator<std::string>());
 
 		if (input.size() == 2) // only valid input size
 		{
@@ -565,7 +565,7 @@ void Game::client_map_thread(SOCKET client_map_ID)
 				if (actors.find(input[0]) == actors.cend()) continue; // repeat message if the user is not logged in
 			}
 
-			const string user_file = C::user_data_directory + "/" + input[0] + ".xml";
+			const std::string user_file = C::user_data_directory + "/" + input[0] + ".xml";
 
 			if (!U::file_exists(user_file))
 			{
@@ -598,7 +598,7 @@ void Game::client_map_thread(SOCKET client_map_ID)
 		// add user to the lookup
 		clients.set_map_socket(user_ID, client_map_ID);
 
-		if (const shared_ptr<PC> player = U::convert_to<PC>(actors.find(user_ID)->second))
+		if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(user_ID)->second))
 		{
 			// generate an area map from the current player's perspective, send it to the newly connect map socket
 			outbound_queue.put(Message(client_map_ID, "\n\n" + player->generate_area_map(world, actors)));
@@ -633,7 +633,7 @@ void Game::NPC_thread()
 		for (const std::string & name : names)
 		{
 			std::lock_guard<std::mutex> lock(actors_mutex);
-			shared_ptr<Hostile_NPC_Worker> worker = make_shared<Hostile_NPC_Worker>(name);
+			std::shared_ptr<Hostile_NPC_Worker> worker = std::make_shared<Hostile_NPC_Worker>(name);
 			worker->login(world);
 			actors.insert(make_pair(name, worker));
 		}
@@ -641,29 +641,29 @@ void Game::NPC_thread()
 
 	std::this_thread::sleep_for(std::chrono::seconds(15)); // put a delay between server startup and NPCs' first action
 
-	cout << endl;
+	std::cout << std::endl;
 
 	for (;;)
 	{
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 
-		cout << "NPC thread locking actors_mutex...";
+		std::cout << "NPC thread locking actors_mutex...";
 		std::lock_guard<std::mutex> lock(actors_mutex);
-		cout << " done.\n";
+		std::cout << " done.\n";
 
 		for (auto & actor : actors) // for each actor
 		{
-			if (shared_ptr<NPC> npc = U::convert_to<NPC>(actor.second)) // if the actor is an NPC
+			if (std::shared_ptr<NPC> npc = U::convert_to<NPC>(actor.second)) // if the actor is an NPC
 			{
-				cout << "Calling NPC::update() on " << actor.first << "...";
+				std::cout << "Calling NPC::update() on " << actor.first << "...";
 
 				Update_Messages update_messages = npc->update(world, actors); // call update, passing in the world and actors
 
-				cout << " done.\nGenerating outbound messages...";
+				std::cout << " done.\nGenerating outbound messages...";
 
 				generate_outbound_messages(npc->name, update_messages);
 
-				cout << " done.\n";
+				std::cout << " done.\n";
 			}
 		}
 	}
@@ -691,7 +691,7 @@ void Game::close_socket(const SOCKET socket)
 #endif
 }
 
-string Game::login_or_signup(const SOCKET client_ID)
+std::string Game::login_or_signup(const SOCKET client_ID)
 {
 	// return the user_ID of a user after they log in or sign up
 
@@ -700,7 +700,7 @@ string Game::login_or_signup(const SOCKET client_ID)
 
 	for (;;) // return after the user logs in or creates an account
 	{
-		const string login_instructions =
+		const std::string login_instructions =
 			"Type \"username\" \"password\" to log in.\n"
 			"Type \"username\" \"password\" \"repeat password\" to create an account.\n"
 			"*** Password encryption has not yet been implemented. ***";
@@ -722,12 +722,12 @@ string Game::login_or_signup(const SOCKET client_ID)
 		std::stringstream user_input;
 		for (int i = 0; i < data_read; ++i)
 			user_input << input[i];
-		const istream_iterator<string> begin(user_input);
-		const vector<string> input(begin, istream_iterator<string>());
+		const std::istream_iterator<std::string> begin(user_input);
+		const std::vector<std::string> input(begin, std::istream_iterator<std::string>());
 
 		if (input.size() == 3) // new account
 		{
-			const string user_file = C::user_data_directory + "/" + input[0] + ".xml";
+			const std::string user_file = C::user_data_directory + "/" + input[0] + ".xml";
 
 			// check if the username is taken
 			if (U::file_exists(user_file))
@@ -757,7 +757,7 @@ string Game::login_or_signup(const SOCKET client_ID)
 		}
 		else if (input.size() == 2) // returning user
 		{
-			const string user_file = C::user_data_directory + "/" + input[0] + ".xml";
+			const std::string user_file = C::user_data_directory + "/" + input[0] + ".xml";
 
 			if (!U::file_exists(user_file))
 			{
@@ -795,7 +795,7 @@ string Game::login_or_signup(const SOCKET client_ID)
 	}
 }
 
-void Game::generate_outbound_messages(const string & user_ID, const Update_Messages & update_messages)
+void Game::generate_outbound_messages(const std::string & user_ID, const Update_Messages & update_messages)
 {
 	// Make sure the calling function has a lock on the actors_mutex, because this function does not acquire it.
 
@@ -803,10 +803,10 @@ void Game::generate_outbound_messages(const string & user_ID, const Update_Messa
 	int player_x = -1, player_y = -1;
 
 	// create a stringstream to assemble the return message
-	stringstream action_result;
+	std::stringstream action_result;
 	action_result << "\n\n";
 
-	const shared_ptr<Character> character = actors.find(user_ID)->second;
+	const std::shared_ptr<Character> character = actors.find(user_ID)->second;
 
 	// save the player's coordinates in case a map update is required
 	player_x = character->x;
@@ -815,7 +815,7 @@ void Game::generate_outbound_messages(const string & user_ID, const Update_Messa
 	// gather some more information to add to the response message
 	if (U::is<PC>(character))
 	{
-		const shared_ptr<PC> player = U::convert_to<PC>(character);
+		const std::shared_ptr<PC> player = U::convert_to<PC>(character);
 
 		action_result << "Your coordinates are " << player->x << ", " << player->y << " (index " << player->z << ")"
 			<< this->world.room_at(player->x, player->y, player->z)->summary(player->name) // "You look around and notice..."
@@ -834,12 +834,12 @@ void Game::generate_outbound_messages(const string & user_ID, const Update_Messa
 			for (int cy = player_y - (int)C::VIEW_DISTANCE; cy <= player_y + (int)C::VIEW_DISTANCE; ++cy)
 			{
 				// get a list of the users in the room
-				const vector<string> users_in_range = world.room_at(cx, cy, C::GROUND_INDEX)->get_actor_ids();
+				const std::vector<std::string> users_in_range = world.room_at(cx, cy, C::GROUND_INDEX)->get_actor_ids();
 				// for each user in the room
-				for (const string & user : users_in_range)
+				for (const std::string & user : users_in_range)
 				{
 					// if the user is a player character
-					if (const shared_ptr<PC> player = U::convert_to<PC>(actors.find(user)->second))
+					if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(user)->second))
 					{
 						// get the player's map socket
 						SOCKET outbound_socket = clients.get_map_socket(user);
@@ -862,7 +862,7 @@ void Game::generate_outbound_messages(const string & user_ID, const Update_Messa
 			player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
 		{
 			// extract the player
-			const shared_ptr<PC> player = U::convert_to<PC>(actors.find(*player_it)->second);
+			const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(*player_it)->second);
 
 			// get the player's map socket
 			SOCKET outbound_socket = clients.get_map_socket(*player_it);
@@ -886,9 +886,9 @@ void Game::generate_outbound_messages(const string & user_ID, const Update_Messa
 	if (update_messages.to_room != nullptr)
 	{
 		// get a list of all players in the room
-		const vector<string> area_actor_ids = world.room_at(character->x, character->y, character->z)->get_actor_ids();
+		const std::vector<std::string> area_actor_ids = world.room_at(character->x, character->y, character->z)->get_actor_ids();
 
-		for (const string & actor_id : area_actor_ids) // for each player in the room
+		for (const std::string & actor_id : area_actor_ids) // for each player in the room
 		{
 			// if the player is not "self" and the player is a human
 			if (actor_id != user_ID && U::is<PC>(actors.find(actor_id)->second))

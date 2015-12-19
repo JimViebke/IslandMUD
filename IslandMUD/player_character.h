@@ -13,13 +13,13 @@ using PC = Player_Character;
 class Player_Character : public Character
 {
 public:
-	Player_Character(const string & name) : Character(name, C::PC_FACTION_ID) {}
+	Player_Character(const std::string & name) : Character(name, C::PC_FACTION_ID) {}
 
-	string print() const;
+	std::string print() const;
 
-	string get_equipped_item_info() const;
+	std::string get_equipped_item_info() const;
 
-	string generate_area_map(const World & world, const map<string, shared_ptr<Character>> & actors) const;
+	std::string generate_area_map(const World & world, const std::map<std::string, std::shared_ptr<Character>> & actors) const;
 };
 
 #endif

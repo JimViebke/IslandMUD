@@ -1,234 +1,181 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="Item">
-    <Position X="54.25" Y="0.5" Width="1.5" />
+  <Class Name="Item" Collapsed="true">
+    <Position X="55.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACEAAAAAAQAACAAEAAAEAAAAABAAAAAACAg=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Axe">
-    <Position X="35.25" Y="6.25" Width="1.5" />
+  <Class Name="Axe" Collapsed="true">
+    <Position X="35.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Bow">
-    <Position X="37.5" Y="6.25" Width="1.5" />
+  <Class Name="Bow" Collapsed="true">
+    <Position X="37.5" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Sword">
-    <Position X="39.75" Y="6.25" Width="1.5" />
+  <Class Name="Sword" Collapsed="true">
+    <Position X="39.75" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Torch">
-    <Position X="33" Y="6.25" Width="1.5" />
+  <Class Name="Torch" Collapsed="true">
+    <Position X="33" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Staff">
-    <Position X="30.75" Y="6.25" Width="1.5" />
+  <Class Name="Staff" Collapsed="true">
+    <Position X="30.75" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Equipment">
-    <Position X="36.25" Y="4.25" Width="1.5" />
+  <Class Name="Equipment" Collapsed="true">
+    <Position X="36.5" Y="1.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Tree">
-    <Position X="71.25" Y="4.25" Width="1.5" />
+  <Class Name="Tree" Collapsed="true">
+    <Position X="73.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Wood">
-    <Position X="51" Y="6.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Vine">
-    <Position X="48.75" Y="6.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Branch">
-    <Position X="46.5" Y="6.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Stick">
-    <Position X="44.25" Y="6.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Material">
-    <Position X="54.25" Y="4.25" Width="1.5" />
+  <Class Name="Material" Collapsed="true">
+    <Position X="54.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AEAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Forge">
-    <Position X="28.5" Y="7" Width="1.5" />
+  <Class Name="Forge" Collapsed="true">
+    <Position X="28.5" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAACAAQA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Anvil">
-    <Position X="73.5" Y="4.25" Width="1.5" />
+  <Class Name="Anvil" Collapsed="true">
+    <Position X="75.75" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Hammer">
-    <Position X="42" Y="6.25" Width="1.5" />
+  <Class Name="Hammer" Collapsed="true">
+    <Position X="42" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Arrow">
-    <Position X="53.25" Y="6.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Arrowhead">
-    <Position X="55.5" Y="6.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Board">
-    <Position X="57.75" Y="6.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
-      <FileName>item.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Debris">
-    <Position X="80.25" Y="4.25" Width="1.5" />
+  <Class Name="Debris" Collapsed="true">
+    <Position X="82.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Chest">
-    <Position X="78" Y="4.25" Width="1.5" />
+  <Class Name="Chest" Collapsed="true">
+    <Position X="80.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AEAAAAOAAAEEwEAEAAAAAAAAAQAAAIAAABAAAAADAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Log">
-    <Position X="75.75" Y="4.25" Width="1.5" />
+  <Class Name="Log" Collapsed="true">
+    <Position X="78" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Limestone">
-    <Position X="62.25" Y="8.5" Width="1.5" />
+  <Class Name="Limestone" Collapsed="true">
+    <Position X="62.25" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Mineral_Deposit">
-    <Position X="67.75" Y="4.25" Width="1.5" />
+  <Class Name="Mineral_Deposit" Collapsed="true">
+    <Position X="70.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Mineral">
-    <Position X="61" Y="6.5" Width="1.5" />
+  <Class Name="Mineral" Collapsed="true">
+    <Position X="61.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Iron_Deposit">
-    <Position X="66.75" Y="6.25" Width="1.5" />
+  <Class Name="Iron_Deposit" Collapsed="true">
+    <Position X="69" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Limestone_Deposit">
-    <Position X="69" Y="6.25" Width="1.5" />
+  <Class Name="Limestone_Deposit" Collapsed="true">
+    <Position X="71.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Iron">
-    <Position X="60" Y="8.5" Width="1.5" />
+  <Class Name="Iron" Collapsed="true">
+    <Position X="60" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Stone">
-    <Position X="64.5" Y="6.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Fire_Container">
-    <Position X="27.25" Y="4.25" Width="1.5" />
+  <Class Name="Fire_Container" Collapsed="true">
+    <Position X="27.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAABAAAAAAAgAAAAAAAAAAAAAAAACAAAAgAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Bloom">
-    <Position X="82.5" Y="4.25" Width="1.5" />
+  <Class Name="Bloom" Collapsed="true">
+    <Position X="84.75" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AIAAAAAAAEAQAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <HashCode>AAAAAAAAAAAQAAAAAAAAAAAAAgAAAAAAAAQAAAAAAAA=</HashCode>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Bloomery">
-    <Position X="26.25" Y="7" Width="1.5" />
-    <NestedTypes>
-      <Class Name="Bloomery::Meltable" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>item.h</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-    </NestedTypes>
+  <Class Name="Bloomery" Collapsed="true">
+    <Position X="26.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAABAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>item.h</FileName>
+      <HashCode>AAAAABAIAAAAAAAAAQAAAAAAAAQAAAAAgAAAAAAAAAA=</HashCode>
+      <FileName>Item\item.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Forgeable" Collapsed="true">
+    <Position X="66.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAAABAAgBAAhAAAAAAAAQAEAAAAIAABAAAAA=</HashCode>
+      <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

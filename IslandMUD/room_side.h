@@ -14,12 +14,12 @@ class Room_Side
 {
 private:
 	int integrity = C::MAX_SURFACE_HEALTH;
-	string material_id;
-	shared_ptr<Door> door = nullptr;
+	std::string material_id;
+	std::shared_ptr<Door> door = nullptr;
 
 public:
 
-	Room_Side(const string & material_id) : material_id(material_id) {}
+	Room_Side(const std::string & material_id) : material_id(material_id) {}
 
 	// health retrieval and modification
 	int get_health() const;
@@ -27,7 +27,7 @@ public:
 	void change_health(const int & change);
 
 	// the surface's material
-	string get_material_id() const;
+	std::string get_material_id() const;
 
 	// surface information
 	bool is_intact() const;
@@ -35,11 +35,11 @@ public:
 	bool has_door() const;
 	bool has_intact_door() const;
 
-	string can_move_through_wall(const string & player_faction_ID) const;
+	std::string can_move_through_wall(const std::string & player_faction_ID) const;
 
-	shared_ptr<Door> get_door() const;
+	std::shared_ptr<Door> get_door() const;
 
-	void add_door(const int & health, const string & material_ID, const string & faction_ID);
+	void add_door(const int & health, const std::string & material_ID, const std::string & faction_ID);
 	void remove_door();
 
 };

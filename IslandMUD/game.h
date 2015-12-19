@@ -44,7 +44,7 @@ private:
 
 	threadsafe::socket_lookup clients;
 
-	map<string, shared_ptr<Character>> actors; // active/online PC and NPC ids
+	std::map<std::string, std::shared_ptr<Character>> actors; // active/online PC and NPC ids
 	std::mutex actors_mutex; // serves for both of the above types
 
 	World world; // the game world object
@@ -53,12 +53,12 @@ public:
 
 	Game();
 
-	void login(const string & user_id);
+	void login(const std::string & user_id);
 
 	void main_test_loop();
 
 	// execute a command against the game world
-	Update_Messages execute_command(const string & actor_id, const vector<string> & command);
+	Update_Messages execute_command(const std::string & actor_id, const std::vector<std::string> & command);
 
 	// process data, moving it from the input queue to the output queue
 	void processing_thread();
@@ -89,10 +89,10 @@ private:
 	void close_socket(SOCKET socket);
 
 	// return the user_ID of a user after they log in or sign up
-	string login_or_signup(SOCKET client_ID);
+	std::string login_or_signup(SOCKET client_ID);
 	
 	// use an Update_Messages object to generate outbound messages to players
-	void generate_outbound_messages(const string & user_ID, const Update_Messages & message_updates);
+	void generate_outbound_messages(const std::string & user_ID, const Update_Messages & message_updates);
 };
 
 #endif

@@ -3,7 +3,7 @@ Feb 16 2015 */
 
 #include "parse.h"
 
-map<string, string> Parse::dict; // first string maps to second string
+std::map<std::string, std::string> Parse::dict; // first string maps to second string
 
 void Parse::initialize()
 {
@@ -13,7 +13,7 @@ void Parse::initialize()
 
 	if (dict.size() == 0)
 	{
-		cout << "\nLoading parse dictionary...";
+		std::cout << "\nLoading parse dictionary...";
 
 		// test commands
 		P::dict["recipe"] = P::dict["recipes"] = C::PRINT_RECIPES_COMMAND;
@@ -94,28 +94,28 @@ void Parse::initialize()
 	}
 }
 
-vector<string> Parse::tokenize(const string & s)
+std::vector<std::string> Parse::tokenize(const std::string & s)
 {
 	// converts an input string to vector of "engine official" keywords/commands
 
-	cout << "\nDEBUG inside parse.tokenize: "; // debugging
+	std::cout << "\nDEBUG inside parse.tokenize: "; // debugging
 
 	if (Parse::dict.size() == 0) Parse::initialize();
 
 	// convert the space-delimited user input to a vector of strings (one word per string)
-	stringstream ss(s);
-	const istream_iterator<string> begin(ss);
-	vector<string> strings(begin, istream_iterator<string>());
+	std::stringstream ss(s);
+	const std::istream_iterator<std::string> begin(ss);
+	std::vector<std::string> strings(begin, std::istream_iterator<std::string>());
 
 	U::print(strings); // debugging
 
-	for (string & word : strings) // for each word
+	for (std::string & word : strings) // for each word
 	{
 		// convert the word to lowercase
 		U::to_lower_case(word);
 
 		// replace the typed word with the engine keyword if one exists
-		const map<string, string>::const_iterator dict_it = dict.find(word);
+		const std::map<std::string, std::string>::const_iterator dict_it = dict.find(word);
 		if (dict_it != dict.cend())
 		{
 			word = dict_it->second;

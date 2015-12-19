@@ -43,12 +43,12 @@ public:
 	explicit Update_Messages(const std::string & user_message, const bool set_map_update = false) : to_user(user_message), map_update_required(set_map_update) {}
 	explicit Update_Messages(const std::string & user_message, const std::string & room_message, const bool set_map_update = false) : to_user(user_message), map_update_required(set_map_update)
 	{
-		to_room = make_shared<std::string>(room_message);
+		to_room = std::make_shared<std::string>(room_message);
 	}
 	explicit Update_Messages(const std::string & user_message, const std::string & room_message, const std::string & area_message, const bool set_map_update = false) : to_user(user_message), map_update_required(set_map_update)
 	{
-		to_room = make_shared<std::string>(room_message);
-		to_area = make_shared<std::string>(area_message);
+		to_room = std::make_shared<std::string>(room_message);
+		to_area = std::make_shared<std::string>(area_message);
 	}
 };
 

@@ -6,12 +6,12 @@ Jun 3 2015 */
 // using NPC = Non_Player_Character; // ...in order to put this here
 
 // this can only be instantiated by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
-NPC::Non_Player_Character(const string & name, const string & faction_ID) : Character(name, faction_ID) {}
+NPC::Non_Player_Character(const std::string & name, const std::string & faction_ID) : Character(name, faction_ID) {}
 
 // objective debugging
-string NPC::get_objectives() const
+std::string NPC::get_objectives() const
 {
-	stringstream result;
+	std::stringstream result;
 	result << name << " (" << x << "," << y << ") objectives:\n";
 	for (unsigned i = 0; i < objectives.size(); ++i)
 	{
@@ -23,45 +23,45 @@ string NPC::get_objectives() const
 			<< "][" << objectives[i].material
 			<< "][" << objectives[i].noun
 			<< "][" << objectives[i].purpose
-			<< "][" << ((objectives[i].already_planning_to_craft) ? string("true") : string("false"))
+			<< "][" << ((objectives[i].already_planning_to_craft) ? std::string("true") : std::string("false"))
 			<< "] ("
 			<< objectives[i].objective_x << ","
 			<< objectives[i].objective_y << ","
-			<< objectives[i].objective_z << ")" << endl;
+			<< objectives[i].objective_z << ")" << std::endl;
 	}
 
 	return result.str();
 }
 
 // NPC objective constructors
-NPC::Objective::Objective(const string & verb, const string & noun, const string & purpose) :
+NPC::Objective::Objective(const std::string & verb, const std::string & noun, const std::string & purpose) :
 verb(verb), noun(noun), purpose(purpose) {}
-NPC::Objective::Objective(const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z) :
+NPC::Objective::Objective(const std::string & verb, const std::string & noun, const int & objective_x, const int & objective_y, const int & objective_z) :
 verb(verb), noun(noun), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z) {}
-NPC::Objective::Objective(const string & verb, const string & noun, const string & material, const string & direction, const int & objective_x, const int & objective_y, const int & objective_z, const bool & modifier) :
+NPC::Objective::Objective(const std::string & verb, const std::string & noun, const std::string & material, const std::string & direction, const int & objective_x, const int & objective_y, const int & objective_z, const bool & modifier) :
 verb(verb), noun(noun), material(material), direction(direction), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z), modifier(modifier) {}
 
 // NPC Coordinate constructor
 NPC::Coordinate::Coordinate(const int & set_x, const int & set_y, const int & set_z) : _x(set_x), _y(set_y), _z(set_z) {}
 
 // objective creating and deletion
-void NPC::add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const string & purpose)
+void NPC::add_objective(const Objective_Priority & priority, const std::string & verb, const std::string & noun, const std::string & purpose)
 {
 	(priority == Objective_Priority::high_priority) ?
 		objectives.push_front(Objective(verb, noun, purpose)) :
 		objectives.push_back(Objective(verb, noun, purpose));
 }
-void NPC::add_objective(const Objective_Priority & priority, const string & verb, const string & noun, const int & objective_x, const int & objective_y, const int & objective_z)
+void NPC::add_objective(const Objective_Priority & priority, const std::string & verb, const std::string & noun, const int & objective_x, const int & objective_y, const int & objective_z)
 {
 	(priority == Objective_Priority::high_priority) ?
 		objectives.push_front(Objective(verb, noun, x, y, z)) :
 		objectives.push_back(Objective(verb, noun, x, y, z));
 }
-void NPC::erase_objective(const deque<Objective>::iterator & objective_iterator)
+void NPC::erase_objective(const std::deque<Objective>::iterator & objective_iterator)
 {
 	objectives.erase(objective_iterator);
 }
-void NPC::erase_objectives_matching_purpose(const string purpose)
+void NPC::erase_objectives_matching_purpose(const std::string purpose)
 {
 	// arguement must be passed by value! Reference will change as the underlying structure is modified
 
@@ -82,12 +82,12 @@ void NPC::erase_objectives_matching_purpose(const string purpose)
 		}
 	}
 }
-void NPC::erase_goto_objective_matching(const string & purpose)
+void NPC::erase_goto_objective_matching(const std::string & purpose)
 {
 	// erase one goto objective matching purpose
 
 	// for each objective
-	for (deque<Objective>::iterator objective_iterator = objectives.begin();
+	for (std::deque<Objective>::iterator objective_iterator = objectives.begin();
 		objective_iterator != objectives.end(); ++objective_iterator)
 	{
 		// if the objective is a go-to objective matching the passed purpose
@@ -99,12 +99,12 @@ void NPC::erase_goto_objective_matching(const string & purpose)
 		}
 	}
 }
-void NPC::erase_acquire_objective_matching(const string & noun)
+void NPC::erase_acquire_objective_matching(const std::string & noun)
 {
 	// erase one acquire objective matching noun
 
 	// for each objective
-	for (deque<Objective>::iterator objective_iterator = objectives.begin();
+	for (std::deque<Objective>::iterator objective_iterator = objectives.begin();
 		objective_iterator != objectives.end(); ++objective_iterator)
 	{
 		// if the objective is an acquire objective matching the passed noun
@@ -118,20 +118,20 @@ void NPC::erase_acquire_objective_matching(const string & noun)
 }
 
 // objective information
-bool NPC::one_can_craft(const string & item_id) const
+bool NPC::one_can_craft(const std::string & item_id) const
 {
 	// if a recipe exists for an item, the item is craftable
 	return recipes->has_recipe_for(item_id);
 }
-bool NPC::i_have(const string & item_id) const
+bool NPC::i_have(const std::string & item_id) const
 {
 	return this->has(item_id);
 }
-bool NPC::i_dont_have(const string & item_id) const
+bool NPC::i_dont_have(const std::string & item_id) const
 {
 	return !this->has(item_id);
 }
-bool NPC::im_planning_to_acquire(const string & item_ID) const
+bool NPC::im_planning_to_acquire(const std::string & item_ID) const
 {
 	// return true if an "acquire" objective has a noun matching item_ID
 
@@ -145,7 +145,7 @@ bool NPC::im_planning_to_acquire(const string & item_ID) const
 	}
 	return false;
 }
-bool NPC::crafting_requirements_met(const string & item_ID, const World & world) const
+bool NPC::crafting_requirements_met(const std::string & item_ID, const World & world) const
 {
 	// WARNING: this assumes item_ID is craftable
 
@@ -156,7 +156,7 @@ bool NPC::crafting_requirements_met(const string & item_ID, const World & world)
 	Recipe recipe = recipes->get_recipe(item_ID);
 
 	// check both types of inventory requirements
-	for (map<string, int>::const_iterator inventory_need = recipe.inventory_need.cbegin();
+	for (std::map<std::string, int>::const_iterator inventory_need = recipe.inventory_need.cbegin();
 		inventory_need != recipe.inventory_need.cend(); ++inventory_need)
 	{
 		if (!this->has(inventory_need->first, inventory_need->second))
@@ -164,7 +164,7 @@ bool NPC::crafting_requirements_met(const string & item_ID, const World & world)
 			return false;
 		}
 	}
-	for (map<string, int>::const_iterator inventory_remove = recipe.inventory_remove.cbegin();
+	for (std::map<std::string, int>::const_iterator inventory_remove = recipe.inventory_remove.cbegin();
 		inventory_remove != recipe.inventory_remove.cend(); ++inventory_remove)
 	{
 		if (!this->has(inventory_remove->first, inventory_remove->second))
@@ -174,7 +174,7 @@ bool NPC::crafting_requirements_met(const string & item_ID, const World & world)
 	}
 
 	// check both types of local requirements
-	for (map<string, int>::const_iterator local_need = recipe.local_need.cbegin();
+	for (std::map<std::string, int>::const_iterator local_need = recipe.local_need.cbegin();
 		local_need != recipe.local_need.cend(); ++local_need)
 	{
 		if (!world.room_at(x, y, z)->contains_item(local_need->first, local_need->second))
@@ -182,7 +182,7 @@ bool NPC::crafting_requirements_met(const string & item_ID, const World & world)
 			return false;
 		}
 	}
-	for (map<string, int>::const_iterator local_remove = recipe.local_remove.cbegin();
+	for (std::map<std::string, int>::const_iterator local_remove = recipe.local_remove.cbegin();
 		local_remove != recipe.local_remove.cend(); ++local_remove)
 	{
 		if (!world.room_at(x, y, z)->contains_item(local_remove->first, local_remove->second))
@@ -192,7 +192,7 @@ bool NPC::crafting_requirements_met(const string & item_ID, const World & world)
 	}
 
 	// for each objective
-	for (deque<Objective>::const_iterator objective_iterator = objectives.cbegin();
+	for (std::deque<Objective>::const_iterator objective_iterator = objectives.cbegin();
 		objective_iterator != objectives.cend(); ++objective_iterator)
 	{
 		// if I am still planning on acquiring an item for the purpose of crafting item_ID
@@ -206,11 +206,11 @@ bool NPC::crafting_requirements_met(const string & item_ID, const World & world)
 }
 
 // objective planning
-void NPC::plan_to_get(const string & item_id)
+void NPC::plan_to_get(const std::string & item_id)
 {
 	add_objective(Objective_Priority::high_priority, C::AI_OBJECTIVE_ACQUIRE, item_id, item_id);
 }
-void NPC::plan_to_craft(const string & item_id)
+void NPC::plan_to_craft(const std::string & item_id)
 {
 	// assumes item_id is craftable
 
@@ -222,14 +222,14 @@ void NPC::plan_to_craft(const string & item_id)
 	// the inventory requirements should always be completed first.
 
 	// two GOTO objective types
-	for (const pair<string, int> & requirement : recipes->get_recipe(item_id).local_need)
+	for (const std::pair<std::string, int> & requirement : recipes->get_recipe(item_id).local_need)
 	{
 		for (int i = 0; i < requirement.second; ++i)
 		{
 			add_objective(Objective_Priority::high_priority, C::AI_OBJECTIVE_GOTO, requirement.first, item_id);
 		}
 	}
-	for (const pair<string, int> & requirement : recipes->get_recipe(item_id).local_remove)
+	for (const std::pair<std::string, int> & requirement : recipes->get_recipe(item_id).local_remove)
 	{
 		for (int i = 0; i < requirement.second; ++i)
 		{
@@ -238,14 +238,14 @@ void NPC::plan_to_craft(const string & item_id)
 	}
 
 	// two ACQUIRE objective types
-	for (const pair<string, int> & requirement : recipes->get_recipe(item_id).inventory_need)
+	for (const std::pair<std::string, int> & requirement : recipes->get_recipe(item_id).inventory_need)
 	{
 		for (int i = 0; i < requirement.second; ++i)
 		{
 			add_objective(Objective_Priority::high_priority, C::AI_OBJECTIVE_ACQUIRE, requirement.first, item_id);
 		}
 	}
-	for (const pair<string, int> & requirement : recipes->get_recipe(item_id).inventory_remove)
+	for (const std::pair<std::string, int> & requirement : recipes->get_recipe(item_id).inventory_remove)
 	{
 		for (int i = 0; i < requirement.second; ++i)
 		{
@@ -272,7 +272,7 @@ bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world, Update
 
 
 
-	vector<Node> open_list, closed_list;
+	std::vector<Node> open_list, closed_list;
 
 	// Add current room to open list.
 	open_list.push_back(Node(this->x, this->y, ""));
@@ -290,7 +290,7 @@ bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world, Update
 		const Node current_room = move_and_get_lowest_g_cost(open_list, closed_list);
 
 		// for each room adjacent to current
-		for (const string & direction : C::direction_ids)
+		for (const std::string & direction : C::direction_ids)
 		{
 			if (direction == C::UP || direction == C::DOWN) { continue; } // only pathfinding in 2D now
 
@@ -427,7 +427,7 @@ bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world, Update
 
 	} while (true);
 }
-bool NPC::pathfind_to_closest_item(const string & item_id, World & world, Update_Messages & update_messages)
+bool NPC::pathfind_to_closest_item(const std::string & item_id, World & world, Update_Messages & update_messages)
 {
 	// leave this for debugging
 	// cout << "\nSearching for path from " << x << "," << y << " to any " << item_id << ".\n";
@@ -444,7 +444,7 @@ bool NPC::pathfind_to_closest_item(const string & item_id, World & world, Update
 
 
 
-	vector<Node> open_list, closed_list;
+	std::vector<Node> open_list, closed_list;
 
 	// Add current room to open list.
 	open_list.push_back(Node(this->x, this->y, ""));
@@ -462,7 +462,7 @@ bool NPC::pathfind_to_closest_item(const string & item_id, World & world, Update
 		const Node current_room = move_and_get_lowest_g_cost(open_list, closed_list);
 
 		// for each room adjacent to current
-		for (const string & direction : C::direction_ids)
+		for (const std::string & direction : C::direction_ids)
 		{
 			if (direction == C::UP || direction == C::DOWN) { continue; } // only pathfinding in 2D now
 
@@ -625,7 +625,7 @@ bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
 	// start by removing any existing planned path
 	path.clear();
 
-	vector<Node> open_list, closed_list;
+	std::vector<Node> open_list, closed_list;
 
 	// Add current room to open list.
 	open_list.push_back(Node(this->x, this->y, ""));
@@ -643,7 +643,7 @@ bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
 		const Node current_room = move_and_get_lowest_g_cost(open_list, closed_list);
 
 		// for each room adjacent to current
-		for (const string & direction : C::direction_ids)
+		for (const std::string & direction : C::direction_ids)
 		{
 			if (direction == C::UP || direction == C::DOWN) { continue; } // only pathfinding in 2D now
 
@@ -808,7 +808,7 @@ bool NPC::make_path_movement(World & world, Update_Messages & update_messages)
 
 // Node constructors
 NPC::Node::Node() {}
-NPC::Node::Node(const int & set_x, const int & set_y, const string & dir) : x(set_x), y(set_y), direction_from_parent(dir) {}
+NPC::Node::Node(const int & set_x, const int & set_y, const std::string & dir) : x(set_x), y(set_y), direction_from_parent(dir) {}
 
 // Node member setter
 void NPC::Node::set_g_h_f(const int & set_g, const int & set_h)
@@ -823,7 +823,7 @@ void NPC::Node::set_g(const int & set_g)
 }
 
 // pathfinding node utilities
-NPC::Node NPC::move_and_get_lowest_f_cost(vector<Node> & open, vector<Node> & closed)
+NPC::Node NPC::move_and_get_lowest_f_cost(std::vector<Node> & open, std::vector<Node> & closed)
 {
 	// save the f cost of the first node
 	int lowest_f_cost = open[0].f;
@@ -856,7 +856,7 @@ NPC::Node NPC::move_and_get_lowest_f_cost(vector<Node> & open, vector<Node> & cl
 	// return the lowest f-cost node
 	return lowest_f_cost_node;
 }
-NPC::Node NPC::move_and_get_lowest_g_cost(vector<Node> & open, vector<Node> & closed)
+NPC::Node NPC::move_and_get_lowest_g_cost(std::vector<Node> & open, std::vector<Node> & closed)
 {
 	// save the g cost of the first node
 	int lowest_g_cost = open[0].g;
@@ -889,7 +889,7 @@ NPC::Node NPC::move_and_get_lowest_g_cost(vector<Node> & open, vector<Node> & cl
 	// return the lowest g-cost node
 	return lowest_g_cost_node;
 }
-bool NPC::room_in_node_list(const int & find_x, const int & find_y, const vector<Node> & node_list) const
+bool NPC::room_in_node_list(const int & find_x, const int & find_y, const std::vector<Node> & node_list) const
 {
 	// test if a given room node exists in a given node list
 
@@ -907,7 +907,7 @@ bool NPC::room_in_node_list(const int & find_x, const int & find_y, const vector
 	// the node is not in the list
 	return false;
 }
-NPC::Node NPC::get_node_at(const int & find_x, const int & find_y, const vector<Node> & node_list) const
+NPC::Node NPC::get_node_at(const int & find_x, const int & find_y, const std::vector<Node> & node_list) const
 {
 	// for each node
 	for (const Node & node : node_list)

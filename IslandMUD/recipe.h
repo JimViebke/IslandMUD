@@ -7,28 +7,23 @@ May 15 2015 */
 #include <map>
 #include <string>
 
-namespace
-{
-	using namespace std;
-}
-
 class Recipe
 {
 private:
 	Recipe() = delete; // this is deliberately not implemented
 
 public:
-	map<string, int> inventory_need; // needs to be in inventory
-	map<string, int> inventory_remove; // needs to be in inventory, is removed
-	map<string, int> local_need; // needs to be in the room
-	map<string, int> local_remove; // needs to be in the room, is removed
+	std::map<std::string, int> inventory_need; // needs to be in inventory
+	std::map<std::string, int> inventory_remove; // needs to be in inventory, is removed
+	std::map<std::string, int> local_need; // needs to be in the room
+	std::map<std::string, int> local_remove; // needs to be in the room, is removed
 
-	map<string, int> yields; // the item(s) the character recieves
+	std::map<std::string, int> yields; // the item(s) the character recieves
 
 	Recipe(
-		const map<string, int> & inv_n, const map<string, int> & inv_r,
-		const map<string, int> & loc_n, const map<string, int> & loc_r,
-		const map<string, int> & yeilds) :
+		const std::map<std::string, int> & inv_n, const std::map<std::string, int> & inv_r,
+		const std::map<std::string, int> & loc_n, const std::map<std::string, int> & loc_r,
+		const std::map<std::string, int> & yeilds) :
 		inventory_need(inv_n), inventory_remove(inv_r), local_need(loc_n), local_remove(loc_r), yields(yeilds) {}
 };
 

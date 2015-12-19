@@ -10,13 +10,13 @@ Aug 15 2015 */
 class Hostile_NPC_Worker : public Hostile_NPC
 {
 public:
-	Hostile_NPC_Worker(const string & name) : Hostile_NPC(name) {}
+	Hostile_NPC_Worker(const std::string & name) : Hostile_NPC(name) {}
 
-	Update_Messages update(World & world, map<string, shared_ptr<Character>> & actors);
+	Update_Messages update(World & world, std::map<std::string, std::shared_ptr<Character>> & actors);
 
 	void plan_fortress();
 
-	void plan_fortress_outer_wall(const int & fortress_x, const int & fortress_y, const vector<vector<bool>> & fortress_footprint);
+	void plan_fortress_outer_wall(const int & fortress_x, const int & fortress_y, const std::vector<std::vector<bool>> & fortress_footprint);
 
 private:
 
@@ -26,14 +26,14 @@ private:
 		bool doors_planned = false;
 
 	public:
-		vector<Objective> structure_surface_objectives;
+		std::vector<Objective> structure_surface_objectives;
 		void add(const Objective & obj);
 		void plan_doors(const World & world);
 		bool already_planned_doors() const;
 	};
 
 	bool fortress_planned = false;
-	deque<Structure_Objectives> planned_structures;
+	std::deque<Structure_Objectives> planned_structures;
 
 	class Partition
 	{

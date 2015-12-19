@@ -3,18 +3,18 @@ May 15 2015 */
 
 #include "generator.h"
 
-Generator::Generator(const string & map_type)
+Generator::Generator(const std::string & map_type)
 {
-	cout << "\nGenerating new " << map_type << "...";
+	std::cout << "\nGenerating new " << map_type << "...";
 
 	// create the timestamped directory
 	generated_terrain_dir = C::game_directory + "/gen_" + U::to_string(U::current_time_in_ms()) + " (" + map_type + ")";
 	U::create_path_if_not_exists(generated_terrain_dir);
 }
 
-vector<vector<char_type>> Generator::generate_biome_map(const char_type & default_char, const char_type & fill_char, const int & fill_ratio, const int & default_ratio, const int & biome_size)
+std::vector<std::vector<char_type>> Generator::generate_biome_map(const char_type & default_char, const char_type & fill_char, const int & fill_ratio, const int & default_ratio, const int & biome_size)
 {
-	vector<vector<char_type>> biome_map(C::WORLD_X_DIMENSION / biome_size, vector<char_type>(C::WORLD_Y_DIMENSION / biome_size,
+	std::vector<std::vector<char_type>> biome_map(C::WORLD_X_DIMENSION / biome_size, std::vector<char_type>(C::WORLD_Y_DIMENSION / biome_size,
 #ifdef _WIN32
 		' '
 #else
@@ -28,7 +28,7 @@ vector<vector<char_type>> Generator::generate_biome_map(const char_type & defaul
 		for (int j = 0; j < (C::WORLD_Y_DIMENSION / biome_size); ++j)
 		{
 			biome_map[i][j] = (
-				(U::random_int_from(1, max(1, fill_ratio + default_ratio)) <= fill_ratio) ? fill_char : default_char);
+				(U::random_int_from(1, std::max(1, fill_ratio + default_ratio)) <= fill_ratio) ? fill_char : default_char);
 		}
 	}
 
@@ -40,10 +40,10 @@ vector<vector<char_type>> Generator::generate_biome_map(const char_type & defaul
 
 	return biome_map; // this will be used for the next generation step
 }
-vector<vector<char_type>> Generator::generate_static_using_biome_map(const vector<vector<char_type>> & biome_map, const int & biome_size,
+std::vector<std::vector<char_type>> Generator::generate_static_using_biome_map(const std::vector<std::vector<char_type>> & biome_map, const int & biome_size,
 	const char_type & empty_char, const char_type & fill_char)
 {
-	vector<vector<char_type>> v(C::WORLD_X_DIMENSION, vector<char_type>(C::WORLD_Y_DIMENSION,
+	std::vector<std::vector<char_type>> v(C::WORLD_X_DIMENSION, std::vector<char_type>(C::WORLD_Y_DIMENSION,
 #ifdef _WIN32
 		' '
 #else
@@ -78,9 +78,9 @@ vector<vector<char_type>> Generator::generate_static_using_biome_map(const vecto
 }
 
 // different pass types to call manually
-void Generator::game_of_life(vector<vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char)
+void Generator::game_of_life(std::vector<std::vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char)
 {
-	vector<vector<char_type>> working = original; // copy to start
+	std::vector<std::vector<char_type>> working = original; // copy to start
 
 	for (int pass = 0; pass < iterations; ++pass)
 	{
@@ -138,9 +138,9 @@ void Generator::game_of_life(vector<vector<char_type>> & original, const int & i
 	// save
 	generator_pattern << iterations << "C+";
 }
-void Generator::clean(vector<vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char)
+void Generator::clean(std::vector<std::vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char)
 {
-	vector<vector<char_type>> working = original; // copy to start
+	std::vector<std::vector<char_type>> working = original; // copy to start
 
 	for (int pass = 0; pass < iterations; ++pass)
 	{
@@ -184,9 +184,9 @@ void Generator::clean(vector<vector<char_type>> & original, const int & iteratio
 		generator_pattern << "C";
 	}
 }
-void Generator::fill(vector<vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char)
+void Generator::fill(std::vector<std::vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char)
 {
-	vector<vector<char_type>> working = original; // copy to start
+	std::vector<std::vector<char_type>> working = original; // copy to start
 
 	for (int pass = 0; pass < iterations; ++pass)
 	{
@@ -232,37 +232,37 @@ void Generator::fill(vector<vector<char_type>> & original, const int & iteration
 }
 
 // save intermediate generated maps to /gen_[timestamp]/[pattern].txt
-void Generator::save_intermediate_map(const vector<vector<char_type>> & v) const
+void Generator::save_intermediate_map(const std::vector<std::vector<char_type>> & v) const
 {
 	to_file(v, generated_terrain_dir + "/" + generator_pattern.str() + ".txt");
 }
 
 // save to custom location
-void Generator::to_file(const vector<vector<char_type>> & v, const string & path) const
+void Generator::to_file(const std::vector<std::vector<char_type>> & v, const std::string & path) const
 {
 	// copy the entire vector into a stringstream
-	ostringstream oss;
+	std::ostringstream oss;
 	for (unsigned i = 0; i < v.size(); ++i)
 	{
 		for (unsigned j = 0; j < v[0].size(); ++j)
 		{
 			oss << v[i][j];
 		}
-		oss << endl;
+		oss << std::endl;
 	}
 
 	// save the stringstream to the specified path
-	ofstream myfile;
+	std::ofstream myfile;
 	myfile.open(path);
 	myfile << oss.str();
 	myfile.close(); // with RAII this shouldn't be necessary
 }
 
-string Generator::get_generator_pattern() const
+std::string Generator::get_generator_pattern() const
 {
 	return generator_pattern.str();
 }
-string Generator::get_generated_terrain_dir() const
+std::string Generator::get_generated_terrain_dir() const
 {
 	return generated_terrain_dir;
 }

@@ -1,10 +1,12 @@
 /* Jim Viebke
 Jul 31 2015 */
 
+#include <memory>
+
 #include "craft.h"
 
 // contents
-void Chest::add(const shared_ptr<Item> & item)
+void Chest::add(const std::shared_ptr<Item> & item)
 {
 	if (U::is<Material>(item)) // if the item is a material and is therefore stackable
 	{
@@ -17,20 +19,20 @@ void Chest::add(const shared_ptr<Item> & item)
 		else
 		{
 			// if not, give the player a new instance of the item
-			this->material_contents.insert(pair<string, shared_ptr<Material>>(item->name, U::convert_to<Material>(Craft::make(item->name))));
+			this->material_contents.insert(std::pair<std::string, std::shared_ptr<Material>>(item->name, U::convert_to<Material>(Craft::make(item->name))));
 		}
 	}
 	else if (U::is<Equipment>(item)) // if the item is an Equipment type
 	{
 		// insert the new item
-		this->equipment_contents.insert(pair<string, shared_ptr<Equipment>>(item->name, U::convert_to<Equipment>(item)));
+		this->equipment_contents.insert(std::pair<std::string, std::shared_ptr<Equipment>>(item->name, U::convert_to<Equipment>(item)));
 	}
 	else
 	{
 		// this needs to be handled somehow
 	}
 }
-void Chest::remove(const string & item_id, const unsigned & count)
+void Chest::remove(const std::string & item_id, const unsigned & count)
 {
 	// WARNING - for materials this assumes the chest has [count] instances
 
@@ -55,7 +57,7 @@ void Chest::remove(const string & item_id, const unsigned & count)
 		// the chest does not have the item
 	}
 }
-bool Chest::has(const string & item_id, const unsigned & count) const
+bool Chest::has(const std::string & item_id, const unsigned & count) const
 {
 	if (count == 1) // only one instance is required
 	{
@@ -71,12 +73,12 @@ bool Chest::has(const string & item_id, const unsigned & count) const
 			material_contents.find(item_id)->second->amount >= count); // AND in sufficient quantity
 	}
 }
-shared_ptr<Item> Chest::take(const string & item_id)
+std::shared_ptr<Item> Chest::take(const std::string & item_id)
 {
 	if (equipment_contents.find(item_id) != equipment_contents.cend())
 	{
 		// extract the item
-		shared_ptr<Equipment> item = equipment_contents.find(item_id)->second;
+		std::shared_ptr<Equipment> item = equipment_contents.find(item_id)->second;
 		// remove it from the chest
 		remove(item_id);
 		// pass the item back
@@ -96,22 +98,22 @@ shared_ptr<Item> Chest::take(const string & item_id)
 		return Craft::make(C::STONE_ID);
 	}
 }
-string Chest::contents() const
+std::string Chest::contents() const
 {
 	if (equipment_contents.size() == 0 && material_contents.size() == 0)
 	{
 		return "The chest is empty.";
 	}
 
-	stringstream output;
+	std::stringstream output;
 	output << "The chest contains";
 
-	for (multimap<string, shared_ptr<Equipment>>::const_iterator it = equipment_contents.begin();
+	for (std::multimap<std::string, std::shared_ptr<Equipment>>::const_iterator it = equipment_contents.begin();
 		it != equipment_contents.end(); ++it)
 	{
 		output << " " << U::get_article_for(it->second->name) << " " << it->second->name;
 	}
-	for (map<string, shared_ptr<Material>>::const_iterator it = material_contents.begin();
+	for (std::map<std::string, std::shared_ptr<Material>>::const_iterator it = material_contents.begin();
 		it != material_contents.end(); ++it)
 	{
 		output << " " << it->second->name << ":" << it->second->amount;
@@ -119,11 +121,11 @@ string Chest::contents() const
 
 	return (output.str() + ".");
 }
-multimap<string, shared_ptr<Equipment>> Chest::get_equipment_contents() const
+std::multimap<std::string, std::shared_ptr<Equipment>> Chest::get_equipment_contents() const
 {
 	return equipment_contents;
 }
-map<string, shared_ptr<Material>> Chest::get_material_contents() const
+std::map<std::string, std::shared_ptr<Material>> Chest::get_material_contents() const
 {
 	return material_contents;
 }
@@ -161,7 +163,7 @@ int Chest::get_health() const
 }
 
 // faction ID retrieval
-string Chest::get_faction_id() const
+std::string Chest::get_faction_id() const
 {
 	return this->faction_id;
 }

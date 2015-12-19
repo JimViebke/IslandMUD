@@ -14,11 +14,6 @@ using char_type = char;
 using char_type = std::string;
 #endif
 
-namespace
-{
-	using namespace std;
-}
-
 class Constants; // "forward declaring"...
 
 typedef Constants C; // ...to do this here
@@ -44,7 +39,7 @@ public:
 		GAME_MAP_PORT_NUMBER;
 
 	// game data locations
-	static const string
+	static const std::string
 		game_directory,
 		world_terrain_file_location,
 		iron_deposit_map_file_location,
@@ -53,9 +48,9 @@ public:
 		user_data_directory;
 
 	// faction IDs
-	static const string PC_FACTION_ID; // players ("PCs")
-	static const string NPC_NEUTRAL_FACTION_ID; // neutral island inhabitants
-	static const string NPC_HOSTILE_FACTION_ID; // antagonists
+	static const std::string PC_FACTION_ID; // players ("PCs")
+	static const std::string NPC_NEUTRAL_FACTION_ID; // neutral island inhabitants
+	static const std::string NPC_HOSTILE_FACTION_ID; // antagonists
 
 	// map symbols
 	static const char_type
@@ -72,7 +67,7 @@ public:
 		CHEST_CHAR,
 		RUBBLE_CHAR;
 
-	static const string
+	static const std::string
 		// engine signals
 		GOOD_SIGNAL,
 		BAD_SIGNAL,
@@ -208,25 +203,25 @@ public:
 		DEFAULT_ITEM_MAX_HEALTH;
 
 	// map an item ID to its article so we can have "an axe" and "a forge", rather than use "a(n)" for all items
-	static const map<string, string> articles;
+	static const std::map<std::string, std::string> articles;
 
 	// map an item ID to its plural
-	static const map<string, string> plurals;
+	static const std::map<std::string, std::string> plurals;
 
 	// int to char_type conversion
-	static const vector<char_type> numbers;
+	static const std::vector<char_type> numbers;
 
 	// surface information
-	static const vector<string> surface_ids;
-	static const vector<string> direction_ids;
-	static const vector<string> primary_direction_ids; // NESW
-	static const map<string, string> opposite_surface_id;
-	static const map<string, string> opposite_direction_id;
+	static const std::vector<std::string> surface_ids;
+	static const std::vector<std::string> direction_ids;
+	static const std::vector<std::string> primary_direction_ids; // NESW
+	static const std::map<std::string, std::string> opposite_surface_id;
+	static const std::map<std::string, std::string> opposite_direction_id;
 
 	// maps material IDs to the material count required to make a surface
 	// therefore also acts as the list of valid construction surfaces (see implementation)
-	static const map<string, unsigned> SURFACE_REQUIREMENTS;
-	static const map<string, unsigned> DOOR_REQUIREMENTS;
+	static const std::map<std::string, unsigned> SURFACE_REQUIREMENTS;
+	static const std::map<std::string, unsigned> DOOR_REQUIREMENTS;
 
 	// box drawing (more explaination at implementation)
 
@@ -251,7 +246,7 @@ public:
 
 	// more box drawing
 
-	static const vector<char_type> CORNERS;
+	static const std::vector<char_type> CORNERS;
 
 	// walls, ceiling, and floor - min and max health
 
@@ -260,7 +255,7 @@ public:
 		MAX_SURFACE_HEALTH,
 		MAX_DOOR_HEALTH;
 
-	static const map<string, map<string, int>> damage_tables;
+	static const std::map<std::string, std::map<std::string, int>> damage_tables;
 
 	// AI constants
 	static const int
@@ -285,7 +280,7 @@ public:
 		FULL_HEALTH_MAX;
 
 	// AI objective keywords
-	static const string
+	static const std::string
 		AI_OBJECTIVE_ACQUIRE,
 		AI_OBJECTIVE_GOTO,
 		AI_OBJECTIVE_CONSTRUCT;

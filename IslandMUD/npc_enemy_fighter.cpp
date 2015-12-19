@@ -4,7 +4,7 @@ Aug 15 2015 */
 
 #include "npc_enemy_fighter.h"
 
-Update_Messages Hostile_NPC_Fighter::update(World & world, map<string, shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Fighter::update(World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
 	if (i_dont_have(C::AXE_ID) && !im_planning_to_acquire(C::AXE_ID))
 	{
@@ -17,7 +17,7 @@ Update_Messages Hostile_NPC_Fighter::update(World & world, map<string, shared_pt
 	}
 
 	// in this block: take the item if it's here, move to the item if it is visible and reachable,
-	for (deque<Objective>::iterator objective_iterator = objectives.begin();
+	for (std::deque<Objective>::iterator objective_iterator = objectives.begin();
 		objective_iterator != objectives.end();)
 	{
 
@@ -105,7 +105,7 @@ Update_Messages Hostile_NPC_Fighter::update(World & world, map<string, shared_pt
 
 
 	// the next block: work through all objectives, see which objectives can be resolved through crafting attemps.
-	for (deque<Objective>::iterator objective_iterator = objectives.begin();
+	for (std::deque<Objective>::iterator objective_iterator = objectives.begin();
 		objective_iterator != objectives.end(); ++objective_iterator)
 	{
 		// try to craft the item, using obj->purpose if the (obj->verb == GOTO), else use obj->noun (most cases)
@@ -120,7 +120,7 @@ Update_Messages Hostile_NPC_Fighter::update(World & world, map<string, shared_pt
 				// the item crafted was from a "goto" objective
 
 				// save this because our firse erase will invalidate the iterator
-				const string PURPOSE = objective_iterator->purpose;
+				const std::string PURPOSE = objective_iterator->purpose;
 
 				// erase the "goto" objective
 				erase_goto_objective_matching(PURPOSE);
@@ -157,7 +157,7 @@ Update_Messages Hostile_NPC_Fighter::update(World & world, map<string, shared_pt
 				if (!U::bounds_check(cx, cy)) { continue; }
 
 				// for each actor in the room
-				for (const string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
+				for (const std::string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
 				{
 					// if the character is a player character
 					if (U::is<PC>(actors.find(actor_ID)->second))

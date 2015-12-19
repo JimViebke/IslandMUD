@@ -5,10 +5,10 @@ Jeb 16 2015 */
 #include "character.h"
 #include "world.h"
 
-unique_ptr<Recipes> Character::recipes;
+std::unique_ptr<Recipes> Character::recipes;
 
 // Character constructor
-Character::Character(const string & name, const string & set_faction_ID) : name(name)
+Character::Character(const std::string & name, const std::string & set_faction_ID) : name(name)
 {
 	if (Character::recipes == nullptr)
 	{
@@ -26,14 +26,14 @@ Character::Character(const string & name, const string & set_faction_ID) : name(
 	else // the faction is not valid
 	{
 		// Raise an error in the console
-		cout << "ERROR: attempted to create character with invalid faction: [" << set_faction_ID << "]\n";
+		std::cout << "ERROR: attempted to create character with invalid faction: [" << set_faction_ID << "]\n";
 	}
 }
 
-string Character::login(World & world)
+std::string Character::login(World & world)
 {
 	// create a document to load the player's data
-	xml_document user_data_xml;
+	pugi::xml_document user_data_xml;
 
 	// load the player's data to user_data_xml
 	user_data_xml.load_file((C::user_data_directory + "/" + this->name + ".xml").c_str());
@@ -44,12 +44,12 @@ string Character::login(World & world)
 	int loaded_x = -1, loaded_y = -1, loaded_z = -1;
 
 	// load the three values from the node
-	const xml_node location_node = user_data_xml.child(C::XML_USER_LOCATION.c_str());
+	const pugi::xml_node location_node = user_data_xml.child(C::XML_USER_LOCATION.c_str());
 
 	// extract the attributes as well as the values for the attributes
-	const xml_attribute x_attribute = location_node.attribute(string("x").c_str());
-	const xml_attribute y_attribute = location_node.attribute(string("y").c_str());
-	const xml_attribute z_attribute = location_node.attribute(string("z").c_str());
+	const pugi::xml_attribute x_attribute = location_node.attribute(std::string("x").c_str());
+	const pugi::xml_attribute y_attribute = location_node.attribute(std::string("y").c_str());
+	const pugi::xml_attribute z_attribute = location_node.attribute(std::string("z").c_str());
 	loaded_x = x_attribute.as_int();
 	loaded_y = y_attribute.as_int();
 	loaded_z = z_attribute.as_int();
@@ -78,13 +78,13 @@ string Character::login(World & world)
 	world.room_at(x, y, z)->add_actor(this->name);
 
 	// select the level node
-	const xml_node level_node = user_data_xml.child(C::XML_USER_LEVELS.c_str());
+	const pugi::xml_node level_node = user_data_xml.child(C::XML_USER_LEVELS.c_str());
 
 	// select each level attribute
-	const xml_attribute swordsmanship_level_attribute = level_node.attribute(C::XML_LEVEL_SWORDSMANSHIP.c_str());
-	const xml_attribute archery_level_attribute = level_node.attribute(C::XML_LEVEL_ARCHERY.c_str());
-	const xml_attribute forest_visibility_level_attribute = level_node.attribute(C::XML_LEVEL_FOREST_VISIBILITY.c_str());
-	const xml_attribute full_health_level_attribute = level_node.attribute(C::XML_LEVEL_HEALTH_MAX.c_str());
+	const pugi::xml_attribute swordsmanship_level_attribute = level_node.attribute(C::XML_LEVEL_SWORDSMANSHIP.c_str());
+	const pugi::xml_attribute archery_level_attribute = level_node.attribute(C::XML_LEVEL_ARCHERY.c_str());
+	const pugi::xml_attribute forest_visibility_level_attribute = level_node.attribute(C::XML_LEVEL_FOREST_VISIBILITY.c_str());
+	const pugi::xml_attribute full_health_level_attribute = level_node.attribute(C::XML_LEVEL_HEALTH_MAX.c_str());
 
 	// if an attribute is non-empty, load its level value
 	if (!swordsmanship_level_attribute.empty())
@@ -105,10 +105,10 @@ string Character::login(World & world)
 	}
 
 	// select status node (just holds current_health at this time)
-	const xml_node status_node = user_data_xml.child(C::XML_USER_STATUS.c_str());
+	const pugi::xml_node status_node = user_data_xml.child(C::XML_USER_STATUS.c_str());
 
 	// if current_health is non-empty, set current health
-	const xml_attribute current_health_attribute = status_node.attribute(C::XML_USER_STATUS_CURRENT_HEALTH.c_str());
+	const pugi::xml_attribute current_health_attribute = status_node.attribute(C::XML_USER_STATUS_CURRENT_HEALTH.c_str());
 	if (!current_health_attribute.empty())
 	{
 		this->set_current_health(current_health_attribute.as_int());
@@ -120,29 +120,29 @@ string Character::login(World & world)
 
 
 	// for each item node of the equipment node
-	for (const xml_node & equipment_node : user_data_xml.child(C::XML_USER_EQUIPMENT.c_str()).children())
+	for (const pugi::xml_node & equipment_node : user_data_xml.child(C::XML_USER_EQUIPMENT.c_str()).children())
 	{
 		// create the item
-		shared_ptr<Equipment> equipment = U::convert_to<Equipment>(Craft::make(equipment_node.name()));
+		std::shared_ptr<Equipment> equipment = U::convert_to<Equipment>(Craft::make(equipment_node.name()));
 
 		// extract the value of the health attribute and use it to set the item's health
 		equipment->set_health(equipment_node.attribute(C::XML_ITEM_HEALTH.c_str()).as_int());
 
 		// add the item to the player's inventory
-		equipment_inventory.insert(pair<string, shared_ptr<Equipment>>(equipment->name, equipment));
+		equipment_inventory.insert(std::pair<std::string, std::shared_ptr<Equipment>>(equipment->name, equipment));
 	}
 
 	// for each item in the material node
-	for (const xml_node & material : user_data_xml.child(C::XML_USER_MATERIALS.c_str()).children())
+	for (const pugi::xml_node & material : user_data_xml.child(C::XML_USER_MATERIALS.c_str()).children())
 	{
 		// use the name of the material node to create a new materail object
-		shared_ptr<Material> item = U::convert_to<Material>(Craft::make(material.name()));
+		std::shared_ptr<Material> item = U::convert_to<Material>(Craft::make(material.name()));
 
 		// extract the amount from the item's attribute
 		item->amount = material.attribute(C::XML_USER_MATERIAL_COUNT.c_str()).as_uint();
 
 		// add the item to the material inventory
-		material_inventory.insert(pair<string, shared_ptr<Material>>(item->name, item));
+		material_inventory.insert(std::pair<std::string, std::shared_ptr<Material>>(item->name, item));
 	}
 
 
@@ -150,13 +150,13 @@ string Character::login(World & world)
 	// notify success
 	return "You have logged in to IslandMUD!";
 }
-string Character::save()
+std::string Character::save()
 {
 	// if an item is equipped, move it back to the player's inventory
 	this->unequip();
 
 	// load the existing document to save the user's info
-	xml_document user_data_xml;
+	pugi::xml_document user_data_xml;
 	user_data_xml.load_file((C::user_data_directory + "/" + this->name + ".xml").c_str());
 
 	// erase the nodes we want to overwrite
@@ -167,19 +167,19 @@ string Character::save()
 	user_data_xml.remove_child(C::XML_USER_MATERIALS.c_str());
 
 	// create nodes to store user equipment and materials
-	xml_node status_node = user_data_xml.append_child(C::XML_USER_STATUS.c_str());
-	xml_node location_node = user_data_xml.append_child(C::XML_USER_LOCATION.c_str());
-	xml_node level_node = user_data_xml.append_child(C::XML_USER_LEVELS.c_str());
-	xml_node equipment_node = user_data_xml.append_child(C::XML_USER_EQUIPMENT.c_str());
-	xml_node material_node = user_data_xml.append_child(C::XML_USER_MATERIALS.c_str());
+	pugi::xml_node status_node = user_data_xml.append_child(C::XML_USER_STATUS.c_str());
+	pugi::xml_node location_node = user_data_xml.append_child(C::XML_USER_LOCATION.c_str());
+	pugi::xml_node level_node = user_data_xml.append_child(C::XML_USER_LEVELS.c_str());
+	pugi::xml_node equipment_node = user_data_xml.append_child(C::XML_USER_EQUIPMENT.c_str());
+	pugi::xml_node material_node = user_data_xml.append_child(C::XML_USER_MATERIALS.c_str());
 
 	/// add health attribute to status node
 	status_node.append_attribute(C::XML_USER_STATUS_CURRENT_HEALTH.c_str()).set_value(this->current_health);
 
 	// add x, y, and z attributes to the location node
-	location_node.append_attribute(string("x").c_str()).set_value(this->x);
-	location_node.append_attribute(string("y").c_str()).set_value(this->y);
-	location_node.append_attribute(string("z").c_str()).set_value(this->z);
+	location_node.append_attribute(std::string("x").c_str()).set_value(this->x);
+	location_node.append_attribute(std::string("y").c_str()).set_value(this->y);
+	location_node.append_attribute(std::string("z").c_str()).set_value(this->z);
 
 	// add each level to the location node
 	level_node.append_attribute(C::XML_LEVEL_SWORDSMANSHIP.c_str()).set_value(this->swordsmanship_level);
@@ -188,25 +188,25 @@ string Character::save()
 	level_node.append_attribute(C::XML_LEVEL_HEALTH_MAX.c_str()).set_value(this->max_health);
 
 	// for each piece of equipment in the user's inventory
-	for (multimap<string, shared_ptr<Equipment>>::const_iterator it = equipment_inventory.cbegin();
+	for (std::multimap<std::string, std::shared_ptr<Equipment>>::const_iterator it = equipment_inventory.cbegin();
 		it != equipment_inventory.cend(); ++it)
 	{
 		// save the equipment to a new node under the equipment node
-		xml_node equipment = equipment_node.append_child(it->first.c_str());
+		pugi::xml_node equipment = equipment_node.append_child(it->first.c_str());
 
 		// append a health attribute to the equipment node and set its value to the health of the equipment
 		equipment.append_attribute(C::XML_ITEM_HEALTH.c_str()).set_value(it->second->get_health());
 	}
 
 	// for each material in the user's inventory
-	for (map<string, shared_ptr<Material>>::const_iterator it = material_inventory.cbegin();
+	for (std::map<std::string, std::shared_ptr<Material>>::const_iterator it = material_inventory.cbegin();
 		it != material_inventory.cend(); ++it)
 	{
 		// save the material to a new node under the material node
-		xml_node material = material_node.append_child(it->first.c_str());
+		pugi::xml_node material = material_node.append_child(it->first.c_str());
 
 		// add an attribute called "count" with a value of material->count
-		xml_attribute material_attribute = material.append_attribute(C::XML_USER_MATERIAL_COUNT.c_str());
+		pugi::xml_attribute material_attribute = material.append_attribute(C::XML_USER_MATERIAL_COUNT.c_str());
 		material_attribute.set_value(it->second->amount);
 	}
 
@@ -299,7 +299,7 @@ void Character::set_current_health(const int & health_value)
 }
 
 // inventory information
-bool Character::has(const string & item_name, const unsigned & item_count) const
+bool Character::has(const std::string & item_name, const unsigned & item_count) const
 {
 	if (item_count == 1) // only one instance is required
 	{
@@ -316,19 +316,19 @@ bool Character::has(const string & item_name, const unsigned & item_count) const
 			material_inventory.find(item_name)->second->amount >= item_count); // AND the material exists in sufficient quantity
 	}
 }
-bool Character::does_not_have(const string & item_name, const unsigned & item_count) const
+bool Character::does_not_have(const std::string & item_name, const unsigned & item_count) const
 {
 	return !this->has(item_name, item_count);
 }
-string Character::get_inventory() const // debugging
+std::string Character::get_inventory() const // debugging
 {
-	stringstream contents;
-	for (multimap<string, shared_ptr<Equipment>>::const_iterator it = equipment_inventory.begin();
+	std::stringstream contents;
+	for (std::multimap<std::string, std::shared_ptr<Equipment>>::const_iterator it = equipment_inventory.begin();
 		it != equipment_inventory.end(); ++it)
 	{
 		contents << it->second->name << " ";
 	}
-	for (map<string, shared_ptr<Material>>::const_iterator it = material_inventory.begin();
+	for (std::map<std::string, std::shared_ptr<Material>>::const_iterator it = material_inventory.begin();
 		it != material_inventory.end(); ++it)
 	{
 		contents << it->second->name << ":" << it->second->amount << " ";
@@ -337,7 +337,7 @@ string Character::get_inventory() const // debugging
 }
 
 // inventory manipulation
-void Character::add(const shared_ptr<Item> & item)
+void Character::add(const std::shared_ptr<Item> & item)
 {
 	// if the item is a material and is therefore stackable
 	if (U::is<Material>(item))
@@ -351,16 +351,16 @@ void Character::add(const shared_ptr<Item> & item)
 		else
 		{
 			// if not, give the player a new instance of the item
-			this->material_inventory.insert(pair<string, shared_ptr<Material>>(item->name, U::convert_to<Material>(Craft::make(item->name))));
+			this->material_inventory.insert(std::pair<std::string, std::shared_ptr<Material>>(item->name, U::convert_to<Material>(Craft::make(item->name))));
 		}
 	}
 	else // the item is not a material and is therefore an Equipment type
 	{
 		// insert the new item
-		this->equipment_inventory.insert(pair<string, shared_ptr<Equipment>>(item->name, U::convert_to<Equipment>(item)));
+		this->equipment_inventory.insert(std::pair<std::string, std::shared_ptr<Equipment>>(item->name, U::convert_to<Equipment>(item)));
 	}
 }
-void Character::remove(const string & item_id, const unsigned & count)
+void Character::remove(const std::string & item_id, const unsigned & count)
 {
 	// WARNING - for materials this assumes the player has [count] instances
 
@@ -392,7 +392,7 @@ void Character::remove(const string & item_id, const unsigned & count)
 }
 
 // actions
-Update_Messages Character::move(const string & direction_ID, World & world)
+Update_Messages Character::move(const std::string & direction_ID, World & world)
 {
 	// movement deltas
 	int dx = 0, dy = 0, dz = 0;
@@ -409,7 +409,7 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 	// world.load_room_to_world(x + dx, y + dy, z + dz);
 
 	// test if the environment (structures) allow the player to move in a given direction
-	const string validate_movement = this->validate_movement(x, y, z, direction_ID, dx, dy, dz, world);
+	const std::string validate_movement = this->validate_movement(x, y, z, direction_ID, dx, dy, dz, world);
 
 	// if the validation failed for any reason
 	if (validate_movement != C::GOOD_SIGNAL)
@@ -422,7 +422,7 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 	world.load_view_radius_around(x + dx, y + dy, this->name);
 
 	// maintain a list of users that are falling out of view that will also need a map update
-	vector<string> additional_users_to_notify;
+	std::vector<std::string> additional_users_to_notify;
 
 	// remove viewing ID from rooms leaving view
 	if (direction_ID == C::NORTH || direction_ID == C::SOUTH)
@@ -535,11 +535,11 @@ Update_Messages Character::move(const string & direction_ID, World & world)
 		true); // update required for all users in sight range
 
 	// users that have fallen out of view won't recieve a map update unless we send one to them explicitly
-	updates.additional_map_update_users = make_shared<vector<string>>(std::move(additional_users_to_notify));
-
+	updates.additional_map_update_users = std::make_shared<std::vector<std::string>>(std::move(additional_users_to_notify));
+	
 	return updates;
 }
-Update_Messages Character::craft(const string & craft_item_id, World & world)
+Update_Messages Character::craft(const std::string & craft_item_id, World & world)
 {
 	// check for special case
 	if (craft_item_id == C::CHEST_ID)
@@ -557,39 +557,39 @@ Update_Messages Character::craft(const string & craft_item_id, World & world)
 	const Recipe recipe = Character::recipes->get_recipe(craft_item_id);
 
 	// verify the conditions for the recipe are present
-	for (map<string, int>::const_iterator it = recipe.inventory_need.cbegin(); it != recipe.inventory_need.cend(); ++it)
+	for (std::map<std::string, int>::const_iterator it = recipe.inventory_need.cbegin(); it != recipe.inventory_need.cend(); ++it)
 	{
 		if (it->first != "" && !this->has(it->first, it->second)) { return Update_Messages(U::get_article_for(craft_item_id) + " " + craft_item_id + " requires " + ((it->second == 1) ? U::get_article_for(it->first) : U::to_string(it->second)) + " " + it->first); }
 	}
-	for (map<string, int>::const_iterator it = recipe.inventory_remove.cbegin(); it != recipe.inventory_remove.cend(); ++it)
+	for (std::map<std::string, int>::const_iterator it = recipe.inventory_remove.cbegin(); it != recipe.inventory_remove.cend(); ++it)
 	{
 		if (it->first != "" && !this->has(it->first, it->second)) { return Update_Messages(U::get_article_for(craft_item_id) + " " + craft_item_id + " uses " + ((it->second == 1) ? U::get_article_for(it->first) : U::to_string(it->second)) + " " + it->first); }
 	}
-	for (map<string, int>::const_iterator it = recipe.local_need.cbegin(); it != recipe.local_need.cend(); ++it)
+	for (std::map<std::string, int>::const_iterator it = recipe.local_need.cbegin(); it != recipe.local_need.cend(); ++it)
 	{
 		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return Update_Messages(U::get_article_for(craft_item_id) + " " + craft_item_id + " requires " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first); }
 	}
-	for (map<string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
+	for (std::map<std::string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
 	{
 		if (it->first != "" && !world.room_at(x, y, z)->contains_item(it->first)) { return Update_Messages(U::get_article_for(craft_item_id) + " " + craft_item_id + " uses " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first); }
 	}
 
 	// remove ingredients from inventory
-	for (map<string, int>::const_iterator it = recipe.inventory_remove.cbegin(); it != recipe.inventory_remove.cend(); ++it)
+	for (std::map<std::string, int>::const_iterator it = recipe.inventory_remove.cbegin(); it != recipe.inventory_remove.cend(); ++it)
 	{
 		this->remove(it->first, it->second); // ID, count
 	}
 
 	// remove ingredients from area
-	for (map<string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
+	for (std::map<std::string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
 	{
 		this->remove(it->first, it->second); // ID, count
 	}
 
-	stringstream player_update, room_update;
+	std::stringstream player_update, room_update;
 
 	// for each item to be given to the player
-	for (map<string, int>::const_iterator it = recipe.yields.cbegin(); it != recipe.yields.cend(); ++it)
+	for (std::map<std::string, int>::const_iterator it = recipe.yields.cbegin(); it != recipe.yields.cend(); ++it)
 	{
 		// for as many times as the item is to be given to the player
 		for (int i = 0; i < it->second; ++i)
@@ -603,7 +603,7 @@ Update_Messages Character::craft(const string & craft_item_id, World & world)
 			}
 
 			// craft the item
-			shared_ptr<Item> item = Craft::make(it->first);
+			std::shared_ptr<Item> item = Craft::make(it->first);
 
 			// if the item can be carried
 			if (item->is_takable())
@@ -635,7 +635,7 @@ Update_Messages Character::craft(const string & craft_item_id, World & world)
 
 	return Update_Messages(player_update.str(), room_update.str());
 }
-Update_Messages Character::take(const string & take_item_id, World & world)
+Update_Messages Character::take(const std::string & take_item_id, World & world)
 {
 	// check if the item is not in the player's vicinity
 	if (!world.room_at(x, y, z)->contains_item(take_item_id))
@@ -657,7 +657,7 @@ Update_Messages Character::take(const string & take_item_id, World & world)
 	return Update_Messages("You take " + U::get_article_for(take_item_id) + " " + take_item_id + ".",
 		this->name + " takes " + U::get_article_for(take_item_id) + " " + take_item_id + ".");
 }
-Update_Messages Character::drop(const string & drop_item_id, World & world)
+Update_Messages Character::drop(const std::string & drop_item_id, World & world)
 {
 	// if the player is holding the item specified
 	if (this->equipped_item != nullptr && this->equipped_item->name == drop_item_id)
@@ -687,7 +687,7 @@ Update_Messages Character::drop(const string & drop_item_id, World & world)
 	return Update_Messages("You drop " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".",
 		this->name + " drops " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".");
 }
-Update_Messages Character::equip(const string & item_ID)
+Update_Messages Character::equip(const std::string & item_ID)
 {
 	/*
 	You ready your [item_id].
@@ -708,8 +708,8 @@ Update_Messages Character::equip(const string & item_ID)
 	}
 
 	// create a stringstream to accumulate feedback
-	stringstream user_update;
-	stringstream room_update;
+	std::stringstream user_update;
+	std::stringstream room_update;
 
 	// the player does have the item to equip, test if an item is already equipped
 	if (this->equipped_item != nullptr)
@@ -773,7 +773,7 @@ Update_Messages Character::unequip()
 	}
 
 	// save the ID of the currently equipped item
-	const string item_ID = equipped_item->name;
+	const std::string item_ID = equipped_item->name;
 
 	// save the existing the item to the player's inventory
 	this->add(equipped_item);
@@ -783,7 +783,7 @@ Update_Messages Character::unequip()
 
 	return Update_Messages("You put your " + item_ID + " away.", this->name + " lowers the " + item_ID + ".");
 }
-Update_Messages Character::add_to_chest(const string & insert_item_id, World & world)
+Update_Messages Character::add_to_chest(const std::string & insert_item_id, World & world)
 {
 	// if this room does not have a chest
 	if (!world.room_at(x, y, z)->has_chest())
@@ -827,7 +827,7 @@ Update_Messages Character::add_to_chest(const string & insert_item_id, World & w
 	return Update_Messages("You place the " + insert_item_id + " into the chest.",
 		this->name + " places " + U::get_article_for(insert_item_id) + " " + insert_item_id + " into the chest.");
 }
-Update_Messages Character::take_from_chest(const string & take_item_id, World & world)
+Update_Messages Character::take_from_chest(const std::string & take_item_id, World & world)
 {
 	// if this room does not have a chest
 	if (!world.room_at(x, y, z)->has_chest())
@@ -858,7 +858,7 @@ Update_Messages Character::look_inside_chest(const World & world) const
 	// validation within
 	return world.room_at(x, y, z)->chest_contents(faction_ID, this->name);
 }
-Update_Messages Character::construct_surface(const string & material_id, const string & surface_id, World & world)
+Update_Messages Character::construct_surface(const std::string & material_id, const std::string & surface_id, World & world)
 {
 	if (world.room_at(x, y, z)->is_forest())
 	{
@@ -932,7 +932,7 @@ Update_Messages Character::construct_surface(const string & material_id, const s
 
 		true);
 }
-Update_Messages Character::construct_surface_with_door(const string & surface_material_id, const string & surface_id, const string & door_material_id, World & world)
+Update_Messages Character::construct_surface_with_door(const std::string & surface_material_id, const std::string & surface_id, const std::string & door_material_id, World & world)
 {
 	// Part 1: validate that a surface can be constructed
 
@@ -1040,7 +1040,7 @@ Update_Messages Character::construct_surface_with_door(const string & surface_ma
 
 	// Part 5: the responses
 
-	stringstream to_player, to_room;
+	std::stringstream to_player, to_room;
 
 	to_player << "You construct a " << surface_material_id; // you construct a [material]
 	to_room << this->name << " constructs a " << surface_material_id; // you construct a [material]
@@ -1059,7 +1059,7 @@ Update_Messages Character::construct_surface_with_door(const string & surface_ma
 	// "You construct a stone floor with a stone hatch." OR "You construct a stone wall to your north with a branch door."
 	return Update_Messages(to_player.str(), to_room.str(), true); // send messages to user and room, and require map update for players in view distance
 }
-Update_Messages Character::attack_surface(const string & surface_ID, World & world)
+Update_Messages Character::attack_surface(const std::string & surface_ID, World & world)
 {
 	// get this check out of the way
 	if (surface_ID == C::CEILING || surface_ID == C::FLOOR)
@@ -1111,7 +1111,7 @@ Update_Messages Character::attack_surface(const string & surface_ID, World & wor
 		return Update_Messages("There is only rubble where a wall once was.");
 	}
 }
-Update_Messages Character::attack_door(const string & surface_ID, World & world)
+Update_Messages Character::attack_door(const std::string & surface_ID, World & world)
 {
 	// get this check out of the way
 	if (surface_ID == C::CEILING || surface_ID == C::FLOOR)
@@ -1153,7 +1153,7 @@ Update_Messages Character::attack_door(const string & surface_ID, World & world)
 	// this feedback might not be correct for all cases
 	return Update_Messages("There is no door to your " + surface_ID + ".");
 }
-Update_Messages Character::attack_item(const string & target_ID, World & world)
+Update_Messages Character::attack_item(const std::string & target_ID, World & world)
 {
 	// if the target isn't here
 	if (!world.room_at(x, y, z)->contains_item(target_ID))
@@ -1171,7 +1171,7 @@ Update_Messages Character::attack_item(const string & target_ID, World & world)
 		}
 
 		// extract the damage table for the attacking implement
-		const map<string, int> damage_table = C::damage_tables.find(equipped_item->name)->second;
+		const std::map<std::string, int> damage_table = C::damage_tables.find(equipped_item->name)->second;
 
 		// if the damage table does not have an entry for the target item ID
 		if (damage_table.find(target_ID) == damage_table.cend())
@@ -1194,7 +1194,7 @@ Update_Messages Character::attack_item(const string & target_ID, World & world)
 	else // the user does not have an item equipped, do a barehanded attack
 	{
 		// extract the damage table for a bare-handed attack
-		const map<string, int> damage_table = C::damage_tables.find(C::ATTACK_COMMAND)->second;
+		const std::map<std::string, int> damage_table = C::damage_tables.find(C::ATTACK_COMMAND)->second;
 
 		// if the damage table does not contain an entry for the target
 		if (damage_table.find(target_ID) == damage_table.cend())
@@ -1218,7 +1218,7 @@ Update_Messages Character::attack_item(const string & target_ID, World & world)
 }
 
 // movement info
-string Character::validate_movement(const int & cx, const int & cy, const int & cz, const string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const
+std::string Character::validate_movement(const int & cx, const int & cy, const int & cz, const std::string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const
 {
 	// determine if a character can move in a given direction (8 compass points, up, or down)
 
@@ -1230,7 +1230,7 @@ string Character::validate_movement(const int & cx, const int & cy, const int & 
 		direction_ID == C::SOUTH || direction_ID == C::WEST)
 	{
 		// save the value of an attempt to move out of the current room
-		string move_attempt = world.room_at(cx, cy, cz)->can_move_in_direction(direction_ID, faction_ID);
+		std::string move_attempt = world.room_at(cx, cy, cz)->can_move_in_direction(direction_ID, faction_ID);
 
 		if (move_attempt != C::GOOD_SIGNAL)
 		{
@@ -1253,8 +1253,8 @@ string Character::validate_movement(const int & cx, const int & cy, const int & 
 		direction_ID == C::NORTH_WEST || direction_ID == C::NORTH_EAST ||
 		direction_ID == C::SOUTH_EAST || direction_ID == C::SOUTH_WEST)
 	{
-		const unique_ptr<Room>::pointer current_room = world.room_at(cx, cy, cz);
-		const unique_ptr<Room>::pointer destination_room = world.room_at(cx + dx, cy + dy, cz);
+		const std::unique_ptr<Room>::pointer current_room = world.room_at(cx, cy, cz);
+		const std::unique_ptr<Room>::pointer destination_room = world.room_at(cx + dx, cy + dy, cz);
 
 		if (direction_ID == C::NORTH_WEST)
 		{

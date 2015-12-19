@@ -16,7 +16,7 @@ char_type U::corner_char(const bool & north, const bool & east, const bool & sou
 }
 
 // text formatting
-void U::to_lower_case(string & word)
+void U::to_lower_case(std::string & word)
 {
 	// convert a vector of strings passed by reference to a vector of lowercase strings
 	if (word.length() > 0)
@@ -24,7 +24,7 @@ void U::to_lower_case(string & word)
 		std::transform(word.begin(), word.end(), word.begin(), ::tolower);
 	}
 }
-string U::capitalize(string & word)
+std::string U::capitalize(std::string & word)
 {
 	// immediately return the string if it is empty
 	if (word.size() == 0) return word;
@@ -35,13 +35,13 @@ string U::capitalize(string & word)
 
 	return word;
 }
-string U::capitalize(const string & word)
+std::string U::capitalize(const std::string & word)
 {
 	// immediately return the string if it is empty
 	if (word.size() == 0) return word;
 
 	// copy 'word' to a string that can be modified
-	string result = word;
+	std::string result = word;
 
 	// if the first letter is in the range a-z, convert the letter to capital by subtracting 32
 	if (result[0] >= 'a' && result[0] <= 'z')
@@ -50,19 +50,19 @@ string U::capitalize(const string & word)
 	return result;
 }
 
-string U::get_article_for(const string & noun)
+std::string U::get_article_for(const std::string & noun)
 {
 	// get an iterator to the <key, value> pair for <noun, article>
-	const map<string, string>::const_iterator it = C::articles.find(noun);
+	const std::map<std::string, std::string>::const_iterator it = C::articles.find(noun);
 
 	// return the article if the key exists, else return generic "a(n)".
 	return ((it != C::articles.cend()) ? it->second : "a(n)");
 }
 
-string U::get_plural_for(const string & noun)
+std::string U::get_plural_for(const std::string & noun)
 {
 	// get an iterator to the <key, value> pair for <noun, article>
-	const map<string, string>::const_iterator it = C::plurals.find(noun);
+	const std::map<std::string, std::string>::const_iterator it = C::plurals.find(noun);
 
 	// return the article if the key exists, else return the original noun
 	return ((it != C::plurals.cend()) ? it->second : noun);
@@ -84,7 +84,7 @@ int U::euclidean_distance(const int & x1, const int & y1, const int & x2, const 
 }
 int U::diagonal_distance(const int & x1, const int & y1, const int & x2, const int & y2)
 {
-	return max(difference(x1, x2), difference(x2, y2));
+	return std::max(difference(x1, x2), difference(x2, y2));
 }
 
 // pathfinding
@@ -96,7 +96,7 @@ int U::diagonal_movement_cost(const int & x1, const int & y1, const int & x2, co
 	// a diagonal move = (sqrt(2) * straight move)
 	int dx = abs(x1 - x2);
 	int dy = abs(y1 - y2);
-	return C::AI_MOVEMENT_COST * (dx + dy) + (C::AI_MOVEMENT_COST_DIAGONAL - 2 * C::AI_MOVEMENT_COST) * min(dx, dy);
+	return C::AI_MOVEMENT_COST * (dx + dy) + (C::AI_MOVEMENT_COST_DIAGONAL - 2 * C::AI_MOVEMENT_COST) * std::min(dx, dy);
 }
 
 // random utils

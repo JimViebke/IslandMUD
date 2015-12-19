@@ -6,7 +6,7 @@ Aug 15 2015 */
 
 #include "npc_enemy_worker.h"
 
-Update_Messages Hostile_NPC_Worker::update(World & world, map<string, shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Worker::update(World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
 	if (!fortress_planned)
 	{
@@ -35,7 +35,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, map<string, shared_ptr
 	{
 		// in this block: take the item if it's here, move to the item if it is visible and reachable, otherwise plan to craft the item
 		// and aquire needed resources
-		for (deque<Objective>::iterator objective_iterator = objectives.begin();
+		for (std::deque<Objective>::iterator objective_iterator = objectives.begin();
 			objective_iterator != objectives.end();)
 		{
 			// if the NPC is searching for an item
@@ -64,7 +64,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, map<string, shared_ptr
 				// see if the item is reachable
 				if (pathfind_to_closest_item(objective_iterator->noun, world, update_messages))
 				{
-					cout << "Found a path to " << objective_iterator->noun << endl; // debugging
+					std::cout << "Found a path to " << objective_iterator->noun << std::endl; // debugging
 					return update_messages;
 				}
 
@@ -101,7 +101,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, map<string, shared_ptr
 							// the item crafted was from a "goto" objective
 
 							// save this because our firse erase will invalidate the iterator
-							const string PURPOSE = objective_iterator->purpose;
+							const std::string PURPOSE = objective_iterator->purpose;
 
 							// erase the "goto" objective
 							erase_goto_objective_matching(PURPOSE);
@@ -136,7 +136,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, map<string, shared_ptr
 		}
 
 		// the next block: work through all objectives, see which objectives can be resolved through crafting attemps.
-		for (deque<Objective>::iterator objective_iterator = objectives.begin();
+		for (std::deque<Objective>::iterator objective_iterator = objectives.begin();
 			objective_iterator != objectives.end(); ++objective_iterator)
 		{
 			// try to craft the item, using obj->purpose if the (obj->verb == GOTO), else use obj->noun (most cases)
@@ -151,7 +151,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, map<string, shared_ptr
 					// the item crafted was from a "goto" objective
 
 					// save this because our firse erase will invalidate the iterator
-					const string PURPOSE = objective_iterator->purpose;
+					const std::string PURPOSE = objective_iterator->purpose;
 
 					// erase the "goto" objective
 					erase_goto_objective_matching(PURPOSE);
@@ -182,7 +182,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, map<string, shared_ptr
 	int objective_attempts = 0;
 
 	// construct the outer wall
-	for (deque<Objective>::iterator objective_it = objectives.begin();
+	for (std::deque<Objective>::iterator objective_it = objectives.begin();
 		objective_it != objectives.end();)
 	{
 		// limit how many objective attempts the AI can make before control is returned
@@ -234,7 +234,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, map<string, shared_ptr
 					if (objective_it->modifier)
 					{
 						// starting with the current objective
-						deque<Objective>::iterator it = objective_it;
+						std::deque<Objective>::iterator it = objective_it;
 						// for each objective
 						while (++it != objectives.cend())
 						{
@@ -263,11 +263,11 @@ Update_Messages Hostile_NPC_Worker::update(World & world, map<string, shared_ptr
 				}
 
 				// construct the surface, with a door if the modifier is true				
-				update_messages = ((objective_it->modifier) 
+				update_messages = ((objective_it->modifier)
 					? construct_surface_with_door(objective_it->material, objective_it->direction, objective_it->material, world)
 					: construct_surface(objective_it->material, objective_it->direction, world));
 
-				if (update_messages.to_user.find("You construct ") != string::npos) // find a better way to do this
+				if (update_messages.to_user.find("You construct ") != std::string::npos) // find a better way to do this
 				{
 					// if successful, erase the objective and return
 					objectives.erase(objective_it);
@@ -417,7 +417,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, map<string, shared_ptr
 	if (planned_structures.size() > 0)
 	{
 		// for each planned structure
-		for (deque<Structure_Objectives>::iterator structure_it = planned_structures.begin();
+		for (std::deque<Structure_Objectives>::iterator structure_it = planned_structures.begin();
 			structure_it != planned_structures.end();)
 		{
 			// if the structure has no remaining surfaces
@@ -439,10 +439,10 @@ Update_Messages Hostile_NPC_Worker::update(World & world, map<string, shared_ptr
 	if (planned_structures.size() > 0)
 	{
 		// select the next planned structure
-		deque<Structure_Objectives>::iterator structure_it = planned_structures.begin();
+		std::deque<Structure_Objectives>::iterator structure_it = planned_structures.begin();
 
 		// for each construction objective
-		for (vector<Objective>::iterator objective_it = structure_it->structure_surface_objectives.begin();
+		for (std::vector<Objective>::iterator objective_it = structure_it->structure_surface_objectives.begin();
 			objective_it != structure_it->structure_surface_objectives.end();)
 		{
 			// limit how many objective attempts the AI can make before control is returned
@@ -494,9 +494,9 @@ Update_Messages Hostile_NPC_Worker::update(World & world, map<string, shared_ptr
 					? construct_surface_with_door(objective_it->material, objective_it->direction, objective_it->material, world)
 					: construct_surface(objective_it->material, objective_it->direction, world));
 
-				if (update_messages.to_user.find("You construct ") != string::npos) // find a better way to do this
+				if (update_messages.to_user.find("You construct ") != std::string::npos) // find a better way to do this
 				{
-					// if successful, erase the objective
+					// if successful, erase the objectivev
 					structure_it->structure_surface_objectives.erase(objective_it);
 
 					// if this was the last construction objective for this structure, remove it
@@ -669,7 +669,7 @@ void Hostile_NPC_Worker::plan_fortress()
 		fortress_y + (FORTRESS_WIDTH / 2)) >= C::WORLD_X_DIMENSION * 0.45);
 
 	// the first partition is the size of the fortress 
-	vector<Partition> partitions;
+	std::vector<Partition> partitions;
 	partitions.push_back(Partition(fortress_x, fortress_y, FORTRESS_HEIGHT, FORTRESS_WIDTH));
 
 	// flag whether any changes were made
@@ -732,7 +732,7 @@ void Hostile_NPC_Worker::plan_fortress()
 		}
 	} while (partition_divided_on_last_pass); // repeat as long as the flag indicates at least one partition was split
 
-	vector<Structure> structures;
+	std::vector<Structure> structures;
 
 	// generate one structure inside each partition
 	for (const Partition & partition : partitions)
@@ -758,7 +758,7 @@ void Hostile_NPC_Worker::plan_fortress()
 	// For alignment, subtract fortress_x from all x and height values, and subtract fortress_y from all
 	// y and width values. The magic number +4 comes from the need to have a padding of 2 around all sides of the fortress.
 	// The magic number +2 is for the same reason.
-	vector<vector<bool>> fortress_footprint(FORTRESS_HEIGHT + 4, vector<bool>(FORTRESS_WIDTH + 4, false));
+	std::vector<std::vector<bool>> fortress_footprint(FORTRESS_HEIGHT + 4, std::vector<bool>(FORTRESS_WIDTH + 4, false));
 	for (const Structure & structure : structures)
 	{
 		for (int i = 0; i < structure.height; ++i)
@@ -809,11 +809,11 @@ void Hostile_NPC_Worker::plan_fortress()
 	}
 }
 
-void Hostile_NPC_Worker::plan_fortress_outer_wall(const int & fortress_x, const int & fortress_y, const vector<vector<bool>> & fortress_footprint)
+void Hostile_NPC_Worker::plan_fortress_outer_wall(const int & fortress_x, const int & fortress_y, const std::vector<std::vector<bool>> & fortress_footprint)
 {
 	// create a vector the same size as the fortress, populated with Area_type::fortress_exterior
-	vector<vector<Area_Type>> area(fortress_footprint.size(), vector<Area_Type>(fortress_footprint[0].size(), Area_Type::fortress_exterior));
-
+	std::vector<std::vector<Area_Type>> area(fortress_footprint.size(), std::vector<Area_Type>(fortress_footprint[0].size(), Area_Type::fortress_exterior));
+	
 	// for each room that could possibly be a structure
 	for (unsigned i = 2; i < fortress_footprint.size() - 2; ++i)
 	{
@@ -866,7 +866,7 @@ void Hostile_NPC_Worker::plan_fortress_outer_wall(const int & fortress_x, const 
 	}
 
 	// create a 2D vector of booleans to indicate which nodes/rooms the below flood fill visited
-	vector<vector<bool>> exterior_visited(area.size(), vector<bool>(area[0].size(), false));
+	std::vector<std::vector<bool>> exterior_visited(area.size(), std::vector<bool>(area[0].size(), false));
 
 	// use a deque-based 4-directional flood fill
 	std::deque<Coordinate> flood_fill;

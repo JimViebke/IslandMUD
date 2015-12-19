@@ -1,7 +1,7 @@
 
 #include "npc_enemy_bodyguard.h"
 
-Update_Messages Hostile_NPC_Bodyguard::update(World & world, map<string, shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Bodyguard::update(World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
 	// NPC bodyguards cheat by knowing their protect_target's location. Gameplay impact should be negligible.
 
@@ -17,13 +17,13 @@ Update_Messages Hostile_NPC_Bodyguard::update(World & world, map<string, shared_
 	}
 
 	// extract protect_target
-	shared_ptr<Character> protect_target = actors.find(protect_target_id)->second;
+	std::shared_ptr<Character> protect_target = actors.find(protect_target_id)->second;
 
 	//	if I have a kill_target
 	if (kill_target_id != "")
 	{
 		// extract the kill_target
-		shared_ptr<Character> kill_target = actors.find(kill_target_id)->second;
+		std::shared_ptr<Character> kill_target = actors.find(kill_target_id)->second;
 
 		// if the target is not in the actors list, the target is no longer in game
 		if (kill_target == nullptr)
@@ -167,14 +167,14 @@ Update_Messages Hostile_NPC_Bodyguard::update(World & world, map<string, shared_
 	return Update_Messages("");
 }
 
-void Hostile_NPC_Bodyguard::set_protect_target(const string & set_protect_target_id)
+void Hostile_NPC_Bodyguard::set_protect_target(const std::string & set_protect_target_id)
 {
 	this->protect_target_id = set_protect_target_id;
 }
 
-bool Hostile_NPC_Bodyguard::attempt_set_new_kill_target(World & world, map<string, shared_ptr<Character>> & actors)
+bool Hostile_NPC_Bodyguard::attempt_set_new_kill_target(World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
-	vector<string> hostile_ids;
+	std::vector<std::string> hostile_ids;
 
 	// for each visible room
 	for (int cx = x - (int)C::VIEW_DISTANCE; cx <= x + (int)C::VIEW_DISTANCE; ++cx)
@@ -182,7 +182,7 @@ bool Hostile_NPC_Bodyguard::attempt_set_new_kill_target(World & world, map<strin
 		for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 		{
 			// for each actor in the room
-			for (const string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
+			for (const std::string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
 			{
 				// if the actor is a player character
 				if (U::is<PC>(actors.find(actor_ID)->second))
@@ -203,7 +203,7 @@ bool Hostile_NPC_Bodyguard::attempt_set_new_kill_target(World & world, map<strin
 	this->kill_target_id = U::random_element_from(hostile_ids);
 
 	// create a pointer to the player
-	shared_ptr<Character> kill_target = actors.find(kill_target_id)->second;
+	std::shared_ptr<Character> kill_target = actors.find(kill_target_id)->second;
 
 	// save the player's current location as the player's last know location (in case they walk out of visible range)
 	kill_target_last_known_location._x = kill_target->x;
@@ -213,7 +213,7 @@ bool Hostile_NPC_Bodyguard::attempt_set_new_kill_target(World & world, map<strin
 	// we have a target
 	return true;
 }
-bool Hostile_NPC_Bodyguard::attempt_update_kill_target_last_known_location(const shared_ptr<Character> & kill_target)
+bool Hostile_NPC_Bodyguard::attempt_update_kill_target_last_known_location(const std::shared_ptr<Character> & kill_target)
 {
 	// if the NPC can see the kill_target
 	if (U::diagonal_distance(x, y, kill_target->x, kill_target->y) <= C::VIEW_DISTANCE)
