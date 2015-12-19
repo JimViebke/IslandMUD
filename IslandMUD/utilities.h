@@ -184,7 +184,7 @@ namespace Utilities
 	std::string get_plural_for(const std::string & noun);
 
 	// math
-	inline int difference(const int & a, const int & b);
+	template<typename T> inline T difference(const T & a, const T & b) { return (a - b > 0) ? (a - b) : (b - a); }
 	int euclidean_distance(const int & x1, const int & y1, const int & x2, const int & y2);
 	int diagonal_distance(const int & x1, const int & y1, const int & x2, const int & y2);
 

@@ -69,10 +69,6 @@ std::string U::get_plural_for(const std::string & noun)
 }
 
 // math
-int U::difference(const int & a, const int & b)
-{
-	return (a - b > 0) ? (a - b) : (b - a);
-}
 int U::euclidean_distance(const int & x1, const int & y1, const int & x2, const int & y2)
 {
 	int x_diff = difference(x1, x2);
