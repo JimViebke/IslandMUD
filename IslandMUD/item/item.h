@@ -116,7 +116,7 @@ private:
 		const long long milliseconds_since_last_update = U::current_time_in_ms() - last_update_timestamp;
 
 		// Calculate how much the item's temperature has changed. This always moves in the direction of the ambient temperature.
-		const long long change_in_degrees = milliseconds_since_last_update / 100; // 1 degree per 100 milliseconds
+		const unsigned change_in_degrees = unsigned(milliseconds_since_last_update / 100); // 1 degree per 100 milliseconds
 
 		// if the temperature has reached the ambient temperature
 		if (change_in_degrees > U::difference(this->self_temperature, ambient_temperature))
@@ -162,7 +162,7 @@ private:
 		std::shared_ptr<Item> meltable_item;
 		unsigned temperature;
 		long long insertion_time;
-		Bloomery::Meltable(const std::shared_ptr<Item> & insert_item)
+		Meltable(const std::shared_ptr<Item> & insert_item)
 		{
 			this->meltable_item = insert_item;
 			this->insertion_time = U::current_time_in_ms();
