@@ -516,3 +516,5 @@ const int C::FORTRESS_MIN_X = 20;
 const int C::FORTRESS_MAX_X = 20;
 const int C::FORTRESS_MIN_Y = 20;
 const int C::FORTRESS_MAX_Y = 20;
+
+const unsigned C::AMBIENT_AIR_TEMPERATURE = 15;

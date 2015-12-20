@@ -295,6 +295,10 @@ public:
 		FORTRESS_MAX_X,
 		FORTRESS_MIN_Y,
 		FORTRESS_MAX_Y;
+
+	// blacksmithing constants
+	static const unsigned
+		AMBIENT_AIR_TEMPERATURE; // air temperature (in Celcius)
 };
 
 #endif
