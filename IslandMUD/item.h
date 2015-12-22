@@ -10,5 +10,6 @@
 #include "item\misc.h"
 #include "item\equipment.h"
 #include "item\materials.h"
+#include "item\chest.h"
 
 #endif

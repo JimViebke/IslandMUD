@@ -9,7 +9,7 @@ Feb 14, 2015 */
 #include <map>
 #include <memory>
 
-#include "constants.h"
+#include "../constants.h"
 #include "../utilities.h"
 
 class Item
@@ -25,30 +25,15 @@ protected:
 
 	int health = 100;
 
-	Item(const std::string & item_name, const bool & is_takable, const int & set_health = C::DEFAULT_ITEM_MAX_HEALTH) :
-		name(item_name), takable(is_takable), health(set_health) {}
+	Item(const std::string & item_name, const bool & is_takable, const int & set_health = C::DEFAULT_ITEM_MAX_HEALTH);
 
-	virtual ~Item() {}
+	virtual ~Item();
 
 public:
-
-	bool is_takable() const { return takable; }
-	int get_health() const { return health; }
-	void set_health(const int & set_health)
-	{
-		// if the passed value is out of bounds, set health to max_health, otherwise set to the passed value
-		health = ((set_health > C::DEFAULT_ITEM_MAX_HEALTH || set_health < C::DEFAULT_ITEM_MIN_HEALTH)
-			? C::DEFAULT_ITEM_MAX_HEALTH : set_health);
-	}
-	void update_health(const int & update_health)
-	{
-		// subtract the passed amount from the current health
-		health -= update_health;
-
-		// use set_health() to validate
-		set_health(health);
-	}
-
+	bool is_takable() const;
+	int get_health() const;
+	void set_health(const int & set_health);
+	void update_health(const int & update_health);
 };
 
 class Material : public Item
@@ -109,13 +94,13 @@ public:
 	void update_specs(const unsigned & ambient_temperature)
 	{
 		// Use the ambient temperature to update the temperature of the forgeable item.
-		// The ambient temperature is the temperature of the fire, the forge, or just the air temperature.
+		// The ambient temperature is the temperature of the fire, the forge, or just the air temperature when not in a fire.
 
 		// Time and size are the only factors that affect the speed at which the temperature of the forgeable ite
 		// approaches the ambient temperature.
 
 		// The temperature of the forgeable item approaches the ambient temperature at 10 degrees per second,
-		// or 1 degree per 100 milliseconds.
+		// or 1 degree per 100 milliseconds, or 600 degrees per minute.
 		// Using this scale, items reach temperature in about one minute, and cool to room temperature in about one minute as well.
 
 		// first update the timestamp
@@ -152,8 +137,6 @@ class Bloom : public Forgeable // this is the glowy lump that comes out of a blo
 {
 public:
 	Bloom() : Forgeable(C::BLOOM_ID) {}
-
-	// unsigned bloom_units() const { return iron_units + carbon_units + impurity_units; }
 };
 
 class Mineral : public Material
@@ -176,12 +159,16 @@ public:
 
 	std::string observe_bloomery()
 	{
+		update_bloomery();
 
+		// ...
 	}
 
 	Bloom remove_bloom()
 	{
+		update_bloomery();
 
+		// ...
 	}
 
 private:
@@ -239,39 +226,6 @@ private:
 
 public:
 	Forge() : Fire_Container(C::FORGE_ID) {}
-};
-
-class Chest : public Item
-{
-private:
-	std::string faction_id;
-	std::multimap<std::string, std::shared_ptr<Equipment>> equipment_contents = {};
-	std::map<std::string, std::shared_ptr<Material>> material_contents = {};
-
-public:
-	Chest(const std::string & set_faction_id) : Item(C::CHEST_ID, false), faction_id(set_faction_id) {}
-	Chest(const std::string & set_faction_id, const int & set_health, const std::multimap<std::string, std::shared_ptr<Equipment>> & set_equipment_contents,
-		const std::map<std::string, std::shared_ptr<Material>> & set_material_contents) : Item(C::CHEST_ID, false, set_health),
-		faction_id(set_faction_id),
-		equipment_contents(set_equipment_contents),
-		material_contents(set_material_contents) {}
-
-	// contents manipulation and retrieval
-	void add(const std::shared_ptr<Item> & item);
-	void remove(const std::string & item_id, const unsigned & count = 1);
-	bool has(const std::string & item_id, const unsigned & count = 1) const;
-	std::shared_ptr<Item> take(const std::string & item_id);
-	std::string contents() const;
-	std::multimap<std::string, std::shared_ptr<Equipment>> get_equipment_contents() const;
-	std::map<std::string, std::shared_ptr<Material>> get_material_contents() const;
-
-	// health
-	void damage(const int & amount);
-	void set_health(const int & amount);
-	int get_health() const;
-
-	// faction ID retrieval
-	std::string get_faction_id() const;
 };
 
 class Mineral_Deposit : public Item

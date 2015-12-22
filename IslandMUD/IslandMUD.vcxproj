@@ -82,12 +82,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="character.cpp" />
-    <ClCompile Include="chest.cpp" />
+    <ClCompile Include="item\chest.cpp" />
     <ClCompile Include="constants.cpp" />
     <ClCompile Include="craft.cpp" />
     <ClCompile Include="door.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="generator.cpp" />
+    <ClCompile Include="item\item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="message.cpp" />
     <ClCompile Include="non_player_character.cpp" />
@@ -113,6 +114,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="generator.h" />
     <ClInclude Include="item.h" />
+    <ClInclude Include="item\chest.h" />
     <ClInclude Include="item\equipment.h" />
     <ClInclude Include="Item\item.h" />
     <ClInclude Include="item\materials.h" />

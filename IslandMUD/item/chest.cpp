@@ -3,7 +3,8 @@ Jul 31 2015 */
 
 #include <memory>
 
-#include "craft.h"
+#include "chest.h"
+#include "../craft.h"
 
 // contents
 void Chest::add(const std::shared_ptr<Item> & item)
