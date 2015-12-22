@@ -82,6 +82,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="character.cpp" />
+    <ClCompile Include="item\bloomery.cpp" />
     <ClCompile Include="item\chest.cpp" />
     <ClCompile Include="constants.cpp" />
     <ClCompile Include="craft.cpp" />
@@ -114,6 +115,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="generator.h" />
     <ClInclude Include="item.h" />
+    <ClInclude Include="item\bloomery.h" />
     <ClInclude Include="item\chest.h" />
     <ClInclude Include="item\equipment.h" />
     <ClInclude Include="Item\item.h" />

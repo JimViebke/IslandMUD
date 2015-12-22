@@ -11,5 +11,6 @@
 #include "item\equipment.h"
 #include "item\materials.h"
 #include "item\chest.h"
+#include "item\bloomery.h"
 
 #endif

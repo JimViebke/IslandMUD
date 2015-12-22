@@ -87,6 +87,9 @@
     <ClCompile Include="item\chest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="item\bloomery.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="player_character.h">
@@ -183,6 +186,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="item\chest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="item\bloomery.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
