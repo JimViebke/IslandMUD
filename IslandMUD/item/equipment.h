@@ -12,6 +12,12 @@ Basic Equipment types for IslandMUD.
 #include "item.h"
 #include "../constants.h"
 
+class Equipment : public Item
+{
+protected:
+	Equipment(const std::string & name) : Item(name, true) {}
+};
+
 class Staff : public Equipment
 {
 public:

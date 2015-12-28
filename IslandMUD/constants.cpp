@@ -160,6 +160,7 @@ const std::string C::XML_ROOM = "room";
 const std::string C::XML_IS_WATER = "is_water";
 const std::string C::XML_ITEM = "item";
 const std::string C::XML_ITEM_HEALTH = "health";
+const std::string C::XML_ITEM_COUNT = "count";
 const std::string C::XML_SURFACE = "surface";
 const std::string C::XML_SURFACE_HEALTH = "health";
 const std::string C::XML_SURFACE_DIRECTION = "direction";
@@ -171,9 +172,6 @@ const std::string C::XML_DOOR_FACTION = "faction";
 const std::string C::XML_CHEST = "chest";
 const std::string C::XML_CHEST_HEALTH = "health";
 const std::string C::XML_CHEST_FACTION_ID = "faction_id";
-const std::string C::XML_CHEST_EQUIPMENT = "equipment_contents";
-const std::string C::XML_CHEST_MATERIALS = "material_contents";
-const std::string C::XML_CHEST_MATERIALS_COUNT = "count";
 
 // user data xml
 const std::string C::XML_USER_ACCOUNT = "account";
@@ -182,9 +180,6 @@ const std::string C::XML_USER_STATUS = "status";
 const std::string C::XML_USER_STATUS_CURRENT_HEALTH = "current_health";
 const std::string C::XML_USER_LOCATION = "location";
 const std::string C::XML_USER_LEVELS = "levels";
-const std::string C::XML_USER_EQUIPMENT = "equipment";
-const std::string C::XML_USER_MATERIALS = "materials";
-const std::string C::XML_USER_MATERIAL_COUNT = "count";
 
 // user level xml
 const std::string C::XML_LEVEL_SWORDSMANSHIP = "swordsmanship";

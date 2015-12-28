@@ -101,43 +101,6 @@ bool Room::is_unloadable() const
 {
 	return actor_ids.size() == 0 && viewing_actor_ids.size() == 0;
 }
-bool Room::contains_item(const std::string & item_id) const
-{
-	return contents.find(item_id) != contents.cend();
-}
-bool Room::contains_item(const std::string & item_id, const unsigned & count) const
-{
-	// test if a room has a specified quantity for crafting
-
-	if (count == 1) // if only one item is required
-	{
-		return contains_item(item_id); // defer
-	}
-
-	// more than one is required
-	if (contents.count(item_id) >= count) // if there are a sufficient number of matching items
-	{
-		return true; // return success
-	}
-
-	// if the item is a material, attempt to extract it
-	const std::multimap<std::string, std::shared_ptr<Item>>::const_iterator it = contents.find(item_id);
-	if (it != contents.cend()) // if the item exist
-	{
-		// attempt to convert the item to a material type
-		if (std::shared_ptr<Material> material_item = U::convert_to<Material>(it->second))
-		{
-			// if the amount is greater than or equal to count
-			if (material_item->amount >= count)
-			{
-				return true; // success
-			}
-		}
-	}
-
-	// there is not a sufficient count of items in the room
-	return false;
-}
 bool Room::is_observed_by(const std::string & actor_id) const
 {
 	return U::contains(viewing_actor_ids, actor_id);
@@ -148,7 +111,7 @@ bool Room::is_water() const
 }
 bool Room::is_forest() const
 {
-	return this->contains_item(C::TREE_ID);
+	return this->contains(C::TREE_ID);
 }
 bool Room::has_non_mineral_deposit_item() const
 {
@@ -156,7 +119,7 @@ bool Room::has_non_mineral_deposit_item() const
 	for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator it = contents.cbegin(); it != contents.cend(); ++it)
 	{
 		// if the item is not a mineral deposit
-		if (it->first != C::IRON_DEPOSIT_ID && it->first != C::LIMESTONE_DEPOSIT_ID)
+		if (it->first != C::IRON_DEPOSIT_ID && it->first != C::LIMESTONE_DEPOSIT_ID) // find a better way to do this
 		{
 			// an item is not a mineral deposit
 			return true;
@@ -176,8 +139,6 @@ bool Room::has_mineral_deposit() const
 // chests
 void Room::add_chest(const std::string & set_faction_id)
 {
-	updated = true;
-
 	chest = std::make_shared<Chest>(set_faction_id);
 }
 bool Room::has_chest() const
@@ -196,9 +157,7 @@ int Room::chest_health() const
 }
 void Room::add_item_to_chest(const std::shared_ptr<Item> & item)
 {
-	updated = true;
-
-	chest->add(item);
+	chest->insert(item);
 }
 Update_Messages Room::chest_contents(const std::string & faction_ID, const std::string & username) const
 {
@@ -216,12 +175,10 @@ Update_Messages Room::chest_contents(const std::string & faction_ID, const std::
 	}
 
 	// return the contents of the chest
-	return Update_Messages(chest->contents(), username + " looks into the chest.");
+	return Update_Messages(chest->contents_to_string(), username + " looks into the chest.");
 }
 void Room::damage_chest()
 {
-	updated = true;
-
 	// use equipped weapon and damage tables
 
 
@@ -234,12 +191,10 @@ bool Room::chest_has(const std::string & item_id) const
 		return false;
 	}
 
-	return chest->has(item_id);
+	return chest->contains(item_id);
 }
 std::shared_ptr<Item> Room::remove_from_chest(const std::string & item_id)
 {
-	updated = true;
-
 	// manifest a stone if a chest does not exist
 	// (this would indicate an validation failure in the calling function)
 	if (!has_chest())
@@ -247,7 +202,7 @@ std::shared_ptr<Item> Room::remove_from_chest(const std::string & item_id)
 		return Craft::make(C::STONE_ID);
 	}
 
-	return chest->take(item_id);
+	return chest->erase(item_id);
 }
 std::shared_ptr<Chest> Room::get_chest() const
 {
@@ -255,30 +210,41 @@ std::shared_ptr<Chest> Room::get_chest() const
 }
 void Room::set_chest(const std::shared_ptr<Chest> & set_chest)
 {
-	// only used at load time, so the "update" flag will not be set to true
-
 	this->chest = set_chest;
+}
+
+// bloomeries
+std::string Room::add_item_to_bloomery(const std::shared_ptr<Forgeable> & item)
+{
+	// save an iterator
+	auto bloomery_it = contents.find(C::BLOOMERY_ID);
+
+	if (bloomery_it == contents.cend())
+	{
+		return "There is no bloomery here.";
+	}
+
+	if (U::is_not<Forgeable>(item))
+	{
+		return "You cannot put a " + item->name + " in a bloomery.";
+	}
+
+	// save a new shared_ptr to the bloomery in question
+	std::shared_ptr<Bloomery> bloomery = U::convert_to<Bloomery>(bloomery_it->second);
+
+	bloomery->add_to_bloomery(item);
+
+	return "You place the " + item->name + " in a bloomery.";
 }
 
 // items
 void Room::add_item(const std::shared_ptr<Item> item) // pass a copy rather than a reference
 {
-	/* This doesn't stack materials.
-	This could easily be fixed, but room saving/unloading doesn't use item counts.
-	Alternatively, treat the symptoms and just fix the printout
-	*/
-
-	contents.insert(std::pair<std::string, std::shared_ptr<Item>>(item->name, item));
-	updated = true;
+	this->insert(item);
 }
 void Room::remove_item(const std::string & item_id, const int & count)
 {
-	for (int i = 0; i < count; ++i) // for as many items as are to be removed
-	{
-		contents.erase(contents.find(item_id)); // remove the item
-	}
-
-	updated = true;
+	this->erase(item_id, count);
 }
 bool Room::damage_item(const std::string & item_id, const int & amount)
 {
@@ -315,7 +281,6 @@ void Room::add_surface(const std::string & surface_ID, const std::string & mater
 	{
 		// create a new Room_Side and add it to room_sides
 		room_sides.insert(std::pair<std::string, Room_Side>(surface_ID, Room_Side(material_ID)));
-		updated = true;
 	}
 }
 void Room::add_surface(const std::string & surface_ID, const std::string & material_ID, const int & surface_health)
@@ -330,8 +295,6 @@ void Room::add_surface(const std::string & surface_ID, const std::string & mater
 
 		// select the surface and set its health to the passed value
 		room_sides.find(surface_ID)->second.set_health(surface_health);
-
-		updated = true;
 	}
 }
 void Room::add_door(const std::string & directon_ID, const int & health, const std::string & material_ID, const std::string & faction_ID)
@@ -358,8 +321,6 @@ void Room::add_door(const std::string & directon_ID, const int & health, const s
 
 	// delegate the work to the room's surface
 	room_sides.find(directon_ID)->second.add_door(health, material_ID, faction_ID);
-
-	updated = true;
 }
 
 // damage surface
@@ -418,8 +379,6 @@ Update_Messages Room::damage_surface(const std::string & surface_ID, const std::
 	std::cout << "surface health before attack: " << room_sides.find(surface_ID)->second.get_health() << std::endl;
 	room_sides.find(surface_ID)->second.change_health(item_damage_table.find(surface_material_ID)->second*-1);
 	std::cout << "surface health after attack:  " << room_sides.find(surface_ID)->second.get_health() << std::endl;
-
-	updated = true; // the room has been modified since it was loaded
 
 	// after applying damage, test again to see if the surface is rubble
 	if (room_sides.find(surface_ID)->second.is_intact())
@@ -536,9 +495,7 @@ Update_Messages Room::damage_door(const std::string & surface_ID, const std::sha
 	std::cout << "door health before attack: " << room_sides.find(surface_ID)->second.get_door()->get_health() << std::endl; // debugging
 	room_sides.find(surface_ID)->second.get_door()->update_health_by(item_damage_table.find(door_material_ID)->second * -1);
 	std::cout << "door health after attack:  " << room_sides.find(surface_ID)->second.get_door()->get_health() << std::endl; // debugging
-
-	updated = true; // the room has now been modified since it was loaded
-
+	
 	// if the door has 0 health
 	if (room_sides.find(surface_ID)->second.get_door()->is_rubble())
 	{
@@ -666,39 +623,7 @@ std::string Room::summary(const std::string & player_ID) const
 	// report on the items in the room
 	if (contents.size() > 0) // if there are items present
 	{
-		// create a map of <item id, item count>
-		std::map<std::string, int> stacked_contents;
-		for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator it = contents.cbegin();
-			it != contents.cend(); ++it)
-		{
-			stacked_contents[it->first]++;
-		}
-
-		// save an iterator to the last item
-		const std::map<std::string, int>::const_iterator last_item_it = --stacked_contents.cend();
-
-		summary_stream << "\n\nHere there is";
-		// for each item
-		for (std::map<std::string, int>::const_iterator item_it = stacked_contents.cbegin();
-			item_it != stacked_contents.cend(); ++item_it)
-		{
-			// if there is more than one instance of the item here
-			if (item_it->second > 1)
-			{
-				// append the item_id followed by the count
-				summary_stream << " " << item_it->first << " (x" << item_it->second << ")";
-			}
-			else
-			{
-				// don't append the count
-				summary_stream << " " << U::get_article_for(item_it->first) << " " << item_it->first;
-			}
-
-			// conditionally append a comma
-			summary_stream << ((item_it == last_item_it) ? "" : ",");
-		}
-
-		summary_stream << ".";
+		summary_stream << "\n\nHere there is " << this->contents_to_string();
 	}
 
 	// if the room contains a chest

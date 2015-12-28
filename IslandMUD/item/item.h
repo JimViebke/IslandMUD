@@ -36,13 +36,13 @@ public:
 	void update_health(const int & update_health);
 };
 
-class Material : public Item
+class Stackable : public Item
 {
 public:
 	unsigned amount = 1;
 
 protected:
-	Material(const std::string & cust_name) : Item(cust_name, true) {} // all materials are takable
+	Stackable(const std::string & cust_name) : Item(cust_name, true) {} // all stackable items are takable
 };
 
 class Fire_Container : public Item
@@ -139,28 +139,16 @@ public:
 	Bloom() : Forgeable(C::BLOOM_ID) {}
 };
 
-class Mineral : public Material
+class Mineral : public Stackable
 {
 protected:
-	Mineral(const std::string & mineral_ID) : Material(mineral_ID) {}
-};
-
-
-
-class Equipment : public Item
-{
-	// string equipment_material; // stone, iron, wood, etc
-	// string handle_material; // wood, etc
-	// other members represent quality, health
-
-protected:
-	Equipment(const std::string & set_name) : Item(set_name, true) {} // all equipment is takable
+	Mineral(const std::string & mineral_ID) : Stackable(mineral_ID) {}
 };
 
 class Forge : public Fire_Container
 {
 private:
-	std::unique_ptr<Equipment> workpiece;
+	std::unique_ptr<Forgeable> workpiece;
 	time_t workpiece_insert_time; // the time that the current workpiece placed in the forge
 
 public:

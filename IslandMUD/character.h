@@ -13,8 +13,9 @@ Feb 14, 2015 */
 #include "world.h"
 #include "recipes.h"
 #include "message.h"
+#include "item/container.h"
 
-class Character
+class Character : public Container
 {
 private:
 	long long last_action_timestamp;
@@ -42,8 +43,7 @@ protected:
 	std::string leader_ID;
 	std::vector<std::string> follower_IDs;
 
-	std::multimap<std::string, std::shared_ptr<Equipment>> equipment_inventory; // equipment doesn't stack
-	std::map<std::string, std::shared_ptr<Material>> material_inventory; // materials stack
+	std::multimap<std::string, std::shared_ptr<Item>> inventory;
 
 public:
 
@@ -70,13 +70,8 @@ public:
 	void set_current_health(const int & current_health);
 
 	// inventory information
-	bool has(const std::string & item_name, const unsigned & item_count = 1) const;
 	bool does_not_have(const std::string & item_name, const unsigned & item_count = 1) const;
 	std::string get_inventory() const; // debugging
-
-	// inventory manipulation
-	void add(const std::shared_ptr<Item> & item);
-	void remove(const std::string & item_id, const unsigned & count = 1);
 
 	// actions
 	Update_Messages craft(const std::string & craft_item_id, World & world);
@@ -93,6 +88,7 @@ public:
 	Update_Messages attack_surface(const std::string & surface_ID, World & world);
 	Update_Messages attack_door(const std::string & surface_ID, World & world);
 	Update_Messages attack_item(const std::string & target_ID, World & world);
+	Update_Messages add_to_bloomery(const std::string & item_ID, const unsigned & count, World & world);
 
 	// movement info
 	std::string validate_movement(const int & cx, const int & cy, const int & cz, const std::string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const;

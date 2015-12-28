@@ -7,32 +7,16 @@ May 15 2015 */
 
 std::string PC::print() const
 {
-	std::stringstream output;
+	const std::string contents_summary = this->contents_to_string();
 
-	// if the player is carrying any equipment, list them after materials
-	if (equipment_inventory.size() > 0) // if the player is carrying anything
+	if (contents_summary.size() == 0)
 	{
-		for (std::multimap<std::string, std::shared_ptr<Equipment>>::const_iterator item_it = equipment_inventory.cbegin(); // for each item
-			item_it != equipment_inventory.cend(); ++item_it)
-		{
-			output << item_it->second->name << " "; // add its name to the output
-		}
+		return "\n\nYou aren't carrying anything.";
 	}
-
-	// if the player is carrying any materials, list them above equipment
-	if (material_inventory.size() > 0)
+	else
 	{
-		for (std::multimap<std::string, std::shared_ptr<Material>>::const_iterator item_it = material_inventory.cbegin(); // for each item
-			item_it != material_inventory.cend(); ++item_it)
-		{
-			output << item_it->second->name << " (x" << item_it->second->amount << ") "; // add its name to the output: stick (x5)
-		}
+		return "You have " + contents_summary;
 	}
-
-	return "\n\n" + // leave an empt line
-		((output.str().size() > 0) ? // if there is anything to print
-		"You have " + output.str() : // return the output
-		"You aren't carrying anything."); // return generic "no items" message
 }
 
 std::string PC::get_equipped_item_info() const
@@ -73,7 +57,7 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 		{
 			if (U::bounds_check(cx, cy))
 			{
-				forest_grid[i][cy - (y - (C::VIEW_DISTANCE + 1))] = world.room_at(cx, cy, C::GROUND_INDEX)->contains_item(C::TREE_ID);
+				forest_grid[i][cy - (y - (C::VIEW_DISTANCE + 1))] = world.room_at(cx, cy, C::GROUND_INDEX)->contains(C::TREE_ID);
 			}
 		}
 	}

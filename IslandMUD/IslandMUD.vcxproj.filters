@@ -81,13 +81,16 @@
     <ClCompile Include="message.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="item\item.cpp">
+    <ClCompile Include="item.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="item\chest.cpp">
+    <ClCompile Include="item\container.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="item\bloomery.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="item\chest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -176,27 +179,27 @@
     <ClInclude Include="item.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="item\materials.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="item\equipment.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="item\misc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="item\chest.h">
+    <ClInclude Include="item\stackable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="item\container.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="item\bloomery.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="item\chest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="item\equipment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram - Items.cd">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="ClassDiagram - Characters.cd">
+    <None Include="Class Diagram.cd">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

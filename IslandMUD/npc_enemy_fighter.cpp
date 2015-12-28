@@ -24,7 +24,7 @@ Update_Messages Hostile_NPC_Fighter::update(World & world, std::map<std::string,
 		if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE)
 		{
 			// if the item is here, take it, remove the current objective, and return
-			if (world.room_at(x, y, z)->contains_item(objective_iterator->noun))
+			if (world.room_at(x, y, z)->contains(objective_iterator->noun))
 			{
 				Update_Messages update_messages = take(objective_iterator->noun, world);
 

@@ -13,26 +13,25 @@ Feb 14, 2015 */
 #include "room_side.h" // walls, floor, or ceiling
 #include "message.h"
 
-class Room
+class Room : public Container
 {
 private:
-	bool updated = false; // has the room been updated since it was loaded?
 	bool water = false; // is the room dry land or water?
 	std::shared_ptr<Chest> chest; // nullptr if the room does not have a chest
 	std::map<std::string, Room_Side> room_sides = {}; // the floor, walls, and ceiling in the room (present surfaces only)
-	std::multimap<std::string, std::shared_ptr<Item>> contents = {}; // the items in a room
 	std::vector<std::string> viewing_actor_ids = {}; // the PCs and NPCs who can see this room
 	std::vector<std::string> actor_ids = {}; // the PCs and NPCs in a room
 
 public:
 
-	Room() {}
+	Room() : Container() {}
 
 	// configuration
 	void set_water_status(const bool & is_water) { water = is_water; }
 
 	// room contents
 	const std::multimap<std::string, std::shared_ptr<Item>> get_contents() const { return contents; }
+	std::multimap<std::string, std::shared_ptr<Item>> & get_contents() { return contents; }
 	const std::map<std::string, Room_Side> get_room_sides() const { return room_sides; }
 	const std::vector<std::string> get_actor_ids() const { return actor_ids; }
 
@@ -44,8 +43,6 @@ public:
 	std::string can_move_in_direction(const std::string & direction_ID, const std::string & faction_ID);
 	bool contains_no_items() const;
 	bool is_unloadable() const;
-	bool contains_item(const std::string & item_id) const;
-	bool contains_item(const std::string & item_id, const unsigned & count) const;
 	bool is_observed_by(const std::string & actor_id) const;
 	bool is_water() const;
 	bool is_forest() const;
@@ -64,6 +61,9 @@ public:
 	std::shared_ptr<Item> remove_from_chest(const std::string & item_id);
 	std::shared_ptr<Chest> get_chest() const;
 	void set_chest(const std::shared_ptr<Chest> & set_chest);
+
+	// bloomeries
+	std::string add_item_to_bloomery(const std::shared_ptr<Forgeable> & item);
 
 	// items
 	void add_item(const std::shared_ptr<Item> item);

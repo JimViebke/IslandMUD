@@ -502,6 +502,13 @@ void World::add_room_to_world(pugi::xml_node & room_node, const int & x, const i
 		// set the item's health
 		item->set_health(item_node.attribute(C::XML_ITEM_HEALTH.c_str()).as_int());
 
+		// if the item is a stackable type
+		if (std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item))
+		{
+			// set the amount as the value of the "count" attribute
+			stackable->amount = std::max(1u, item_node.attribute(C::XML_ITEM_COUNT.c_str()).as_uint());
+		}
+
 		// add the item to the room
 		room->add_item(item);
 	}
@@ -547,38 +554,35 @@ void World::add_room_to_world(pugi::xml_node & room_node, const int & x, const i
 	if (!chest_node.empty())
 	{
 		// create the chest's internal structure for equipment
-		std::multimap<std::string, std::shared_ptr<Equipment>> equipment_contents = {};
-		// for each equipment node
-		for (const pugi::xml_node & equipment_item_node : chest_node.child(C::XML_CHEST_EQUIPMENT.c_str()).children())
-		{
-			// create the equipment item
-			std::shared_ptr<Equipment> equipment = U::convert_to<Equipment>(Craft::make(equipment_item_node.name()));
+		std::multimap<std::string, std::shared_ptr<Item>> chest_contents = {};
 
-			// add the equipment to the equipment multimap
-			equipment_contents.insert(make_pair(equipment->name, equipment));
+		// for each item node (children of the chest node)
+		for (const pugi::xml_node & item_node : chest_node.child(C::XML_ITEM.c_str()).children())
+		{
+			// create the item
+			std::shared_ptr<Item> item = U::convert_to<Item>(Craft::make(item_node.name()));
+
+			// set the item's health
+			item->set_health(item_node.attribute(C::XML_ITEM_HEALTH.c_str()).as_int());
+
+			// if the item is a stackable type
+			if (std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item))
+			{
+				// set the amount as the value of the "count" attribute
+				stackable->amount = std::max(1u, item_node.attribute(C::XML_ITEM_COUNT.c_str()).as_uint());
+			}
+
+			// add the item to the temporary multimap
+			chest_contents.insert(make_pair(item->name, item));
 		}
 
-		// create the chest's internal structure for materials
-		std::map<std::string, std::shared_ptr<Material>> material_contents = {};
-		// for each material node
-		for (const pugi::xml_node & material_item_node : chest_node.child(C::XML_CHEST_MATERIALS.c_str()).children())
-		{
-			// create the material item
-			std::shared_ptr<Material> material = U::convert_to<Material>(Craft::make(material_item_node.name()));
-
-			// set the amount
-			material->amount = material_item_node.attribute(C::XML_CHEST_MATERIALS_COUNT.c_str()).as_int();
-
-			// add the material to the materials multimap
-			material_contents.insert(make_pair(material->name, material));
-		}
-
-		// create an anonymous chest object and add the chest to the room
+		// create an anonymous chest object and add it to the room
 		room->set_chest(std::make_shared<Chest>(Chest(
 			chest_node.attribute(C::XML_CHEST_FACTION_ID.c_str()).as_string(), // the chest's faction ID
 			chest_node.attribute(C::XML_CHEST_HEALTH.c_str()).as_int(), // the chest's health
-			equipment_contents, material_contents) // the chest's contents
+			chest_contents) // the chest's contents
 			));
+
 	}
 
 	// add room to world
@@ -667,19 +671,26 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 	// add a boolean representing if the room is water (off-island or a lake/river)
 	room_node.append_attribute(C::XML_IS_WATER.c_str()).set_value(room->is_water());
 
+	// add a node to contain all item nodes
+	pugi::xml_node items_node = room_node.append_child(C::XML_ITEM.c_str());
+
 	// for each item in the room
 	const std::multimap<std::string, std::shared_ptr<Item>> room_item_contents = room->get_contents();
 	for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = room_item_contents.cbegin();
 		item_it != room_item_contents.cend(); ++item_it)
 	{
-		// create a node for an item
-		pugi::xml_node item_node = room_node.append_child(C::XML_ITEM.c_str());
+		// create a node for the item, append it to the items node
+		pugi::xml_node item_node = items_node.append_child(item_it->second->name.c_str());
 
 		// append the item's health as an attribute
 		item_node.append_attribute(C::XML_ITEM_HEALTH.c_str()).set_value(item_it->second->get_health());
 
-		// append the item's ID
-		item_node.append_child(pugi::node_pcdata).set_value(item_it->first.c_str());
+		// if the item is a stackable type
+		if (std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item_it->second))
+		{
+			// append count="[amount]" to the item's item node
+			item_node.append_attribute(C::XML_ITEM_COUNT.c_str()).set_value(stackable->amount);
+		}
 	}
 
 	// for each side of the room
@@ -729,7 +740,7 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 		chest_node.set_name(C::XML_CHEST.c_str());
 
 		// extract the chest from the room
-		const std::shared_ptr<Chest> chest = room->get_chest(); // ****** HERE
+		const std::shared_ptr<Chest> chest = room->get_chest();
 
 		// add an attribute for the chest's faction ID
 		chest_node.append_attribute(C::XML_CHEST_FACTION_ID.c_str()).set_value(chest->get_faction_id().c_str());
@@ -738,25 +749,24 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 		chest_node.append_attribute(C::XML_CHEST_HEALTH.c_str()).set_value(chest->get_health());
 
 		// add equipment and material nodes to the chest node
-		pugi::xml_node equipment_node = chest_node.append_child(C::XML_CHEST_EQUIPMENT.c_str());
-		pugi::xml_node material_node = chest_node.append_child(C::XML_CHEST_MATERIALS.c_str());
+		pugi::xml_node items_node = chest_node.append_child(C::XML_ITEM.c_str());
 
 		// for each equipment item
-		const std::multimap<std::string, std::shared_ptr<Equipment>> chest_equipment_contents = chest->get_equipment_contents(); // extract contents
-		for (std::multimap<std::string, std::shared_ptr<Equipment>>::const_iterator equipment_it = chest_equipment_contents.cbegin();
-			equipment_it != chest_equipment_contents.cend(); ++equipment_it)
+		const std::multimap<std::string, std::shared_ptr<Item>> chest_contents = chest->get_contents(); // extract contents
+		for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = chest_contents.cbegin();
+			item_it != chest_contents.cend(); ++item_it)
 		{
-			// append a node where name is the equipment's ID
-			/* xml_node item_node = */ equipment_node.append_child(equipment_it->first.c_str());
-		}
+			pugi::xml_node item_node = items_node.append_child(item_it->second->name.c_str());
 
-		// for each material item
-		const std::map<std::string, std::shared_ptr<Material>> chest_material_contents = chest->get_material_contents(); // extract contents
-		for (std::map<std::string, std::shared_ptr<Material>>::const_iterator material_it = chest_material_contents.cbegin();
-			material_it != chest_material_contents.cend(); ++material_it)
-		{
-			// append a node where name is the material's ID, with an attribute with a name of "XML_CHEST_MATERIALS_COUNT", and a value of the material's count
-			/* xml_node item_node = */ material_node.append_child(material_it->first.c_str()).append_attribute(C::XML_CHEST_MATERIALS_COUNT.c_str()).set_value(material_it->second->amount);
+			// if the item is stackable
+			if (std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item_it->second))
+			{
+				// add count="[amount]" to the node's attributes
+				item_node.append_attribute(C::XML_ITEM_COUNT.c_str()).set_value(stackable->amount);
+			}
+
+			// append a health attribute to the item node and set its value to the health of the item
+			item_node.append_attribute(C::XML_ITEM_HEALTH.c_str()).set_value(item_it->second->get_health());
 		}
 	}
 

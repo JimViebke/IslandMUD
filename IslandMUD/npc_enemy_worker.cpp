@@ -15,8 +15,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, std::map<std::string, 
 
 		for (int i = 0; i < 10000; ++i) // cheating here to start the NPC off with materials
 		{
-			// start off with some materials
-			this->add(Craft::make(C::STONE_ID));
+			this->insert(Craft::make(C::STONE_ID));
 		}
 	}
 
@@ -42,7 +41,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, std::map<std::string, 
 			if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE)
 			{
 				// if the item is here, take it, remove the current objective, and return
-				if (world.room_at(x, y, z)->contains_item(objective_iterator->noun))
+				if (world.room_at(x, y, z)->contains(objective_iterator->noun))
 				{
 					// remove the item from the room
 					update_messages = take(objective_iterator->noun, world);
@@ -205,7 +204,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, std::map<std::string, 
 				}
 
 				// check if there is a tree in the way
-				if (world.room_at(x, y, z)->contains_item(C::TREE_ID))
+				if (world.room_at(x, y, z)->contains(C::TREE_ID))
 				{
 					// if the axe is not equipped
 					if (equipped_item == nullptr || equipped_item->name != C::AXE_ID)
@@ -476,7 +475,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, std::map<std::string, 
 				}
 
 				// check if there is a tree in the way
-				if (world.room_at(x, y, z)->contains_item(C::TREE_ID))
+				if (world.room_at(x, y, z)->contains(C::TREE_ID))
 				{
 					// if the axe is not equipped
 					if (equipped_item == nullptr || equipped_item->name != C::AXE_ID)

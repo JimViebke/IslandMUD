@@ -125,11 +125,11 @@ bool NPC::one_can_craft(const std::string & item_id) const
 }
 bool NPC::i_have(const std::string & item_id) const
 {
-	return this->has(item_id);
+	return this->contains(item_id);
 }
 bool NPC::i_dont_have(const std::string & item_id) const
 {
-	return !this->has(item_id);
+	return !this->contains(item_id);
 }
 bool NPC::im_planning_to_acquire(const std::string & item_ID) const
 {
@@ -159,7 +159,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const World & w
 	for (std::map<std::string, int>::const_iterator inventory_need = recipe.inventory_need.cbegin();
 		inventory_need != recipe.inventory_need.cend(); ++inventory_need)
 	{
-		if (!this->has(inventory_need->first, inventory_need->second))
+		if (!this->contains(inventory_need->first, inventory_need->second))
 		{
 			return false;
 		}
@@ -167,7 +167,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const World & w
 	for (std::map<std::string, int>::const_iterator inventory_remove = recipe.inventory_remove.cbegin();
 		inventory_remove != recipe.inventory_remove.cend(); ++inventory_remove)
 	{
-		if (!this->has(inventory_remove->first, inventory_remove->second))
+		if (!this->contains(inventory_remove->first, inventory_remove->second))
 		{
 			return false;
 		}
@@ -177,7 +177,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const World & w
 	for (std::map<std::string, int>::const_iterator local_need = recipe.local_need.cbegin();
 		local_need != recipe.local_need.cend(); ++local_need)
 	{
-		if (!world.room_at(x, y, z)->contains_item(local_need->first, local_need->second))
+		if (!world.room_at(x, y, z)->contains(local_need->first, local_need->second))
 		{
 			return false;
 		}
@@ -185,7 +185,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const World & w
 	for (std::map<std::string, int>::const_iterator local_remove = recipe.local_remove.cbegin();
 		local_remove != recipe.local_remove.cend(); ++local_remove)
 	{
-		if (!world.room_at(x, y, z)->contains_item(local_remove->first, local_remove->second))
+		if (!world.room_at(x, y, z)->contains(local_remove->first, local_remove->second))
 		{
 			return false;
 		}
@@ -323,7 +323,7 @@ bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world, Update
 				// calculate the movement cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains_item(C::TREE_ID))
+					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -353,7 +353,7 @@ bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world, Update
 				// calculate the move cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains_item(C::TREE_ID))
+					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -495,7 +495,7 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, World & world, U
 				// calculate the movement cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains_item(C::TREE_ID))
+					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -523,7 +523,7 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, World & world, U
 				// calculate the move cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains_item(C::TREE_ID))
+					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -558,7 +558,7 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, World & world, U
 	destination_room.g = 999999;
 	for (const Node & node : closed_list)
 	{
-		if (world.room_at(node.x, node.y, C::GROUND_INDEX)->contains_item(item_id) &&
+		if (world.room_at(node.x, node.y, C::GROUND_INDEX)->contains(item_id) &&
 			node.g < destination_room.g)
 		{
 			destination_room = node;
@@ -676,7 +676,7 @@ bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
 				// calculate the movement cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains_item(C::TREE_ID))
+					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -706,7 +706,7 @@ bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
 				// calculate the move cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains_item(C::TREE_ID))
+					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))

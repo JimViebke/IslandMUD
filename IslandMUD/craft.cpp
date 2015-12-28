@@ -2,6 +2,7 @@
 Feb 16 2014 */
 
 #include "craft.h"
+#include "item.h"
 
 namespace
 {

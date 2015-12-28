@@ -89,7 +89,8 @@
     <ClCompile Include="door.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="generator.cpp" />
-    <ClCompile Include="item\item.cpp" />
+    <ClCompile Include="item\container.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="message.cpp" />
     <ClCompile Include="non_player_character.cpp" />
@@ -117,9 +118,10 @@
     <ClInclude Include="item.h" />
     <ClInclude Include="item\bloomery.h" />
     <ClInclude Include="item\chest.h" />
+    <ClInclude Include="item\container.h" />
     <ClInclude Include="item\equipment.h" />
     <ClInclude Include="Item\item.h" />
-    <ClInclude Include="item\materials.h" />
+    <ClInclude Include="item\stackable.h" />
     <ClInclude Include="item\misc.h" />
     <ClInclude Include="message.h" />
     <ClInclude Include="non_player_character.h" />
@@ -143,8 +145,7 @@
     <ClInclude Include="world.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram - Characters.cd" />
-    <None Include="ClassDiagram - Items.cd" />
+    <None Include="Class Diagram.cd" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="notes.txt" />
