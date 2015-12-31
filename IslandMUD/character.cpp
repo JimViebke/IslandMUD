@@ -160,6 +160,7 @@ std::string Character::save()
 	user_data_xml.remove_child(C::XML_USER_STATUS.c_str());
 	user_data_xml.remove_child(C::XML_USER_LOCATION.c_str());
 	user_data_xml.remove_child(C::XML_USER_LEVELS.c_str());
+	user_data_xml.remove_child(C::XML_ITEM.c_str());
 
 	// create nodes to store user equipment and materials
 	pugi::xml_node status_node = user_data_xml.append_child(C::XML_USER_STATUS.c_str());
