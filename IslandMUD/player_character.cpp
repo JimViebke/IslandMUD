@@ -15,7 +15,7 @@ std::string PC::print() const
 	}
 	else
 	{
-		return "You have " + contents_summary;
+		return "You have" + contents_summary;
 	}
 }
 

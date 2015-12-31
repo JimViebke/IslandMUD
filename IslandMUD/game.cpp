@@ -819,7 +819,7 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 
 		action_result << "Your coordinates are " << player->x << ", " << player->y << " (index " << player->z << ")"
 			<< this->world.room_at(player->x, player->y, player->z)->summary(player->name) // "You look around and notice..."
-			<< player->print(); // prepend "You have..."
+			<< "\n\n" << player->print() << "\n\n"; // "You have..."
 	}
 
 	// add the update message to the end of the outbound message
