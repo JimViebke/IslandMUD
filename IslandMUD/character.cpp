@@ -779,7 +779,7 @@ Update_Messages Character::construct_surface(const std::string & material_id, co
 	}
 
 	// check that the player has the item
-	if (this->contains(material_id))
+	if (!this->contains(material_id))
 	{
 		return Update_Messages("You don't have " + material_id + ".");
 	}
@@ -857,7 +857,7 @@ Update_Messages Character::construct_surface_with_door(const std::string & surfa
 	}
 
 	// check that the player has the item
-	if (this->contains(surface_material_id))
+	if (!this->contains(surface_material_id))
 	{
 		return Update_Messages("You don't have any " + U::get_plural_for(surface_material_id) + ".");
 	}
@@ -885,7 +885,7 @@ Update_Messages Character::construct_surface_with_door(const std::string & surfa
 	const unsigned DOOR_MATERIAL_COUNT_REQUIRED = C::DOOR_REQUIREMENTS.find(door_material_id)->second;
 
 	// check that the player has the required material
-	if (this->contains(door_material_id))
+	if (!this->contains(door_material_id))
 	{
 		return Update_Messages("You don't have any " + U::get_plural_for(surface_material_id) + ".");
 	}
