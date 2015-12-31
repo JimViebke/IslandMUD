@@ -17,6 +17,7 @@ std::string Container::contents_to_string() const
 	}
 
 	std::stringstream output;
+	output << " ";
 
 	// record an iterator to the last item
 	const auto last_it = contents.end()--;
@@ -24,7 +25,6 @@ std::string Container::contents_to_string() const
 	for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator it = contents.begin();
 		it != contents.end(); ++it)
 	{
-		output << " ";
 
 		// if the item is stackable
 		if (const std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(it->second))
@@ -32,6 +32,10 @@ std::string Container::contents_to_string() const
 			if (stackable->amount != 1) // and the amount is != 1
 			{
 				output << stackable->amount << " " << U::get_plural_for(stackable->name);
+			}
+			else
+			{
+				output << U::get_article_for(it->second->name) << " " << it->second->name; // this is duplicated below, but I'm not sure how to fix this
 			}
 		}
 		else // the item is not stackable
@@ -137,7 +141,7 @@ void Container::erase(const std::string & item_id, const unsigned & count)
 	{
 		// erase the amount required
 		stackable->amount -= count;
-		
+
 		// if the container no longer contains at least one instance of the item
 		if (stackable->amount < 1)
 		{
