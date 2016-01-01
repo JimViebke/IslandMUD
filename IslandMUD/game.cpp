@@ -796,9 +796,6 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 {
 	// Make sure the calling function has a lock on the actors_mutex, because this function does not acquire it.
 
-	// create these to save the player's coordinates if a map update is required
-	int player_x = -1, player_y = -1;
-
 	// create a stringstream to assemble the return message
 	std::stringstream action_result;
 	action_result << "\n\n";
@@ -806,8 +803,8 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 	const std::shared_ptr<Character> character = actors.find(user_ID)->second;
 
 	// save the player's coordinates in case a map update is required
-	player_x = character->x;
-	player_y = character->y;
+	const int player_x = character->x;
+	const int player_y = character->y;
 
 	// gather some more information to add to the response message
 	if (U::is<PC>(character))
