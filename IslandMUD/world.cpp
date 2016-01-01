@@ -10,11 +10,6 @@ May 15 2015 */
 
 World::World()
 {
-
-}
-
-void World::load()
-{
 	create_world_container();
 	load_or_generate_terrain_and_mineral_maps();
 }

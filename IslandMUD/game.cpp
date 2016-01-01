@@ -12,9 +12,6 @@ const int INVALID_SOCKET = 0xffff;
 
 Game::Game()
 {
-	// load the world
-	world.load();
-
 	// start the threads for listening on port numbers
 	std::thread(&Game::networking_thread, this, C::GAME_PORT_NUMBER, &Game::client_thread).detach();
 	std::thread(&Game::networking_thread, this, C::GAME_MAP_PORT_NUMBER, &Game::client_map_thread).detach();

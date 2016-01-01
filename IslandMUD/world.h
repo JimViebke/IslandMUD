@@ -28,8 +28,6 @@ public:
 
 	World();
 
-	void load();
-
 	// access a room given coordinates
 	std::unique_ptr<Room>::pointer room_at(const int & x, const int & y, const int & z);
 	const std::unique_ptr<Room>::pointer room_at(const int & x, const int & y, const int & z) const;
