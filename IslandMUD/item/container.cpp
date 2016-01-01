@@ -119,7 +119,7 @@ std::shared_ptr<Item> Container::erase(const std::string & item_id)
 		// return a new instance of the stackable item
 		return Craft::make(item_id);
 	}
-	else // the item is not stackab.e
+	else // the item is not stackable
 	{
 		// destroy the container's reference to the item
 		contents.erase(item_id);
