@@ -627,7 +627,7 @@ void Game::NPC_thread()
 {
 	// hardcode some new NPCs for startup
 	{
-		const std::vector<std::string> names = { "Jeb", "Bill", "Bob" };
+		const std::vector<std::string> names = { "Jeb"/* , "Bill", "Bob" */ };
 
 		// create a worker NPC for each name in the list
 		for (const std::string & name : names)
@@ -657,7 +657,7 @@ void Game::NPC_thread()
 			{
 				std::cout << "Calling NPC::update() on " << actor.first << "...";
 
-				Update_Messages update_messages = npc->update(world, actors); // call update, passing in the world and actors
+				const Update_Messages update_messages = npc->update(world, actors); // call update, passing in the world and actors
 
 				std::cout << " done.\nGenerating outbound messages...";
 
