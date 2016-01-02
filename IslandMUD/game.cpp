@@ -20,7 +20,7 @@ Game::Game()
 	std::thread(&Game::outbound_thread, this).detach();
 
 	// start the thread responsible for all things NPC
-	// std::thread(&Game::NPC_thread, this).detach();
+	std::thread(&Game::NPC_thread, this).detach();
 }
 
 void Game::login(const std::string & user_id)
