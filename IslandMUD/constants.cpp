@@ -158,7 +158,9 @@ const std::string C::DOOR = "door";
 // room xml
 const std::string C::XML_ROOM = "room";
 const std::string C::XML_IS_WATER = "is_water";
+const std::string C::XML_ITEMS = "items";
 const std::string C::XML_ITEM = "item";
+const std::string C::XML_ITEM_ID = "item_ID";
 const std::string C::XML_ITEM_HEALTH = "health";
 const std::string C::XML_ITEM_COUNT = "count";
 const std::string C::XML_SURFACE = "surface";

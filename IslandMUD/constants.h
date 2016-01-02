@@ -160,7 +160,9 @@ public:
 		// room xml
 		XML_ROOM,
 		XML_IS_WATER,
+		XML_ITEMS,
 		XML_ITEM,
+		XML_ITEM_ID,
 		XML_ITEM_HEALTH,
 		XML_ITEM_COUNT,
 		XML_SURFACE,

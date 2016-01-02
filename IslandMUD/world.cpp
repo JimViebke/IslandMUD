@@ -486,15 +486,15 @@ void World::add_room_to_world(pugi::xml_node & room_node, const int & x, const i
 	// set whether or not the room is water (off-island or river/lake)
 	room->set_water_status(room_node.attribute(C::XML_IS_WATER.c_str()).as_bool());
 
-	const pugi::xml_node items_node = room_node.child(C::XML_ITEM.c_str());
+	const pugi::xml_node items_node = room_node.child(C::XML_ITEMS.c_str());
 
 	// for each item under the item node
 	for (const pugi::xml_node & item_node : items_node)
 	{
 		// use the item ID to make a new item and add it to the room
 
-		// create the item
-		std::shared_ptr<Item> item = Craft::make(item_node.name());
+		// create the item using the value of the item ID attribute
+		std::shared_ptr<Item> item = Craft::make(item_node.attribute(C::XML_ITEM_ID.c_str()).as_string());
 
 		// set the item's health
 		item->set_health(item_node.attribute(C::XML_ITEM_HEALTH.c_str()).as_int());
@@ -669,7 +669,7 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 	room_node.append_attribute(C::XML_IS_WATER.c_str()).set_value(room->is_water());
 
 	// add a node to contain all item nodes
-	pugi::xml_node items_node = room_node.append_child(C::XML_ITEM.c_str());
+	pugi::xml_node items_node = room_node.append_child(C::XML_ITEMS.c_str());
 
 	// for each item in the room
 	const std::multimap<std::string, std::shared_ptr<Item>> room_item_contents = room->get_contents();
@@ -677,7 +677,10 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 		item_it != room_item_contents.cend(); ++item_it)
 	{
 		// create a node for the item, append it to the items node
-		pugi::xml_node item_node = items_node.append_child(item_it->second->name.c_str());
+		pugi::xml_node item_node = items_node.append_child(C::XML_ITEM.c_str());
+
+		// append the name of the item: item_ID="limestone deposit"
+		item_node.append_attribute(C::XML_ITEM_ID.c_str()).set_value(item_it->second->name.c_str());
 
 		// append the item's health as an attribute
 		item_node.append_attribute(C::XML_ITEM_HEALTH.c_str()).set_value(item_it->second->get_health());
