@@ -855,16 +855,17 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 		for (auto player_it = (*update_messages.additional_map_update_users).cbegin();
 			player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
 		{
-			// extract the player
-			const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(*player_it)->second);
+			// if the referenced character is a player character
+			if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(*player_it)->second))
+			{
+				// get the player's map socket
+				SOCKET outbound_socket = clients.get_map_socket(*player_it);
+				// if the player does not have a map socket, send the map to the player's main socket
+				if (outbound_socket == -1) outbound_socket = clients.get_socket(*player_it);
 
-			// get the player's map socket
-			SOCKET outbound_socket = clients.get_map_socket(*player_it);
-			// if the player does not have a map socket, send the map to the player's main socket
-			if (outbound_socket == -1) outbound_socket = clients.get_socket(*player_it);
-
-			// generate an area map from the current player's perspective, send it to the correct socket
-			outbound_queue.put(Message(outbound_socket, player->generate_area_map(world, actors)));
+				// generate an area map from the current player's perspective, send it to the correct socket
+				outbound_queue.put(Message(outbound_socket, player->generate_area_map(world, actors)));
+			}
 		}
 	}
 
