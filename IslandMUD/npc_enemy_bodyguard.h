@@ -31,6 +31,11 @@ private:
 	// returns a boolean indicating if the kill target's last known location was updated
 	bool attempt_update_kill_target_last_known_location(const std::shared_ptr<Character> & kill_target);
 
+	// AI subroutines
+
+	Update_Messages hunt_target(std::shared_ptr<Character> & kill_target, std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors);
+
+	Update_Messages move_toward_protect_target(std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors);
 };
 
 #endif

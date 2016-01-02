@@ -32,94 +32,7 @@ Update_Messages Hostile_NPC_Bodyguard::update(World & world, std::map<std::strin
 		}
 		else // the target is online
 		{
-			// if I am at the target's location, do combat logic
-			if (kill_target->x == x && kill_target->y == y && kill_target->z == z)
-			{
-				return Update_Messages(""); // combat logic here
-			}
-
-			// else the target is online and I am not at the target's location
-
-			// if the kill target is visible
-			if (attempt_update_kill_target_last_known_location(kill_target))
-			{
-				// if the path is empty or going the wrong direction, or the target has moved
-				if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_kill_target ||
-					kill_target->x != path.back()._x ||
-					kill_target->y != path.back()._y)
-				{
-					// generate a new path
-					save_path_to(kill_target->x, kill_target->y, world);
-					stored_path_type = Stored_Path_Type::to_kill_target;
-				}
-
-				// make the next movement
-				Update_Messages update_messages("");
-				if (!make_path_movement(world, update_messages)) // if the next movement fails, regenerate the path and try again
-				{
-					save_path_to(kill_target->x, kill_target->y, world);
-					make_path_movement(world, update_messages);
-				}
-
-				return update_messages;
-			}
-
-			// else the kill target is not visible
-
-			// if have a last_known_location for kill_target
-			if (kill_target_last_known_location._x != -1 &&
-				kill_target_last_known_location._y != -1)
-			{
-				// if my location is not last_known_location
-				if (kill_target_last_known_location._x != x ||
-					kill_target_last_known_location._y != y ||
-					kill_target_last_known_location._z != z)
-				{
-					// if the path is empty or going to the wrong destination
-					if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_kill_target)
-					{
-						// generate a new path
-						save_path_to(kill_target_last_known_location._x, kill_target_last_known_location._y, world);
-						stored_path_type = Stored_Path_Type::to_kill_target;
-					}
-
-					// make the next move
-					Update_Messages update_messages("");
-					if (!make_path_movement(world, update_messages)) // if the next movement fails, regenerate the path and try again
-					{
-						save_path_to(kill_target_last_known_location._x, kill_target_last_known_location._y, world);
-						make_path_movement(world, update_messages);
-					}
-
-					return update_messages; // action was used
-				}
-
-				// else I am at the last known location and cannot see the target (this condition is handled in the next block)
-			}
-
-			// kill target is not visible and I don't have a last known location for the kill target
-			kill_target_last_known_location.reset();
-
-			// if the path is empty or going to the wrong destination
-			if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_protect_target)
-			{
-				// generate a new path
-				save_path_to(protect_target->x, protect_target->y, world);
-				stored_path_type = Stored_Path_Type::to_protect_target;
-			}
-
-			// make the next movement
-			Update_Messages update_messages("");
-			make_path_movement(world, update_messages);
-
-			// if the kill target is (now) visible
-			if (attempt_update_kill_target_last_known_location(kill_target))
-			{
-				save_path_to(kill_target_last_known_location._x, kill_target_last_known_location._y, world); // save a new path
-				stored_path_type = Stored_Path_Type::to_kill_target; // update the stored path type
-			}
-
-			return update_messages; // action was used
+			return hunt_target(kill_target, protect_target, world, actors);
 		}
 	}
 
@@ -128,19 +41,7 @@ Update_Messages Hostile_NPC_Bodyguard::update(World & world, std::map<std::strin
 	// if I am out of guard range of my protect_target
 	if (U::diagonal_distance(x, y, protect_target->x, protect_target->y) > guard_radius)
 	{
-		// if the path is empty or going to the wrong destination
-		if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_protect_target)
-		{
-			// generate a new path
-			save_path_to(protect_target->x, protect_target->y, world);
-			stored_path_type = Stored_Path_Type::to_protect_target;
-		}
-
-		// make the next movement
-		Update_Messages update_messages("");
-		make_path_movement(world, update_messages);
-
-		return update_messages; // action was used
+		return move_toward_protect_target(protect_target, world, actors);
 	}
 
 	// the NPC is in range of the protect target, check for a new kill target
@@ -227,4 +128,115 @@ bool Hostile_NPC_Bodyguard::attempt_update_kill_target_last_known_location(const
 
 	// the NPC cannot see the kill target, the last_known_location was not updated
 	return false;
+}
+
+// AI subroutines
+
+Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & kill_target, std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+{
+	// if I am at the target's location, do combat logic
+	if (kill_target->x == x && kill_target->y == y && kill_target->z == z)
+	{
+		return Update_Messages(""); // combat logic here
+	}
+
+	// else the target is online and I am not at the target's location
+
+	// if the kill target is visible
+	if (attempt_update_kill_target_last_known_location(kill_target))
+	{
+		// if the path is empty or going the wrong direction, or the target has moved
+		if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_kill_target ||
+			kill_target->x != path.back()._x ||
+			kill_target->y != path.back()._y)
+		{
+			// generate a new path
+			save_path_to(kill_target->x, kill_target->y, world);
+			stored_path_type = Stored_Path_Type::to_kill_target;
+		}
+
+		// make the next movement
+		Update_Messages update_messages("");
+		if (!make_path_movement(world, update_messages)) // if the next movement fails, regenerate the path and try again
+		{
+			save_path_to(kill_target->x, kill_target->y, world);
+			make_path_movement(world, update_messages);
+		}
+
+		return update_messages;
+	}
+
+	// else the kill target is not visible
+
+	// if have a last_known_location for kill_target
+	if (kill_target_last_known_location._x != -1 &&
+		kill_target_last_known_location._y != -1)
+	{
+		// if my location is not last_known_location
+		if (kill_target_last_known_location._x != x ||
+			kill_target_last_known_location._y != y ||
+			kill_target_last_known_location._z != z)
+		{
+			// if the path is empty or going to the wrong destination
+			if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_kill_target)
+			{
+				// generate a new path
+				save_path_to(kill_target_last_known_location._x, kill_target_last_known_location._y, world);
+				stored_path_type = Stored_Path_Type::to_kill_target;
+			}
+
+			// make the next move
+			Update_Messages update_messages("");
+			if (!make_path_movement(world, update_messages)) // if the next movement fails, regenerate the path and try again
+			{
+				save_path_to(kill_target_last_known_location._x, kill_target_last_known_location._y, world);
+				make_path_movement(world, update_messages);
+			}
+
+			return update_messages; // action was used
+		}
+
+		// else I am at the last known location and cannot see the target (this condition is handled in the next block)
+	}
+
+	// kill target is not visible and I don't have a last known location for the kill target
+	kill_target_last_known_location.reset();
+
+	// if the path is empty or going to the wrong destination
+	if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_protect_target)
+	{
+		// generate a new path
+		save_path_to(protect_target->x, protect_target->y, world);
+		stored_path_type = Stored_Path_Type::to_protect_target;
+	}
+
+	// make the next movement
+	Update_Messages update_messages("");
+	make_path_movement(world, update_messages);
+
+	// if the kill target is (now) visible
+	if (attempt_update_kill_target_last_known_location(kill_target))
+	{
+		save_path_to(kill_target_last_known_location._x, kill_target_last_known_location._y, world); // save a new path
+		stored_path_type = Stored_Path_Type::to_kill_target; // update the stored path type
+	}
+
+	return update_messages; // action was used
+}
+
+Update_Messages Hostile_NPC_Bodyguard::move_toward_protect_target(std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+{
+	// if the path is empty or going to the wrong destination
+	if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_protect_target)
+	{
+		// generate a new path
+		save_path_to(protect_target->x, protect_target->y, world);
+		stored_path_type = Stored_Path_Type::to_protect_target;
+	}
+
+	// make the next movement
+	Update_Messages update_messages("");
+	make_path_movement(world, update_messages);
+
+	return update_messages; // action was used
 }
