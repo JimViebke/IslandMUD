@@ -827,6 +827,9 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 		{
 			for (int cy = player_y - (int)C::VIEW_DISTANCE; cy <= player_y + (int)C::VIEW_DISTANCE; ++cy)
 			{
+				// skip if the room is out of bounds
+				if (!U::bounds_check(cx, cy, C::GROUND_INDEX)) continue;
+
 				// get a list of the users in the room
 				const std::vector<std::string> users_in_range = world.room_at(cx, cy, C::GROUND_INDEX)->get_actor_ids();
 				// for each user in the room
