@@ -49,19 +49,7 @@ Update_Messages Hostile_NPC_Bodyguard::update(World & world, std::map<std::strin
 	// if a new kill target can be found
 	if (attempt_set_new_kill_target(world, actors))
 	{
-		// if the path is empty or going to the wrong destination
-		if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_kill_target)
-		{
-			// generate a new path
-			save_path_to(kill_target_last_known_location._x, kill_target_last_known_location._y, world);
-			stored_path_type = Stored_Path_Type::to_kill_target;
-		}
-
-		// make the next movement
-		Update_Messages update_messages("");
-		make_path_movement(world, update_messages);
-
-		return update_messages; // action was used
+		return approach_new_kill_target(world);
 	}
 
 	// else, idle
@@ -232,6 +220,23 @@ Update_Messages Hostile_NPC_Bodyguard::move_toward_protect_target(std::shared_pt
 		// generate a new path
 		save_path_to(protect_target->x, protect_target->y, world);
 		stored_path_type = Stored_Path_Type::to_protect_target;
+	}
+
+	// make the next movement
+	Update_Messages update_messages("");
+	make_path_movement(world, update_messages);
+
+	return update_messages; // action was used
+}
+
+Update_Messages Hostile_NPC_Bodyguard::approach_new_kill_target(World & world)
+{
+	// if the path is empty or going to the wrong destination
+	if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_kill_target)
+	{
+		// generate a new path
+		save_path_to(kill_target_last_known_location._x, kill_target_last_known_location._y, world);
+		stored_path_type = Stored_Path_Type::to_kill_target;
 	}
 
 	// make the next movement

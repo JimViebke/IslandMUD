@@ -19,7 +19,7 @@ public:
 
 private:
 	enum class Stored_Path_Type { to_kill_target, to_protect_target };
-	
+
 	// NPC bodyguards will stay within guard_radius rooms of the NPC they are protecting
 	int guard_radius; // measured in diagonal/Chebyshev distance, not Euclidian distance
 	Stored_Path_Type stored_path_type;
@@ -33,9 +33,13 @@ private:
 
 	// AI subroutines
 
-	Update_Messages hunt_target(std::shared_ptr<Character> & kill_target, std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors);
+	Update_Messages hunt_target(std::shared_ptr<Character> & kill_target, std::shared_ptr<Character> & protect_target,
+		World & world, std::map<std::string, std::shared_ptr<Character>> & actors);
 
-	Update_Messages move_toward_protect_target(std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors);
+	Update_Messages move_toward_protect_target(std::shared_ptr<Character> & protect_target,
+		World & world, std::map<std::string, std::shared_ptr<Character>> & actors);
+
+	Update_Messages approach_new_kill_target(World & world);
 };
 
 #endif
