@@ -31,18 +31,18 @@ namespace U = Utilities; // ...to do this here
 namespace Utilities
 {
 	// debugging output
-	template <typename T> inline void print(const vector<T> & v)
+	template <typename T> inline void print(const std::vector<T> & v)
 	{
 		for (const T & element : v)
 		{
-			cout << element << " ";
+			std::cout << element << " ";
 		}
 	}
 
 	// string construction
-	template <typename T> inline string to_string(const T & val)
+	template <typename T> inline std::string to_string(const T & val)
 	{
-		stringstream output;
+		std::stringstream output;
 		output << val;
 		return output.str();
 	}
@@ -73,7 +73,7 @@ namespace Utilities
 	char_type corner_char(const bool & north, const bool & east, const bool & south, const bool & west);
 
 	// movement
-	inline void assign_movement_deltas(const string & direction_ID, int & dx, int & dy)
+	inline void assign_movement_deltas(const std::string & direction_ID, int & dx, int & dy)
 	{
 		// express movement through two dimensions in dx, dy
 		// If direction_ID is invalid, output arguments will not be modified.
@@ -89,7 +89,7 @@ namespace Utilities
 
 		// nothing to return, values passed by reference
 	}
-	inline void assign_movement_deltas(const string & direction_ID, int & dx, int & dy, int & dz)
+	inline void assign_movement_deltas(const std::string & direction_ID, int & dx, int & dy, int & dz)
 	{
 		// express movement through three dimensions in dx, dy, dz
 		// If direction_ID is invalid, output arguments will not be modified.
@@ -107,7 +107,7 @@ namespace Utilities
 
 		// nothing to return, values passed by reference
 	}
-	inline string get_movement_direction(const int & x, const int & y, const int & dest_x, const int & dest_y)
+	inline std::string get_movement_direction(const int & x, const int & y, const int & dest_x, const int & dest_y)
 	{
 		if (x == dest_x) // east or west
 		{
@@ -131,7 +131,7 @@ namespace Utilities
 	}
 
 	// vector utilities
-	template <typename T> inline bool contains(const vector<T> & v, const T & find_element)
+	template <typename T> inline bool contains(const std::vector<T> & v, const T & find_element)
 	{
 		for (const T & element : v)
 		{
@@ -142,22 +142,22 @@ namespace Utilities
 		}
 		return false;
 	}
-	template <typename T> inline void erase_element_from_vector(vector<T> & vec, const T & erase_element)
+	template <typename T> inline void erase_element_from_vector(std::vector<T> & vec, const T & erase_element)
 	{
 		vec.erase(find(vec.begin(), vec.end(), erase_element));
 	}
-	template <typename T> void append_b_to_a(vector<T> & dest, const vector<T> & source)
+	template <typename T> void append_b_to_a(std::vector<T> & dest, const std::vector<T> & source)
 	{
 		dest.insert(dest.end(), source.begin(), source.end());
 	}
 
 	// file utilities
-	inline bool file_exists(const string & path)
+	inline bool file_exists(const std::string & path)
 	{
 		struct stat buf;
 		return (stat(path.c_str(), &buf) != -1);
 	}
-	inline void create_path_if_not_exists(const string & path)
+	inline void create_path_if_not_exists(const std::string & path)
 	{
 		// if a path does not exist, create it
 #ifdef _WIN32
@@ -166,25 +166,25 @@ namespace Utilities
 		system(string("mkdir -p " + path).c_str());
 #endif
 	}
-	inline void to_file(const string & path, const string & contents)
+	inline void to_file(const std::string & path, const std::string & contents)
 	{
-		ofstream file;
+		std::ofstream file;
 		file.open(path);
 		file << contents;
 		file.close();
 	}
 
 	// text formatting
-	void to_lower_case(string & word);
-	string capitalize(string & word);
-	string capitalize(const string & word);
+	void to_lower_case(std::string & word);
+	std::string capitalize(std::string & word);
+	std::string capitalize(const std::string & word);
 
 	// grammar
-	string get_article_for(const string & noun);
-	string get_plural_for(const string & noun);
+	std::string get_article_for(const std::string & noun);
+	std::string get_plural_for(const std::string & noun);
 
 	// math
-	inline int difference(const int & a, const int & b);
+	template<typename T> inline T difference(const T & a, const T & b) { return (a - b > 0) ? (a - b) : (b - a); }
 	int euclidean_distance(const int & x1, const int & y1, const int & x2, const int & y2);
 	int diagonal_distance(const int & x1, const int & y1, const int & x2, const int & y2);
 
@@ -194,7 +194,7 @@ namespace Utilities
 	// random utils
 	int random_int_from(const int & min, const int & max);
 	unsigned random_int_from(const unsigned & min, const unsigned & max);
-	template <typename T> inline T random_element_from(const vector<T> & v)
+	template <typename T> inline T random_element_from(const std::vector<T> & v)
 	{
 		// this will crash if v is empty
 		return v[U::random_int_from(0u, unsigned(v.size() - 1))];
@@ -204,7 +204,7 @@ namespace Utilities
 	inline long long current_time_in_ms()
 	{
 		// return chrono::system_clock::to_time_t(chrono::system_clock::now());
-		return chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
+		return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	}
 
 	// polymorphic testing and conversion
@@ -224,15 +224,15 @@ namespace Utilities
 	{
 		return !U::is<Derived_Type>(object);
 	}
-	template <typename Derived_Type, typename Parent_Type> inline shared_ptr<Derived_Type> convert_to(shared_ptr<Parent_Type> const & object)
+	template <typename Derived_Type, typename Parent_Type> inline std::shared_ptr<Derived_Type> convert_to(std::shared_ptr<Parent_Type> const & object)
 	{
-		return dynamic_pointer_cast<Derived_Type>(object);
+		return std::dynamic_pointer_cast<Derived_Type>(object);
 	}
 
 	// managed pointer utilities
-	template<typename T, typename... Args> inline unique_ptr<T> make_unique(Args&&... args)
+	template<typename T, typename... Args> inline std::unique_ptr<T> make_unique(Args&&... args)
 	{
-		return unique_ptr<T>(new T(forward<Args>(args)...));
+		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}
 }
 

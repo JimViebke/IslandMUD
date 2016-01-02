@@ -4,7 +4,7 @@ Aug 15 2015 */
 
 #include "npc_enemy_fighter.h"
 
-void Hostile_NPC_Fighter::update(World & world, map<string, shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Fighter::update(World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
 	if (i_dont_have(C::AXE_ID) && !im_planning_to_acquire(C::AXE_ID))
 	{
@@ -17,16 +17,16 @@ void Hostile_NPC_Fighter::update(World & world, map<string, shared_ptr<Character
 	}
 
 	// in this block: take the item if it's here, move to the item if it is visible and reachable,
-	for (deque<Objective>::iterator objective_iterator = objectives.begin();
+	for (std::deque<Objective>::iterator objective_iterator = objectives.begin();
 		objective_iterator != objectives.end();)
 	{
 
 		if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE)
 		{
 			// if the item is here, take it, remove the current objective, and return
-			if (world.room_at(x, y, z)->contains_item(objective_iterator->noun))
+			if (world.room_at(x, y, z)->contains(objective_iterator->noun))
 			{
-				take(objective_iterator->noun, world);
+				Update_Messages update_messages = take(objective_iterator->noun, world);
 
 				if (objective_iterator->noun == objective_iterator->purpose)
 				{
@@ -39,13 +39,14 @@ void Hostile_NPC_Fighter::update(World & world, map<string, shared_ptr<Character
 					erase_objective(objective_iterator);
 				}
 
-				return;
+				return update_messages;
 			}
 
 			// see if the item is reachable
-			if (pathfind_to_closest_item(objective_iterator->noun, world))
+			Update_Messages update_messages("");
+			if (pathfind_to_closest_item(objective_iterator->noun, world, update_messages))
 			{
-				return;
+				return update_messages;
 			}
 
 			// what's the difference between the above and below block?
@@ -86,12 +87,13 @@ void Hostile_NPC_Fighter::update(World & world, map<string, shared_ptr<Character
 		{
 			if (one_can_craft(objective_iterator->purpose) && crafting_requirements_met(objective_iterator->purpose, world))
 			{
-				if (pathfind_to_closest_item(objective_iterator->noun, world))
+				Update_Messages update_messages("");
+				if (pathfind_to_closest_item(objective_iterator->noun, world, update_messages))
 				{
 					// delete extra objectives here
 					// or maybe not; perhaps the objective should be cleared when the item is taken/crafted
 
-					return;
+					return update_messages;
 				}
 			}
 		}
@@ -103,13 +105,13 @@ void Hostile_NPC_Fighter::update(World & world, map<string, shared_ptr<Character
 
 
 	// the next block: work through all objectives, see which objectives can be resolved through crafting attemps.
-	for (deque<Objective>::iterator objective_iterator = objectives.begin();
+	for (std::deque<Objective>::iterator objective_iterator = objectives.begin();
 		objective_iterator != objectives.end(); ++objective_iterator)
 	{
 		// try to craft the item, using obj->purpose if the (obj->verb == GOTO), else use obj->noun (most cases)
-		const Update_Messages craft_attempt = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
+		const Update_Messages update_messages = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
 		
-		if (craft_attempt.to_room != nullptr) // find a better way to determine if crafting was successful
+		if (update_messages.to_room != nullptr) // find a better way to determine if crafting was successful
 		{
 			// if successful, clear completed objectives
 
@@ -118,7 +120,7 @@ void Hostile_NPC_Fighter::update(World & world, map<string, shared_ptr<Character
 				// the item crafted was from a "goto" objective
 
 				// save this because our firse erase will invalidate the iterator
-				const string PURPOSE = objective_iterator->purpose;
+				const std::string PURPOSE = objective_iterator->purpose;
 
 				// erase the "goto" objective
 				erase_goto_objective_matching(PURPOSE);
@@ -137,7 +139,7 @@ void Hostile_NPC_Fighter::update(World & world, map<string, shared_ptr<Character
 				erase_objective(objective_iterator);
 			}
 
-			return;
+			return update_messages; // this shouldn't compile
 		}
 	}
 
@@ -155,17 +157,20 @@ void Hostile_NPC_Fighter::update(World & world, map<string, shared_ptr<Character
 				if (!U::bounds_check(cx, cy)) { continue; }
 
 				// for each actor in the room
-				for (const string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
+				for (const std::string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
 				{
 					// if the character is a player character
 					if (U::is<PC>(actors.find(actor_ID)->second))
 					{
 						// [target acquired]
-						pathfind(cx, cy, world);
-						return;
+						Update_Messages update_messages("");
+						pathfind(cx, cy, world, update_messages);
+						return update_messages;
 					}
 				}
 			}
 		}
 	}
+
+	return Update_Messages("");
 }

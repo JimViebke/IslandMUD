@@ -15,27 +15,27 @@ May 15 2015 */
 class Recipes
 {
 public:
-	map<string, Recipe> recipes; // name, recipe object
+	Recipes();
 
-	Recipes() {}
+	// information
+	bool has_recipe_for(const std::string & name) const;
+
+	// retrieval
+	Recipe get_recipe(const std::string & recipe_name) const;
+
+	// debugging
+	std::string get_recipes() const;
+	std::string get_recipes_matching(const std::string & item_ID) const;
+
+private:
+	std::map<std::string, Recipe> recipes; // name, recipe object
 
 	void load();
 
 	// recipe population
-	void add_recipe(const string & name,
-		const map<string, int> & inv_n, const map<string, int> & inv_r,
-		const map<string, int> & loc_n, const map<string, int> & loc_r, const map<string, int> & yields);
-
-	// information
-	bool has_recipe_for(const string & name) const;
-
-	// retrieval
-	Recipe get_recipe(const string & recipe_name) const;
-
-	// debugging
-	string get_recipes() const;
-	string get_recipes_matching(const string & item_ID) const;
-
+	void add_recipe(const std::string & name,
+		const std::map<std::string, int> & inv_n, const std::map<std::string, int> & inv_r,
+		const std::map<std::string, int> & loc_n, const std::map<std::string, int> & loc_r, const std::map<std::string, int> & yields);
 };
 
 #endif

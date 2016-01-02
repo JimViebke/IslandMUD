@@ -12,7 +12,7 @@ Feb 14, 2015 */
 class Craft
 {
 public:
-	static shared_ptr<Item> make(const string & item_ID);
+	static std::shared_ptr<Item> make(const std::string & item_ID);
 
 private:
 	Craft() = delete;

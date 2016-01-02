@@ -2,21 +2,23 @@
 Feb 16 2014 */
 
 #include "craft.h"
+#include "item.h"
 
 namespace
 {
-	template <typename Item_Type> shared_ptr<Item> create_instance() { return make_shared<Item_Type>(); }
+	template <typename Item_Type> std::shared_ptr<Item> create_instance() { return std::make_shared<Item_Type>(); }
 }
 
-shared_ptr<Item> Craft::make(const string & item_ID)
+std::shared_ptr<Item> Craft::make(const std::string & item_ID)
 {
 	// alphabetical based on ID, not object name
-	typedef shared_ptr<Item>(*create_item_pointer)();
-	const static map<string, create_item_pointer> items = {
+	typedef std::shared_ptr<Item>(*create_item_pointer)();
+	const static std::map<std::string, create_item_pointer> items = {
 		{ C::ANVIL_ID, &create_instance<Anvil> },
 		{ C::ARROW_ID, &create_instance<Arrow> },
 		{ C::ARROWHEAD_ID, &create_instance<Arrowhead> },
 		{ C::AXE_ID, &create_instance<Axe> },
+		{ C::BLOOMERY_ID, &create_instance<Bloomery> },
 		{ C::BOARD_ID, &create_instance<Board> },
 		{ C::BOW_ID, &create_instance<Bow> },
 		{ C::BRANCH_ID, &create_instance<Branch> },
@@ -28,7 +30,6 @@ shared_ptr<Item> Craft::make(const string & item_ID)
 		{ C::LIMESTONE_ID, &create_instance<Limestone> },
 		{ C::LIMESTONE_DEPOSIT_ID, &create_instance<Limestone_Deposit> },
 		{ C::LOG_ID, &create_instance<Log> },
-		{ C::SMELTER_ID, &create_instance<Smelter> },
 		{ C::STAFF_ID, &create_instance<Staff> },
 		{ C::STICK_ID, &create_instance<Stick> },
 		{ C::STONE_ID, &create_instance<Stone> },
@@ -40,9 +41,9 @@ shared_ptr<Item> Craft::make(const string & item_ID)
 	};
 
 	// extract the corresponding entry in the map
-	const map<string, create_item_pointer>::const_iterator pair = items.find(item_ID);
+	const std::map<std::string, create_item_pointer>::const_iterator pair = items.find(item_ID);
 
 	// craft a new instance of the specified item by calling the function pointer,
 	// creating a new stone if the key (item ID) was not in the map
-	return (pair != items.cend()) ? pair->second() : make_shared<Stone>();
+	return (pair != items.cend()) ? pair->second() : std::make_shared<Stone>();
 }

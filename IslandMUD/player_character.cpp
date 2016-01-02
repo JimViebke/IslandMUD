@@ -5,37 +5,21 @@ May 15 2015 */
 #include "npc_enemy.h"
 #include "npc_unaffiliated.h"
 
-string PC::print() const
+std::string PC::print() const
 {
-	stringstream output;
+	const std::string contents_summary = this->contents_to_string();
 
-	// if the player is carrying any equipment, list them after materials
-	if (equipment_inventory.size() > 0) // if the player is carrying anything
+	if (contents_summary.size() == 0)
 	{
-		for (multimap<string, shared_ptr<Equipment>>::const_iterator item_it = equipment_inventory.cbegin(); // for each item
-			item_it != equipment_inventory.cend(); ++item_it)
-		{
-			output << item_it->second->name << " "; // add its name to the output
-		}
+		return "\n\nYou aren't carrying anything.";
 	}
-
-	// if the player is carrying any materials, list them above equipment
-	if (material_inventory.size() > 0)
+	else
 	{
-		for (multimap<string, shared_ptr<Material>>::const_iterator item_it = material_inventory.cbegin(); // for each item
-			item_it != material_inventory.cend(); ++item_it)
-		{
-			output << item_it->second->name << " (x" << item_it->second->amount << ") "; // add its name to the output: stick (x5)
-		}
+		return "You have" + contents_summary;
 	}
-
-	return "\n\n" + // leave an empt line
-		((output.str().size() > 0) ? // if there is anything to print
-		"You have " + output.str() : // return the output
-		"You aren't carrying anything."); // return generic "no items" message
 }
 
-string PC::get_equipped_item_info() const
+std::string PC::get_equipped_item_info() const
 {
 	// if the player does not have anything equipped
 	if (this->equipped_item == nullptr)
@@ -47,13 +31,13 @@ string PC::get_equipped_item_info() const
 }
 
 // Build and return a top-down area map around a given coordinate
-string PC::generate_area_map(const World & world, const map<string, shared_ptr<Character>> & actors) const
+std::string PC::generate_area_map(const World & world, const std::map<std::string, std::shared_ptr<Character>> & actors) const
 {
-	vector<vector<char_type>> user_map; // three vectors feed into one vector
+	std::vector<std::vector<char_type>> user_map; // three vectors feed into one vector
 
 	// create a 2D vector to represent whether or not a tree is at a location.
 	// Dimensions are (view+1+view) plus a padding of 1 on each side
-	vector<vector<bool>> forest_grid((C::VIEW_DISTANCE * 2) + 3, vector<bool>((C::VIEW_DISTANCE * 2) + 3, false));
+	std::vector<std::vector<bool>> forest_grid((C::VIEW_DISTANCE * 2) + 3, std::vector<bool>((C::VIEW_DISTANCE * 2) + 3, false));
 
 	/*
 	We're looking for presence/absence info on trees in a 11*11 radius, and fitting it into a 13x13 grid, with a ring around for bounds padding.
@@ -73,7 +57,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 		{
 			if (U::bounds_check(cx, cy))
 			{
-				forest_grid[i][cy - (y - (C::VIEW_DISTANCE + 1))] = world.room_at(cx, cy, C::GROUND_INDEX)->contains_item(C::TREE_ID);
+				forest_grid[i][cy - (y - (C::VIEW_DISTANCE + 1))] = world.room_at(cx, cy, C::GROUND_INDEX)->contains(C::TREE_ID);
 			}
 		}
 	}
@@ -83,7 +67,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 	set n, e, s, w to(room contains surface ? ); */
 	for (int cx = x - (int)C::VIEW_DISTANCE; cx <= x + (int)C::VIEW_DISTANCE; ++cx)
 	{
-		vector<char_type> a, b, c; // three rows
+		std::vector<char_type> a, b, c; // three rows
 		for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 		{
 			// if the room is out of bounds
@@ -198,7 +182,7 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				// count the enemies standing at a coordinate
 				unsigned enemy_count = 0, neutral_count = 0, friendly_count = 0;
 				// for each actor in the room
-				for (const string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
+				for (const std::string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
 				{
 					// if the actor is a hostile NPC
 					if (U::is<Hostile_NPC>(actors.find(actor_ID)->second))
@@ -280,8 +264,8 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 				b.push_back(((wr) ? C::RUBBLE_CHAR : ((wd) ? C::NS_DOOR : ((w) ? C::NS_WALL : C::LAND_CHAR))));
 				// if the current coordinates are the player's, draw an @ icon
 				b.push_back(((cx == x && cy == y) ? C::PLAYER_CHAR
-					// else if there is another player, draw an @ icron
-					: ((friendly_count > 0) ? C::PLAYER_CHAR
+					// else if there is another player, draw a lowercase 'a'
+					: ((friendly_count > 0) ? C::OTHER_PLAYER_CHAR
 					// else if there is an enemy, draw enemy count
 					: ((enemy_count > 0) ? U::to_char_type(enemy_count)
 					// else if there are neutrals, draw neutral count
@@ -308,12 +292,12 @@ string PC::generate_area_map(const World & world, const map<string, shared_ptr<C
 		user_map.push_back(c);
 	} // end for each row
 
-	stringstream result;
+	std::stringstream result;
 	// for each row except the first and last
 	for (unsigned i = 1; i < user_map.size() - 1; ++i)
 	{
 		// for all iterations except the first, append a newline
-		if (i != 1) { result << endl; }
+		if (i != 1) { result << std::endl; }
 
 		// for each character in the row except the first and last
 		for (unsigned j = 1; j < user_map[i].size() - 1; ++j)

@@ -22,26 +22,27 @@ const unsigned C::GAME_MAP_PORT_NUMBER = 8051;
 
 // game data locations
 #ifdef _WIN32
-const string C::game_directory = "C:/IslandMUD"; // Windows path
+const std::string C::game_directory = "C:/IslandMUD"; // Windows path
 #else
 const string C::game_directory = "/home/IslandMUD"; // Linux path
 #endif
-const string C::world_terrain_file_location = C::game_directory + "/world_terrain.txt";
-const string C::iron_deposit_map_file_location = C::game_directory + "/iron_deposit_map.txt";
-const string C::limestone_deposit_map_file_location = C::game_directory + "/limestone_deposit_map.txt";
-const string C::room_directory = C::game_directory + "/rooms";
-const string C::user_data_directory = C::game_directory + "/user_data";
+const std::string C::world_terrain_file_location = C::game_directory + "/world_terrain.txt";
+const std::string C::iron_deposit_map_file_location = C::game_directory + "/iron_deposit_map.txt";
+const std::string C::limestone_deposit_map_file_location = C::game_directory + "/limestone_deposit_map.txt";
+const std::string C::room_directory = C::game_directory + "/rooms";
+const std::string C::user_data_directory = C::game_directory + "/user_data";
 
 // faction IDs
-const string C::PC_FACTION_ID = "player";
-const string C::NPC_NEUTRAL_FACTION_ID = "neutral_NPC";
-const string C::NPC_HOSTILE_FACTION_ID = "hostile_NPC";
+const std::string C::PC_FACTION_ID = "player";
+const std::string C::NPC_NEUTRAL_FACTION_ID = "neutral_NPC";
+const std::string C::NPC_HOSTILE_FACTION_ID = "hostile_NPC";
 
 // map symbols
 #ifdef _WIN32
 const char_type C::OUT_OF_BOUNDS_CHAR = '*';
 const char_type C::ERROR_CHAR = '!';
 const char_type C::PLAYER_CHAR = '@';
+const char_type C::OTHER_PLAYER_CHAR = 'a';
 const char_type C::NPC_NEUTRAL_CHAR = '+';
 const char_type C::WATER_CHAR = '~';
 const char_type C::LAND_CHAR = ' ';
@@ -54,6 +55,7 @@ const char_type C::RUBBLE_CHAR = '#';
 const char_type C::OUT_OF_BOUNDS_CHAR = "*";
 const char_type C::ERROR_CHAR = "!";
 const char_type C::PLAYER_CHAR = "@";
+const char_type C::OTHER_PLAYER_CHAR = "a";
 const char_type C::NPC_NEUTRAL_CHAR = "+";
 const char_type C::WATER_CHAR = "~";
 const char_type C::LAND_CHAR = " ";
@@ -65,132 +67,130 @@ const char_type C::RUBBLE_CHAR = "#";
 #endif
 
 // engine signals
-const string C::GOOD_SIGNAL = "good";
-const string C::BAD_SIGNAL = "bad";
+const std::string C::GOOD_SIGNAL = "good";
+const std::string C::BAD_SIGNAL = "bad";
 
 // item IDs
-const string C::BAD_ITEM_ID = "bad_item_id";
+const std::string C::BAD_ITEM_ID = "bad_item_id";
 
-const string C::SMELTER_ID = "smelter";
-const string C::FORGE_ID = "forge";
-const string C::ANVIL_ID = "anvil";
-const string C::DEBRIS_ID = "debris";
+const std::string C::BLOOMERY_ID = "bloomery";
+const std::string C::BLOOM_ID = "bloom";
+const std::string C::FORGE_ID = "forge";
+const std::string C::ANVIL_ID = "anvil";
+const std::string C::DEBRIS_ID = "debris";
 
 // item IDs -> materials
-const string C::WOOD_ID = "wood";
-const string C::STONE_ID = "stone";
-const string C::VINE_ID = "vine";
-const string C::STICK_ID = "stick";
-const string C::BRANCH_ID = "branch";
-const string C::ARROW_ID = "arrow";
-const string C::ARROWHEAD_ID = "arrowhead";
-const string C::BOARD_ID = "board";
+const std::string C::WOOD_ID = "wood";
+const std::string C::STONE_ID = "stone";
+const std::string C::VINE_ID = "vine";
+const std::string C::STICK_ID = "stick";
+const std::string C::BRANCH_ID = "branch";
+const std::string C::ARROW_ID = "arrow";
+const std::string C::ARROWHEAD_ID = "arrowhead";
+const std::string C::BOARD_ID = "board";
 
 // item IDs -> other
-const string C::TREE_ID = "tree";
-const string C::CHEST_ID = "chest";
-const string C::LOG_ID = "log";
+const std::string C::TREE_ID = "tree";
+const std::string C::CHEST_ID = "chest";
+const std::string C::LOG_ID = "log";
 
 // item IDs -> equipment
-const string C::AXE_ID = "axe";
-const string C::STAFF_ID = "staff";
-const string C::SWORD_ID = "sword";
-const string C::BOW_ID = "bow";
-const string C::TORCH_ID = "torch";
-const string C::HAMMER_ID = "hammer";
+const std::string C::AXE_ID = "axe";
+const std::string C::STAFF_ID = "staff";
+const std::string C::SWORD_ID = "sword";
+const std::string C::BOW_ID = "bow";
+const std::string C::TORCH_ID = "torch";
+const std::string C::HAMMER_ID = "hammer";
 
 // item IDs -> rocks and minerals
-const string C::IRON_DEPOSIT_ID = "iron deposit"; // when they are in the ground
-const string C::LIMESTONE_DEPOSIT_ID = "limestone deposit";
+const std::string C::IRON_DEPOSIT_ID = "iron deposit"; // when they are in the ground
+const std::string C::LIMESTONE_DEPOSIT_ID = "limestone deposit";
 
-const string C::IRON_ID = "iron"; // once they are out of the ground
-const string C::LIMESTONE_ID = "limestone";
+const std::string C::IRON_ID = "iron"; // once they are out of the ground
+const std::string C::LIMESTONE_ID = "limestone";
 
 // none of these are actual item IDs, they exist for the parser to work with multi-word IDs
-const string C::KEYWORD_DEPOSIT = "deposit";
+const std::string C::KEYWORD_DEPOSIT = "deposit";
 
 // action commands
-const string C::LOGIN_COMMAND = "login";
-const string C::SAVE_COMMAND = "save";
-const string C::SHOW_HELP_COMMAND = "help";
-const string C::LEGEND_COMMAND = "legend";
-const string C::TAKE_COMMAND = "take";
-const string C::EQUIP_COMMAND = "equip";
-const string C::ITEM_COMMAND = "item"; // view equipped item
-const string C::DEQUIP_COMMAND = "dequip";
-const string C::CRAFT_COMMAND = "craft";
-const string C::MINE_COMMAND = "mine";
-const string C::MOVE_COMMAND = "move";
-const string C::DROP_COMMAND = "drop";
-const string C::INSERT_COMMAND = "insert";
-const string C::FROM_COMMAND = "from";
-const string C::CONSTRUCT_COMMAND = "construct";
-const string C::WAIT_COMMAND = "wait"; // for debugging (see constants.h)
-const string C::WITH_COMMAND = "with";
-const string C::PRINT_RECIPES_COMMAND = "recipes"; // for debugging (see constants.h)
-const string C::ATTACK_COMMAND = "attack";
+const std::string C::LOGIN_COMMAND = "login";
+const std::string C::SAVE_COMMAND = "save";
+const std::string C::SHOW_HELP_COMMAND = "help";
+const std::string C::LEGEND_COMMAND = "legend";
+const std::string C::TAKE_COMMAND = "take";
+const std::string C::EQUIP_COMMAND = "equip";
+const std::string C::ITEM_COMMAND = "item"; // view equipped item
+const std::string C::DEQUIP_COMMAND = "dequip";
+const std::string C::CRAFT_COMMAND = "craft";
+const std::string C::MINE_COMMAND = "mine";
+const std::string C::MOVE_COMMAND = "move";
+const std::string C::DROP_COMMAND = "drop";
+const std::string C::INSERT_COMMAND = "insert";
+const std::string C::FROM_COMMAND = "from";
+const std::string C::CONSTRUCT_COMMAND = "construct";
+const std::string C::WAIT_COMMAND = "wait"; // for debugging (see constants.h)
+const std::string C::WITH_COMMAND = "with";
+const std::string C::PRINT_RECIPES_COMMAND = "recipes"; // for debugging (see constants.h)
+const std::string C::ATTACK_COMMAND = "attack";
 
 // direction commands/IDs
-const string C::NORTH = "north";
-const string C::NORTH_EAST = "northeast";
-const string C::EAST = "east";
-const string C::SOUTH_EAST = "southeast";
-const string C::SOUTH = "south";
-const string C::SOUTH_WEST = "southwest";
-const string C::WEST = "west";
-const string C::NORTH_WEST = "northwest";
+const std::string C::NORTH = "north";
+const std::string C::NORTH_EAST = "northeast";
+const std::string C::EAST = "east";
+const std::string C::SOUTH_EAST = "southeast";
+const std::string C::SOUTH = "south";
+const std::string C::SOUTH_WEST = "southwest";
+const std::string C::WEST = "west";
+const std::string C::NORTH_WEST = "northwest";
 
 // floor and ceiling IDs + directions
-const string C::FLOOR = "floor";
-const string C::CEILING = "ceiling";
+const std::string C::FLOOR = "floor";
+const std::string C::CEILING = "ceiling";
 
-const string C::UP = "up";
-const string C::DOWN = "down";
+const std::string C::UP = "up";
+const std::string C::DOWN = "down";
 
 // doors and walls
-const string C::SURFACE = "surface";
-const string C::WALL = "wall";
-const string C::DOOR = "door";
+const std::string C::SURFACE = "surface";
+const std::string C::WALL = "wall";
+const std::string C::DOOR = "door";
 
 // room xml
-const string C::XML_ROOM = "room";
-const string C::XML_IS_WATER = "is_water";
-const string C::XML_ITEM = "item";
-const string C::XML_ITEM_HEALTH = "health";
-const string C::XML_SURFACE = "surface";
-const string C::XML_SURFACE_HEALTH = "health";
-const string C::XML_SURFACE_DIRECTION = "direction";
-const string C::XML_SURFACE_MATERIAL = "material";
-const string C::XML_DOOR = "door";
-const string C::XML_DOOR_HEALTH = "health";
-const string C::XML_DOOR_MATERIAL = "material";
-const string C::XML_DOOR_FACTION = "faction";
-const string C::XML_CHEST = "chest";
-const string C::XML_CHEST_HEALTH = "health";
-const string C::XML_CHEST_FACTION_ID = "faction_id";
-const string C::XML_CHEST_EQUIPMENT = "equipment_contents";
-const string C::XML_CHEST_MATERIALS = "material_contents";
-const string C::XML_CHEST_MATERIALS_COUNT = "count";
+const std::string C::XML_ROOM = "room";
+const std::string C::XML_IS_WATER = "is_water";
+const std::string C::XML_ITEMS = "items";
+const std::string C::XML_ITEM = "item";
+const std::string C::XML_ITEM_ID = "item_ID";
+const std::string C::XML_ITEM_HEALTH = "health";
+const std::string C::XML_ITEM_COUNT = "count";
+const std::string C::XML_SURFACE = "surface";
+const std::string C::XML_SURFACE_HEALTH = "health";
+const std::string C::XML_SURFACE_DIRECTION = "direction";
+const std::string C::XML_SURFACE_MATERIAL = "material";
+const std::string C::XML_DOOR = "door";
+const std::string C::XML_DOOR_HEALTH = "health";
+const std::string C::XML_DOOR_MATERIAL = "material";
+const std::string C::XML_DOOR_FACTION = "faction";
+const std::string C::XML_CHEST = "chest";
+const std::string C::XML_CHEST_HEALTH = "health";
+const std::string C::XML_CHEST_FACTION_ID = "faction_id";
 
 // user data xml
-const string C::XML_USER_ACCOUNT = "account";
-const string C::XML_USER_PASSWORD = "password";
-const string C::XML_USER_STATUS = "status";
-const string C::XML_USER_STATUS_CURRENT_HEALTH = "current_health";
-const string C::XML_USER_LOCATION = "location";
-const string C::XML_USER_LEVELS = "levels";
-const string C::XML_USER_EQUIPMENT = "equipment";
-const string C::XML_USER_MATERIALS = "materials";
-const string C::XML_USER_MATERIAL_COUNT = "count";
+const std::string C::XML_USER_ACCOUNT = "account";
+const std::string C::XML_USER_PASSWORD = "password";
+const std::string C::XML_USER_STATUS = "status";
+const std::string C::XML_USER_STATUS_CURRENT_HEALTH = "current_health";
+const std::string C::XML_USER_LOCATION = "location";
+const std::string C::XML_USER_LEVELS = "levels";
 
 // user level xml
-const string C::XML_LEVEL_SWORDSMANSHIP = "swordsmanship";
-const string C::XML_LEVEL_ARCHERY = "archery";
-const string C::XML_LEVEL_FOREST_VISIBILITY = "forest_visibility";
-const string C::XML_LEVEL_HEALTH_MAX = "max_health";
+const std::string C::XML_LEVEL_SWORDSMANSHIP = "swordsmanship";
+const std::string C::XML_LEVEL_ARCHERY = "archery";
+const std::string C::XML_LEVEL_FOREST_VISIBILITY = "forest_visibility";
+const std::string C::XML_LEVEL_HEALTH_MAX = "max_health";
 
 // user health xml
-const string C::XML_CURRENT_HEALTH = "current_health";
+const std::string C::XML_CURRENT_HEALTH = "current_health";
 
 // item health/integrity
 const int C::DEFAULT_ITEM_MIN_HEALTH = 0;
@@ -198,11 +198,11 @@ const int C::DEFAULT_ITEM_MAX_HEALTH = 100;
 
 namespace // anonymous namespace to prevent access outside this file
 {
-	map<string, string> generate_articles_map()
+	std::map<std::string, std::string> generate_articles_map()
 	{
-		cout << "\nLoading article lookup...";
+		std::cout << "\nLoading article lookup...";
 
-		map<string, string> temp_articles;
+		std::map<std::string, std::string> temp_articles;
 
 		// item IDs
 
@@ -213,7 +213,9 @@ namespace // anonymous namespace to prevent access outside this file
 			temp_articles[C::IRON_ID] =
 			temp_articles[C::IRON_DEPOSIT_ID] = "an";
 
-		temp_articles[C::BOARD_ID] =
+		temp_articles[C::BLOOM_ID] =
+			temp_articles[C::BLOOMERY_ID] =
+			temp_articles[C::BOARD_ID] =
 			temp_articles[C::BOW_ID] =
 			temp_articles[C::BRANCH_ID] =
 			temp_articles[C::CHEST_ID] =
@@ -222,7 +224,6 @@ namespace // anonymous namespace to prevent access outside this file
 			temp_articles[C::LIMESTONE_ID] =
 			temp_articles[C::LIMESTONE_DEPOSIT_ID] =
 			temp_articles[C::LOG_ID] =
-			temp_articles[C::SMELTER_ID] =
 			temp_articles[C::STAFF_ID] =
 			temp_articles[C::STICK_ID] =
 			temp_articles[C::STONE_ID] =
@@ -243,11 +244,11 @@ namespace // anonymous namespace to prevent access outside this file
 		return temp_articles;
 	}
 
-	map<string, string> generate_plurals_map()
+	std::map<std::string, std::string> generate_plurals_map()
 	{
-		cout << "\nLoading plurals lookup...";
+		std::cout << "\nLoading plurals lookup...";
 
-		map<string, string> temp_plurals;
+		std::map<std::string, std::string> temp_plurals;
 
 		// item IDs
 
@@ -258,6 +259,8 @@ namespace // anonymous namespace to prevent access outside this file
 		// temp_plurals[C::IRON_ID] = "";
 		// temp_plurals[C::IRON_DEPOSIT_ID] = "an";
 
+		temp_plurals[C::BLOOM_ID] = "bloom";
+		temp_plurals[C::BLOOMERY_ID] = "bloomeries";
 		temp_plurals[C::BOARD_ID] = "boards";
 		temp_plurals[C::BOW_ID] = "bows";
 		temp_plurals[C::BRANCH_ID] = "branches";
@@ -266,7 +269,6 @@ namespace // anonymous namespace to prevent access outside this file
 		// temp_plurals[C::LIMESTONE_ID] = "";
 		// temp_plurals[C::LIMESTONE_DEPOSIT_ID] = "";
 		temp_plurals[C::LOG_ID] = "logs";
-		temp_plurals[C::SMELTER_ID] = "smelters";
 		temp_plurals[C::STAFF_ID] = "staves";
 		temp_plurals[C::STICK_ID] = "sticks";
 		temp_plurals[C::STONE_ID] = "stones";
@@ -280,31 +282,31 @@ namespace // anonymous namespace to prevent access outside this file
 	}
 }
 
-const map<string, string> C::articles = generate_articles_map();
-const map<string, string> C::plurals = generate_plurals_map();
+const std::map<std::string, std::string> C::articles = generate_articles_map();
+const std::map<std::string, std::string> C::plurals = generate_plurals_map();
 
 // efficient int to char conversion
 #ifdef _WIN32
-const vector<char_type> C::numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+const std::vector<char_type> C::numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 #else
-const vector<char_type> C::numbers = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+const std::vector<char_type> C::numbers = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 #endif
 
 // store a vector of all valid surface ids
-const vector<string> C::surface_ids = { C::NORTH, C::EAST, C::SOUTH, C::WEST, C::FLOOR, C::CEILING };
+const std::vector<std::string> C::surface_ids = { C::NORTH, C::EAST, C::SOUTH, C::WEST, C::FLOOR, C::CEILING };
 
 // store a vector of all valid movement directions
-const vector<string> C::direction_ids = {
+const std::vector<std::string> C::direction_ids = {
 	C::NORTH, C::EAST, C::SOUTH, C::WEST,
 	C::NORTH_EAST, C::NORTH_WEST,
 	C::SOUTH_EAST, C::SOUTH_WEST,
 	C::UP, C::DOWN };
 
-const vector<string> C::primary_direction_ids = {
+const std::vector<std::string> C::primary_direction_ids = {
 	C::NORTH, C::EAST, C::SOUTH, C::WEST };
 
 // map surface ids to their opposite surface
-const map<string, string> C::opposite_surface_id = {
+const std::map<std::string, std::string> C::opposite_surface_id = {
 	{ C::NORTH, C::SOUTH },
 	{ C::SOUTH, C::NORTH },
 	{ C::EAST, C::WEST },
@@ -313,7 +315,7 @@ const map<string, string> C::opposite_surface_id = {
 	{ C::FLOOR, C::CEILING },
 };
 
-const map<string, string> C::opposite_direction_id = {
+const std::map<std::string, std::string> C::opposite_direction_id = {
 	{ C::NORTH, C::SOUTH },
 	{ C::SOUTH, C::NORTH },
 	{ C::EAST, C::WEST },
@@ -325,7 +327,7 @@ const map<string, string> C::opposite_direction_id = {
 };
 
 // Amount of a resource required to construct a surface (wall/ceiling/floor) of that type
-const map<string, unsigned> C::SURFACE_REQUIREMENTS =
+const std::map<std::string, unsigned> C::SURFACE_REQUIREMENTS =
 {
 	{ C::WOOD_ID, 5 }, // {material, count required}
 	{ C::STONE_ID, 5 },
@@ -334,7 +336,7 @@ const map<string, unsigned> C::SURFACE_REQUIREMENTS =
 };
 
 // Amount of a resource required to construct a door of that type
-const map<string, unsigned> C::DOOR_REQUIREMENTS =
+const std::map<std::string, unsigned> C::DOOR_REQUIREMENTS =
 {
 	{ C::WOOD_ID, 5 }, // {material, count required}
 	{ C::STONE_ID, 5 },
@@ -384,7 +386,7 @@ const char_type C::WE_DOOR = "─"; // ─
 
 // more box drawing
 
-const vector<char_type> C::CORNERS = {
+const std::vector<char_type> C::CORNERS = {
 	// wsen
 	// 0000 land_char
 	C::LAND_CHAR,
@@ -444,11 +446,11 @@ const int C::MAX_DOOR_HEALTH = 100;
 /* Create a two-dimensional map to calculate damamge values.
 Associate each attacking implement with a map of target, value pairs. */
 
-const map<string, map<string, int>> C::damage_tables =
+const std::map<std::string, std::map<std::string, int>> C::damage_tables =
 {
 	// unarmed attacks are deliberately set high for testing
 
-	{ string(C::ATTACK_COMMAND), { // attack command is also used to represent an unarmed attack
+	{ std::string(C::ATTACK_COMMAND), { // attack command is also used to represent an unarmed attack
 		{ C::STICK_ID, 49 }, // formerly 6
 		{ C::WOOD_ID, 49 }, // formerly 3
 		{ C::STONE_ID, 49, }, // formerly 1
@@ -456,20 +458,20 @@ const map<string, map<string, int>> C::damage_tables =
 		{ C::TREE_ID, 49 } // possibly remove this
 	} },
 
-	{ string(C::STAFF_ID), {
+	{ std::string(C::STAFF_ID), {
 		{ C::STICK_ID, 8 },
 		{ C::WOOD_ID, 5 },
 		{ C::STONE_ID, 1 }
 	} },
 
-	{ string(C::AXE_ID), {
+	{ std::string(C::AXE_ID), {
 		{ C::STICK_ID, 10 },
 		{ C::WOOD_ID, 10 },
 		{ C::STONE_ID, 5 },
 		{ C::TREE_ID, 33 } // also set high for testing
 	} },
 
-	{ string(C::SWORD_ID), {
+	{ std::string(C::SWORD_ID), {
 		{ C::STICK_ID, 8 },
 		{ C::WOOD_ID, 7 },
 		{ C::STONE_ID, 2 }
@@ -497,9 +499,9 @@ const int C::FULL_HEALTH_MIN = 100; // this is full health for new players
 const int C::FULL_HEALTH_MAX = 200; // this is full health for fully leveled health
 
 // AI objective keywords
-const string C::AI_OBJECTIVE_ACQUIRE = "acquire";
-const string C::AI_OBJECTIVE_GOTO = "goto";
-const string C::AI_OBJECTIVE_CONSTRUCT = "construct";
+const std::string C::AI_OBJECTIVE_ACQUIRE = "acquire";
+const std::string C::AI_OBJECTIVE_GOTO = "goto";
+const std::string C::AI_OBJECTIVE_CONSTRUCT = "construct";
 
 // chests
 const int C::MAX_CHEST_HEALTH = 100;
@@ -511,3 +513,5 @@ const int C::FORTRESS_MIN_X = 20;
 const int C::FORTRESS_MAX_X = 20;
 const int C::FORTRESS_MIN_Y = 20;
 const int C::FORTRESS_MAX_Y = 20;
+
+const unsigned C::AMBIENT_AIR_TEMPERATURE = 15;

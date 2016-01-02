@@ -34,11 +34,11 @@ int Door::get_health() const
 {
 	return health;
 }
-string Door::get_faction_ID() const
+std::string Door::get_faction_ID() const
 {
 	return faction_ID;
 }
-string Door::get_material_ID() const
+std::string Door::get_material_ID() const
 {
 	return material_ID;
 }

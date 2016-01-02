@@ -39,7 +39,7 @@ void Room_Side::change_health(const int & change)
 }
 
 // the surface's material
-string Room_Side::get_material_id() const
+std::string Room_Side::get_material_id() const
 {
 	return material_id;
 }
@@ -62,7 +62,7 @@ bool Room_Side::has_intact_door() const
 	return this->has_door() && !door->is_rubble();
 }
 
-string Room_Side::can_move_through_wall(const string & player_faction_ID) const
+std::string Room_Side::can_move_through_wall(const std::string & player_faction_ID) const
 {
 	// if the surface has a door
 	if (this->has_door())
@@ -89,14 +89,14 @@ string Room_Side::can_move_through_wall(const string & player_faction_ID) const
 	}
 }
 
-shared_ptr<Door> Room_Side::get_door() const
+std::shared_ptr<Door> Room_Side::get_door() const
 {
 	return door;
 }
 
-void Room_Side::add_door(const int & health, const string & material_ID, const string & faction_ID)
+void Room_Side::add_door(const int & health, const std::string & material_ID, const std::string & faction_ID)
 {
-	this->door = make_shared<Door>(faction_ID, material_ID, health);
+	this->door = std::make_shared<Door>(faction_ID, material_ID, health);
 }
 void Room_Side::remove_door()
 {

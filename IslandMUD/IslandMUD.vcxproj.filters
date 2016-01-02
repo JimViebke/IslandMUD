@@ -24,9 +24,6 @@
     <ClCompile Include="character.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="chest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="constants.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -84,6 +81,18 @@
     <ClCompile Include="message.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="item.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="item\container.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="item\bloomery.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="item\chest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="player_character.h">
@@ -134,9 +143,6 @@
     <ClInclude Include="generator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="item.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="non_player_character.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -167,12 +173,33 @@
     <ClInclude Include="threadsafe_socket_lookup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Item\item.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="item.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="item\misc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="item\stackable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="item\container.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="item\bloomery.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="item\chest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="item\equipment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram - Items.cd">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="ClassDiagram - Characters.cd">
+    <None Include="Class Diagram.cd">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

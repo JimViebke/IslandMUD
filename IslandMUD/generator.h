@@ -15,29 +15,29 @@ class Generator
 {
 public:
 
-	Generator(const string & map_type); // defined in class file
+	Generator(const std::string & map_type); // defined in class file
 
 	// generate a miniature map of the biomes
-	vector<vector<char_type>> generate_biome_map(const char_type & default_char, const char_type & fill_char,
+	std::vector<std::vector<char_type>> generate_biome_map(const char_type & default_char, const char_type & fill_char,
 		const int & fill_ratio, const int & default_ratio, const int & biome_size);
 
 	// generate a full size map using static inside of each biome
-	vector<vector<char_type>> generate_static_using_biome_map(const vector<vector<char_type>> & biome_map, const int & biome_size,
+	std::vector<std::vector<char_type>> generate_static_using_biome_map(const std::vector<std::vector<char_type>> & biome_map, const int & biome_size,
 		const char_type & empty_char, const char_type & fill_char);
 
 	// different pass types, all return by reference
-	void game_of_life(vector<vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char);
-	void clean(vector<vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char);
-	void fill(vector<vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char);
+	void game_of_life(std::vector<std::vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char);
+	void clean(std::vector<std::vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char);
+	void fill(std::vector<std::vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char);
 
 	// save intermediate generated maps to /gen_[timestamp]/[pattern].txt
-	void save_intermediate_map(const vector<vector<char_type>> & v) const;
+	void save_intermediate_map(const std::vector<std::vector<char_type>> & v) const;
 
 	// save to custom location
-	void to_file(const vector<vector<char_type>> & v, const string & path) const;
+	void to_file(const std::vector<std::vector<char_type>> & v, const std::string & path) const;
 
-	string get_generator_pattern() const;
-	string get_generated_terrain_dir() const;
+	std::string get_generator_pattern() const;
+	std::string get_generated_terrain_dir() const;
 
 private:
 
@@ -45,9 +45,9 @@ private:
 	const unsigned x_center = C::WORLD_X_DIMENSION / 2;
 	const unsigned y_center = C::WORLD_Y_DIMENSION / 2;
 
-	stringstream generator_pattern; // reflects the steps used to reach a generated terrain
+	std::stringstream generator_pattern; // reflects the steps used to reach a generated terrain
 
-	string generated_terrain_dir; // the path to place the terrain
+	std::string generated_terrain_dir; // the path to place the terrain
 
 };
 
