@@ -656,6 +656,8 @@ void Game::NPC_thread()
 
 				const Update_Messages update_messages = npc->update(world, actors); // call update, passing in the world and actors
 
+				std::cout << " (located at " << npc->x << ", " << npc->y << ") ";
+
 				std::cout << " done.\nGenerating outbound messages...";
 
 				generate_outbound_messages(npc->name, update_messages);

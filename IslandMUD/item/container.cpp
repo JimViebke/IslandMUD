@@ -140,7 +140,7 @@ void Container::erase(const std::string & item_id, const unsigned & count)
 	if (std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item_it->second))
 	{
 		// erase the amount required
-		stackable->amount -= count;
+		stackable->amount -= std::min(stackable->amount, count);
 
 		// if the container no longer contains at least one instance of the item
 		if (stackable->amount < 1)

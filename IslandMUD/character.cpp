@@ -547,7 +547,8 @@ Update_Messages Character::take(const std::string & take_item_id, World & world)
 	// check if the item is not in the player's vicinity
 	if (!world.room_at(x, y, z)->contains(take_item_id))
 	{
-		return Update_Messages("There is no " + take_item_id + " here.");
+		return Update_Messages("There is no " + take_item_id + " here. Perhaps you can craft " +
+			(U::is<Stackable>(Craft::make(take_item_id)) ? "one?" : "it?")); // pick between "craft it?" and "craft one?" depending on the item's stackability
 	}
 
 	// check if the item is not takable
@@ -633,7 +634,7 @@ Update_Messages Character::equip(const std::string & item_ID)
 
 	// set the equipped item to the specified item
 	equipped_item = this->erase(item_ID);
-	
+
 	// if the stringstream is empty (no item was previously equipped)
 	if (user_update.str().length() == 0)
 	{
