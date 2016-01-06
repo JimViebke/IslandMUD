@@ -353,7 +353,7 @@ const char_type C::SW_CORNER = char(200); // ╚
 const char_type C::SE_CORNER = char(188); // ╝
 
 const char_type C::NES_CORNER = char(204); // ╠
-const char_type C::ESW_CORNER = char(203); // ­╦
+const char_type C::ESW_CORNER = char(203); // ╦
 const char_type C::NSW_CORNER = char(185); // ╣
 const char_type C::NEW_CORNER = char(202); // ╩
 
