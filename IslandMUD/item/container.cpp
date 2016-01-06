@@ -25,7 +25,6 @@ std::string Container::contents_to_string() const
 	for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator it = contents.begin();
 		it != contents.end(); ++it)
 	{
-
 		// if the item is stackable
 		if (const std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(it->second))
 		{
@@ -78,6 +77,10 @@ bool Container::contains(const std::string & item_id, const unsigned & count) co
 		// test if at least [count] instances exist
 		return contents.count(item_id) >= count;
 	}
+}
+unsigned Container::size() const
+{
+	return contents.size();
 }
 
 void Container::insert(const std::shared_ptr<Item> & item)
