@@ -510,7 +510,7 @@ Update_Messages Character::craft(const std::string & craft_item_id, World & worl
 		// for as many times as the item is to be given to the player
 		for (int i = 0; i < it->second; ++i)
 		{
-			// special test cast for chests
+			// special test cases
 			if (craft_item_id == C::CHEST_ID)
 			{
 				// add a chest to the room
@@ -559,7 +559,7 @@ Update_Messages Character::craft(const std::string & craft_item_id, World & worl
 }
 Update_Messages Character::take(const std::string & take_item_id, World & world)
 {
-	// check if the item is not in the player's vicinity
+	// check if the item is in the room
 	if (!world.room_at(x, y, z)->contains(take_item_id))
 	{
 		// the item is not here; assemble a hint for the player based on their surroundings

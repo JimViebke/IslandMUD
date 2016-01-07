@@ -524,7 +524,7 @@ Update_Messages Room::damage_door(const std::string & surface_ID, const std::sha
 	std::cout << "door health before attack: " << room_sides.find(surface_ID)->second.get_door()->get_health() << std::endl; // debugging
 	room_sides.find(surface_ID)->second.get_door()->update_health_by(item_damage_table.find(door_material_ID)->second * -1);
 	std::cout << "door health after attack:  " << room_sides.find(surface_ID)->second.get_door()->get_health() << std::endl; // debugging
-	
+
 	// if the door has 0 health
 	if (room_sides.find(surface_ID)->second.get_door()->is_rubble())
 	{
