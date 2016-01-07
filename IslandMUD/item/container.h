@@ -20,6 +20,7 @@ public:
 
 	bool contains(const std::string & item_id) const;
 	bool contains(const std::string & item_id, const unsigned & count) const;
+	unsigned size() const;
 
 	void insert(const std::shared_ptr<Item> & item);
 	std::shared_ptr<Item> erase(const std::string & item_id); // returns nullptr for items that don't exist

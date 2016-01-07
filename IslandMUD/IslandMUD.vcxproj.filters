@@ -93,6 +93,9 @@
     <ClCompile Include="item\chest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Item\table.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="player_character.h">
@@ -195,6 +198,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="item\equipment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Item\table.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

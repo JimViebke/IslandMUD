@@ -361,7 +361,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	{
 		return actors.find(actor_id)->second->add_to_chest(command[1], world);
 	}
-	// chest
+	// look at chest: "chest"
 	else if (command.size() == 1 && command[0] == C::CHEST_ID)
 	{
 		return actors.find(actor_id)->second->look_inside_chest(world);
@@ -371,6 +371,22 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	{
 		return actors.find(actor_id)->second->take_from_chest(command[1], world);
 	}
+	// put item on table
+	else if (command.size() == 4 && command[0] == C::DROP_COMMAND && command[2] == C::INSERT_COMMAND && command[3] == C::TABLE_ID)
+	{
+		return actors.find(actor_id)->second->add_to_table(command[1], world);
+	}
+	// look at table: "table"
+	else if (command.size() == 1 && command[0] == C::TABLE_ID)
+	{
+		return actors.find(actor_id)->second->look_at_table(world);
+	}
+	// take [item] from table
+	else if (command.size() == 4 && command[0] == C::TAKE_COMMAND && command[2] == C::FROM_COMMAND && command[3] == C::TABLE_ID)
+	{
+		return actors.find(actor_id)->second->take_from_table(command[1], world);
+	}
+	// get equipped item name
 	else if (command.size() == 1 && (command[0] == C::EQUIP_COMMAND || command[0] == C::ITEM_COMMAND))
 	{
 		// extract the actor

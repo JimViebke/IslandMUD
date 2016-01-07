@@ -213,6 +213,35 @@ void Room::set_chest(const std::shared_ptr<Chest> & set_chest)
 	this->chest = set_chest;
 }
 
+// tables
+void Room::add_table()
+{
+	this->table = std::make_shared<Table>();
+}
+bool Room::has_table() const
+{
+	return this->table != nullptr;
+}
+void Room::add_item_to_table(const std::shared_ptr<Item> & item)
+{
+	table->insert(item);
+}
+Update_Messages Room::table_contents(const std::string & username) const
+{
+	if (table->size() == 0) return Update_Messages("There is nothing on the table.");
+
+	return Update_Messages("On the table there is " + table->contents_to_string(),
+		username + " looks at the table.");
+}
+bool Room::table_has(const std::string & item_id) const
+{
+	return table->contains(item_id);
+}
+std::shared_ptr<Item> Room::remove_from_table(const std::string & item_ID)
+{
+	return table->erase(item_ID);
+}
+
 // bloomeries
 std::string Room::add_item_to_bloomery(const std::shared_ptr<Forgeable> & item)
 {
@@ -495,7 +524,7 @@ Update_Messages Room::damage_door(const std::string & surface_ID, const std::sha
 	std::cout << "door health before attack: " << room_sides.find(surface_ID)->second.get_door()->get_health() << std::endl; // debugging
 	room_sides.find(surface_ID)->second.get_door()->update_health_by(item_damage_table.find(door_material_ID)->second * -1);
 	std::cout << "door health after attack:  " << room_sides.find(surface_ID)->second.get_door()->get_health() << std::endl; // debugging
-	
+
 	// if the door has 0 health
 	if (room_sides.find(surface_ID)->second.get_door()->is_rubble())
 	{

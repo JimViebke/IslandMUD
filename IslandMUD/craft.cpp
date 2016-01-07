@@ -34,6 +34,7 @@ std::shared_ptr<Item> Craft::make(const std::string & item_ID)
 		{ C::STICK_ID, &create_instance<Stick> },
 		{ C::STONE_ID, &create_instance<Stone> },
 		{ C::SWORD_ID, &create_instance<Sword> },
+		{ C::TABLE_ID, &create_instance<Table> },
 		{ C::TORCH_ID, &create_instance<Torch> },
 		{ C::TREE_ID, &create_instance<Tree> },
 		{ C::VINE_ID, &create_instance<Vine> },
