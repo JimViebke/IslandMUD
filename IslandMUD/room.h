@@ -18,6 +18,7 @@ class Room : public Container
 private:
 	bool water = false; // is the room dry land or water?
 	std::shared_ptr<Chest> chest; // nullptr if the room does not have a chest
+	std::shared_ptr<Table> table; // nullptr if the room does not have a table
 	std::map<std::string, Room_Side> room_sides = {}; // the floor, walls, and ceiling in the room (present surfaces only)
 	std::vector<std::string> viewing_actor_ids = {}; // the PCs and NPCs who can see this room
 	std::vector<std::string> actor_ids = {}; // the PCs and NPCs in a room
@@ -61,6 +62,14 @@ public:
 	std::shared_ptr<Item> remove_from_chest(const std::string & item_id);
 	std::shared_ptr<Chest> get_chest() const;
 	void set_chest(const std::shared_ptr<Chest> & set_chest);
+
+	// tables
+	void add_table();
+	bool has_table() const;
+	void add_item_to_table(const std::shared_ptr<Item> & item);
+	Update_Messages table_contents(const std::string & username) const;
+	bool table_has(const std::string & item_id) const;
+	std::shared_ptr<Item> remove_from_table(const std::string & item_ID);
 
 	// bloomeries
 	std::string add_item_to_bloomery(const std::shared_ptr<Forgeable> & item);

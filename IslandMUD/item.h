@@ -10,6 +10,7 @@
 #include "item\misc.h"
 #include "item\stackable.h"
 #include "item\chest.h"
+#include "Item\table.h"
 #include "item\bloomery.h"
 #include "item\equipment.h"
 

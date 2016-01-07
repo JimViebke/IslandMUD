@@ -92,6 +92,7 @@ const std::string C::BOARD_ID = "board";
 // item IDs -> other
 const std::string C::TREE_ID = "tree";
 const std::string C::CHEST_ID = "chest";
+const std::string C::TABLE_ID = "table";
 const std::string C::LOG_ID = "log";
 
 // item IDs -> equipment
@@ -228,6 +229,7 @@ namespace // anonymous namespace to prevent access outside this file
 			temp_articles[C::STICK_ID] =
 			temp_articles[C::STONE_ID] =
 			temp_articles[C::SWORD_ID] =
+			temp_articles[C::TABLE_ID] =
 			temp_articles[C::TORCH_ID] =
 			temp_articles[C::TREE_ID] =
 			temp_articles[C::VINE_ID] =

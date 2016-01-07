@@ -91,6 +91,7 @@
     <ClCompile Include="generator.cpp" />
     <ClCompile Include="item\container.cpp" />
     <ClCompile Include="item.cpp" />
+    <ClCompile Include="Item\table.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="message.cpp" />
     <ClCompile Include="non_player_character.cpp" />
@@ -123,6 +124,7 @@
     <ClInclude Include="Item\item.h" />
     <ClInclude Include="item\stackable.h" />
     <ClInclude Include="item\misc.h" />
+    <ClInclude Include="Item\table.h" />
     <ClInclude Include="message.h" />
     <ClInclude Include="non_player_character.h" />
     <ClInclude Include="npc_enemy.h" />

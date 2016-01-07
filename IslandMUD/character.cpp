@@ -448,7 +448,7 @@ Update_Messages Character::move(const std::string & direction_ID, World & world)
 }
 Update_Messages Character::craft(const std::string & craft_item_id, World & world)
 {
-	// check for special case
+	// check for special cases
 	if (craft_item_id == C::CHEST_ID)
 	{
 		if (world.room_at(x, y, z)->has_chest())
@@ -456,6 +456,15 @@ Update_Messages Character::craft(const std::string & craft_item_id, World & worl
 			return Update_Messages("There is already a chest here.");
 		}
 	}
+	else if (craft_item_id == C::TABLE_ID)
+	{
+		if (world.room_at(x, y, z)->has_table())
+		{
+			return Update_Messages("There is already a table here.");
+		}
+	}
+
+
 
 	// return if the recipe does not exist
 	if (!Character::recipes->has_recipe_for(craft_item_id)) { return Update_Messages("There is no way to craft " + U::get_article_for(craft_item_id) + " " + craft_item_id + "."); }
@@ -508,6 +517,12 @@ Update_Messages Character::craft(const std::string & craft_item_id, World & worl
 				world.room_at(x, y, z)->add_chest(this->faction_ID);
 				continue;
 			}
+			else if (craft_item_id == C::TABLE_ID)
+			{
+				// add a table to the room
+				world.room_at(x, y, z)->add_table();
+				continue;
+			}
 
 			// craft the item
 			std::shared_ptr<Item> item = Craft::make(it->first);
@@ -547,8 +562,27 @@ Update_Messages Character::take(const std::string & take_item_id, World & world)
 	// check if the item is not in the player's vicinity
 	if (!world.room_at(x, y, z)->contains(take_item_id))
 	{
-		return Update_Messages("There is no " + take_item_id + " here. Perhaps you can craft " +
-			(U::is<Stackable>(Craft::make(take_item_id)) ? "one?" : "it?")); // pick between "craft it?" and "craft one?" depending on the item's stackability
+		// the item is not here; assemble a hint for the player based on their surroundings
+
+		const bool chest_present = world.room_at(x, y, z)->has_chest();
+		const bool table_present = world.room_at(x, y, z)->has_table();
+
+		std::string suggestion = "";
+
+		if (chest_present && table_present)
+		{
+			suggestion = " Check the nearby chest or table, or craft a new " + take_item_id + ".";
+		}
+		else if (chest_present)
+		{
+			suggestion = " Check the nearby chest or craft a new " + take_item_id + ".";
+		}
+		else if (table_present)
+		{
+			suggestion = " Check the nearby table or craft a new " + take_item_id + ".";
+		}
+
+		return Update_Messages("There is no " + take_item_id + " here." + suggestion);
 	}
 
 	// check if the item is not takable
@@ -737,6 +771,56 @@ Update_Messages Character::look_inside_chest(const World & world) const
 {
 	// validation within
 	return world.room_at(x, y, z)->chest_contents(faction_ID, this->name);
+}
+Update_Messages Character::add_to_table(const std::string & add_item_ID, World & world)
+{
+	// check if the player has the item
+	if (!this->contains(add_item_ID))
+	{
+		return Update_Messages("You do not have " + U::get_article_for(add_item_ID) + " " + add_item_ID + ".");
+	}
+
+	// check if there is a table in the room
+	if (!world.room_at(x, y, z)->has_table())
+	{
+		return Update_Messages("There is no table here.");
+	}
+
+	// move the item from the player's inventory to the table
+	world.room_at(x, y, z)->add_item_to_table(this->erase(add_item_ID));
+
+	return Update_Messages("You put the " + add_item_ID + " on the table.",
+		name + " puts " + U::get_article_for(add_item_ID) + " " + add_item_ID + " on the table.");
+}
+Update_Messages Character::take_from_table(const std::string remove_item_ID, World & world)
+{
+	// check if there is a table in the room
+	if (!world.room_at(x, y, z)->has_table())
+	{
+		return Update_Messages("There is no table here.");
+	}
+
+	// check if the table has the item
+	if (!world.room_at(x, y, z)->table_has(remove_item_ID))
+	{
+		return Update_Messages("There is no " + remove_item_ID + " on the table.");
+	}
+
+	// move the item from the table to the player's inventory
+	this->insert(world.room_at(x, y, z)->remove_from_table(remove_item_ID));
+
+	return Update_Messages("You take " + U::get_article_for(remove_item_ID) + " " + remove_item_ID + " from the table.",
+		this->name + " removes " + U::get_article_for(remove_item_ID) + " " + remove_item_ID + " from the table.");
+}
+Update_Messages Character::look_at_table(const World & world) const
+{
+	// check if there is a table in the room
+	if (!world.room_at(x, y, z)->has_table())
+	{
+		return Update_Messages("There is no table here.");
+	}
+
+	return world.room_at(x, y, z)->table_contents(this->name);
 }
 Update_Messages Character::construct_surface(const std::string & material_id, const std::string & surface_id, World & world)
 {
