@@ -13,6 +13,7 @@ class Table : public Item, public Container
 {
 public:
 	Table();
+	Table(const int & set_health, const std::multimap<std::string, std::shared_ptr<Item>> & set_contents);
 };
 
 #endif

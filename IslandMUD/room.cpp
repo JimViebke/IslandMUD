@@ -241,6 +241,14 @@ std::shared_ptr<Item> Room::remove_from_table(const std::string & item_ID)
 {
 	return table->erase(item_ID);
 }
+std::shared_ptr<Table> Room::get_table() const
+{
+	return table;
+}
+void Room::set_table(const std::shared_ptr<Table> & set_table)
+{
+	this->table = set_table;
+}
 
 // bloomeries
 std::string Room::add_item_to_bloomery(const std::shared_ptr<Forgeable> & item)
