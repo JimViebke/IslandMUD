@@ -33,10 +33,10 @@ private:
 
 	// AI subroutines
 
-	Update_Messages hunt_target(std::shared_ptr<Character> & kill_target, std::shared_ptr<Character> & protect_target,
+	Update_Messages hunt_target(std::shared_ptr<Character> & kill_target, const std::shared_ptr<Character> & protect_target,
 		World & world, std::map<std::string, std::shared_ptr<Character>> & actors);
 
-	Update_Messages move_toward_protect_target(std::shared_ptr<Character> & protect_target,
+	Update_Messages move_toward_protect_target(const std::shared_ptr<Character> & protect_target,
 		World & world, std::map<std::string, std::shared_ptr<Character>> & actors);
 
 	Update_Messages approach_new_kill_target(World & world);

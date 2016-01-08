@@ -120,7 +120,7 @@ bool Hostile_NPC_Bodyguard::attempt_update_kill_target_last_known_location(const
 
 // AI subroutines
 
-Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & kill_target, std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & kill_target, const std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
 	// if I am at the target's location, do combat logic
 	if (kill_target->x == x && kill_target->y == y && kill_target->z == z)
@@ -212,7 +212,7 @@ Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & 
 	return update_messages; // action was used
 }
 
-Update_Messages Hostile_NPC_Bodyguard::move_toward_protect_target(std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Bodyguard::move_toward_protect_target(const std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
 	// if the path is empty or going to the wrong destination
 	if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_protect_target)
