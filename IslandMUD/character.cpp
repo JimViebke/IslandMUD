@@ -1154,7 +1154,8 @@ Update_Messages Character::attack_item(const std::string & target_ID, World & wo
 		if (world.room_at(x, y, z)->damage_item(target_ID, damage_table.find(target_ID)->second))
 		{
 			return Update_Messages("You destroy the " + target_ID + " using your " + equipped_item->name + ".",
-				this->name + " uses " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + " to destroy " + U::get_article_for(target_ID) + " " + target_ID + ".");
+				this->name + " uses " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + " to destroy " + U::get_article_for(target_ID) + " " + target_ID + ".",
+				true);
 		}
 		else
 		{
@@ -1177,7 +1178,8 @@ Update_Messages Character::attack_item(const std::string & target_ID, World & wo
 		if (world.room_at(x, y, z)->damage_item(target_ID, damage_table.find(target_ID)->second))
 		{
 			return Update_Messages("You destroy the " + target_ID + " using your bare hands.",
-				this->name + " uses bare hands to destroy " + U::get_article_for(target_ID) + " " + target_ID + ".");
+				this->name + " uses bare hands to destroy " + U::get_article_for(target_ID) + " " + target_ID + ".",
+				true);
 		}
 		else
 		{
@@ -1185,7 +1187,6 @@ Update_Messages Character::attack_item(const std::string & target_ID, World & wo
 				this->name + " uses bare hands to damage " + U::get_article_for(target_ID) + " " + target_ID + ".");
 		}
 	}
-
 }
 Update_Messages Character::add_to_bloomery(const std::string & item_ID, const unsigned & count, World & world)
 {

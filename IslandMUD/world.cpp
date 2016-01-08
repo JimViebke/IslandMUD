@@ -579,7 +579,42 @@ void World::add_room_to_world(pugi::xml_node & room_node, const int & x, const i
 			chest_node.attribute(C::XML_CHEST_HEALTH.c_str()).as_int(), // the chest's health
 			chest_contents) // the chest's contents
 			));
+	}
 
+	// extract the table node
+	const pugi::xml_node table_node = room_node.child(C::XML_TABLE.c_str());
+
+	// if the extracted table node exists
+	if (!table_node.empty())
+	{
+		// create the table's internal structure for equipment
+		std::multimap<std::string, std::shared_ptr<Item>> table_contents = {};
+
+		// for each item node (children of the table node)
+		for (const pugi::xml_node & item_node : table_node.child(C::XML_ITEM.c_str()).children())
+		{
+			// create the item
+			std::shared_ptr<Item> item = U::convert_to<Item>(Craft::make(item_node.name()));
+
+			// set the item's health
+			item->set_health(item_node.attribute(C::XML_ITEM_HEALTH.c_str()).as_int());
+
+			// if the item is a stackable type
+			if (std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item))
+			{
+				// set the amount as the value of the "count" attribute
+				stackable->amount = std::max(1u, item_node.attribute(C::XML_ITEM_COUNT.c_str()).as_uint());
+			}
+
+			// add the item to the temporary multimap
+			table_contents.insert(make_pair(item->name, item));
+		}
+
+		// create an anonymous table object and add it to the room
+		room->set_table(std::make_shared<Table>(Table(
+			table_node.attribute(C::XML_TABLE_HEALTH.c_str()).as_int(), // the table's health
+			table_contents) // the table's contents
+			));
 	}
 
 	// add room to world
@@ -755,6 +790,41 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 		const std::multimap<std::string, std::shared_ptr<Item>> chest_contents = chest->get_contents(); // extract contents
 		for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = chest_contents.cbegin();
 			item_it != chest_contents.cend(); ++item_it)
+		{
+			pugi::xml_node item_node = items_node.append_child(item_it->second->name.c_str());
+
+			// if the item is stackable
+			if (std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item_it->second))
+			{
+				// add count="[amount]" to the node's attributes
+				item_node.append_attribute(C::XML_ITEM_COUNT.c_str()).set_value(stackable->amount);
+			}
+
+			// append a health attribute to the item node and set its value to the health of the item
+			item_node.append_attribute(C::XML_ITEM_HEALTH.c_str()).set_value(item_it->second->get_health());
+		}
+	}
+
+	// if there is a table in this room
+	if (room->has_table())
+	{
+		// create a table node on the room node and name the table node
+		pugi::xml_node table_node = room_node.append_child(C::XML_TABLE.c_str());
+		table_node.set_name(C::XML_TABLE.c_str());
+
+		// extract the table from the room
+		const std::shared_ptr<Table> table = room->get_table();
+
+		// add a health attribute to the table node
+		table_node.append_attribute(C::XML_TABLE_HEALTH.c_str()).set_value(table->get_health());
+
+		// add equipment and material nodes to the table node
+		pugi::xml_node items_node = table_node.append_child(C::XML_ITEM.c_str());
+
+		// for each equipment item
+		const std::multimap<std::string, std::shared_ptr<Item>> table_contents = table->get_contents(); // extract contents
+		for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = table_contents.cbegin();
+			item_it != table_contents.cend(); ++item_it)
 		{
 			pugi::xml_node item_node = items_node.append_child(item_it->second->name.c_str());
 

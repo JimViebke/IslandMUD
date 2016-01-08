@@ -29,7 +29,7 @@ public:
 protected:
 	std::multimap<std::string, std::shared_ptr<Item>> contents;
 
-	Container() {} // must be inherited to be instantiated	
+	Container() {} // must be inherited to be instantiated
 	
 	void set_contents(const std::multimap<std::string, std::shared_ptr<Item>> & set_contents);
 };

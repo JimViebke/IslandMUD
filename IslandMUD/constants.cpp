@@ -175,6 +175,8 @@ const std::string C::XML_DOOR_FACTION = "faction";
 const std::string C::XML_CHEST = "chest";
 const std::string C::XML_CHEST_HEALTH = "health";
 const std::string C::XML_CHEST_FACTION_ID = "faction_id";
+const std::string C::XML_TABLE = "table";
+const std::string C::XML_TABLE_HEALTH = "health";
 
 // user data xml
 const std::string C::XML_USER_ACCOUNT = "account";

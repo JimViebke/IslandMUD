@@ -7,7 +7,10 @@ Source filefor Item parent class. */
 #include "item.h"
 
 Item::Item(const std::string & item_name, const bool & is_takable, const int & set_health)
-	: name(item_name), takable(is_takable), health(set_health) {}
+	: name(item_name), takable(is_takable)
+{
+	this->set_health(set_health);
+}
 
 Item::~Item() {}
 

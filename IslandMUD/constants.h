@@ -177,6 +177,8 @@ public:
 		XML_CHEST,
 		XML_CHEST_HEALTH,
 		XML_CHEST_FACTION_ID,
+		XML_TABLE,
+		XML_TABLE_HEALTH,
 
 		// user data xml
 		XML_USER_ACCOUNT,
