@@ -76,7 +76,7 @@ public:
 		BLOOM_ID,
 		FORGE_ID,
 		ANVIL_ID,
-		DEBRIS_ID, // collapsed ceilings
+		DEBRIS_ID, // collapsed ceilings and walls
 
 		// item IDs -> materials
 		WOOD_ID,
