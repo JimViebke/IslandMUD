@@ -17,7 +17,10 @@ Update_Messages Hostile_NPC_Bodyguard::update(World & world, std::map<std::strin
 	}
 
 	// extract protect_target
-	std::shared_ptr<Character> protect_target = actors.find(protect_target_id)->second;
+	const std::shared_ptr<Character> protect_target = actors.find(protect_target_id)->second;
+
+	// return to the protect_target if the NPC pursues the kill_target to far.
+	check_maximum_hunt_radius(protect_target);
 
 	//	if I have a kill_target
 	if (kill_target_id != "")
@@ -119,6 +122,17 @@ bool Hostile_NPC_Bodyguard::attempt_update_kill_target_last_known_location(const
 }
 
 // AI subroutines
+
+void Hostile_NPC_Bodyguard::check_maximum_hunt_radius(const std::shared_ptr<Character> & protect_target)
+{
+	// if the NPC has hunted a threat beyond the hunt radius
+	if (U::diagonal_distance(x, y, protect_target->x, protect_target->y) > this->hunt_radius)
+	{
+		// forget about the threat, which will cause the NPC to return to the protect_target
+		kill_target_last_known_location.reset();
+		kill_target_id.clear();
+	}
+}
 
 Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & kill_target, const std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
