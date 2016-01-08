@@ -264,6 +264,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 			"\n" +
 			"\n " + C::ITEM_CHAR + "     one or more items" +
 			"\n " + C::CHEST_CHAR + "     a chest" +
+			"\n " + C::TABLE_CHAR + "     a table" +
 			"\n" +
 			"\n " + C::WALL_CHAR + C::WALL_CHAR + C::WALL_CHAR + "   a wall" +
 			"\n " + C::WALL_CHAR + C::DOOR_CHAR + C::WALL_CHAR + "   a wall with a door" +
