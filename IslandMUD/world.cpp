@@ -174,11 +174,11 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		Generator gen("world terrain map");
 
 		// generate a biome map
-		std::vector<std::vector<char_type>> biome_map = gen.generate_biome_map(C::LAND_CHAR, C::FOREST_CHAR, 3, 1, 25); // hardcoding a bit here
+		std::vector<std::vector<char>> biome_map = gen.generate_biome_map(C::LAND_CHAR, C::FOREST_CHAR, 3, 1, 25); // hardcoding a bit here
 		gen.to_file(biome_map, gen.get_generated_terrain_dir() + "/biome_map.txt");
 
 		// use the biome map to generate static in a full size map
-		std::vector<std::vector<char_type>> world_map = gen.generate_static_using_biome_map(biome_map, 25, C::LAND_CHAR, C::FOREST_CHAR); // hardcoding again
+		std::vector<std::vector<char>> world_map = gen.generate_static_using_biome_map(biome_map, 25, C::LAND_CHAR, C::FOREST_CHAR); // hardcoding again
 		gen.to_file(world_map, gen.get_generated_terrain_dir() + "/static.txt");
 
 		gen.game_of_life(world_map, 5, C::LAND_CHAR, C::FOREST_CHAR); gen.save_intermediate_map(world_map);
@@ -191,7 +191,7 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		// save the final terrain to disk
 		gen.to_file(world_map, C::world_terrain_file_location);
 
-		this->terrain = U::make_unique<std::vector<std::vector<char_type>>>(world_map);
+		this->terrain = U::make_unique<std::vector<std::vector<char>>>(world_map);
 	}
 
 	// generate a new iron ore mineral map if needed
@@ -205,10 +205,10 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		Generator gen("iron ore mineral map");
 
 		// generate a biome map
-		std::vector<std::vector<char_type>> biome_map = gen.generate_biome_map(C::LAND_CHAR, C::GENERIC_MINERAL_CHAR, 1, 19, 25); // hardcoding a bit here
+		std::vector<std::vector<char>> biome_map = gen.generate_biome_map(C::LAND_CHAR, C::GENERIC_MINERAL_CHAR, 1, 19, 25); // hardcoding a bit here
 
 		// use the biome map to generate static in a full size map
-		std::vector<std::vector<char_type>> mineral_map = gen.generate_static_using_biome_map(biome_map, 25, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR); // hardcoding again
+		std::vector<std::vector<char>> mineral_map = gen.generate_static_using_biome_map(biome_map, 25, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR); // hardcoding again
 
 		gen.game_of_life(mineral_map, 5, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR); gen.save_intermediate_map(mineral_map);
 		gen.fill(mineral_map, 2, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR);  gen.save_intermediate_map(mineral_map);
@@ -220,7 +220,7 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		// save the mineral map to disk
 		gen.to_file(mineral_map, C::iron_deposit_map_file_location);
 
-		this->iron_deposit_map = U::make_unique<std::vector<std::vector<char_type>>>(mineral_map);
+		this->iron_deposit_map = U::make_unique<std::vector<std::vector<char>>>(mineral_map);
 	}
 
 	// generate a new limestone mineral map if needed
@@ -234,10 +234,10 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		Generator gen("limestone mineral map");
 
 		// generate a biome map
-		std::vector<std::vector<char_type>> biome_map = gen.generate_biome_map(C::LAND_CHAR, C::GENERIC_MINERAL_CHAR, 1, 39, 25); // hardcoding a bit here
+		std::vector<std::vector<char>> biome_map = gen.generate_biome_map(C::LAND_CHAR, C::GENERIC_MINERAL_CHAR, 1, 39, 25); // hardcoding a bit here
 
 		// use the biome map to generate static in a full size map
-		std::vector<std::vector<char_type>> mineral_map = gen.generate_static_using_biome_map(biome_map, 25, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR); // hardcoding again
+		std::vector<std::vector<char>> mineral_map = gen.generate_static_using_biome_map(biome_map, 25, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR); // hardcoding again
 
 		gen.game_of_life(mineral_map, 5, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR); gen.save_intermediate_map(mineral_map);
 		gen.fill(mineral_map, 2, C::LAND_CHAR, C::GENERIC_MINERAL_CHAR);  gen.save_intermediate_map(mineral_map);
@@ -249,7 +249,7 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		// save the mineral map to disk
 		gen.to_file(mineral_map, C::limestone_deposit_map_file_location);
 
-		this->limestone_deposit_map = U::make_unique<std::vector<std::vector<char_type>>>(mineral_map);
+		this->limestone_deposit_map = U::make_unique<std::vector<std::vector<char>>>(mineral_map);
 	}
 }
 
@@ -259,7 +259,7 @@ bool World::load_existing_world_terrain()
 {
 	// load the contents of the terrain file, if it exists
 	{
-		std::vector<std::vector<char_type>> temp_terrain;
+		std::vector<std::vector<char>> temp_terrain;
 		if (U::file_exists(C::world_terrain_file_location))
 		{
 			std::fstream terrain_file;
@@ -270,9 +270,9 @@ bool World::load_existing_world_terrain()
 				if (row.length() > 1) // if the row is not empty
 				{
 #ifdef _WIN32
-					temp_terrain.push_back(std::vector<char_type>(row.begin(), row.end())); // copy the contents of the row into an anonymous vector
+					temp_terrain.push_back(std::vector<char>(row.begin(), row.end())); // copy the contents of the row into an anonymous vector
 #else
-					vector<char_type> vec;
+					vector<char> vec;
 					// for each character in the string
 					for (string::iterator it = row.begin(); it != row.end(); ++it)
 					{
@@ -286,7 +286,7 @@ bool World::load_existing_world_terrain()
 			}
 		}
 
-		this->terrain = U::make_unique<std::vector<std::vector<char_type>>>(temp_terrain);
+		this->terrain = U::make_unique<std::vector<std::vector<char>>>(temp_terrain);
 	}
 
 	// test if the loaded terrain is the correct dimensions
@@ -310,7 +310,7 @@ bool World::load_existing_iron_deposit_map()
 {
 	// load the contents of the terrain file, if it exists
 	{
-		std::vector<std::vector<char_type>> temp_terrain;
+		std::vector<std::vector<char>> temp_terrain;
 		if (U::file_exists(C::iron_deposit_map_file_location))
 		{
 			std::fstream terrain_file;
@@ -321,9 +321,9 @@ bool World::load_existing_iron_deposit_map()
 				if (row.length() > 1) // if the row is not empty
 				{
 #ifdef _WIN32
-					temp_terrain.push_back(std::vector<char_type>(row.begin(), row.end())); // copy the contents of the row into an anonymous vector
+					temp_terrain.push_back(std::vector<char>(row.begin(), row.end())); // copy the contents of the row into an anonymous vector
 #else
-					vector<char_type> vec;
+					vector<char> vec;
 					// for each character in the string
 					for (string::iterator it = row.begin(); it != row.end(); ++it)
 					{
@@ -337,7 +337,7 @@ bool World::load_existing_iron_deposit_map()
 			}
 		}
 
-		this->iron_deposit_map = U::make_unique<std::vector<std::vector<char_type>>>(temp_terrain);
+		this->iron_deposit_map = U::make_unique<std::vector<std::vector<char>>>(temp_terrain);
 	}
 
 	// test if the loaded terrain is the correct dimensions
@@ -361,7 +361,7 @@ bool World::load_existing_limestone_deposit_map()
 {
 	// load the contents of the terrain file, if it exists
 	{
-		std::vector<std::vector<char_type>> temp_terrain;
+		std::vector<std::vector<char>> temp_terrain;
 		if (U::file_exists(C::limestone_deposit_map_file_location))
 		{
 			std::fstream terrain_file;
@@ -372,9 +372,9 @@ bool World::load_existing_limestone_deposit_map()
 				if (row.length() > 1) // if the row is not empty
 				{
 #ifdef _WIN32
-					temp_terrain.push_back(std::vector<char_type>(row.begin(), row.end())); // copy the contents of the row into an anonymous vector
+					temp_terrain.push_back(std::vector<char>(row.begin(), row.end())); // copy the contents of the row into an anonymous vector
 #else
-					vector<char_type> vec;
+					vector<char> vec;
 					// for each character in the string
 					for (string::iterator it = row.begin(); it != row.end(); ++it)
 					{
@@ -388,7 +388,7 @@ bool World::load_existing_limestone_deposit_map()
 			}
 		}
 
-		this->limestone_deposit_map = U::make_unique<std::vector<std::vector<char_type>>>(temp_terrain);
+		this->limestone_deposit_map = U::make_unique<std::vector<std::vector<char>>>(temp_terrain);
 	}
 
 	// test if the loaded terrain is the correct dimensions

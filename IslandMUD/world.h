@@ -18,9 +18,9 @@ class World
 private:
 	
 	// 2d terrain (biome) map
-	std::unique_ptr<std::vector<std::vector<char_type>>> terrain;
-	std::unique_ptr<std::vector<std::vector<char_type>>> iron_deposit_map;
-	std::unique_ptr<std::vector<std::vector<char_type>>> limestone_deposit_map;
+	std::unique_ptr<std::vector<std::vector<char>>> terrain;
+	std::unique_ptr<std::vector<std::vector<char>>> iron_deposit_map;
+	std::unique_ptr<std::vector<std::vector<char>>> limestone_deposit_map;
 
 	std::vector<std::unique_ptr<Room>> world;
 

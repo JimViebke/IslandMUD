@@ -265,9 +265,9 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 			"\n " + C::ITEM_CHAR + "     one or more items" +
 			"\n " + C::CHEST_CHAR + "     a chest" +
 			"\n" +
-			"\n " + C::WE_WALL + C::WE_WALL + C::WE_WALL + "   a wall" +
-			"\n " + C::WE_WALL + C::WE_DOOR + C::WE_WALL + "   a wall with a door" +
-			"\n " + C::WE_WALL + C::RUBBLE_CHAR + C::WE_WALL + "   a smashed door or wall (traversable)");
+			"\n " + C::WALL_CHAR + C::WALL_CHAR + C::WALL_CHAR + "   a wall" +
+			"\n " + C::WALL_CHAR + C::DOOR_CHAR + C::WALL_CHAR + "   a wall with a door" +
+			"\n " + C::WALL_CHAR + C::RUBBLE_CHAR + C::WALL_CHAR + "   a smashed door or wall (traversable)");
 	}
 	// moving: "move northeast" OR "northeast"
 	else if ((command.size() == 2 && command[0] == C::MOVE_COMMAND)

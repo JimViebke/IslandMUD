@@ -33,7 +33,7 @@ std::string PC::get_equipped_item_info() const
 // Build and return a top-down area map around a given coordinate
 std::string PC::generate_area_map(const World & world, const std::map<std::string, std::shared_ptr<Character>> & actors) const
 {
-	std::vector<std::vector<char_type>> user_map; // three vectors feed into one vector
+	std::vector<std::vector<char>> user_map; // three vectors feed into one vector
 
 	// create a 2D vector to represent whether or not a tree is at a location.
 	// Dimensions are (view+1+view) plus a padding of 1 on each side
@@ -67,7 +67,7 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 	set n, e, s, w to(room contains surface ? ); */
 	for (int cx = x - (int)C::VIEW_DISTANCE; cx <= x + (int)C::VIEW_DISTANCE; ++cx)
 	{
-		std::vector<char_type> a, b, c; // three rows
+		std::vector<char> a, b, c; // three rows
 		for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 		{
 			// if the room is out of bounds
@@ -205,7 +205,7 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 				// if (enemy_count > 0) { cout << "\nAt " << cx << "," << cy << " there are " << enemy_count << " enemies."; }
 				// if (neutral_count > 0) { cout << "\nAt " << cx << "," << cy << " there are " << neutral_count << " neutrals."; }
 
-				char_type nw_corner = C::LAND_CHAR, ne_corner = C::LAND_CHAR, se_corner = C::LAND_CHAR, sw_corner = C::LAND_CHAR;
+				char nw_corner = C::LAND_CHAR, ne_corner = C::LAND_CHAR, se_corner = C::LAND_CHAR, sw_corner = C::LAND_CHAR;
 				{
 					// relative to the north west corner of the room, is there a wall to the n/e/s/w
 					const bool wtn = world.room_has_surface(cx - 1, cy, C::GROUND_INDEX, C::WEST);
@@ -216,7 +216,7 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 					// in order for this corner to render, there must be one adjacent local wall OR two adjacent remote walls
 					if (wte || wts || (wtn && wtw))
 					{
-						nw_corner = U::corner_char(wtn, wte, wts, wtw);
+						nw_corner = C::WALL_CHAR;
 					}
 				}
 				{
@@ -228,7 +228,7 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 
 					if (wtw || wts || (wtn && wte))
 					{
-						ne_corner = U::corner_char(wtn, wte, wts, wtw);
+						ne_corner = C::WALL_CHAR;
 					}
 				}
 				{
@@ -240,7 +240,7 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 
 					if (wtn || wtw || (wts && wte))
 					{
-						se_corner = U::corner_char(wtn, wte, wts, wtw);
+						se_corner = C::WALL_CHAR;
 					}
 				}
 				{
@@ -252,22 +252,22 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 
 					if (wtn || wte || (wts && wtw))
 					{
-						sw_corner = U::corner_char(wtn, wte, wts, wtw);
+						sw_corner = C::WALL_CHAR;
 					}
 				}
 
 				// time for glorious nested ternary statements to do this cheap
 				a.push_back(nw_corner);
-				a.push_back(((nr) ? C::RUBBLE_CHAR : ((nd) ? C::WE_DOOR : ((n) ? C::WE_WALL : C::LAND_CHAR))));
+				a.push_back(((nr) ? C::RUBBLE_CHAR : ((nd) ? C::DOOR_CHAR : ((n) ? C::WALL_CHAR : C::LAND_CHAR))));
 				a.push_back(ne_corner);
 
-				b.push_back(((wr) ? C::RUBBLE_CHAR : ((wd) ? C::NS_DOOR : ((w) ? C::NS_WALL : C::LAND_CHAR))));
+				b.push_back(((wr) ? C::RUBBLE_CHAR : ((wd) ? C::DOOR_CHAR : ((w) ? C::WALL_CHAR : C::LAND_CHAR))));
 				// if the current coordinates are the player's, draw an @ icon
 				b.push_back(((cx == x && cy == y) ? C::PLAYER_CHAR
 					// else if there is another player, draw a lowercase 'a'
 					: ((friendly_count > 0) ? C::OTHER_PLAYER_CHAR
 					// else if there is an enemy, draw enemy count
-					: ((enemy_count > 0) ? U::to_char_type(enemy_count)
+					: ((enemy_count > 0) ? U::to_char(enemy_count)
 					// else if there are neutrals, draw neutral count
 					: ((neutral_count > 0) ? C::NPC_NEUTRAL_CHAR
 					// else if there is a chest, draw a chest
@@ -278,10 +278,10 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 					: ((world.room_at(cx, cy, C::GROUND_INDEX)->has_mineral_deposit()) ? C::GENERIC_MINERAL_CHAR
 					// else draw a land char
 					: C::LAND_CHAR))))))));
-				b.push_back(((er) ? C::RUBBLE_CHAR : ((ed) ? C::NS_DOOR : ((e) ? C::NS_WALL : C::LAND_CHAR))));
+				b.push_back(((er) ? C::RUBBLE_CHAR : ((ed) ? C::DOOR_CHAR : ((e) ? C::WALL_CHAR : C::LAND_CHAR))));
 
 				c.push_back(sw_corner);
-				c.push_back(((sr) ? C::RUBBLE_CHAR : ((sd) ? C::WE_DOOR : ((s) ? C::WE_WALL : C::LAND_CHAR))));
+				c.push_back(((sr) ? C::RUBBLE_CHAR : ((sd) ? C::DOOR_CHAR : ((s) ? C::WALL_CHAR : C::LAND_CHAR))));
 				c.push_back(se_corner);
 			}
 		} // end for each room in row

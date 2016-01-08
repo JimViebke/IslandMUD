@@ -8,12 +8,6 @@ Feb 14, 2015 */
 #include <map>
 #include <vector>
 
-#ifdef _WIN32
-using char_type = char;
-#else
-using char_type = std::string;
-#endif
-
 class Constants; // "forward declaring"...
 
 typedef Constants C; // ...to do this here
@@ -53,7 +47,7 @@ public:
 	static const std::string NPC_HOSTILE_FACTION_ID; // antagonists
 
 	// map symbols
-	static const char_type
+	static const char
 		OUT_OF_BOUNDS_CHAR,
 		ERROR_CHAR,
 		PLAYER_CHAR,
@@ -65,6 +59,7 @@ public:
 		GENERIC_MINERAL_CHAR,
 		ITEM_CHAR,
 		CHEST_CHAR,
+		TABLE_CHAR,
 		RUBBLE_CHAR;
 
 	static const std::string
@@ -208,8 +203,8 @@ public:
 	// map an item ID to its plural
 	static const std::map<std::string, std::string> plurals;
 
-	// int to char_type conversion
-	static const std::vector<char_type> numbers;
+	// int to char conversion
+	static const std::vector<char> numbers;
 
 	// surface information
 	static const std::vector<std::string> surface_ids;
@@ -223,30 +218,9 @@ public:
 	static const std::map<std::string, unsigned> SURFACE_REQUIREMENTS;
 	static const std::map<std::string, unsigned> DOOR_REQUIREMENTS;
 
-	// box drawing (more explaination at implementation)
-
-	static const char_type
-		NW_CORNER,
-		NE_CORNER,
-		SW_CORNER,
-		SE_CORNER,
-
-		NES_CORNER,
-		ESW_CORNER,
-		NSW_CORNER,
-		NEW_CORNER,
-
-		NESW,
-
-		NS_WALL,
-		WE_WALL,
-
-		NS_DOOR,
-		WE_DOOR;
-
-	// more box drawing
-
-	static const std::vector<char_type> CORNERS;
+	static const char
+		WALL_CHAR,
+		DOOR_CHAR;
 
 	// walls, ceiling, and floor - min and max health
 
