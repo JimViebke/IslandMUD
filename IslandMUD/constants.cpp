@@ -51,6 +51,8 @@ const char C::ITEM_CHAR = '?';
 const char C::CHEST_CHAR = 'c';
 const char C::TABLE_CHAR = 't';
 const char C::RUBBLE_CHAR = '!';
+const char C::WALL_CHAR = '#';
+const char C::DOOR_CHAR = '/';
 
 // engine signals
 const std::string C::GOOD_SIGNAL = "good";
@@ -329,11 +331,6 @@ const std::map<std::string, unsigned> C::DOOR_REQUIREMENTS =
 	{ C::STICK_ID, 5 },
 	{ C::BRANCH_ID, 5 }
 };
-
-// box drawing
-
-const char C::WALL_CHAR = '#';
-const char C::DOOR_CHAR = '/';
 
 // walls, ceiling, and floor - min and max health
 

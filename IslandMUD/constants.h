@@ -60,7 +60,9 @@ public:
 		ITEM_CHAR,
 		CHEST_CHAR,
 		TABLE_CHAR,
-		RUBBLE_CHAR;
+		RUBBLE_CHAR,
+		WALL_CHAR,
+		DOOR_CHAR;
 
 	static const std::string
 		// engine signals
@@ -217,10 +219,6 @@ public:
 	// therefore also acts as the list of valid construction surfaces (see implementation)
 	static const std::map<std::string, unsigned> SURFACE_REQUIREMENTS;
 	static const std::map<std::string, unsigned> DOOR_REQUIREMENTS;
-
-	static const char
-		WALL_CHAR,
-		DOOR_CHAR;
 
 	// walls, ceiling, and floor - min and max health
 
