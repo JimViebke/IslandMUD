@@ -663,10 +663,17 @@ std::string Room::summary(const std::string & player_ID) const
 		summary_stream << "\n\nHere there is " << this->contents_to_string();
 	}
 
-	// if the room contains a chest
-	if (has_chest())
+	// if the room contains a table or chest
+	if (has_table() && has_chest())
 	{
-		// append a sentence to the current paragraph
+		summary_stream << " There is a table and a chest here.";
+	}
+	else if (has_table())
+	{
+		summary_stream << " There is a table here.";
+	}
+	else if (has_chest())
+	{
 		summary_stream << " There is a chest here.";
 	}
 
