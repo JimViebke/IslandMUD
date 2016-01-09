@@ -173,6 +173,10 @@ Update_Messages Room::chest_contents(const std::string & faction_ID, const std::
 		return Update_Messages("This chest has an unfamiliar lock.",
 			username + " tries the chest's lock.");
 	}
+	
+	// if the chest is empty
+	if (chest->size() == 0) return Update_Messages("There is nothing in the chest.",
+		username + " looks into the chest.");
 
 	// return the contents of the chest
 	return Update_Messages(chest->contents_to_string(), username + " looks into the chest.");
