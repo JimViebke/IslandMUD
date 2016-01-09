@@ -232,7 +232,7 @@ Update_Messages Room::table_contents(const std::string & username) const
 
 	if (table->size() == 0) return Update_Messages("There is nothing on the table.");
 
-	return Update_Messages("On the table there is " + table->contents_to_string(),
+	return Update_Messages("On the table there is" + table->contents_to_string(),
 		username + " looks at the table.");
 }
 bool Room::table_has(const std::string & item_id) const
