@@ -179,7 +179,8 @@ Update_Messages Room::chest_contents(const std::string & faction_ID, const std::
 		username + " looks into the chest.");
 
 	// return the contents of the chest
-	return Update_Messages(chest->contents_to_string(), username + " looks into the chest.");
+	return Update_Messages("In the chest there is" + chest->contents_to_string(),
+		username + " looks into the chest.");
 }
 void Room::damage_chest()
 {
