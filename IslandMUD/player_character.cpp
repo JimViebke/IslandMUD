@@ -270,6 +270,8 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 					: ((enemy_count > 0) ? U::to_char(enemy_count)
 					// else if there are neutrals, draw neutral count
 					: ((neutral_count > 0) ? C::NPC_NEUTRAL_CHAR
+					// else if there is a table, draw a table
+					: ((world.room_at(cx, cy, C::GROUND_INDEX)->has_table()) ? C::TABLE_CHAR
 					// else if there is a chest, draw a chest
 					: ((world.room_at(cx, cy, C::GROUND_INDEX)->has_chest()) ? C::CHEST_CHAR
 					// else if there is a non-mineral deposit item, draw an item char
@@ -277,7 +279,7 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 					// else if there is a mineral deposit, draw a mineral char
 					: ((world.room_at(cx, cy, C::GROUND_INDEX)->has_mineral_deposit()) ? C::GENERIC_MINERAL_CHAR
 					// else draw a land char
-					: C::LAND_CHAR))))))));
+					: C::LAND_CHAR)))))))));
 				b.push_back(((er) ? C::RUBBLE_CHAR : ((ed) ? C::DOOR_CHAR : ((e) ? C::WALL_CHAR : C::LAND_CHAR))));
 
 				c.push_back(sw_corner);
