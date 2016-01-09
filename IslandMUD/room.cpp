@@ -228,6 +228,8 @@ void Room::add_item_to_table(const std::shared_ptr<Item> & item)
 }
 Update_Messages Room::table_contents(const std::string & username) const
 {
+	if (!has_table()) return Update_Messages("There is no table here.");
+
 	if (table->size() == 0) return Update_Messages("There is nothing on the table.");
 
 	return Update_Messages("On the table there is " + table->contents_to_string(),

@@ -814,12 +814,7 @@ Update_Messages Character::take_from_table(const std::string remove_item_ID, Wor
 }
 Update_Messages Character::look_at_table(const World & world) const
 {
-	// check if there is a table in the room
-	if (!world.room_at(x, y, z)->has_table())
-	{
-		return Update_Messages("There is no table here.");
-	}
-
+	// validation within
 	return world.room_at(x, y, z)->table_contents(this->name);
 }
 Update_Messages Character::construct_surface(const std::string & material_id, const std::string & surface_id, World & world)
