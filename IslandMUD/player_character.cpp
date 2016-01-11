@@ -2,8 +2,7 @@
 May 15 2015 */
 
 #include "player_character.h"
-#include "npc_enemy.h"
-#include "npc_unaffiliated.h"
+#include "npc.h"
 
 std::string PC::print() const
 {

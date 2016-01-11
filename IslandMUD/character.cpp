@@ -416,18 +416,10 @@ Update_Messages Character::move(const std::string & direction_ID, World & world)
 	// the movement validated, remove character id from area
 	world.room_at(x, y, z)->remove_actor(this->name);
 
-	// test if the room can be unloaded
-	if (world.is_unloadable(x, y, z)) // Why are we trying to unload the room we're moving out of? The player will still be able to see this.
-	{
-		world.unload_room(x, y, z);
-	}
-	// consider moving the above block to world.remove_character(x, y, z, id)
-	// the check to unload could be in one place
-
 	// update character internal coordinates
 	x += dx;
 	y += dy;
-	z += dz;
+	z += dz; // x, y, and z now refer to the destination room
 
 	// add character id to new area using the new x and y coordinates
 	world.room_at(x, y, z)->add_actor(this->name);

@@ -6,7 +6,7 @@ May 15 2015 */
 
 #include "world.h"
 #include "character.h"
-#include "npc_enemy.h"
+#include "npc.h"
 
 World::World()
 {

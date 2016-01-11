@@ -639,17 +639,23 @@ void Game::client_map_thread(SOCKET client_map_ID)
 
 void Game::NPC_thread()
 {
-	// hardcode some new NPCs for startup
+	// hardcode some NPC workers for startup
 	{
-		const std::vector<std::string> names = { "Jeb"/* , "Bill", "Bob" */ };
+		const std::vector<std::string> workers = { "Jeb", "Bill", "Bob" };
+		const std::vector<std::string> bodyguards = { "Alpha", "Beta", "Gamma" };
 
-		// create a worker NPC for each name in the list
-		for (const std::string & name : names)
+		// create a worker NPCs
+		for (unsigned i = 0; i < std::min(workers.size(), bodyguards.size()); ++i)
 		{
 			std::lock_guard<std::mutex> lock(actors_mutex);
-			std::shared_ptr<Hostile_NPC_Worker> worker = std::make_shared<Hostile_NPC_Worker>(name);
+
+			std::shared_ptr<Hostile_NPC_Worker> worker = std::make_shared<Hostile_NPC_Worker>(workers[i]);
 			worker->login(world);
-			actors.insert(make_pair(name, worker));
+			actors.insert(make_pair(worker->name, worker));
+
+			std::shared_ptr<Hostile_NPC_Bodyguard> bodyguard = std::make_shared<Hostile_NPC_Bodyguard>(bodyguards[i], workers[i]);
+			bodyguard->login(world);
+			actors.insert(make_pair(bodyguard->name, bodyguard));
 		}
 	}
 
