@@ -44,7 +44,20 @@ Update_Messages Hostile_NPC_Bodyguard::update(World & world, std::map<std::strin
 	// if I am out of guard range of my protect_target
 	if (U::diagonal_distance(x, y, protect_target->x, protect_target->y) > guard_radius)
 	{
-		return move_toward_protect_target(protect_target, world, actors);
+		Update_Messages update_messages("");
+		if (move_toward_protect_target(protect_target, world, actors, update_messages))
+		{
+			// approaching the protect_target succeeded
+			return update_messages;
+		}
+		else // approaching the protect_target failed
+		{
+			// attempt remedial pathfinding
+			if (best_attempt_pathfind(protect_target->x, protect_target->y, world, update_messages))
+			{
+				return update_messages;
+			}
+		}
 	}
 
 	// the NPC is in range of the protect target, check for a new kill target
@@ -226,7 +239,7 @@ Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & 
 	return update_messages; // action was used
 }
 
-Update_Messages Hostile_NPC_Bodyguard::move_toward_protect_target(const std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+bool Hostile_NPC_Bodyguard::move_toward_protect_target(const std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors, Update_Messages & update_messages)
 {
 	// if the path is empty or going to the wrong destination
 	if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_protect_target)
@@ -237,10 +250,7 @@ Update_Messages Hostile_NPC_Bodyguard::move_toward_protect_target(const std::sha
 	}
 
 	// make the next movement
-	Update_Messages update_messages("");
-	make_path_movement(world, update_messages);
-
-	return update_messages; // action was used
+	return make_path_movement(world, update_messages);
 }
 
 Update_Messages Hostile_NPC_Bodyguard::approach_new_kill_target(World & world)
