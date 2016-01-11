@@ -96,6 +96,9 @@
     <ClCompile Include="NPC\npc_unaffiliated.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="NPC\npc_enemy_corporal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="player_character.h">
@@ -204,6 +207,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="npc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NPC\npc_enemy_corporal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

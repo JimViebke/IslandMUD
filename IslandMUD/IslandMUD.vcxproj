@@ -97,6 +97,7 @@
     <ClCompile Include="NPC\non_player_character.cpp" />
     <ClCompile Include="NPC\npc_enemy.cpp" />
     <ClCompile Include="NPC\npc_enemy_bodyguard.cpp" />
+    <ClCompile Include="NPC\npc_enemy_corporal.cpp" />
     <ClCompile Include="NPC\npc_enemy_fighter.cpp" />
     <ClCompile Include="NPC\npc_enemy_worker.cpp" />
     <ClCompile Include="NPC\npc_unaffiliated.cpp" />
@@ -130,6 +131,7 @@
     <ClInclude Include="NPC\non_player_character.h" />
     <ClInclude Include="NPC\npc_enemy.h" />
     <ClInclude Include="NPC\npc_enemy_bodyguard.h" />
+    <ClInclude Include="NPC\npc_enemy_corporal.h" />
     <ClInclude Include="NPC\npc_enemy_fighter.h" />
     <ClInclude Include="NPC\npc_enemy_worker.h" />
     <ClInclude Include="NPC\npc_unaffiliated.h" />
