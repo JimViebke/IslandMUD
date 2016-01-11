@@ -4,17 +4,6 @@ Oct 21, 2015*/
 
 #include "utilities.h"
 
-char_type U::corner_char(const bool & north, const bool & east, const bool & south, const bool & west)
-{
-	int index = 0;
-	if (north) { index += 1; }
-	if (east) { index += 2; }
-	if (south) { index += 4; }
-	if (west) { index += 8; }
-
-	return C::CORNERS[index];
-}
-
 // text formatting
 void U::to_lower_case(std::string & word)
 {

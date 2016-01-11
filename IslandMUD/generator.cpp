@@ -12,15 +12,9 @@ Generator::Generator(const std::string & map_type)
 	U::create_path_if_not_exists(generated_terrain_dir);
 }
 
-std::vector<std::vector<char_type>> Generator::generate_biome_map(const char_type & default_char, const char_type & fill_char, const int & fill_ratio, const int & default_ratio, const int & biome_size)
+std::vector<std::vector<char>> Generator::generate_biome_map(const char & default_char, const char & fill_char, const int & fill_ratio, const int & default_ratio, const int & biome_size)
 {
-	std::vector<std::vector<char_type>> biome_map(C::WORLD_X_DIMENSION / biome_size, std::vector<char_type>(C::WORLD_Y_DIMENSION / biome_size,
-#ifdef _WIN32
-		' '
-#else
-		" "
-#endif
-		));
+	std::vector<std::vector<char>> biome_map(C::WORLD_X_DIMENSION / biome_size, std::vector<char>(C::WORLD_Y_DIMENSION / biome_size, ' '));
 
 	// generate the biome map
 	for (int i = 0; i < (C::WORLD_X_DIMENSION / biome_size); ++i)
@@ -40,16 +34,10 @@ std::vector<std::vector<char_type>> Generator::generate_biome_map(const char_typ
 
 	return biome_map; // this will be used for the next generation step
 }
-std::vector<std::vector<char_type>> Generator::generate_static_using_biome_map(const std::vector<std::vector<char_type>> & biome_map, const int & biome_size,
-	const char_type & empty_char, const char_type & fill_char)
+std::vector<std::vector<char>> Generator::generate_static_using_biome_map(const std::vector<std::vector<char>> & biome_map, const int & biome_size,
+	const char & empty_char, const char & fill_char)
 {
-	std::vector<std::vector<char_type>> v(C::WORLD_X_DIMENSION, std::vector<char_type>(C::WORLD_Y_DIMENSION,
-#ifdef _WIN32
-		' '
-#else
-		" "
-#endif
-		));
+	std::vector<std::vector<char>> v(C::WORLD_X_DIMENSION, std::vector<char>(C::WORLD_Y_DIMENSION, ' '));
 
 	for (unsigned x = 0; x < v.size(); ++x)
 	{
@@ -78,9 +66,9 @@ std::vector<std::vector<char_type>> Generator::generate_static_using_biome_map(c
 }
 
 // different pass types to call manually
-void Generator::game_of_life(std::vector<std::vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char)
+void Generator::game_of_life(std::vector<std::vector<char>> & original, const int & iterations, const char & empty_char, const char & fill_char)
 {
-	std::vector<std::vector<char_type>> working = original; // copy to start
+	std::vector<std::vector<char>> working = original; // copy to start
 
 	for (int pass = 0; pass < iterations; ++pass)
 	{
@@ -138,9 +126,9 @@ void Generator::game_of_life(std::vector<std::vector<char_type>> & original, con
 	// save
 	generator_pattern << iterations << "C+";
 }
-void Generator::clean(std::vector<std::vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char)
+void Generator::clean(std::vector<std::vector<char>> & original, const int & iterations, const char & empty_char, const char & fill_char)
 {
-	std::vector<std::vector<char_type>> working = original; // copy to start
+	std::vector<std::vector<char>> working = original; // copy to start
 
 	for (int pass = 0; pass < iterations; ++pass)
 	{
@@ -184,9 +172,9 @@ void Generator::clean(std::vector<std::vector<char_type>> & original, const int 
 		generator_pattern << "C";
 	}
 }
-void Generator::fill(std::vector<std::vector<char_type>> & original, const int & iterations, const char_type & empty_char, const char_type & fill_char)
+void Generator::fill(std::vector<std::vector<char>> & original, const int & iterations, const char & empty_char, const char & fill_char)
 {
-	std::vector<std::vector<char_type>> working = original; // copy to start
+	std::vector<std::vector<char>> working = original; // copy to start
 
 	for (int pass = 0; pass < iterations; ++pass)
 	{
@@ -232,13 +220,13 @@ void Generator::fill(std::vector<std::vector<char_type>> & original, const int &
 }
 
 // save intermediate generated maps to /gen_[timestamp]/[pattern].txt
-void Generator::save_intermediate_map(const std::vector<std::vector<char_type>> & v) const
+void Generator::save_intermediate_map(const std::vector<std::vector<char>> & v) const
 {
 	to_file(v, generated_terrain_dir + "/" + generator_pattern.str() + ".txt");
 }
 
 // save to custom location
-void Generator::to_file(const std::vector<std::vector<char_type>> & v, const std::string & path) const
+void Generator::to_file(const std::vector<std::vector<char>> & v, const std::string & path) const
 {
 	// copy the entire vector into a stringstream
 	std::ostringstream oss;

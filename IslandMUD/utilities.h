@@ -46,7 +46,7 @@ namespace Utilities
 		output << val;
 		return output.str();
 	}
-	inline char_type to_char_type(const unsigned & val)
+	inline char to_char(const unsigned & val)
 	{
 		// crashes for numbers not in the range of 0-9 inclusive
 		return C::numbers[val];
@@ -68,9 +68,6 @@ namespace Utilities
 			y < C::WORLD_Y_DIMENSION &&
 			z < C::WORLD_Z_DIMENSION);
 	}
-
-	// box drawing
-	char_type corner_char(const bool & north, const bool & east, const bool & south, const bool & west);
 
 	// movement
 	inline void assign_movement_deltas(const std::string & direction_ID, int & dx, int & dy)

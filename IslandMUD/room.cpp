@@ -173,9 +173,14 @@ Update_Messages Room::chest_contents(const std::string & faction_ID, const std::
 		return Update_Messages("This chest has an unfamiliar lock.",
 			username + " tries the chest's lock.");
 	}
+	
+	// if the chest is empty
+	if (chest->size() == 0) return Update_Messages("There is nothing in the chest.",
+		username + " looks into the chest.");
 
 	// return the contents of the chest
-	return Update_Messages(chest->contents_to_string(), username + " looks into the chest.");
+	return Update_Messages("In the chest there is" + chest->contents_to_string(),
+		username + " looks into the chest.");
 }
 void Room::damage_chest()
 {
@@ -228,9 +233,11 @@ void Room::add_item_to_table(const std::shared_ptr<Item> & item)
 }
 Update_Messages Room::table_contents(const std::string & username) const
 {
+	if (!has_table()) return Update_Messages("There is no table here.");
+
 	if (table->size() == 0) return Update_Messages("There is nothing on the table.");
 
-	return Update_Messages("On the table there is " + table->contents_to_string(),
+	return Update_Messages("On the table there is" + table->contents_to_string(),
 		username + " looks at the table.");
 }
 bool Room::table_has(const std::string & item_id) const
@@ -663,10 +670,17 @@ std::string Room::summary(const std::string & player_ID) const
 		summary_stream << "\n\nHere there is " << this->contents_to_string();
 	}
 
-	// if the room contains a chest
-	if (has_chest())
+	// if the room contains a table or chest
+	if (has_table() && has_chest())
 	{
-		// append a sentence to the current paragraph
+		summary_stream << " There is a table and a chest here.";
+	}
+	else if (has_table())
+	{
+		summary_stream << " There is a table here.";
+	}
+	else if (has_chest())
+	{
 		summary_stream << " There is a chest here.";
 	}
 
