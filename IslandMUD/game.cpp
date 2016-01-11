@@ -641,8 +641,8 @@ void Game::NPC_thread()
 {
 	// hardcode some NPC workers for startup
 	{
-		const std::vector<std::string> workers = { "Jeb" , "Bill", "Bob" };
-		const std::vector<std::string> bodyguards = { "Alpha" };
+		const std::vector<std::string> workers = { "Jeb", "Bill", "Bob" };
+		const std::vector<std::string> bodyguards = { "Alpha", "Beta", "Gamma" };
 
 		// create a worker NPCs
 		for (unsigned i = 0; i < std::min(workers.size(), bodyguards.size()); ++i)
