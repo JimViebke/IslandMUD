@@ -427,6 +427,113 @@ bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world, Update
 
 	} while (true);
 }
+bool NPC::best_attempt_pathfind(const int & x_dest, const int & y_dest, World & world, Update_Messages & update_messages)
+{
+	// the NPC could not pathfind to the destination, try to move in the direction of the destination.
+
+	// returns a boolean indicating if the NPC moved.
+
+	if (x > x_dest && y > y_dest) // northwest
+	{
+		// if the target is out of view but inline with any part of the current visible area,
+		// don't pathfind to corner; pathfind to the edge of the visible area that
+		// is inline with the destination
+
+		if (save_path_to(
+			(((x - x_dest) <= C::VIEW_DISTANCE) ? (x_dest) : (x - C::VIEW_DISTANCE)),
+			(((y - y_dest) <= C::VIEW_DISTANCE) ? (y_dest) : (y - C::VIEW_DISTANCE)), world))
+		{
+			// attempt to move to the destination, return if successful
+			if (make_path_movement(world, update_messages)) { return true; }
+		}
+	}
+
+	if (x > x_dest && y < y_dest) // northeast
+	{
+		if (save_path_to(
+			(((x - x_dest) <= C::VIEW_DISTANCE) ? (x_dest) : (x - C::VIEW_DISTANCE)),
+			(((y_dest - y) <= C::VIEW_DISTANCE) ? (y_dest) : (y + C::VIEW_DISTANCE)), world))
+		{
+			if (make_path_movement(world, update_messages)) { return true; }
+		}
+	}
+
+	if (x < x_dest && y > y_dest) // southwest
+	{
+		if (save_path_to(
+			(((x_dest - x) <= C::VIEW_DISTANCE) ? (x_dest) : (x + C::VIEW_DISTANCE)),
+			(((y - y_dest) <= C::VIEW_DISTANCE) ? (y_dest) : (y - C::VIEW_DISTANCE)), world))
+		{
+			if (make_path_movement(world, update_messages)) { return true; }
+		}
+	}
+
+	if (x < x_dest && y < y_dest) // southeast
+	{
+		if (save_path_to(
+			(((x_dest - x) <= C::VIEW_DISTANCE) ? (x_dest) : (x + C::VIEW_DISTANCE)),
+			(((y_dest - y) <= C::VIEW_DISTANCE) ? (y_dest) : (y + C::VIEW_DISTANCE)), world))
+		{
+			if (make_path_movement(world, update_messages)) { return true; }
+		}
+	}
+
+	// execution reaches here if a diagonal movement failed or the target is directly n/e/s/w or
+	// the target is visible but unreachable
+
+	if (x > x_dest) // north
+	{
+		// starting at the edge of view and working toward the player
+		for (int i = C::VIEW_DISTANCE; i > 0; --i)
+		{
+			// if a path can be found
+			if (save_path_to(x - i, y, world))
+			{
+				// make the first move
+				make_path_movement(world, update_messages);
+				return true;
+			}
+		}
+	}
+
+	if (x < x_dest) // south
+	{
+		for (int i = C::VIEW_DISTANCE; i > 0; --i)
+		{
+			if (save_path_to(x + i, y, world))
+			{
+				make_path_movement(world, update_messages);
+				return true;
+			}
+		}
+	}
+
+	if (y > y_dest) // west
+	{
+		for (int i = C::VIEW_DISTANCE; i > 0; --i)
+		{
+			if (save_path_to(x, y - i, world))
+			{
+				make_path_movement(world, update_messages);
+				return true;
+			}
+		}
+	}
+
+	if (y < y_dest) // east
+	{
+		for (int i = C::VIEW_DISTANCE; i > 0; --i)
+		{
+			if (save_path_to(x, y + i, world))
+			{
+				make_path_movement(world, update_messages);
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
 bool NPC::pathfind_to_closest_item(const std::string & item_id, World & world, Update_Messages & update_messages)
 {
 	// leave this for debugging

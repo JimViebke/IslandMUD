@@ -106,6 +106,7 @@ protected:
 
 	// returns true if successful
 	bool pathfind(const int & x_dest, const int & y_dest, World & world, Update_Messages & update_messages);
+	bool best_attempt_pathfind(const int & x_dest, const int & y_dest, World & world, Update_Messages & update_messages);
 	bool pathfind_to_closest_item(const std::string & item_id, World & world, Update_Messages & update_messages);
 	bool save_path_to(const int & x_dest, const int & y_dest, World & world);
 	bool make_path_movement(World & world, Update_Messages & update_messages);
