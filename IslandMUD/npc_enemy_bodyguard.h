@@ -40,8 +40,9 @@ private:
 	Update_Messages hunt_target(std::shared_ptr<Character> & kill_target, const std::shared_ptr<Character> & protect_target,
 		World & world, std::map<std::string, std::shared_ptr<Character>> & actors);
 
-	Update_Messages move_toward_protect_target(const std::shared_ptr<Character> & protect_target,
-		World & world, std::map<std::string, std::shared_ptr<Character>> & actors);
+	bool move_toward_protect_target(const std::shared_ptr<Character> & protect_target,
+		World & world, std::map<std::string, std::shared_ptr<Character>> & actors,
+		Update_Messages & update_messages);
 
 	Update_Messages approach_new_kill_target(World & world);
 };
