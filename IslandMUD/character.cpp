@@ -419,7 +419,7 @@ Update_Messages Character::move(const std::string & direction_ID, World & world)
 	// update character internal coordinates
 	x += dx;
 	y += dy;
-	z += dz;
+	z += dz; // x, y, and z now refer to the destination room
 
 	// add character id to new area using the new x and y coordinates
 	world.room_at(x, y, z)->add_actor(this->name);
