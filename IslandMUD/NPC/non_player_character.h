@@ -8,8 +8,8 @@ This contains NPC members and functionality that is common for hostile and neutr
 
 #include <stack>
 
-#include "character.h"
-#include "player_character.h"
+#include "../character.h"
+#include "../player_character.h"
 
 class Non_Player_Character; // forward-declaring...
 

@@ -42,24 +42,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="non_player_character.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="npc_enemy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="npc_enemy_bodyguard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="npc_enemy_fighter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="npc_enemy_worker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="npc_unaffiliated.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="parse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -94,6 +76,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Item\table.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NPC\npc_enemy_bodyguard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NPC\npc_enemy_fighter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NPC\npc_enemy_worker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NPC\npc_enemy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NPC\non_player_character.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NPC\npc_unaffiliated.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -146,24 +146,6 @@
     <ClInclude Include="generator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="non_player_character.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="npc_enemy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="npc_enemy_bodyguard.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="npc_enemy_fighter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="npc_enemy_worker.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="npc_unaffiliated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="parse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -201,6 +183,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Item\table.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NPC\npc_enemy_bodyguard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NPC\npc_enemy_fighter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NPC\npc_enemy_worker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NPC\npc_enemy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NPC\non_player_character.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NPC\npc_unaffiliated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="npc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
