@@ -78,6 +78,25 @@ bool Container::contains(const std::string & item_id, const unsigned & count) co
 		return contents.count(item_id) >= count;
 	}
 }
+unsigned Container::count(const std::string & item_id) const
+{
+	// count the number of items in the container that match the item ID
+	const unsigned count = contents.count(item_id);
+
+	// if the count is 1, the single item could be a stackable type
+	if (count == 1)
+	{
+		// if the item is a stackable type
+		if (const std::shared_ptr<Stackable> & stackable = U::convert_to<Stackable>(contents.find(item_id)->second))
+		{
+			// the amount of the stackable is the correct value
+			return stackable->amount;
+		}
+	}
+
+	// the item occurs 0 or more than 1 times; return count as the correct value
+	return count;
+}
 unsigned Container::size() const
 {
 	return contents.size();
