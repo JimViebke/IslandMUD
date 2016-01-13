@@ -49,7 +49,7 @@ void Parse::initialize()
 		P::dict["chest"] = P::dict["crate"] = C::CHEST_ID;
 		P::dict["log"] = C::LOG_ID;
 
-		// items -> materials
+		// items -> stackables
 		P::dict["stone"] = P::dict["rock"] = C::STONE_ID;
 		P::dict["branch"] = P::dict["branches"] = C::BRANCH_ID;
 		P::dict["stick"] = C::STICK_ID;
