@@ -45,14 +45,6 @@ private:
 
 	typedef Partition Structure;
 
-	/*class Structure
-	{
-	public:
-		int _x, _y, height, width;
-		Structure(const int & x, const int & y, const int & height, const int & width) :
-			_x(x), _y(y), height(height), width(width) {}
-	};*/
-
 	// used during fortress outer wall generation
 	enum class Area_Type { structure, fortress_interior, fortress_exterior };
 };
