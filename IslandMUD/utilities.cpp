@@ -4,7 +4,22 @@ Oct 21, 2015*/
 
 #include "utilities.h"
 
-// text formatting
+// string utilities
+unsigned U::to_unsigned(const std::string & word)
+{
+	// "a1b2c3" will return 123. "abc" will return 0.
+
+	unsigned count = 0;
+	for (const char & digit : word) // for each character in the second command
+	{
+		if (digit >= '0' && digit <= '9') // if the character is a digit
+		{
+			count *= 10; // shift digits to the left
+			count += digit - '0'; // add newest digit
+		}
+	}
+	return count;
+}
 void U::to_lower_case(std::string & word)
 {
 	// convert a vector of strings passed by reference to a vector of lowercase strings

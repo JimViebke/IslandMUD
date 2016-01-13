@@ -171,7 +171,8 @@ namespace Utilities
 		file.close();
 	}
 
-	// text formatting
+	// string utilities
+	unsigned to_unsigned(const std::string & word);
 	void to_lower_case(std::string & word);
 	std::string capitalize(std::string & word);
 	std::string capitalize(const std::string & word);
