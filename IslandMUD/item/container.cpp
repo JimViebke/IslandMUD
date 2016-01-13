@@ -106,7 +106,7 @@ void Container::insert(const std::shared_ptr<Item> & item)
 {
 	if (item == nullptr) return; // well, something went wrong
 
-	if (U::is<Stackable>(item) && contains(item->name)) // if the item is stackable and already exists in the chest
+	if (U::is<Stackable>(item) && this->contains(item->name)) // if the item is stackable and already exists in the chest
 	{
 		// increment the existing item in the chest
 		U::convert_to<Stackable>(contents.find(item->name)->second)->amount++;
