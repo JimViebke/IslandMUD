@@ -667,7 +667,7 @@ std::string Room::summary(const std::string & player_ID) const
 	// report on the items in the room
 	if (contents.size() > 0) // if there are items present
 	{
-		summary_stream << "\n\nHere there is " << this->contents_to_string();
+		summary_stream << "\n\nHere there is" << this->contents_to_string();
 	}
 
 	// if the room contains a table or chest

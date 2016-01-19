@@ -9,7 +9,7 @@
 std::string Container::contents_to_string() const
 {
 	// The calling function could construct the beginning of the sentence, like
-	// "You have " or "The chest contains ".
+	// "You have" or "The chest contains".
 
 	if (contents.size() == 0)
 	{
