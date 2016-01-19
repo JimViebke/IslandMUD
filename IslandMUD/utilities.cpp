@@ -54,6 +54,7 @@ std::string U::capitalize(const std::string & word)
 	return result;
 }
 
+// grammar
 std::string U::get_article_for(const std::string & noun)
 {
 	// get an iterator to the <key, value> pair for <noun, article>
@@ -62,7 +63,6 @@ std::string U::get_article_for(const std::string & noun)
 	// return the article if the key exists, else return generic "a(n)".
 	return ((it != C::articles.cend()) ? it->second : "a(n)");
 }
-
 std::string U::get_plural_for(const std::string & noun)
 {
 	// get an iterator to the <key, value> pair for <noun, article>
@@ -70,6 +70,15 @@ std::string U::get_plural_for(const std::string & noun)
 
 	// return the article if the key exists, else return the original noun
 	return ((it != C::plurals.cend()) ? it->second : noun);
+}
+std::string U::get_singular_for(const std::string & noun)
+{
+	for (const auto & pair : C::articles)
+	{
+		if (pair.second == noun) return pair.first;
+	}
+
+	return noun; // return the original word if the singular form could not be found
 }
 
 // math
