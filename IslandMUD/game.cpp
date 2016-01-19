@@ -291,6 +291,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	{
 		return actors.find(actor_id)->second->craft(command[1], world); // (item_id, world)
 	}
+	// mining: "mine iron"
 	else if (command.size() == 2 && command[0] == C::MINE_COMMAND)
 	{
 		return actors.find(actor_id)->second->craft(command[1], world); // (item_id, world)
