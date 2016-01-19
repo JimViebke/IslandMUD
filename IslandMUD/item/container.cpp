@@ -124,11 +124,8 @@ std::shared_ptr<Item> Container::erase(const std::string & item_id)
 	// if the item does not exist to take, return a null pointer
 	if (item_it == contents.cend()) return nullptr;
 
-	// create a new shared_ptr to the stored item
-	std::shared_ptr<Item> item = contents.find(item_id)->second;
-
 	// if the item is a stackable type
-	if (std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item))
+	if (std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item_it->second))
 	{
 		// count one less item in storage
 		stackable->amount--;
@@ -145,6 +142,9 @@ std::shared_ptr<Item> Container::erase(const std::string & item_id)
 	}
 	else // the item is not stackable
 	{
+		// create a new shared_ptr to the stored item
+		std::shared_ptr<Item> item = item_it->second;
+
 		// destroy the container's reference to the item
 		contents.erase(item_id);
 
