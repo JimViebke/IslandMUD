@@ -585,8 +585,7 @@ Update_Messages Character::take(const std::string & take_item_id, World & world)
 	}
 
 	// the item is takable
-	this->insert(world.room_at(x, y, z)->get_contents().find(take_item_id)->second); // copy the item to the player
-	world.room_at(x, y, z)->remove_item(take_item_id); // remove the item from the world
+	this->insert(world.room_at(x, y, z)->erase(take_item_id)); // copy the item to the player
 
 	return Update_Messages("You take " + U::get_article_for(take_item_id) + " " + take_item_id + ".",
 		this->name + " takes " + U::get_article_for(take_item_id) + " " + take_item_id + ".");
