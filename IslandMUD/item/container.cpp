@@ -56,7 +56,7 @@ const std::multimap<std::string, std::shared_ptr<Item>> & Container::get_content
 
 bool Container::contains(const std::string & item_id) const
 {
-	// return a boolean indicating if chest contains at least one instance of the specified item
+	// return a boolean indicating if container contains at least one instance of the specified item
 	return this->contents.find(item_id) != contents.cend();
 }
 bool Container::contains(const std::string & item_id, const unsigned & count) const
@@ -108,10 +108,10 @@ void Container::insert(const std::shared_ptr<Item> & item)
 
 	if (U::is<Stackable>(item) && this->contains(item->name)) // if the item is stackable and already exists in the chest
 	{
-		// increment the existing item in the chest
+		// increment the existing item in the container
 		U::convert_to<Stackable>(contents.find(item->name)->second)->amount++;
 	}
-	else // the item is either not stackable, or is not in the chest
+	else // the item is either not stackable, or is not in the container
 	{
 		contents.insert(make_pair(item->name, item));
 	}
@@ -157,7 +157,7 @@ void Container::erase(const std::string & item_id, const unsigned & count)
 	// get an iterator to the item in question
 	const std::multimap<std::string, std::shared_ptr<Item>>::iterator item_it = contents.find(item_id);
 
-	// if the item is not present in the chest, remove the item
+	// if the item is not present in the container, remove the item
 	if (item_it == contents.cend()) return;
 
 	// if the item is stackable
