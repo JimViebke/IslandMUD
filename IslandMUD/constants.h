@@ -133,6 +133,9 @@ public:
 		PRINT_RECIPES_COMMAND, // dev only. No full recipe printout in normal game.
 		ATTACK_COMMAND,
 
+		// quantity
+		ALL_COMMAND,
+
 		// direction commands/IDs
 		NORTH,
 		NORTH_EAST,

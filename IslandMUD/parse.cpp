@@ -38,6 +38,9 @@ void Parse::initialize()
 		P::dict["construct"] = P::dict["build"] = P::dict["erect"] = C::CONSTRUCT_COMMAND;
 		P::dict["attack"] = P::dict["smash"] = P::dict["strike"] = P::dict["bash"] = P::dict["break"] = P::dict["damage"] = P::dict["stab"] = P::dict["slash"] = P::dict["chop"] = C::ATTACK_COMMAND;
 
+		// quantity
+		P::dict["all"] = P::dict["each"] = P::dict["every"] = P::dict["*"] = C::ALL_COMMAND;
+
 		// items
 
 		// items -> other

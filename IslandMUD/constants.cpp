@@ -122,6 +122,8 @@ const std::string C::WITH_COMMAND = "with";
 const std::string C::PRINT_RECIPES_COMMAND = "recipes"; // for debugging (see constants.h)
 const std::string C::ATTACK_COMMAND = "attack";
 
+const std::string C::ALL_COMMAND = "all"; // quantity
+
 // direction commands/IDs
 const std::string C::NORTH = "north";
 const std::string C::NORTH_EAST = "northeast";
