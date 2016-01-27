@@ -48,8 +48,8 @@ namespace Utilities
 	}
 	inline char to_char(const unsigned & val)
 	{
-		// crashes for numbers not in the range of 0-9 inclusive
-		return C::numbers[val];
+		// undefined behavior for numbers not in the range of 0-9 inclusive
+		return val + '0';
 	}
 
 	// verify a set of coordinates against the dimensions of the world

@@ -208,9 +208,6 @@ public:
 	// map an item ID to its plural
 	static const std::map<std::string, std::string> plurals;
 
-	// int to char conversion
-	static const std::vector<char> numbers;
-
 	// surface information
 	static const std::vector<std::string> surface_ids;
 	static const std::vector<std::string> direction_ids;
