@@ -73,9 +73,13 @@ std::string U::get_plural_for(const std::string & noun)
 }
 std::string U::get_singular_for(const std::string & noun)
 {
+	// We're doing a reverse-lookup here. Not very efficient, but oh well.
+
+	// for each singular/plural pair
 	for (const auto & pair : C::articles)
 	{
-		if (pair.second == noun) return pair.first;
+		// if the plural matches the passed noun
+		if (pair.second == noun) return pair.first; // return the singular form of the passed plural
 	}
 
 	return noun; // return the original word if the singular form could not be found
