@@ -43,8 +43,6 @@ protected:
 	std::string leader_ID;
 	std::vector<std::string> follower_IDs;
 
-	std::multimap<std::string, std::shared_ptr<Item>> inventory;
-
 public:
 
 	// Item dragging_item; // a character can drag an item if they don't want to carry it.	
