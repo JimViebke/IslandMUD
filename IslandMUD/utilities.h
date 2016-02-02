@@ -227,12 +227,6 @@ namespace Utilities
 	{
 		return std::dynamic_pointer_cast<Derived_Type>(object);
 	}
-
-	// managed pointer utilities
-	template<typename T, typename... Args> inline std::unique_ptr<T> make_unique(Args&&... args)
-	{
-		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-	}
 }
 
 #endif

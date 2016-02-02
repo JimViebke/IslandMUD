@@ -14,7 +14,7 @@ Character::Character(const std::string & name, const std::string & set_faction_I
 {
 	if (Character::recipes == nullptr)
 	{
-		Character::recipes = U::make_unique<Recipes>();
+		Character::recipes = std::make_unique<Recipes>();
 	}
 
 	// if the faction is valid
