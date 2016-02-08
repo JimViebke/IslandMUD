@@ -21,36 +21,41 @@ namespace threadsafe
 			// Sockets(const SOCKET & user, const SOCKET & map) : user_socket(user), map_socket(map) {}
 		};
 
-		std::map<std::string, Sockets> sockets_map;
+		std::map<std::string, Sockets> sockets_map; // map a username to two sockets
 		mutable std::mutex mutex; // this mutex can be locked by constant member functions
 
 	public:
 		socket_lookup() {}
 
+		// save the user's socket
 		void set_socket(const std::string & user_ID, const SOCKET & socket)
 		{
 			std::lock_guard<std::mutex> lock(mutex);
 			sockets_map[user_ID].user_socket = socket;
 		}
+		// save the user's map socket
 		void set_map_socket(const std::string & user_ID, const SOCKET & map_socket)
 		{
 			std::lock_guard<std::mutex> lock(mutex);
 			sockets_map[user_ID].map_socket = map_socket;
 		}
 
+		// retrieve a user's socket
 		SOCKET get_socket(const std::string & user_ID) const
 		{
 			std::lock_guard<std::mutex> lock(mutex);
-			auto it = sockets_map.find(user_ID);
+			const auto it = sockets_map.find(user_ID);
 			return (it != sockets_map.cend()) ? it->second.user_socket : -1;
 		}
+		// retrieve a user's map socket
 		SOCKET get_map_socket(const std::string & user_ID) const
 		{
 			std::lock_guard<std::mutex> lock(mutex);
-			auto it = sockets_map.find(user_ID);
+			const auto it = sockets_map.find(user_ID);
 			return (it != sockets_map.cend()) ? it->second.map_socket : -1;
 		}
 
+		// retrieve a user ID associated with a socket (reverse lookup)
 		std::string get_user_ID(const SOCKET & socket) const
 		{
 			std::lock_guard<std::mutex> lock(mutex);
@@ -61,6 +66,7 @@ namespace threadsafe
 			return "";
 		}
 
+		// erase the records for a user
 		void erase(const std::string & user_ID)
 		{
 			std::lock_guard<std::mutex> lock(mutex);
