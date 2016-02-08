@@ -25,6 +25,8 @@ Game::Game()
 
 void Game::login(const std::string & user_id)
 {
+	// the caller must own a lock on actors_mutex
+
 	// create a player character
 	PC player(user_id);
 	// load the player's data and place the player in the world
