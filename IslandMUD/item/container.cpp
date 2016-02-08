@@ -186,6 +186,8 @@ void Container::erase(const std::string & item_id, const unsigned & count)
 
 // protected
 
+Container::Container() {}
+
 void Container::set_contents(const std::multimap<std::string, std::shared_ptr<Item>> & set_contents)
 {
 	contents = set_contents;
