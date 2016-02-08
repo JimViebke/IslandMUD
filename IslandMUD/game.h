@@ -51,8 +51,6 @@ public:
 
 	void login(const std::string & user_id);
 
-	void main_test_loop();
-
 	// execute a command against the game world
 	Update_Messages execute_command(const std::string & actor_id, const std::vector<std::string> & command);
 
