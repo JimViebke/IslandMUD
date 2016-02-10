@@ -44,33 +44,33 @@ void Parse::initialize()
 		// items
 
 		// items -> other
-		P::dict["bloom"] = C::BLOOM_ID;
-		P::dict["bloomery"] = C::BLOOMERY_ID;
-		P::dict["forge"] = C::FORGE_ID;
-		P::dict["anvil"] = C::ANVIL_ID;
-		P::dict["tree"] = C::TREE_ID;
-		P::dict["chest"] = P::dict["crate"] = C::CHEST_ID;
-		P::dict["log"] = C::LOG_ID;
+		P::dict["bloom"] = P::dict["blooms"] = C::BLOOM_ID;
+		P::dict["bloomery"] = P::dict["bloomeries"] = C::BLOOMERY_ID;
+		P::dict["forge"] = P::dict["forges"] = C::FORGE_ID;
+		P::dict["anvil"] = P::dict["anvils"] = C::ANVIL_ID;
+		P::dict["tree"] = P::dict["trees"] = C::TREE_ID;
+		P::dict["chest"] = P::dict["chests"] = P::dict["crate"] = P::dict["crates"] = C::CHEST_ID;
+		P::dict["log"] = P::dict["logs"] = C::LOG_ID;
 
 		// items -> stackables
-		P::dict["stone"] = P::dict["rock"] = C::STONE_ID;
+		P::dict["stone"] = P::dict["stones"] = P::dict["rock"] = P::dict["rocks"] = C::STONE_ID;
 		P::dict["branch"] = P::dict["branches"] = C::BRANCH_ID;
-		P::dict["stick"] = C::STICK_ID;
-		P::dict["vine"] = C::VINE_ID;
-		P::dict["arrow"] = C::ARROW_ID;
-		P::dict["arrowhead"] = C::ARROWHEAD_ID;
+		P::dict["stick"] = P::dict["sticks"] = C::STICK_ID;
+		P::dict["vine"] = P::dict["vines"] = C::VINE_ID;
+		P::dict["arrow"] = P::dict["arrows"] = C::ARROW_ID;
+		P::dict["arrowhead"] = P::dict["arrowheads"] = C::ARROWHEAD_ID;
 		P::dict["board"] = P::dict["boards"] = P::dict["plank"] = P::dict["planks"] = C::BOARD_ID;
 
 		// items -> tools
-		P::dict["bow"] = C::BOW_ID;
-		P::dict["staff"] = C::STAFF_ID;
-		P::dict["axe"] = P::dict["ax"] = C::AXE_ID;
-		P::dict["sword"] = C::SWORD_ID;
-		P::dict["hammer"] = C::HAMMER_ID;
+		P::dict["bow"] = P::dict["bows"] = C::BOW_ID;
+		P::dict["staff"] = P::dict["staffs"] = C::STAFF_ID;
+		P::dict["axe"] = P::dict["axes"] = P::dict["ax"] = P::dict["axs"] = C::AXE_ID;
+		P::dict["sword"] = P::dict["swords"] = C::SWORD_ID;
+		P::dict["hammer"] = P::dict["hammers"] = C::HAMMER_ID;
 
 		// items -> minerals
-		P::dict["iron"] = C::IRON_ID;
-		P::dict["limestone"] = C::LIMESTONE_ID;
+		P::dict["iron"] = P::dict["irons"] = C::IRON_ID;
+		P::dict["limestone"] = P::dict["limestones"] = C::LIMESTONE_ID;
 
 		// items -> mineral keywords (partial IDs for compound mineral names)
 		P::dict["deposit"] = C::KEYWORD_DEPOSIT;
