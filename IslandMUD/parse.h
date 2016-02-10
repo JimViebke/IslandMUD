@@ -21,9 +21,9 @@ private:
 	
 	static std::map<std::string, std::string> dict; // first string maps to second string
 	
-	static void initialize();
-
 public:
+
+	static void initialize();
 
 	static std::vector<std::string> tokenize(const std::string & s);
 };
