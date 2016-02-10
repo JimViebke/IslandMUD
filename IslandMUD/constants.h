@@ -70,7 +70,6 @@ public:
 		BAD_SIGNAL,
 
 		// item IDs
-		BAD_ITEM_ID,
 
 		BLOOMERY_ID,
 		BLOOM_ID,

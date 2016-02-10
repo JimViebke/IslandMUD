@@ -59,7 +59,6 @@ const std::string C::GOOD_SIGNAL = "good";
 const std::string C::BAD_SIGNAL = "bad";
 
 // item IDs
-const std::string C::BAD_ITEM_ID = "bad_item_id";
 
 const std::string C::BLOOMERY_ID = "bloomery";
 const std::string C::BLOOM_ID = "bloom";
