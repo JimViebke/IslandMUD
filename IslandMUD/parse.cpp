@@ -94,6 +94,8 @@ void Parse::initialize()
 		// Look Mr. Frodo! A
 		P::dict["door"] = C::DOOR;
 		P::dict["wall"] = P::dict["surface"] = C::WALL;
+
+		std::cout << "\nLoaded parse dictionary with " << P::dict.size() << " entries.";
 	}
 }
 
