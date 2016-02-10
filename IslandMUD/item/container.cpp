@@ -22,6 +22,7 @@ std::string Container::contents_to_string() const
 	// record an iterator to the last item
 	const auto last_it = --contents.end();
 
+	// for each item
 	for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator it = contents.begin();
 		it != contents.end(); ++it)
 	{

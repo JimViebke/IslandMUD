@@ -51,7 +51,7 @@ public:
 protected:
 
 	Character(const std::string & name, const std::string & set_faction_ID);
-	virtual ~Character() {} // to make a polymorphic type
+	virtual ~Character(); // make Character into a polymorphic type
 
 public:
 
