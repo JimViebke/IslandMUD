@@ -621,8 +621,16 @@ Update_Messages Character::drop(const std::string & drop_item_id, World & world,
 		}
 	}
 
-	return Update_Messages("You drop " + U::to_string(count) + " " + U::get_plural_for(drop_item_id) + ".",
-		this->name + " drops " + U::to_string(count) + " " + U::get_plural_for(drop_item_id) + ".");
+	if (count > 1) // plural result
+	{
+		return Update_Messages("You drop " + U::to_string(count) + " " + U::get_plural_for(drop_item_id) + ".",
+			this->name + " drops " + U::to_string(count) + " " + U::get_plural_for(drop_item_id) + ".");
+	}
+	else // singular result
+	{
+		return Update_Messages("You drop " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".",
+			this->name + " drops " + U::get_article_for(drop_item_id) + " " + drop_item_id) + ".");
+	}
 }
 Update_Messages Character::equip(const std::string & item_ID)
 {
