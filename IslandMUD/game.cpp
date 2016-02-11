@@ -106,9 +106,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		// if the drop count is 1
 		if (command[1] == "1")
 		{
-			// ensure the return message uses the singular form of the item name
-			const std::string singular_item_ID = U::get_singular_for(command[2]);
-			return Update_Messages("You don't have " + U::get_article_for(singular_item_ID) + " " + singular_item_ID + " to drop.");
+			return Update_Messages("You don't have " + U::get_article_for(command[2]) + " " + command[2] + " to drop.");
 		}
 		else // ensure the return message uses the plural form of the word
 		{
