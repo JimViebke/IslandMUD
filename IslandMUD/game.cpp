@@ -91,6 +91,31 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	{
 		return actors.find(actor_id)->second->drop(command[1], world); // (item_id, world)
 	}
+	// dropping item: drop n staffs" (the tokenizer will have already converted plurals to singular)
+	else if (command.size() == 3 && command[0] == C::DROP_COMMAND)
+	{
+		// extract the character
+		std::shared_ptr<Character> character = actors.find(actor_id)->second;
+
+		// test if the actor contains any of the item specified
+		if (character->count(command[2]) > 0)
+		{
+			return character->drop(command[2], world, U::to_unsigned(command[1])); // (item_id, world, total count)
+		}
+
+		// if the drop count is 1
+		if (command[1] == "1")
+		{
+			// ensure the return message uses the singular form of the item name
+			const std::string singular_item_ID = U::get_singular_for(command[2]);
+			return Update_Messages("You don't have " + U::get_article_for(singular_item_ID) + " " + singular_item_ID + " to drop.");
+		}
+		else // ensure the return message uses the plural form of the word
+		{
+			return Update_Messages("You don't have any " + U::get_plural_for(command[2]) + " to drop.");
+		}
+
+	}
 	// crafting: "craft sword"
 	else if (command.size() == 2 && command[0] == C::CRAFT_COMMAND)
 	{

@@ -184,7 +184,7 @@ std::string Character::save()
 
 	// for each item in the user's inventory
 	for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator it = contents.cbegin();
-		it != contents.cend(); ++it)
+	it != contents.cend(); ++it)
 	{
 		// save the item to a new node under the items node
 		pugi::xml_node item_node = items_node.append_child(it->first.c_str());
@@ -590,7 +590,7 @@ Update_Messages Character::take(const std::string & take_item_id, World & world)
 	return Update_Messages("You take " + U::get_article_for(take_item_id) + " " + take_item_id + ".",
 		this->name + " takes " + U::get_article_for(take_item_id) + " " + take_item_id + ".");
 }
-Update_Messages Character::drop(const std::string & drop_item_id, World & world)
+Update_Messages Character::drop(const std::string & drop_item_id, World & world, const unsigned & count)
 {
 	// if the player is holding the item specified
 	if (this->equipped_item != nullptr && this->equipped_item->name == drop_item_id)
@@ -603,18 +603,24 @@ Update_Messages Character::drop(const std::string & drop_item_id, World & world)
 	}
 	else // the player is not holding the item, check if the item is in the player's inventory
 	{
-		if (!this->contains(drop_item_id)) // if the player does not have the item specified
+		if (!this->contains(drop_item_id, count)) // if the player does not have the item specified
 		{
 			// the item does not exist in the player's inventory
-			return Update_Messages("You don't have " + U::get_article_for(drop_item_id) + " " + drop_item_id + " to drop.");
+			if (count == 1)
+				return Update_Messages("You don't have " + U::get_article_for(drop_item_id) + " " + drop_item_id + " to drop.");
+			else
+				return Update_Messages("You don't have " + U::to_string(count) + " " + U::get_plural_for(drop_item_id) + " to drop.");
 		}
 
 		// add the item to the world, removing it from the player's inventory
-		world.room_at(x, y, z)->add_item(this->erase(drop_item_id));
+		for (unsigned i = 0; i < count; ++i)
+		{
+			world.room_at(x, y, z)->add_item(this->erase(drop_item_id));
+		}
 	}
 
-	return Update_Messages("You drop " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".",
-		this->name + " drops " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".");
+	return Update_Messages("You drop " + U::to_string(count) + " " + U::get_plural_for(drop_item_id) + ".",
+		this->name + " drops " + U::to_string(count) + " " + U::get_plural_for(drop_item_id) + ".");
 }
 Update_Messages Character::equip(const std::string & item_ID)
 {
