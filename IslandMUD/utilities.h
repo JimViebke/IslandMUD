@@ -180,7 +180,6 @@ namespace Utilities
 	// grammar
 	std::string get_article_for(const std::string & noun);
 	std::string get_plural_for(const std::string & noun);
-	std::string get_singular_for(const std::string & noun);
 
 	// math
 	template<typename T> inline T difference(const T & a, const T & b) { return (a - b > 0) ? (a - b) : (b - a); }

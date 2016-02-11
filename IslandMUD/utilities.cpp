@@ -71,19 +71,6 @@ std::string U::get_plural_for(const std::string & noun)
 	// return the article if the key exists, else return the original noun
 	return ((it != C::plurals.cend()) ? it->second : noun);
 }
-std::string U::get_singular_for(const std::string & noun)
-{
-	// We're doing a reverse-lookup here. Not very efficient, but oh well.
-
-	// for each singular/plural pair
-	for (const auto & pair : C::articles)
-	{
-		// if the plural matches the passed noun
-		if (pair.second == noun) return pair.first; // return the singular form of the passed plural
-	}
-
-	return noun; // return the original word if the singular form could not be found
-}
 
 // math
 int U::euclidean_distance(const int & x1, const int & y1, const int & x2, const int & y2)
