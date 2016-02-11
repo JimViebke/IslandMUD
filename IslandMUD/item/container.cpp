@@ -95,7 +95,7 @@ unsigned Container::count(const std::string & item_id) const
 		}
 	}
 
-	// the item occurs 0 or more than 1 times; return count as the correct value
+	// the item occurs 0 or more than 1 times, or the single instance is not a Stackable item; return count as the correct value
 	return count;
 }
 unsigned Container::size() const
