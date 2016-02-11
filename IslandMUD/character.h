@@ -43,8 +43,6 @@ protected:
 	std::string leader_ID;
 	std::vector<std::string> follower_IDs;
 
-	std::multimap<std::string, std::shared_ptr<Item>> inventory;
-
 public:
 
 	// Item dragging_item; // a character can drag an item if they don't want to carry it.	
@@ -53,7 +51,7 @@ public:
 protected:
 
 	Character(const std::string & name, const std::string & set_faction_ID);
-	virtual ~Character() {} // to make a polymorphic type
+	virtual ~Character(); // make Character into a polymorphic type
 
 public:
 
@@ -77,10 +75,10 @@ public:
 	Update_Messages craft(const std::string & craft_item_id, World & world);
 	Update_Messages move(const std::string & direction, World & world);
 	Update_Messages take(const std::string & item_id, World & world);
-	Update_Messages drop(const std::string & drop_item_id, World & world);
+	Update_Messages drop(const std::string & drop_item_id, World & world, const unsigned & count = 1);
 	Update_Messages equip(const std::string & item_ID);
 	Update_Messages unequip();
-	Update_Messages add_to_chest(const std::string & insert_item_id, World & world);
+	Update_Messages add_to_chest(std::string insert_item_id, World & world, const unsigned & count = 1);
 	Update_Messages take_from_chest(const std::string & take_item_id, World & world);
 	Update_Messages look_inside_chest(const World & world) const;
 	Update_Messages add_to_table(const std::string & add_item_ID, World & world);

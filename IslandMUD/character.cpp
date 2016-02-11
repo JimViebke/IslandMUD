@@ -9,12 +9,11 @@ Jeb 16 2015 */
 
 std::unique_ptr<Recipes> Character::recipes;
 
-// Character constructor
 Character::Character(const std::string & name, const std::string & set_faction_ID) : name(name)
 {
 	if (Character::recipes == nullptr)
 	{
-		Character::recipes = U::make_unique<Recipes>();
+		Character::recipes = std::make_unique<Recipes>();
 	}
 
 	// if the faction is valid
@@ -31,6 +30,7 @@ Character::Character(const std::string & name, const std::string & set_faction_I
 		std::cout << "ERROR: attempted to create character with invalid faction: [" << set_faction_ID << "]\n";
 	}
 }
+Character::~Character() {}
 
 std::string Character::login(World & world)
 {
@@ -184,7 +184,7 @@ std::string Character::save()
 
 	// for each item in the user's inventory
 	for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator it = contents.cbegin();
-		it != contents.cend(); ++it)
+	it != contents.cend(); ++it)
 	{
 		// save the item to a new node under the items node
 		pugi::xml_node item_node = items_node.append_child(it->first.c_str());
@@ -584,14 +584,13 @@ Update_Messages Character::take(const std::string & take_item_id, World & world)
 		return Update_Messages("You can't take the " + take_item_id + ".");
 	}
 
-	// the item is takable
-	this->insert(world.room_at(x, y, z)->get_contents().find(take_item_id)->second); // copy the item to the player
-	world.room_at(x, y, z)->remove_item(take_item_id); // remove the item from the world
+	// The item is takable. erase() the item from the world, insert() the item to the player.
+	this->insert(world.room_at(x, y, z)->erase(take_item_id));
 
 	return Update_Messages("You take " + U::get_article_for(take_item_id) + " " + take_item_id + ".",
 		this->name + " takes " + U::get_article_for(take_item_id) + " " + take_item_id + ".");
 }
-Update_Messages Character::drop(const std::string & drop_item_id, World & world)
+Update_Messages Character::drop(const std::string & drop_item_id, World & world, const unsigned & count)
 {
 	// if the player is holding the item specified
 	if (this->equipped_item != nullptr && this->equipped_item->name == drop_item_id)
@@ -601,21 +600,37 @@ Update_Messages Character::drop(const std::string & drop_item_id, World & world)
 
 		// destroy the user's copy of the item
 		this->equipped_item = nullptr;
+
+		return Update_Messages("You drop your " + drop_item_id + ".");
 	}
 	else // the player is not holding the item, check if the item is in the player's inventory
 	{
-		if (!this->contains(drop_item_id)) // if the player does not have the item specified
+		if (!this->contains(drop_item_id, count)) // if the player does not have the item specified
 		{
-			// the item does not exist in the player's inventory
-			return Update_Messages("You don't have " + U::get_article_for(drop_item_id) + " " + drop_item_id + " to drop.");
+			// the item does not exist in the player's inventory in the required quantity
+			if (count == 1)
+				return Update_Messages("You don't have " + U::get_article_for(drop_item_id) + " " + drop_item_id + " to drop.");
+			else
+				return Update_Messages("You don't have " + U::to_string(count) + " " + U::get_plural_for(drop_item_id) + " to drop.");
 		}
 
-		// add the item to the world, removing it from the player's inventory
-		world.room_at(x, y, z)->add_item(this->erase(drop_item_id));
+		// add the item(s) to the world, removing from the player's inventory
+		for (unsigned i = 0; i < count; ++i)
+		{
+			world.room_at(x, y, z)->add_item(this->erase(drop_item_id));
+		}
 	}
 
-	return Update_Messages("You drop " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".",
-		this->name + " drops " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".");
+	if (count > 1) // plural result
+	{
+		return Update_Messages("You drop " + U::to_string(count) + " " + U::get_plural_for(drop_item_id) + ".",
+			this->name + " drops " + U::to_string(count) + " " + U::get_plural_for(drop_item_id) + ".");
+	}
+	else // singular result
+	{
+		return Update_Messages("You drop " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".",
+			this->name + " drops " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".");
+	}
 }
 Update_Messages Character::equip(const std::string & item_ID)
 {
@@ -697,7 +712,7 @@ Update_Messages Character::unequip()
 
 	return Update_Messages("You put your " + item_ID + " away.", this->name + " lowers the " + item_ID + ".");
 }
-Update_Messages Character::add_to_chest(const std::string & insert_item_id, World & world)
+Update_Messages Character::add_to_chest(std::string insert_item_id, World & world, const unsigned & count)
 {
 	// if this room does not have a chest
 	if (!world.room_at(x, y, z)->has_chest())
@@ -711,27 +726,41 @@ Update_Messages Character::add_to_chest(const std::string & insert_item_id, Worl
 		return Update_Messages("This chest has an unfamiliar lock.");
 	}
 
-	// if the player doesn't have the item
-	if (!this->contains(insert_item_id))
-	{
-		return Update_Messages("You don't have " + U::get_article_for(insert_item_id) + " " + insert_item_id + ".");
-	}
-
 	// if the item is equipped
 	if (equipped_item != nullptr && equipped_item->name == insert_item_id)
 	{
 		world.room_at(x, y, z)->add_item_to_chest(equipped_item);
 		equipped_item = nullptr;
+		return Update_Messages("You place your " + insert_item_id + " in the chest.");
 	}
-	// if the item is a piece of equipment
-	else
+	else // the item is not equipped; remove it from the player's inventory
 	{
-		world.room_at(x, y, z)->add_item_to_chest(this->erase(insert_item_id));
+		if (!this->contains(insert_item_id, count)) // if the player does not have the item specified
+		{
+			// the item does not exist in the player's inventory in the required quantity
+			if (count == 1)
+				return Update_Messages("You don't have " + U::get_article_for(insert_item_id) + " " + insert_item_id + " to put in the chest.");
+			else
+				return Update_Messages("You don't have " + U::to_string(count) + " " + U::get_plural_for(insert_item_id) + " to put in the chest.");
+		}
+
+		// add the item(s) to the chest, removing from the player's inventory
+		for (unsigned i = 0; i < count; ++i)
+		{
+			world.room_at(x, y, z)->add_item_to_chest(this->erase(insert_item_id));
+		}
 	}
 
-	// You place the sword into the chest.
-	return Update_Messages("You place the " + insert_item_id + " into the chest.",
-		this->name + " places " + U::get_article_for(insert_item_id) + " " + insert_item_id + " into the chest.");
+	if (count > 1) // plural result
+	{
+		return Update_Messages("You place " + U::to_string(count) + " " + U::get_plural_for(insert_item_id) + " into the chest.",
+			this->name + " places " + U::to_string(count) + " " + U::get_plural_for(insert_item_id) + " into the chest.");
+	}
+	else // singular result
+	{
+		return Update_Messages("You place " + U::get_article_for(insert_item_id) + " " + insert_item_id + " into the chest.",
+			this->name + " places " + U::get_article_for(insert_item_id) + " " + insert_item_id + " into the chest.");
+	}
 }
 Update_Messages Character::take_from_chest(const std::string & take_item_id, World & world)
 {
@@ -873,13 +902,13 @@ Update_Messages Character::construct_surface(const std::string & material_id, co
 	// "You construct a stone floor/ceiling." OR "You construct a stone wall to your north."
 	return Update_Messages("You construct a " + material_id + // you construct a [material]
 		((surface_id != C::CEILING && surface_id != C::FLOOR) ?
-		" wall to your " + surface_id : // wall to your [direction]
-		" " + surface_id), // ceiling/floor
+			" wall to your " + surface_id : // wall to your [direction]
+			" " + surface_id), // ceiling/floor
 
 		this->name + " constructs a " + material_id + // [name] constructs a [material]
 		((surface_id != C::CEILING && surface_id != C::FLOOR) ?
-		" wall to your " + surface_id : // wall to your [direction]
-		" " + surface_id), // ceiling/floor
+			" wall to your " + surface_id : // wall to your [direction]
+			" " + surface_id), // ceiling/floor
 
 		true);
 }

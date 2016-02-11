@@ -70,7 +70,6 @@ public:
 		BAD_SIGNAL,
 
 		// item IDs
-		BAD_ITEM_ID,
 
 		BLOOMERY_ID,
 		BLOOM_ID,
@@ -132,6 +131,9 @@ public:
 		WITH_COMMAND,
 		PRINT_RECIPES_COMMAND, // dev only. No full recipe printout in normal game.
 		ATTACK_COMMAND,
+
+		// quantity
+		ALL_COMMAND,
 
 		// direction commands/IDs
 		NORTH,
@@ -204,9 +206,6 @@ public:
 
 	// map an item ID to its plural
 	static const std::map<std::string, std::string> plurals;
-
-	// int to char conversion
-	static const std::vector<char> numbers;
 
 	// surface information
 	static const std::vector<std::string> surface_ids;

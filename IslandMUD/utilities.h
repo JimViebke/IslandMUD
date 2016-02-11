@@ -48,8 +48,8 @@ namespace Utilities
 	}
 	inline char to_char(const unsigned & val)
 	{
-		// crashes for numbers not in the range of 0-9 inclusive
-		return C::numbers[val];
+		// undefined behavior for numbers not in the range of 0-9 inclusive
+		return val + '0';
 	}
 
 	// verify a set of coordinates against the dimensions of the world
@@ -171,7 +171,8 @@ namespace Utilities
 		file.close();
 	}
 
-	// text formatting
+	// string utilities
+	unsigned to_unsigned(const std::string & word);
 	void to_lower_case(std::string & word);
 	std::string capitalize(std::string & word);
 	std::string capitalize(const std::string & word);
@@ -224,12 +225,6 @@ namespace Utilities
 	template <typename Derived_Type, typename Parent_Type> inline std::shared_ptr<Derived_Type> convert_to(std::shared_ptr<Parent_Type> const & object)
 	{
 		return std::dynamic_pointer_cast<Derived_Type>(object);
-	}
-
-	// managed pointer utilities
-	template<typename T, typename... Args> inline std::unique_ptr<T> make_unique(Args&&... args)
-	{
-		return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}
 }
 

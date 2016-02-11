@@ -8,7 +8,7 @@ April 1, 2014 */
 #include <memory>
 #include <map>
 
-#include "pugixml.hpp"
+#include "XML\pugixml.hpp"
 
 #include "room.h"
 #include "generator.h"

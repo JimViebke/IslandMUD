@@ -7,11 +7,14 @@ May 15 2015 */
 #include "world.h"
 #include "character.h"
 #include "npc.h"
+#include "parse.h"
 
 World::World()
 {
 	create_world_container();
 	load_or_generate_terrain_and_mineral_maps();
+
+	Parse::initialize();
 }
 
 // access a room given coordinates
@@ -191,7 +194,7 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		// save the final terrain to disk
 		gen.to_file(world_map, C::world_terrain_file_location);
 
-		this->terrain = U::make_unique<std::vector<std::vector<char>>>(world_map);
+		this->terrain = std::make_unique<std::vector<std::vector<char>>>(world_map);
 	}
 
 	// generate a new iron ore mineral map if needed
@@ -220,7 +223,7 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		// save the mineral map to disk
 		gen.to_file(mineral_map, C::iron_deposit_map_file_location);
 
-		this->iron_deposit_map = U::make_unique<std::vector<std::vector<char>>>(mineral_map);
+		this->iron_deposit_map = std::make_unique<std::vector<std::vector<char>>>(mineral_map);
 	}
 
 	// generate a new limestone mineral map if needed
@@ -249,7 +252,7 @@ void World::load_or_generate_terrain_and_mineral_maps()
 		// save the mineral map to disk
 		gen.to_file(mineral_map, C::limestone_deposit_map_file_location);
 
-		this->limestone_deposit_map = U::make_unique<std::vector<std::vector<char>>>(mineral_map);
+		this->limestone_deposit_map = std::make_unique<std::vector<std::vector<char>>>(mineral_map);
 	}
 }
 
@@ -286,7 +289,7 @@ bool World::load_existing_world_terrain()
 			}
 		}
 
-		this->terrain = U::make_unique<std::vector<std::vector<char>>>(temp_terrain);
+		this->terrain = std::make_unique<std::vector<std::vector<char>>>(temp_terrain);
 	}
 
 	// test if the loaded terrain is the correct dimensions
@@ -337,7 +340,7 @@ bool World::load_existing_iron_deposit_map()
 			}
 		}
 
-		this->iron_deposit_map = U::make_unique<std::vector<std::vector<char>>>(temp_terrain);
+		this->iron_deposit_map = std::make_unique<std::vector<std::vector<char>>>(temp_terrain);
 	}
 
 	// test if the loaded terrain is the correct dimensions
@@ -388,7 +391,7 @@ bool World::load_existing_limestone_deposit_map()
 			}
 		}
 
-		this->limestone_deposit_map = U::make_unique<std::vector<std::vector<char>>>(temp_terrain);
+		this->limestone_deposit_map = std::make_unique<std::vector<std::vector<char>>>(temp_terrain);
 	}
 
 	// test if the loaded terrain is the correct dimensions
@@ -481,7 +484,7 @@ void World::load_vertical_rooms_to_XML(const int & ix, const int & iy, pugi::xml
 void World::add_room_to_world(pugi::xml_node & room_node, const int & x, const int & y, const int & z)
 {
 	// create an empty room
-	std::unique_ptr<Room> room(U::make_unique<Room>());
+	std::unique_ptr<Room> room(std::make_unique<Room>());
 
 	// set whether or not the room is water (off-island or river/lake)
 	room->set_water_status(room_node.attribute(C::XML_IS_WATER.c_str()).as_bool());
@@ -845,7 +848,7 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 // create a new empty room given its coordinates and the world terrain
 std::unique_ptr<Room> World::create_room(const int & x, const int & y, const int & z) const
 {
-	std::unique_ptr<Room> room = U::make_unique<Room>();
+	std::unique_ptr<Room> room = std::make_unique<Room>();
 
 	// if the room is ground level
 	if (z == C::GROUND_INDEX)

@@ -4,7 +4,22 @@ Oct 21, 2015*/
 
 #include "utilities.h"
 
-// text formatting
+// string utilities
+unsigned U::to_unsigned(const std::string & word)
+{
+	// "a1b2c3" will return 123. "abc" will return 0.
+
+	unsigned count = 0;
+	for (const char & digit : word) // for each character in the second command
+	{
+		if (digit >= '0' && digit <= '9') // if the character is a digit
+		{
+			count *= 10; // shift digits to the left
+			count += digit - '0'; // add newest digit
+		}
+	}
+	return count;
+}
 void U::to_lower_case(std::string & word)
 {
 	// convert a vector of strings passed by reference to a vector of lowercase strings
@@ -39,6 +54,7 @@ std::string U::capitalize(const std::string & word)
 	return result;
 }
 
+// grammar
 std::string U::get_article_for(const std::string & noun)
 {
 	// get an iterator to the <key, value> pair for <noun, article>
@@ -47,7 +63,6 @@ std::string U::get_article_for(const std::string & noun)
 	// return the article if the key exists, else return generic "a(n)".
 	return ((it != C::articles.cend()) ? it->second : "a(n)");
 }
-
 std::string U::get_plural_for(const std::string & noun)
 {
 	// get an iterator to the <key, value> pair for <noun, article>

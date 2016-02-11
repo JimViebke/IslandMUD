@@ -25,209 +25,14 @@ Game::Game()
 
 void Game::login(const std::string & user_id)
 {
+	// the caller must own a lock on actors_mutex
+
 	// create a player character
 	PC player(user_id);
 	// load the player's data and place the player in the world
 	player.login(world);
 	// add the character to the actor registry
 	actors.insert(std::pair<std::string, std::shared_ptr<PC>>(player.name, std::make_shared<PC>(player)));
-}
-
-void Game::main_test_loop() // debugging
-{
-
-
-	/*{
-		// pass name, faction, ai type
-		Hostile_NPC_Fighter jeb("Jeb", C::NPC_HOSTILE_FACTION_ID);
-		jeb.login(world);
-
-		jeb.move(C::WEST, world); // trust me
-		jeb.move(C::SOUTH, world);
-		jeb.move(C::SOUTH, world);
-		jeb.move(C::EAST, world);
-		jeb.move(C::EAST, world);
-		jeb.move(C::EAST, world);
-		jeb.move(C::EAST, world);
-
-		actors.insert(make_pair(jeb.name, make_shared<Hostile_NPC_Fighter>(jeb)));
-		}*/
-
-	{
-		std::shared_ptr<Hostile_NPC_Worker> bob = std::make_shared<Hostile_NPC_Worker>("Bob");
-		bob->login(world);
-		actors.insert(std::make_pair(bob->name, bob));
-	}
-
-	{
-		std::shared_ptr<Hostile_NPC_Bodyguard> bill = std::make_shared<Hostile_NPC_Bodyguard>("Bill", "Bob");
-		bill->login(world);
-		// bill->set_target
-		actors.insert(std::make_pair(bill->name, bill));
-	}
-
-
-	// Uncomment the below block to add a hostile NPC for each char in the string below.
-	// The char will be the name of the character.
-	// Not a great idea for debug builds.
-	/*{
-		string temp = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		for (unsigned i = 0; i < temp.size(); ++i)
-		{
-		string s(1, temp[i]);
-		Hostile_NPC h_npc(s, C::NPC_HOSTILE_FACTION_ID);
-		h_npc.login(world);
-		actors.insert(make_pair(h_npc.name, make_shared<Hostile_NPC>(h_npc)));
-		}
-		} */
-
-
-
-	// create some holders to support the main debug loop
-	int auto_advance = 0; // debugging only - idling is default in the final game
-	std::string input, output = ""; // I/O holders
-
-	while (true) // play indefinitely
-	{
-		// print out
-		if (U::is<PC>(actors.find("dev")->second))
-		{
-			std::shared_ptr<PC> dev = U::convert_to<PC>(actors.find("dev")->second);
-
-			if (auto_advance == 0)
-			{
-				std::cout << std::endl
-					<< std::endl
-					<< dev->generate_area_map(world, actors) << std::endl // a top down map
-					<< "Your coordinates are " << dev->x << ", " << dev->y << " (index " << dev->z << ")"
-					<< world.room_at(dev->x, dev->y, dev->z)->summary(dev->name) // "You look around and notice..."
-					<< dev->print(); // prepend "You have..."
-
-#ifndef _WIN32
-				pugi::xml_document document;
-
-				// load the file from the disk into the xml_document in memory
-				document.load_file(string("./server-files/example.xml").c_str());
-
-				// select the root/test node, create it if it does not exist
-				xml_node root_node = document.child(string("test").c_str());
-				if (root_node.empty())
-				{
-					root_node = document.append_child(string("test").c_str());
-				}
-
-				// remove any existing sample node
-				root_node.remove_child(string("sample").c_str());
-
-				// create an ostringstream and add the same printout from the console
-				ostringstream oss;
-				oss << endl
-					<< endl
-					<< dev->generate_area_map(world, actors) << endl // a top down map
-					<< "Your coordinates are " << dev->x << ", " << dev->y << " (index " << dev->z << ")"
-					<< world.room_at(dev->x, dev->y, dev->z)->summary(dev->name) // "You look around and notice..."
-					<< dev->print(); // prepend "You have..."
-
-				// main print out
-				oss << endl
-					<< endl
-					<< "  " << output << endl
-					<< endl
-					<< "> " << flush;
-
-				// append a sample node to the test/root node, append an anonymous pcdata node to the sample node,
-				// and append the contents of the ostringstream to the anonymous pcdata node
-				root_node.append_child(string("sample").c_str()).append_child(node_pcdata).set_value(oss.str().c_str());
-
-				// save the document
-				document.save_file(string("./server-files/example.xml").c_str()); // returns an unused boolean
-#endif
-
-			}
-		}
-
-		// main print out
-		std::cout << std::endl
-			<< std::endl
-			<< "  " << output << std::endl
-			<< std::endl
-			<< "> " << std::flush;
-
-		// get or set input
-		if (auto_advance > 0)
-		{
-			input = "wait"; // automatically set user input instead of getting it
-			--auto_advance;
-		}
-		else // most of the time
-		{
-			std::getline(std::cin, input);
-		}
-
-		// process input
-		std::cout << "\nDEBUG sending to Parse::tokenize(): " << input << std::endl;
-		std::vector<std::string> tokenized_input = Parse::tokenize(input);
-		std::cout << "\nDEBUG parsed input: ";
-		U::print(tokenized_input);
-
-		// hardcoding for development purposes
-		if (tokenized_input.size() > 1 && tokenized_input[0] == C::WAIT_COMMAND)
-		{
-			// tokenize the original input to prevent the number from being removed
-			std::stringstream ss(input);
-			const std::istream_iterator<std::string> begin(ss);
-			std::vector<std::string> strings(begin, std::istream_iterator<std::string>());
-
-			// extract and save the number of turns to delay
-			std::stringstream auto_advance_count;
-			auto_advance_count << strings[1];
-			auto_advance_count >> auto_advance;
-			--auto_advance; // fix a glitch
-		}
-		else // auto-advance was not invoked
-		{
-			// execute processed command against game world
-			// only count loaded rooms if total room count is less than or equal to 100K (100*100*10)
-			std::cout << "\nDEBUG Entering execute_command(), rooms loaded: " << ((C::WORLD_X_DIMENSION*C::WORLD_Y_DIMENSION*C::WORLD_Z_DIMENSION <= 100000) ? U::to_string(world.count_loaded_rooms()) : "(too large to count)") << "...";
-			Update_Messages updates = execute_command("dev", tokenized_input);
-			std::cout << "\nDEBUG Exited execute_command(), rooms loaded: " << ((C::WORLD_X_DIMENSION*C::WORLD_Y_DIMENSION*C::WORLD_Z_DIMENSION <= 100000) ? U::to_string(world.count_loaded_rooms()) : "(too large to count)") << "...";
-		}
-
-		{
-			std::shared_ptr<Character> bob = actors.find("Bob")->second;
-			std::shared_ptr<Character> bill = actors.find("Bill")->second;
-			std::cout << "DEBUG: Distance between bodyguard and worker before update : " << U::diagonal_distance(bob->x, bob->y, bill->x, bill->y) << std::endl;
-		}
-
-		// now execute updates for all NPCs
-		for (std::pair<const std::string, std::shared_ptr<Character>> & actor : actors)
-		{
-			if (U::is<NPC>(actor.second))
-			{
-				std::shared_ptr<NPC> npc = U::convert_to<NPC>(actor.second);
-
-				if (auto_advance == 0)
-				{
-					// cout << npc->get_objectives() << endl; // debugging (before update)
-					std::cout << npc->get_inventory() << std::endl; // debugging (before update)
-				}
-				npc->update(world, actors);
-				if (auto_advance == 0)
-				{
-					std::cout << npc->get_objectives() << std::endl; // debugging (after update)
-					std::cout << npc->get_inventory() << std::endl; // debugging (after update)
-				}
-
-				actor.second = npc; // make sure to save back
-			}
-		}
-
-		{
-			std::shared_ptr<Character> bob = actors.find("Bob")->second;
-			std::shared_ptr<Character> bill = actors.find("Bill")->second;
-			std::cout << "DEBUG: Distance between bodyguard and worker after update : " << U::diagonal_distance(bob->x, bob->y, bill->x, bill->y) << std::endl;
-		}
-	}
 }
 
 Update_Messages Game::execute_command(const std::string & actor_id, const std::vector<std::string> & command)
@@ -286,11 +91,34 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	{
 		return actors.find(actor_id)->second->drop(command[1], world); // (item_id, world)
 	}
+	// dropping item: drop n staffs" (the tokenizer will have already converted plurals to singular)
+	else if (command.size() == 3 && command[0] == C::DROP_COMMAND)
+	{
+		// extract the character
+		std::shared_ptr<Character> character = actors.find(actor_id)->second;
+
+		// test if the player contains any of the item specified
+		if (character->count(command[2]) > 0)
+		{
+			return character->drop(command[2], world, U::to_unsigned(command[1])); // (item_id, world, total count)
+		}
+
+		// if the drop count is 1
+		if (command[1] == "1")
+		{
+			return Update_Messages("You don't have " + U::get_article_for(command[2]) + " " + command[2] + " to drop.");
+		}
+		else // ensure the return message uses the plural form of the word
+		{
+			return Update_Messages("You don't have any " + U::get_plural_for(command[2]) + " to drop.");
+		}
+	}
 	// crafting: "craft sword"
 	else if (command.size() == 2 && command[0] == C::CRAFT_COMMAND)
 	{
 		return actors.find(actor_id)->second->craft(command[1], world); // (item_id, world)
 	}
+	// mining: "mine iron"
 	else if (command.size() == 2 && command[0] == C::MINE_COMMAND)
 	{
 		return actors.find(actor_id)->second->craft(command[1], world); // (item_id, world)
@@ -361,6 +189,34 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	else if (command.size() == 4 && command[0] == C::DROP_COMMAND && command[2] == C::INSERT_COMMAND && command[3] == C::CHEST_ID)
 	{
 		return actors.find(actor_id)->second->add_to_chest(command[1], world);
+	}
+	// put n items in chest
+	else if (command.size() == 5 && command[0] == C::DROP_COMMAND && command[3] == C::INSERT_COMMAND && command[4] == C::CHEST_ID)
+	{
+		// extract the character
+		std::shared_ptr<Character> character = actors.find(actor_id)->second;
+
+		// if the user wants to put all of the item in the chest
+		if (command[1] == C::ALL_COMMAND)
+		{
+			return character->add_to_chest(command[2], world, character->count(command[2])); // (item_id, world, total count)
+		}
+
+		// test if the player contains any of the item specified
+		if (character->count(command[2]) > 0)
+		{
+			return character->add_to_chest(command[2], world, U::to_unsigned(command[1])); // (item_id, world, total count)
+		}
+
+		// if the insert count is 1
+		if (command[1] == "1")
+		{
+			return Update_Messages("You don't have " + U::get_article_for(command[2]) + " " + command[2] + " to put into the chest.");
+		}
+		else // ensure the return message uses the plural form of the word
+		{
+			return Update_Messages("You don't have any " + U::get_plural_for(command[2]) + " to put into the chest.");
+		}
 	}
 	// look at chest: "chest"
 	else if (command.size() == 1 && command[0] == C::CHEST_ID)
@@ -881,7 +737,7 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 	{
 		// for each player that requires an update
 		for (auto player_it = (*update_messages.additional_map_update_users).cbegin();
-			player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
+		player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
 		{
 			// if the referenced character is a player character
 			if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(*player_it)->second))

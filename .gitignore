@@ -10,3 +10,5 @@
 *.user
 *.exe
 IslandMUD/nbproject/private/
+Release/
+Debug/

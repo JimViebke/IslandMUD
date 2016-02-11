@@ -59,7 +59,6 @@ const std::string C::GOOD_SIGNAL = "good";
 const std::string C::BAD_SIGNAL = "bad";
 
 // item IDs
-const std::string C::BAD_ITEM_ID = "bad_item_id";
 
 const std::string C::BLOOMERY_ID = "bloomery";
 const std::string C::BLOOM_ID = "bloom";
@@ -121,6 +120,8 @@ const std::string C::WAIT_COMMAND = "wait"; // for debugging (see constants.h)
 const std::string C::WITH_COMMAND = "with";
 const std::string C::PRINT_RECIPES_COMMAND = "recipes"; // for debugging (see constants.h)
 const std::string C::ATTACK_COMMAND = "attack";
+
+const std::string C::ALL_COMMAND = "all"; // quantity
 
 // direction commands/IDs
 const std::string C::NORTH = "north";
@@ -276,9 +277,6 @@ namespace // anonymous namespace to prevent access outside this file
 
 const std::map<std::string, std::string> C::articles = generate_articles_map();
 const std::map<std::string, std::string> C::plurals = generate_plurals_map();
-
-// efficient int to char conversion
-const std::vector<char> C::numbers = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
 // store a vector of all valid surface ids
 const std::vector<std::string> C::surface_ids = { C::NORTH, C::EAST, C::SOUTH, C::WEST, C::FLOOR, C::CEILING };
