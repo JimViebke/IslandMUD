@@ -872,13 +872,13 @@ Update_Messages Character::construct_surface(const std::string & material_id, co
 	// "You construct a stone floor/ceiling." OR "You construct a stone wall to your north."
 	return Update_Messages("You construct a " + material_id + // you construct a [material]
 		((surface_id != C::CEILING && surface_id != C::FLOOR) ?
-		" wall to your " + surface_id : // wall to your [direction]
-		" " + surface_id), // ceiling/floor
+			" wall to your " + surface_id : // wall to your [direction]
+			" " + surface_id), // ceiling/floor
 
 		this->name + " constructs a " + material_id + // [name] constructs a [material]
 		((surface_id != C::CEILING && surface_id != C::FLOOR) ?
-		" wall to your " + surface_id : // wall to your [direction]
-		" " + surface_id), // ceiling/floor
+			" wall to your " + surface_id : // wall to your [direction]
+			" " + surface_id), // ceiling/floor
 
 		true);
 }

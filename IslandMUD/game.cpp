@@ -687,7 +687,7 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 	{
 		// for each player that requires an update
 		for (auto player_it = (*update_messages.additional_map_update_users).cbegin();
-			player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
+		player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
 		{
 			// if the referenced character is a player character
 			if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(*player_it)->second))
