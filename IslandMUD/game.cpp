@@ -97,7 +97,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		// extract the character
 		std::shared_ptr<Character> character = actors.find(actor_id)->second;
 
-		// test if the actor contains any of the item specified
+		// test if the player contains any of the item specified
 		if (character->count(command[2]) > 0)
 		{
 			return character->drop(command[2], world, U::to_unsigned(command[1])); // (item_id, world, total count)

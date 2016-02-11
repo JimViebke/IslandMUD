@@ -607,14 +607,14 @@ Update_Messages Character::drop(const std::string & drop_item_id, World & world,
 	{
 		if (!this->contains(drop_item_id, count)) // if the player does not have the item specified
 		{
-			// the item does not exist in the player's inventory
+			// the item does not exist in the player's inventory in the required quantity
 			if (count == 1)
 				return Update_Messages("You don't have " + U::get_article_for(drop_item_id) + " " + drop_item_id + " to drop.");
 			else
 				return Update_Messages("You don't have " + U::to_string(count) + " " + U::get_plural_for(drop_item_id) + " to drop.");
 		}
 
-		// add the item to the world, removing it from the player's inventory
+		// add the item(s) to the world, removing from the player's inventory
 		for (unsigned i = 0; i < count; ++i)
 		{
 			world.room_at(x, y, z)->add_item(this->erase(drop_item_id));
