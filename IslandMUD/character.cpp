@@ -712,7 +712,7 @@ Update_Messages Character::unequip()
 
 	return Update_Messages("You put your " + item_ID + " away.", this->name + " lowers the " + item_ID + ".");
 }
-Update_Messages Character::add_to_chest(const std::string & insert_item_id, World & world)
+Update_Messages Character::add_to_chest(std::string insert_item_id, World & world, const unsigned & count)
 {
 	// if this room does not have a chest
 	if (!world.room_at(x, y, z)->has_chest())
@@ -726,27 +726,41 @@ Update_Messages Character::add_to_chest(const std::string & insert_item_id, Worl
 		return Update_Messages("This chest has an unfamiliar lock.");
 	}
 
-	// if the player doesn't have the item
-	if (!this->contains(insert_item_id))
-	{
-		return Update_Messages("You don't have " + U::get_article_for(insert_item_id) + " " + insert_item_id + ".");
-	}
-
 	// if the item is equipped
 	if (equipped_item != nullptr && equipped_item->name == insert_item_id)
 	{
 		world.room_at(x, y, z)->add_item_to_chest(equipped_item);
 		equipped_item = nullptr;
+		return Update_Messages("You place your " + insert_item_id + " in the chest.");
 	}
-	// if the item is a piece of equipment
-	else
+	else // the item is not equipped; remove it from the player's inventory
 	{
-		world.room_at(x, y, z)->add_item_to_chest(this->erase(insert_item_id));
+		if (!this->contains(insert_item_id, count)) // if the player does not have the item specified
+		{
+			// the item does not exist in the player's inventory in the required quantity
+			if (count == 1)
+				return Update_Messages("You don't have " + U::get_article_for(insert_item_id) + " " + insert_item_id + " to put in the chest.");
+			else
+				return Update_Messages("You don't have " + U::to_string(count) + " " + U::get_plural_for(insert_item_id) + " to put in the chest.");
+		}
+
+		// add the item(s) to the chest, removing from the player's inventory
+		for (unsigned i = 0; i < count; ++i)
+		{
+			world.room_at(x, y, z)->add_item_to_chest(this->erase(insert_item_id));
+		}
 	}
 
-	// You place the sword into the chest.
-	return Update_Messages("You place the " + insert_item_id + " into the chest.",
-		this->name + " places " + U::get_article_for(insert_item_id) + " " + insert_item_id + " into the chest.");
+	if (count > 1) // plural result
+	{
+		return Update_Messages("You place " + U::to_string(count) + " " + U::get_plural_for(insert_item_id) + " into the chest.",
+			this->name + " places " + U::to_string(count) + " " + U::get_plural_for(insert_item_id) + " into the chest.");
+	}
+	else // singular result
+	{
+		return Update_Messages("You place " + U::get_article_for(insert_item_id) + " " + insert_item_id + " into the chest.",
+			this->name + " places " + U::get_article_for(insert_item_id) + " " + insert_item_id + " into the chest.");
+	}
 }
 Update_Messages Character::take_from_chest(const std::string & take_item_id, World & world)
 {

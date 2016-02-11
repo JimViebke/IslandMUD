@@ -112,7 +112,6 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		{
 			return Update_Messages("You don't have any " + U::get_plural_for(command[2]) + " to drop.");
 		}
-
 	}
 	// crafting: "craft sword"
 	else if (command.size() == 2 && command[0] == C::CRAFT_COMMAND)
@@ -190,6 +189,34 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	else if (command.size() == 4 && command[0] == C::DROP_COMMAND && command[2] == C::INSERT_COMMAND && command[3] == C::CHEST_ID)
 	{
 		return actors.find(actor_id)->second->add_to_chest(command[1], world);
+	}
+	// put n items in chest
+	else if (command.size() == 5 && command[0] == C::DROP_COMMAND && command[3] == C::INSERT_COMMAND && command[4] == C::CHEST_ID)
+	{
+		// extract the character
+		std::shared_ptr<Character> character = actors.find(actor_id)->second;
+
+		// if the user wants to put all of the item in the chest
+		if (command[1] == C::ALL_COMMAND)
+		{
+			return character->add_to_chest(command[2], world, character->count(command[2])); // (item_id, world, total count)
+		}
+
+		// test if the player contains any of the item specified
+		if (character->count(command[2]) > 0)
+		{
+			return character->add_to_chest(command[2], world, U::to_unsigned(command[1])); // (item_id, world, total count)
+		}
+
+		// if the insert count is 1
+		if (command[1] == "1")
+		{
+			return Update_Messages("You don't have " + U::get_article_for(command[2]) + " " + command[2] + " to put into the chest.");
+		}
+		else // ensure the return message uses the plural form of the word
+		{
+			return Update_Messages("You don't have any " + U::get_plural_for(command[2]) + " to put into the chest.");
+		}
 	}
 	// look at chest: "chest"
 	else if (command.size() == 1 && command[0] == C::CHEST_ID)
