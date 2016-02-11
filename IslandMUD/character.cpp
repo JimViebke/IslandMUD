@@ -600,6 +600,8 @@ Update_Messages Character::drop(const std::string & drop_item_id, World & world,
 
 		// destroy the user's copy of the item
 		this->equipped_item = nullptr;
+
+		return Update_Messages("You drop your " + drop_item_id + ".");
 	}
 	else // the player is not holding the item, check if the item is in the player's inventory
 	{
