@@ -160,7 +160,7 @@ namespace Utilities
 #ifdef _WIN32
 		_mkdir(path.c_str());
 #else
-		system(string("mkdir -p " + path).c_str());
+		system(std::string("mkdir -p " + path).c_str());
 #endif
 	}
 	inline void to_file(const std::string & path, const std::string & contents)

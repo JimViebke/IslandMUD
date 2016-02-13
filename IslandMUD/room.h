@@ -70,7 +70,7 @@ public:
 	Update_Messages table_contents(const std::string & username) const;
 	bool table_has(const std::string & item_id) const;
 	std::shared_ptr<Item> remove_from_table(const std::string & item_ID);
-	std::shared_ptr<Table> Room::get_table() const;
+	std::shared_ptr<Table> get_table() const;
 	void set_table(const std::shared_ptr<Table> & set_table);
 
 	// bloomeries

@@ -8,42 +8,42 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Axe" Collapsed="true">
-    <Position X="47.5" Y="3.25" Width="1.5" />
+    <Position X="47.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item\equipment.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Bow" Collapsed="true">
-    <Position X="52" Y="3.25" Width="1.5" />
+    <Position X="52" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item\equipment.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Sword" Collapsed="true">
-    <Position X="54.25" Y="3.25" Width="1.5" />
+    <Position X="54.25" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item\equipment.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Torch" Collapsed="true">
-    <Position X="56.5" Y="3.25" Width="1.5" />
+    <Position X="56.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAA=</HashCode>
       <FileName>item\equipment.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Staff" Collapsed="true">
-    <Position X="49.75" Y="3.25" Width="1.5" />
+    <Position X="49.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item\equipment.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Stackable" Collapsed="true">
-    <Position X="19" Y="1.75" Width="1.5" />
+    <Position X="19" Y="3" Width="1.5" />
     <Compartments>
       <Compartment Name="Methods" Collapsed="true" />
     </Compartments>
@@ -53,35 +53,35 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Forge" Collapsed="true">
-    <Position X="6.5" Y="3.25" Width="1.5" />
+    <Position X="6.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAACAAQA=</HashCode>
       <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hammer" Collapsed="true">
-    <Position X="58.75" Y="3.25" Width="1.5" />
+    <Position X="58.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item\equipment.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Chest" Collapsed="true">
-    <Position X="60.5" Y="2" Width="1.5" />
+    <Position X="60.5" Y="2.5" Width="1.5" />
     <InheritanceLine Type="Item" ManuallyRouted="true" FixedToPoint="true">
       <Path>
         <Point X="32.25" Y="1.062" />
         <Point X="32.25" Y="1.375" />
         <Point X="61" Y="1.375" />
-        <Point X="61" Y="2" />
+        <Point X="61" Y="2.5" />
       </Path>
     </InheritanceLine>
     <InheritanceLine Type="Container" ManuallyRouted="true" FixedToPoint="true">
       <Path>
-        <Point X="63.5" Y="1.062" />
-        <Point X="63.5" Y="1.375" />
-        <Point X="61.688" Y="1.375" />
-        <Point X="61.688" Y="2" />
+        <Point X="63" Y="1.062" />
+        <Point X="63" Y="1.366" />
+        <Point X="61.625" Y="1.366" />
+        <Point X="61.625" Y="2.5" />
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
@@ -90,154 +90,154 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Limestone" Collapsed="true">
-    <Position X="11" Y="4.75" Width="1.5" />
+    <Position X="11" Y="6" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Mineral_Deposit" Collapsed="true">
-    <Position X="37.25" Y="1.75" Width="1.5" />
+    <Position X="37.25" Y="3" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Mineral" Collapsed="true">
-    <Position X="10" Y="3.25" Width="1.5" />
+    <Position X="10" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Iron_Deposit" Collapsed="true">
-    <Position X="36" Y="3.25" Width="1.5" />
+    <Position X="36" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Limestone_Deposit" Collapsed="true">
-    <Position X="38.25" Y="3.25" Width="1.75" />
+    <Position X="38.25" Y="4.5" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Iron" Collapsed="true">
-    <Position X="8.75" Y="4.75" Width="1.5" />
+    <Position X="8.75" Y="6" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
       <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Fire_Container" Collapsed="true">
-    <Position X="5.5" Y="1.75" Width="1.5" />
+    <Position X="5.5" Y="3" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAAgAACAAAAgQAAAAEAAA=</HashCode>
       <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Bloom" Collapsed="true">
-    <Position X="33.75" Y="3.25" Width="1.5" />
+    <Position X="33.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Bloomery" Collapsed="true">
-    <Position X="4.25" Y="3.25" Width="1.5" />
+    <Position X="4.25" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAABAIAAAAAAAAAQAAAAAAAAQAAAAAAEAAAAEAAgA=</HashCode>
       <FileName>item\bloomery.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Forgeable" Collapsed="true">
-    <Position X="33.75" Y="1.75" Width="1.5" />
+    <Position X="33.75" Y="3" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAgQAAAAAABAAgBAAhAAAAAAAAQAAAAAAYAABAAAAA=</HashCode>
       <FileName>Item\item.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Stone" Collapsed="true">
-    <Position X="20" Y="3.25" Width="1.5" />
+    <Position X="20" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAA=</HashCode>
       <FileName>item\stackable.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Stick" Collapsed="true">
-    <Position X="13.25" Y="3.25" Width="1.5" />
+    <Position X="13.25" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item\stackable.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Branch" Collapsed="true">
-    <Position X="22.25" Y="3.25" Width="1.5" />
+    <Position X="22.25" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAA=</HashCode>
       <FileName>item\stackable.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Vine" Collapsed="true">
-    <Position X="15.5" Y="3.25" Width="1.5" />
+    <Position X="15.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
       <FileName>item\stackable.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Wood" Collapsed="true">
-    <Position X="24.5" Y="3.25" Width="1.5" />
+    <Position X="24.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item\stackable.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Arrow" Collapsed="true">
-    <Position X="17.75" Y="3.25" Width="1.5" />
+    <Position X="17.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
       <FileName>item\stackable.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Arrowhead" Collapsed="true">
-    <Position X="26.75" Y="3.25" Width="1.5" />
+    <Position X="26.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item\stackable.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Board" Collapsed="true">
-    <Position X="29" Y="3.25" Width="1.5" />
+    <Position X="29" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
       <FileName>item\stackable.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Anvil" Collapsed="true">
-    <Position X="45.25" Y="1.75" Width="1.5" />
+    <Position X="45.25" Y="3" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQA=</HashCode>
       <FileName>item\misc.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Debris" Collapsed="true">
-    <Position X="40.75" Y="1.75" Width="1.5" />
+    <Position X="40.75" Y="3" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
       <FileName>item\misc.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Log" Collapsed="true">
-    <Position X="43" Y="1.75" Width="1.5" />
+    <Position X="43" Y="3" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item\misc.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Tree" Collapsed="true">
-    <Position X="31.5" Y="1.75" Width="1.5" />
+    <Position X="31.5" Y="3" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item\misc.h</FileName>
@@ -246,23 +246,23 @@
   <Class Name="Container" Collapsed="true">
     <Position X="62.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AFAAAAQBAABAAAAAAIAIAAAAEAAACAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AFAAAAQBAABAAAAABIAIAAAAEAAACAAAAAAAAAAAAAA=</HashCode>
       <FileName>item\container.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Equipment" Collapsed="true">
-    <Position X="53.25" Y="1.75" Width="1.5" />
+    <Position X="53.25" Y="3" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>item\equipment.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Non_Player_Character" Collapsed="true">
-    <Position X="65" Y="3.75" Width="1.75" />
+    <Position X="67.25" Y="5" Width="1.75" />
     <InheritanceLine Type="Character" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="65.75" Y="2.691" />
-        <Point X="65.75" Y="3.75" />
+        <Point X="68" Y="3.191" />
+        <Point X="68" Y="5" />
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
@@ -271,48 +271,48 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Hostile_NPC" Collapsed="true">
-    <Position X="66.25" Y="5.25" Width="1.5" />
+    <Position X="68.5" Y="6.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAEAAA=</HashCode>
       <FileName>NPC\npc_enemy.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hostile_NPC_Bodyguard" Collapsed="true">
-    <Position X="66" Y="6.75" Width="2" />
+    <Position X="68.25" Y="8" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAABCAAAACACAIQDBAAAAAAACAAAIAAQAIAAgEAAA=</HashCode>
+      <HashCode>AIAAAADAAAAAAGAIQBBAAAAAAACACAIAAAAAEAgEAAA=</HashCode>
       <FileName>NPC\npc_enemy_bodyguard.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hostile_NPC_Fighter" Collapsed="true">
-    <Position X="68.75" Y="6.75" Width="1.75" />
+    <Position X="71" Y="8" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
       <FileName>NPC\npc_enemy_fighter.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hostile_NPC_Worker" Collapsed="true">
-    <Position X="63.5" Y="6.75" Width="1.75" />
+    <Position X="65.75" Y="8" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAwAAAAAAAAIAAAAAAAAAAAAAEIQA=</HashCode>
       <FileName>NPC\npc_enemy_worker.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Neutral_NPC" Collapsed="true">
-    <Position X="61.25" Y="5.25" Width="1.5" />
+    <Position X="63.5" Y="6.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
       <FileName>NPC\npc_unaffiliated.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Player_Character" Collapsed="true">
-    <Position X="68" Y="3.75" Width="1.5" />
+    <Position X="70.25" Y="5" Width="1.5" />
     <InheritanceLine Type="Character" FixedFromPoint="true">
       <Path>
-        <Point X="65.75" Y="2.691" />
-        <Point X="65.75" Y="3.375" />
-        <Point X="68.75" Y="3.375" />
-        <Point X="68.75" Y="3.75" />
+        <Point X="68" Y="3.191" />
+        <Point X="68" Y="4.625" />
+        <Point X="71" Y="4.625" />
+        <Point X="71" Y="5" />
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
@@ -321,24 +321,65 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Character" Collapsed="true">
-    <Position X="65" Y="2" Width="1.5" />
+    <Position X="67.25" Y="2.5" Width="1.5" />
+    <InheritanceLine Type="Container" FixedFromPoint="true">
+      <Path>
+        <Point X="63.938" Y="1.062" />
+        <Point X="63.938" Y="2.125" />
+        <Point X="68" Y="2.125" />
+        <Point X="68" Y="2.5" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>gQgAAABAgACAggGgEAAxQAUAAAQMAAlCwIDoIYEBPgI=</HashCode>
       <FileName>character.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Room" Collapsed="true">
-    <Position X="62.75" Y="2" Width="1.5" />
+    <Position X="65" Y="2.5" Width="1.5" />
+    <InheritanceLine Type="Container" FixedFromPoint="true">
+      <Path>
+        <Point X="63.938" Y="1.062" />
+        <Point X="63.938" Y="2.125" />
+        <Point X="65.75" Y="2.125" />
+        <Point X="65.75" Y="2.5" />
+      </Path>
+    </InheritanceLine>
     <TypeIdentifier>
       <HashCode>ABhKAXBMRAaIAIBUkBEAAYACUwKBACA4IgEIIgICqCA=</HashCode>
       <FileName>room.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Hostile_NPC_Corporal" Collapsed="true">
-    <Position X="71.25" Y="6.75" Width="1.75" />
+    <Position X="73.5" Y="8" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
       <FileName>NPC\npc_enemy_corporal.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Table" Collapsed="true">
+    <Position X="62.75" Y="2.5" Width="1.5" />
+    <InheritanceLine Type="Item" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="32.25" Y="1.062" />
+        <Point X="32.25" Y="1.379" />
+        <Point X="61.013" Y="1.379" />
+        <Point X="61.013" Y="1.839" />
+        <Point X="61.542" Y="1.839" Type="JumpStart" />
+        <Point X="61.708" Y="1.839" Type="JumpEnd" />
+        <Point X="63" Y="1.839" />
+        <Point X="63" Y="2.5" />
+      </Path>
+    </InheritanceLine>
+    <InheritanceLine Type="Container" FixedFromPoint="true">
+      <Path>
+        <Point X="63.5" Y="1.062" />
+        <Point X="63.5" Y="2.5" />
+      </Path>
+    </InheritanceLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Item\table.h</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

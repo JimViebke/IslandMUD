@@ -13,7 +13,6 @@ Feb 14, 2015 */
 #include "world.h"
 #include "recipes.h"
 #include "message.h"
-#include "item/container.h"
 
 class Character : public Container
 {
