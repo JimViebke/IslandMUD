@@ -2,9 +2,45 @@
 <configurationDescriptor version="95">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="f1" displayName="source" projectFiles="true">
+      <logicalFolder name="item" displayName="item" projectFiles="true">
+        <itemPath>item/bloomery.cpp</itemPath>
+        <itemPath>item/bloomery.h</itemPath>
+        <itemPath>item/chest.cpp</itemPath>
+        <itemPath>item/chest.h</itemPath>
+        <itemPath>item/container.cpp</itemPath>
+        <itemPath>item/container.h</itemPath>
+        <itemPath>item/equipment.h</itemPath>
+        <itemPath>item/item.h</itemPath>
+        <itemPath>item/misc.h</itemPath>
+        <itemPath>item/stackable.h</itemPath>
+        <itemPath>item/table.cpp</itemPath>
+        <itemPath>item/table.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="NPC" displayName="NPC" projectFiles="true">
+        <itemPath>NPC/non_player_character.cpp</itemPath>
+        <itemPath>NPC/non_player_character.h</itemPath>
+        <itemPath>NPC/npc_enemy.cpp</itemPath>
+        <itemPath>NPC/npc_enemy.h</itemPath>
+        <itemPath>NPC/npc_enemy_bodyguard.cpp</itemPath>
+        <itemPath>NPC/npc_enemy_bodyguard.h</itemPath>
+        <itemPath>NPC/npc_enemy_corporal.cpp</itemPath>
+        <itemPath>NPC/npc_enemy_corporal.h</itemPath>
+        <itemPath>NPC/npc_enemy_fighter.cpp</itemPath>
+        <itemPath>NPC/npc_enemy_fighter.h</itemPath>
+        <itemPath>NPC/npc_enemy_worker.cpp</itemPath>
+        <itemPath>NPC/npc_enemy_worker.h</itemPath>
+        <itemPath>NPC/npc_unaffiliated.cpp</itemPath>
+        <itemPath>NPC/npc_unaffiliated.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="XML" displayName="XML" projectFiles="true">
+        <logicalFolder name="New Folder" displayName="New Folder" projectFiles="true">
+        </logicalFolder>
+        <itemPath>XML/pugiconfig.hpp</itemPath>
+        <itemPath>XML/pugixml.cpp</itemPath>
+        <itemPath>XML/pugixml.hpp</itemPath>
+      </logicalFolder>
       <itemPath>character.cpp</itemPath>
       <itemPath>character.h</itemPath>
-      <itemPath>chest.cpp</itemPath>
       <itemPath>constants.cpp</itemPath>
       <itemPath>constants.h</itemPath>
       <itemPath>craft.cpp</itemPath>
@@ -15,29 +51,16 @@
       <itemPath>game.h</itemPath>
       <itemPath>generator.cpp</itemPath>
       <itemPath>generator.h</itemPath>
+      <itemPath>item.cpp</itemPath>
       <itemPath>item.h</itemPath>
       <itemPath>main.cpp</itemPath>
       <itemPath>message.cpp</itemPath>
       <itemPath>message.h</itemPath>
-      <itemPath>non_player_character.cpp</itemPath>
-      <itemPath>non_player_character.h</itemPath>
-      <itemPath>npc_enemy.cpp</itemPath>
-      <itemPath>npc_enemy.h</itemPath>
-      <itemPath>npc_enemy_bodyguard.cpp</itemPath>
-      <itemPath>npc_enemy_bodyguard.h</itemPath>
-      <itemPath>npc_enemy_fighter.cpp</itemPath>
-      <itemPath>npc_enemy_fighter.h</itemPath>
-      <itemPath>npc_enemy_worker.cpp</itemPath>
-      <itemPath>npc_enemy_worker.h</itemPath>
-      <itemPath>npc_unaffiliated.cpp</itemPath>
-      <itemPath>npc_unaffiliated.h</itemPath>
+      <itemPath>npc.h</itemPath>
       <itemPath>parse.cpp</itemPath>
       <itemPath>parse.h</itemPath>
       <itemPath>player_character.cpp</itemPath>
       <itemPath>player_character.h</itemPath>
-      <itemPath>pugiconfig.hpp</itemPath>
-      <itemPath>pugixml.cpp</itemPath>
-      <itemPath>pugixml.hpp</itemPath>
       <itemPath>recipe.h</itemPath>
       <itemPath>recipes.cpp</itemPath>
       <itemPath>recipes.h</itemPath>
@@ -80,17 +103,48 @@
           <commandlineTool>gcc-4.9</commandlineTool>
         </cTool>
         <ccTool>
-          <standard>8</standard>
           <commandlineTool>g++-4.9</commandlineTool>
-          <commandLine>-pthread</commandLine>
+          <commandLine>-pthread -std=c++14</commandLine>
           <warningLevel>3</warningLevel>
         </ccTool>
       </compileType>
+      <item path="NPC/non_player_character.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="NPC/non_player_character.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy_bodyguard.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy_bodyguard.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy_corporal.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy_corporal.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy_fighter.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy_fighter.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy_worker.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy_worker.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="NPC/npc_unaffiliated.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="NPC/npc_unaffiliated.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="XML/pugiconfig.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="XML/pugixml.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="XML/pugixml.hpp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="character.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="character.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="chest.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="constants.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -112,7 +166,33 @@
       </item>
       <item path="generator.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="item.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="item.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/bloomery.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="item/bloomery.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/chest.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="item/chest.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/container.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="item/container.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/equipment.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/item.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/misc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/stackable.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/table.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="item/table.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -120,29 +200,7 @@
       </item>
       <item path="message.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="non_player_character.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="non_player_character.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="npc_enemy.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="npc_enemy.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="npc_enemy_bodyguard.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="npc_enemy_bodyguard.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="npc_enemy_fighter.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="npc_enemy_fighter.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="npc_enemy_worker.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="npc_enemy_worker.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="npc_unaffiliated.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="npc_unaffiliated.h" ex="false" tool="3" flavor2="0">
+      <item path="npc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="parse.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -151,12 +209,6 @@
       <item path="player_character.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="player_character.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pugiconfig.hpp" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pugixml.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pugixml.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="recipe.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -201,9 +253,8 @@
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>
-          <standard>8</standard>
           <commandlineTool>g++-4.9</commandlineTool>
-          <commandLine>-pthread</commandLine>
+          <commandLine>-pthread -std=c++14</commandLine>
           <warningLevel>3</warningLevel>
         </ccTool>
         <fortranCompilerTool>
@@ -213,11 +264,43 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path="NPC/non_player_character.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="NPC/non_player_character.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy_bodyguard.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy_bodyguard.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy_corporal.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy_corporal.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy_fighter.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy_fighter.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy_worker.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="NPC/npc_enemy_worker.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="NPC/npc_unaffiliated.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="NPC/npc_unaffiliated.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="XML/pugiconfig.hpp" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="XML/pugixml.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="XML/pugixml.hpp" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="character.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="character.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="chest.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="constants.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -239,7 +322,33 @@
       </item>
       <item path="generator.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="item.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="item.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/bloomery.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="item/bloomery.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/chest.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="item/chest.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/container.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="item/container.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/equipment.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/item.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/misc.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/stackable.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/table.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="item/table.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -247,29 +356,7 @@
       </item>
       <item path="message.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="non_player_character.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="non_player_character.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="npc_enemy.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="npc_enemy.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="npc_enemy_bodyguard.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="npc_enemy_bodyguard.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="npc_enemy_fighter.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="npc_enemy_fighter.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="npc_enemy_worker.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="npc_enemy_worker.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="npc_unaffiliated.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="npc_unaffiliated.h" ex="false" tool="3" flavor2="0">
+      <item path="npc.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="parse.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -278,12 +365,6 @@
       <item path="player_character.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="player_character.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pugiconfig.hpp" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pugixml.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pugixml.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="recipe.h" ex="false" tool="3" flavor2="0">
       </item>
