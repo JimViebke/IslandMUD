@@ -5,13 +5,14 @@
 #ifndef ITEM_INCLUDE_HEADER
 #define ITEM_INCLUDE_HEADER
 
-#include "item\item.h"
+#include "item/item.h"
 
-#include "item\misc.h"
-#include "item\stackable.h"
-#include "item\chest.h"
-#include "Item\table.h"
-#include "item\bloomery.h"
-#include "item\equipment.h"
+#include "item/container.h"
+#include "item/misc.h"
+#include "item/stackable.h"
+#include "item/chest.h"
+#include "item/table.h"
+#include "item/bloomery.h"
+#include "item/equipment.h"
 
 #endif
