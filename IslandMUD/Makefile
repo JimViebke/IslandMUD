@@ -56,7 +56,7 @@ build: .build-post
 .build-pre:
 # Add your pre 'build' code here...
 
-CXXFLAGS=-std=c++11
+CXXFLAGS=-std=c++14
 
 .build-post: .build-impl
 # Add your post 'build' code here...
