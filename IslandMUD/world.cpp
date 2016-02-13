@@ -676,7 +676,7 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 	// for each item in the room
 	const std::multimap<std::string, std::shared_ptr<Item>> room_item_contents = room->get_contents();
 	for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = room_item_contents.cbegin();
-		item_it != room_item_contents.cend(); ++item_it)
+	item_it != room_item_contents.cend(); ++item_it)
 	{
 		// create a node for the item, append it to the items node
 		pugi::xml_node item_node = items_node.append_child(C::XML_ITEM.c_str());
@@ -698,7 +698,7 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 	// for each side of the room
 	const std::map<std::string, Room_Side> room_sides = room->get_room_sides();
 	for (std::map<std::string, Room_Side>::const_iterator surface_it = room_sides.cbegin();
-		surface_it != room_sides.cend(); ++surface_it)
+	surface_it != room_sides.cend(); ++surface_it)
 	{
 		// create a node for a surface
 		pugi::xml_node surface_node = room_node.append_child(C::XML_SURFACE.c_str());
@@ -756,7 +756,7 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 		// for each equipment item
 		const std::multimap<std::string, std::shared_ptr<Item>> chest_contents = chest->get_contents(); // extract contents
 		for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = chest_contents.cbegin();
-			item_it != chest_contents.cend(); ++item_it)
+		item_it != chest_contents.cend(); ++item_it)
 		{
 			pugi::xml_node item_node = items_node.append_child(item_it->second->name.c_str());
 
@@ -791,7 +791,7 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 		// for each equipment item
 		const std::multimap<std::string, std::shared_ptr<Item>> table_contents = table->get_contents(); // extract contents
 		for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = table_contents.cbegin();
-			item_it != table_contents.cend(); ++item_it)
+		item_it != table_contents.cend(); ++item_it)
 		{
 			pugi::xml_node item_node = items_node.append_child(item_it->second->name.c_str());
 
