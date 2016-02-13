@@ -95,7 +95,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	else if (command.size() == 3 && command[0] == C::DROP_COMMAND)
 	{
 		// extract the character
-		std::shared_ptr<Character> character = actors.find(actor_id)->second;
+		std::shared_ptr<Character> & character = actors.find(actor_id)->second;
 
 		// test if the player contains any of the item specified
 		if (character->count(command[2]) > 0)
@@ -194,7 +194,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	else if (command.size() == 5 && command[0] == C::DROP_COMMAND && command[3] == C::INSERT_COMMAND && command[4] == C::CHEST_ID)
 	{
 		// extract the character
-		std::shared_ptr<Character> character = actors.find(actor_id)->second;
+		std::shared_ptr<Character> & character = actors.find(actor_id)->second;
 
 		// if the user wants to put all of the item in the chest
 		if (command[1] == C::ALL_COMMAND)
@@ -228,7 +228,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	{
 		return actors.find(actor_id)->second->take_from_chest(command[1], world);
 	}
-	// put item on table
+	// put [item] on table
 	else if (command.size() == 4 && command[0] == C::DROP_COMMAND && command[2] == C::INSERT_COMMAND && command[3] == C::TABLE_ID)
 	{
 		return actors.find(actor_id)->second->add_to_table(command[1], world);
