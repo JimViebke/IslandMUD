@@ -272,19 +272,7 @@ bool World::load_existing_world_terrain()
 			{
 				if (row.length() > 1) // if the row is not empty
 				{
-#ifdef _WIN32
 					temp_terrain.push_back(std::vector<char>(row.begin(), row.end())); // copy the contents of the row into an anonymous vector
-#else
-					vector<char> vec;
-					// for each character in the string
-					for (string::iterator it = row.begin(); it != row.end(); ++it)
-					{
-						// add it to the vector as a string of its own
-						vec.push_back(string(1, *it));
-					}
-					// add the vector as the next row in the terrain file
-					temp_terrain.push_back(vec);
-#endif
 				}
 			}
 		}
@@ -323,19 +311,7 @@ bool World::load_existing_iron_deposit_map()
 			{
 				if (row.length() > 1) // if the row is not empty
 				{
-#ifdef _WIN32
 					temp_terrain.push_back(std::vector<char>(row.begin(), row.end())); // copy the contents of the row into an anonymous vector
-#else
-					vector<char> vec;
-					// for each character in the string
-					for (string::iterator it = row.begin(); it != row.end(); ++it)
-					{
-						// add it to the vector as a string of its own
-						vec.push_back(string(1, *it));
-					}
-					// add the vector as the next row in the terrain file
-					temp_terrain.push_back(vec);
-#endif
 				}
 			}
 		}
@@ -374,19 +350,7 @@ bool World::load_existing_limestone_deposit_map()
 			{
 				if (row.length() > 1) // if the row is not empty
 				{
-#ifdef _WIN32
 					temp_terrain.push_back(std::vector<char>(row.begin(), row.end())); // copy the contents of the row into an anonymous vector
-#else
-					vector<char> vec;
-					// for each character in the string
-					for (string::iterator it = row.begin(); it != row.end(); ++it)
-					{
-						// add it to the vector as a string of its own
-						vec.push_back(string(1, *it));
-					}
-					// add the vector as the next row in the terrain file
-					temp_terrain.push_back(vec);
-#endif
 				}
 			}
 		}
