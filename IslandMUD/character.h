@@ -92,6 +92,8 @@ public:
 	Update_Messages attack_item(const std::string & target_ID, World & world);
 	Update_Messages add_to_bloomery(const std::string & item_ID, const unsigned & count, World & world);
 
+	Update_Messages multi_item_release(std::shared_ptr<Character> & character, multi_item_release_call release_call, World & world, const std::string & item_ID, const std::string & count);
+
 	// movement info
 	std::string validate_movement(const int & cx, const int & cy, const int & cz, const std::string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const;
 

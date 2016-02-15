@@ -1220,6 +1220,40 @@ Update_Messages Character::add_to_bloomery(const std::string & item_ID, const un
 	return Update_Messages("Character::add_to_bloomery() is incomplete.");
 }
 
+Update_Messages Character::multi_item_release(std::shared_ptr<Character> & character, multi_item_release_call release_call, World & world, const std::string & item_ID, const std::string & count)
+{
+	// create an unsigned integer to store the number of items to release
+	unsigned release_count = 0;
+
+	// if the user has indicated they wish to release all of a type
+	if (count == C::ALL_COMMAND)
+	{
+		// release as many of the item as the character has
+		release_count = character->count(item_ID);
+	}
+	else // the user likely typed a number
+	{
+		// attempt to convert the string into an unsigned integer
+		release_count = U::to_unsigned(count);
+	}
+
+	// test if the player contains any of the item specified
+	if (character->count(item_ID) > 0)
+	{
+		return release_call(character, item_ID, world, release_count);
+	}
+
+	// if the release count is 1
+	if (release_count == 1)
+	{
+		return Update_Messages("You don't have " + U::get_article_for(item_ID) + " " + item_ID + ".");
+	}
+	else // ensure the return message uses the plural form of the word
+	{
+		return Update_Messages("You don't have any " + U::get_plural_for(item_ID) + ".");
+	}
+}
+
 // movement info
 std::string Character::validate_movement(const int & cx, const int & cy, const int & cz, const std::string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const
 {
