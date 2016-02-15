@@ -27,7 +27,7 @@ std::string Container::contents_to_string() const
 		it != contents.end(); ++it)
 	{
 		// if the item is stackable
-		if (const std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(it->second))
+		if (const std::shared_ptr<Stackable> & stackable = U::convert_to<Stackable>(it->second))
 		{
 			if (stackable->amount != 1) // and the amount is != 1
 			{
@@ -68,7 +68,7 @@ bool Container::contains(const std::string & item_id, const unsigned & count) co
 	if (item_it == contents.cend()) return false;
 
 	// if the item is stackable
-	if (const std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item_it->second))
+	if (const std::shared_ptr<Stackable> & stackable = U::convert_to<Stackable>(item_it->second))
 	{
 		// test if the present amount is greater than or equal to the count
 		return stackable->amount >= count;
@@ -128,7 +128,7 @@ std::shared_ptr<Item> Container::erase(const std::string & item_id)
 	if (item_it == contents.cend()) return nullptr;
 
 	// if the item is a stackable type
-	if (std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item_it->second))
+	if (std::shared_ptr<Stackable> & stackable = U::convert_to<Stackable>(item_it->second))
 	{
 		// count one less item in storage
 		stackable->amount--;
@@ -164,7 +164,7 @@ void Container::erase(const std::string & item_id, const unsigned & count)
 	if (item_it == contents.cend()) return;
 
 	// if the item is stackable
-	if (std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item_it->second))
+	if (std::shared_ptr<Stackable> & stackable = U::convert_to<Stackable>(item_it->second))
 	{
 		// erase the amount required
 		stackable->amount -= std::min(stackable->amount, count);
