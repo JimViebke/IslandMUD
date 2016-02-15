@@ -17,8 +17,8 @@ class Room : public Container
 {
 private:
 	bool water = false; // is the room dry land or water?
-	std::shared_ptr<Chest> chest; // nullptr if the room does not have a chest
-	std::shared_ptr<Table> table; // nullptr if the room does not have a table
+	std::shared_ptr<Chest> chest = nullptr; // nullptr if the room does not have a chest
+	std::shared_ptr<Table> table = nullptr; // nullptr if the room does not have a table
 	std::map<std::string, Room_Side> room_sides = {}; // the floor, walls, and ceiling in the room (present surfaces only)
 	std::vector<std::string> viewing_actor_ids = {}; // the PCs and NPCs who can see this room
 	std::vector<std::string> actor_ids = {}; // the PCs and NPCs in a room
