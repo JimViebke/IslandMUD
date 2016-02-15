@@ -1320,3 +1320,17 @@ std::string Character::validate_movement(const int & cx, const int & cy, const i
 	// no issues were detected
 	return C::GOOD_SIGNAL;
 }
+
+// These are used to create function pointers to their corresponding non-static member functions aobve.
+Update_Messages Character::drop_call(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count)
+{
+	return character->drop(item_ID, world, count);
+}
+Update_Messages Character::add_to_chest_call(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count)
+{
+	return character->add_to_chest(item_ID, world, count);
+}
+Update_Messages Character::add_to_table_call(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count)
+{
+	return character->add_to_table(item_ID, world, count);
+}

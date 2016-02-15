@@ -93,6 +93,11 @@ public:
 	// movement info
 	std::string validate_movement(const int & cx, const int & cy, const int & cz, const std::string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const;
 
+	// These are used to create function pointers to their corresponding non-static member functions aobve.
+	static Update_Messages drop_call(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count);
+	static Update_Messages add_to_chest_call(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count);
+	static Update_Messages add_to_table_call(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count);
+
 };
 
 #endif
