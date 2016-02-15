@@ -80,7 +80,7 @@ public:
 	Update_Messages add_to_chest(std::string insert_item_id, World & world, const unsigned & count = 1);
 	Update_Messages take_from_chest(const std::string & take_item_id, World & world);
 	Update_Messages look_inside_chest(const World & world) const;
-	Update_Messages add_to_table(const std::string & add_item_ID, World & world);
+	Update_Messages add_to_table(const std::string & add_item_ID, World & world, const unsigned & count = 1);
 	Update_Messages take_from_table(const std::string remove_item_ID, World & world);
 	Update_Messages look_at_table(const World & world) const;
 	Update_Messages construct_surface(const std::string & material_id, const std::string & surface_id, World & world);

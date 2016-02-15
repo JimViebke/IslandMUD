@@ -793,7 +793,7 @@ Update_Messages Character::look_inside_chest(const World & world) const
 	// validation within
 	return world.room_at(x, y, z)->chest_contents(faction_ID, this->name);
 }
-Update_Messages Character::add_to_table(const std::string & add_item_ID, World & world)
+Update_Messages Character::add_to_table(const std::string & add_item_ID, World & world, const unsigned & count)
 {
 	// check if the player has the item
 	if (!this->contains(add_item_ID))
