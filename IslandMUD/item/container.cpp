@@ -103,9 +103,9 @@ unsigned Container::size() const
 	return contents.size();
 }
 
-void Container::insert(const std::shared_ptr<Item> & item)
+bool Container::insert(const std::shared_ptr<Item> & item)
 {
-	if (item == nullptr) return; // well, something went wrong
+	if (item == nullptr) return false; // well, something went wrong
 
 	if (U::is<Stackable>(item) && this->contains(item->name)) // if the item is stackable and already exists in the container
 	{
@@ -116,6 +116,8 @@ void Container::insert(const std::shared_ptr<Item> & item)
 	{
 		contents.insert(make_pair(item->name, item));
 	}
+
+	return true;
 }
 std::shared_ptr<Item> Container::erase(const std::string & item_id)
 {

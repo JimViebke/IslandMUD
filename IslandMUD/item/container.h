@@ -23,7 +23,7 @@ public:
 	unsigned count(const std::string & item_id) const;
 	unsigned size() const;
 
-	void insert(const std::shared_ptr<Item> & item);
+	bool insert(const std::shared_ptr<Item> & item);
 	std::shared_ptr<Item> erase(const std::string & item_id); // returns nullptr for items that don't exist
 	void erase(const std::string & item_id, const unsigned & count);
 
