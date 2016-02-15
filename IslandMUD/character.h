@@ -54,6 +54,8 @@ protected:
 
 public:
 
+	typedef Update_Messages(*multi_item_release_call)(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count);
+
 	std::string login(World & world);
 	std::string save();
 
