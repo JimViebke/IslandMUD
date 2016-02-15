@@ -32,7 +32,7 @@ Character::Character(const std::string & name, const std::string & set_faction_I
 }
 Character::~Character() {}
 
-std::string Character::login(World & world)
+void Character::login(World & world)
 {
 	// create a document to load the player's data
 	pugi::xml_document user_data_xml;
@@ -143,9 +143,6 @@ std::string Character::login(World & world)
 		// add the item to the player's inventory
 		this->insert(item);
 	}
-
-	// notify success
-	return "You have logged in to IslandMUD!";
 }
 Update_Messages Character::save()
 {
