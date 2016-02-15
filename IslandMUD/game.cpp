@@ -23,18 +23,6 @@ Game::Game()
 	std::thread(&Game::NPC_thread, this).detach();
 }
 
-void Game::login(const std::string & user_id)
-{
-	// the caller must own a lock on actors_mutex
-
-	// create a player character
-	PC player(user_id);
-	// load the player's data and place the player in the world
-	player.login(world);
-	// add the character to the actor registry
-	actors.insert(std::pair<std::string, std::shared_ptr<PC>>(player.name, std::make_shared<PC>(player)));
-}
-
 Update_Messages Game::execute_command(const std::string & actor_id, const std::vector<std::string> & command)
 {
 	// "help"
