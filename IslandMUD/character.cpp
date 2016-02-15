@@ -147,7 +147,7 @@ std::string Character::login(World & world)
 	// notify success
 	return "You have logged in to IslandMUD!";
 }
-std::string Character::save()
+Update_Messages Character::save()
 {
 	// if an item is equipped, move it back to the player's inventory
 	this->unequip();
@@ -203,7 +203,7 @@ std::string Character::save()
 	// save the user_data to disk
 	user_data_xml.save_file((C::user_data_directory + "/" + this->name + ".xml").c_str()); // returns an unused boolean
 
-	return "Player info saved to disk.";
+	return Update_Messages("Player info saved to disk.");
 }
 
 // levels

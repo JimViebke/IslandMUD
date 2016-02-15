@@ -173,7 +173,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	// save
 	else if (command.size() == 1 && command[0] == C::SAVE_COMMAND)
 	{
-		return Update_Messages(actors.find(actor_id)->second->save());
+		return actors.find(actor_id)->second->save();
 	}
 	// equip [item]
 	else if (command.size() == 2 && command[0] == C::EQUIP_COMMAND)
