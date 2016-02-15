@@ -55,7 +55,7 @@ public:
 	bool has_chest() const;
 	std::string get_chest_faction_id() const;
 	int chest_health() const;
-	void add_item_to_chest(const std::shared_ptr<Item> & item);
+	bool add_item_to_chest(const std::shared_ptr<Item> & item);
 	Update_Messages chest_contents(const std::string & faction_ID, const std::string & username) const;
 	void damage_chest();
 	bool chest_has(const std::string & item_id) const;
@@ -66,7 +66,7 @@ public:
 	// tables
 	void add_table();
 	bool has_table() const;
-	void add_item_to_table(const std::shared_ptr<Item> & item);
+	bool add_item_to_table(const std::shared_ptr<Item> & item);
 	Update_Messages table_contents(const std::string & username) const;
 	bool table_has(const std::string & item_id) const;
 	std::shared_ptr<Item> remove_from_table(const std::string & item_ID);
@@ -77,7 +77,7 @@ public:
 	std::string add_item_to_bloomery(const std::shared_ptr<Forgeable> & item);
 
 	// items
-	void add_item(const std::shared_ptr<Item> item);
+	bool add_item(const std::shared_ptr<Item> & item);
 	void remove_item(const std::string & item_id, const int & count = 1);
 	bool damage_item(const std::string & item_id, const int & amount);
 
