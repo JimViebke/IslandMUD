@@ -21,10 +21,8 @@ Feb 14, 2015 */
 #include <cstring>
 #endif
 
-#include "utilities.h"
 #include "constants.h"
 #include "character.h"
-#include "player_character.h"
 #include "npc.h"
 #include "parse.h"
 #include "world.h"

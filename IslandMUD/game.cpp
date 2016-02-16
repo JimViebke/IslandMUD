@@ -539,9 +539,9 @@ void Game::outbound_thread()
 {
 	for (;;)
 	{
-		const Message message = outbound_queue.get(); // return by reference (blocking)
+		const Message message = outbound_queue.get(); // (blocking)
 
-		// dispatch data to the user (nonblocking) (because we're using TCP, data is lossless unless total failure occurs)
+		// dispatch data to the user (because we're using TCP, data is lossless unless total failure occurs)
 		send(message.user_socket_ID, message.data.c_str(), message.data.size(), 0);
 	}
 }
@@ -580,7 +580,7 @@ std::string Game::login_or_signup(const SOCKET client_ID)
 		// check if reading the socket failed
 		if (data_read == 0 || data_read == -1) // graceful disconnect, less graceful disconnect (respectively)
 		{
-			close_socket(client_ID); // close socket (platform-independent)
+			close_socket(client_ID); // close socket (platform-independent wrapper)
 			return ""; // the user lost connection before logging in
 		}
 
