@@ -1,5 +1,7 @@
 *.idb
 *.ilk
+*.iobj
+*.ipdb
 *.log
 *.obj
 *.opensdf
@@ -8,7 +10,5 @@
 *.suo
 *.tlog
 *.user
-*.exe
 IslandMUD/nbproject/private/
-Release/
 Debug/
