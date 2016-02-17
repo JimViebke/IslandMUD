@@ -23,18 +23,6 @@ Game::Game()
 	std::thread(&Game::NPC_thread, this).detach();
 }
 
-void Game::login(const std::string & user_id)
-{
-	// the caller must own a lock on actors_mutex
-
-	// create a player character
-	PC player(user_id);
-	// load the player's data and place the player in the world
-	player.login(world);
-	// add the character to the actor registry
-	actors.insert(std::pair<std::string, std::shared_ptr<PC>>(player.name, std::make_shared<PC>(player)));
-}
-
 Update_Messages Game::execute_command(const std::string & actor_id, const std::vector<std::string> & command)
 {
 	// "help"
@@ -89,29 +77,20 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	// dropping item: "drop staff"
 	else if (command.size() == 2 && command[0] == C::DROP_COMMAND)
 	{
-		return actors.find(actor_id)->second->drop(command[1], world); // (item_id, world)
+		// extract the character
+		std::shared_ptr<Character> & character = actors.find(actor_id)->second;
+
+		// call item release
+		return character->item_release(character, &Character::drop_call, world, command[1], 1);
 	}
 	// dropping item: drop n staffs" (the tokenizer will have already converted plurals to singular)
 	else if (command.size() == 3 && command[0] == C::DROP_COMMAND)
 	{
 		// extract the character
-		std::shared_ptr<Character> character = actors.find(actor_id)->second;
+		std::shared_ptr<Character> & character = actors.find(actor_id)->second;
 
-		// test if the player contains any of the item specified
-		if (character->count(command[2]) > 0)
-		{
-			return character->drop(command[2], world, U::to_unsigned(command[1])); // (item_id, world, total count)
-		}
-
-		// if the drop count is 1
-		if (command[1] == "1")
-		{
-			return Update_Messages("You don't have " + U::get_article_for(command[2]) + " " + command[2] + " to drop.");
-		}
-		else // ensure the return message uses the plural form of the word
-		{
-			return Update_Messages("You don't have any " + U::get_plural_for(command[2]) + " to drop.");
-		}
+		// call item release
+		return character->item_release(character, &Character::drop_call, world, command[2], command[1]);
 	}
 	// crafting: "craft sword"
 	else if (command.size() == 2 && command[0] == C::CRAFT_COMMAND)
@@ -173,7 +152,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	// save
 	else if (command.size() == 1 && command[0] == C::SAVE_COMMAND)
 	{
-		return Update_Messages(actors.find(actor_id)->second->save());
+		return actors.find(actor_id)->second->save();
 	}
 	// equip [item]
 	else if (command.size() == 2 && command[0] == C::EQUIP_COMMAND)
@@ -188,35 +167,20 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	// put item in chest
 	else if (command.size() == 4 && command[0] == C::DROP_COMMAND && command[2] == C::INSERT_COMMAND && command[3] == C::CHEST_ID)
 	{
-		return actors.find(actor_id)->second->add_to_chest(command[1], world);
+		// extract the character
+		std::shared_ptr<Character> & character = actors.find(actor_id)->second;
+
+		// call item release
+		return character->item_release(character, &Character::add_to_chest_call, world, command[1], 1);
 	}
 	// put n items in chest
 	else if (command.size() == 5 && command[0] == C::DROP_COMMAND && command[3] == C::INSERT_COMMAND && command[4] == C::CHEST_ID)
 	{
 		// extract the character
-		std::shared_ptr<Character> character = actors.find(actor_id)->second;
+		std::shared_ptr<Character> & character = actors.find(actor_id)->second;
 
-		// if the user wants to put all of the item in the chest
-		if (command[1] == C::ALL_COMMAND)
-		{
-			return character->add_to_chest(command[2], world, character->count(command[2])); // (item_id, world, total count)
-		}
-
-		// test if the player contains any of the item specified
-		if (character->count(command[2]) > 0)
-		{
-			return character->add_to_chest(command[2], world, U::to_unsigned(command[1])); // (item_id, world, total count)
-		}
-
-		// if the insert count is 1
-		if (command[1] == "1")
-		{
-			return Update_Messages("You don't have " + U::get_article_for(command[2]) + " " + command[2] + " to put into the chest.");
-		}
-		else // ensure the return message uses the plural form of the word
-		{
-			return Update_Messages("You don't have any " + U::get_plural_for(command[2]) + " to put into the chest.");
-		}
+		// call multi item release
+		return character->item_release(character, &Character::add_to_chest_call, world, command[2], command[1]);
 	}
 	// look at chest: "chest"
 	else if (command.size() == 1 && command[0] == C::CHEST_ID)
@@ -228,10 +192,23 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	{
 		return actors.find(actor_id)->second->take_from_chest(command[1], world);
 	}
-	// put item on table
+	// put [item] on table
 	else if (command.size() == 4 && command[0] == C::DROP_COMMAND && command[2] == C::INSERT_COMMAND && command[3] == C::TABLE_ID)
 	{
-		return actors.find(actor_id)->second->add_to_table(command[1], world);
+		// extract the character
+		std::shared_ptr<Character> & character = actors.find(actor_id)->second;
+
+		// call item release
+		return character->item_release(character, &Character::add_to_table_call, world, command[1], 1);
+	}
+	// put [n] [item] on table
+	else if (command.size() == 5 && command[0] == C::DROP_COMMAND && command[3] == C::INSERT_COMMAND && command[4] == C::TABLE_ID)
+	{
+		// extract the character
+		std::shared_ptr<Character> & character = actors.find(actor_id)->second;
+
+		// call multi item release
+		return character->item_release(character, &Character::add_to_table_call, world, command[2], command[1]);
 	}
 	// look at table: "table"
 	else if (command.size() == 1 && command[0] == C::TABLE_ID)
@@ -551,9 +528,9 @@ void Game::outbound_thread()
 {
 	for (;;)
 	{
-		const Message message = outbound_queue.get(); // return by reference (blocking)
+		const Message message = outbound_queue.get(); // (blocking)
 
-		// dispatch data to the user (nonblocking) (because we're using TCP, data is lossless unless total failure occurs)
+		// dispatch data to the user (because we're using TCP, data is lossless unless total failure occurs)
 		send(message.user_socket_ID, message.data.c_str(), message.data.size(), 0);
 	}
 }
@@ -592,7 +569,7 @@ std::string Game::login_or_signup(const SOCKET client_ID)
 		// check if reading the socket failed
 		if (data_read == 0 || data_read == -1) // graceful disconnect, less graceful disconnect (respectively)
 		{
-			close_socket(client_ID); // close socket (platform-independent)
+			close_socket(client_ID); // close socket (platform-independent wrapper)
 			return ""; // the user lost connection before logging in
 		}
 

@@ -5,8 +5,6 @@ May 15 2015 */
 #include <memory>
 
 #include "world.h"
-#include "character.h"
-#include "npc.h"
 #include "parse.h"
 
 World::World()

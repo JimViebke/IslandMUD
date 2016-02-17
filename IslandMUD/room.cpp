@@ -155,9 +155,9 @@ int Room::chest_health() const
 	// return the chest's health, or 0 if there is no chest (indicating a validation failure in the calling function)
 	return (has_chest()) ? chest->get_health() : 0;
 }
-void Room::add_item_to_chest(const std::shared_ptr<Item> & item)
+bool Room::add_item_to_chest(const std::shared_ptr<Item> & item)
 {
-	chest->insert(item);
+	return chest->insert(item);
 }
 Update_Messages Room::chest_contents(const std::string & faction_ID, const std::string & username) const
 {
@@ -227,9 +227,9 @@ bool Room::has_table() const
 {
 	return this->table != nullptr;
 }
-void Room::add_item_to_table(const std::shared_ptr<Item> & item)
+bool Room::add_item_to_table(const std::shared_ptr<Item> & item)
 {
-	table->insert(item);
+	return table->insert(item);
 }
 Update_Messages Room::table_contents(const std::string & username) const
 {
@@ -282,9 +282,9 @@ std::string Room::add_item_to_bloomery(const std::shared_ptr<Forgeable> & item)
 }
 
 // items
-void Room::add_item(const std::shared_ptr<Item> item) // pass a copy rather than a reference
+bool Room::add_item(const std::shared_ptr<Item> & item) // pass a copy rather than a reference
 {
-	this->insert(item);
+	return this->insert(item);
 }
 void Room::remove_item(const std::string & item_id, const int & count)
 {

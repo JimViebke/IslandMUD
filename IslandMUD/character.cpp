@@ -32,7 +32,7 @@ Character::Character(const std::string & name, const std::string & set_faction_I
 }
 Character::~Character() {}
 
-std::string Character::login(World & world)
+void Character::login(World & world)
 {
 	// create a document to load the player's data
 	pugi::xml_document user_data_xml;
@@ -143,11 +143,8 @@ std::string Character::login(World & world)
 		// add the item to the player's inventory
 		this->insert(item);
 	}
-
-	// notify success
-	return "You have logged in to IslandMUD!";
 }
-std::string Character::save()
+Update_Messages Character::save()
 {
 	// if an item is equipped, move it back to the player's inventory
 	this->unequip();
@@ -203,7 +200,7 @@ std::string Character::save()
 	// save the user_data to disk
 	user_data_xml.save_file((C::user_data_directory + "/" + this->name + ".xml").c_str()); // returns an unused boolean
 
-	return "Player info saved to disk.";
+	return Update_Messages("Player info saved to disk.");
 }
 
 // levels
@@ -592,39 +589,25 @@ Update_Messages Character::take(const std::string & take_item_id, World & world)
 }
 Update_Messages Character::drop(const std::string & drop_item_id, World & world, const unsigned & count)
 {
-	// if the player is holding the item specified
-	if (this->equipped_item != nullptr && this->equipped_item->name == drop_item_id)
+	// the caller shall verify that the character has the specified item count
+
+	// create a counter to determine how many items are actually dropped
+	unsigned drop_count = 0;
+
+	// add the item(s) to the world, removing from the player's inventory
+	for (unsigned i = 0; i < count; ++i)
 	{
-		// add the item to the world
-		world.room_at(x, y, z)->add_item(this->equipped_item);
-
-		// destroy the user's copy of the item
-		this->equipped_item = nullptr;
-
-		return Update_Messages("You drop your " + drop_item_id + ".");
-	}
-	else // the player is not holding the item, check if the item is in the player's inventory
-	{
-		if (!this->contains(drop_item_id, count)) // if the player does not have the item specified
+		// if the item is successfully added to the room
+		if (world.room_at(x, y, z)->add_item(this->erase(drop_item_id)))
 		{
-			// the item does not exist in the player's inventory in the required quantity
-			if (count == 1)
-				return Update_Messages("You don't have " + U::get_article_for(drop_item_id) + " " + drop_item_id + " to drop.");
-			else
-				return Update_Messages("You don't have " + U::to_string(count) + " " + U::get_plural_for(drop_item_id) + " to drop.");
-		}
-
-		// add the item(s) to the world, removing from the player's inventory
-		for (unsigned i = 0; i < count; ++i)
-		{
-			world.room_at(x, y, z)->add_item(this->erase(drop_item_id));
+			++drop_count;
 		}
 	}
 
-	if (count > 1) // plural result
+	if (drop_count > 1) // plural result
 	{
-		return Update_Messages("You drop " + U::to_string(count) + " " + U::get_plural_for(drop_item_id) + ".",
-			this->name + " drops " + U::to_string(count) + " " + U::get_plural_for(drop_item_id) + ".");
+		return Update_Messages("You drop " + U::to_string(drop_count) + " " + U::get_plural_for(drop_item_id) + ".",
+			this->name + " drops " + U::to_string(drop_count) + " " + U::get_plural_for(drop_item_id) + ".");
 	}
 	else // singular result
 	{
@@ -726,35 +709,23 @@ Update_Messages Character::add_to_chest(std::string insert_item_id, World & worl
 		return Update_Messages("This chest has an unfamiliar lock.");
 	}
 
-	// if the item is equipped
-	if (equipped_item != nullptr && equipped_item->name == insert_item_id)
-	{
-		world.room_at(x, y, z)->add_item_to_chest(equipped_item);
-		equipped_item = nullptr;
-		return Update_Messages("You place your " + insert_item_id + " in the chest.");
-	}
-	else // the item is not equipped; remove it from the player's inventory
-	{
-		if (!this->contains(insert_item_id, count)) // if the player does not have the item specified
-		{
-			// the item does not exist in the player's inventory in the required quantity
-			if (count == 1)
-				return Update_Messages("You don't have " + U::get_article_for(insert_item_id) + " " + insert_item_id + " to put in the chest.");
-			else
-				return Update_Messages("You don't have " + U::to_string(count) + " " + U::get_plural_for(insert_item_id) + " to put in the chest.");
-		}
+	// create a counter to determine how many items are actually added to the chest
+	unsigned add_count = 0;
 
-		// add the item(s) to the chest, removing from the player's inventory
-		for (unsigned i = 0; i < count; ++i)
+	// add the item(s) to the chest, removing from the player's inventory
+	for (unsigned i = 0; i < count; ++i)
+	{
+		// if the item is successfully added to the chest
+		if (world.room_at(x, y, z)->add_item_to_chest(this->erase(insert_item_id)))
 		{
-			world.room_at(x, y, z)->add_item_to_chest(this->erase(insert_item_id));
+			++add_count;
 		}
 	}
 
-	if (count > 1) // plural result
+	if (add_count > 1) // plural result
 	{
-		return Update_Messages("You place " + U::to_string(count) + " " + U::get_plural_for(insert_item_id) + " into the chest.",
-			this->name + " places " + U::to_string(count) + " " + U::get_plural_for(insert_item_id) + " into the chest.");
+		return Update_Messages("You place " + U::to_string(add_count) + " " + U::get_plural_for(insert_item_id) + " into the chest.",
+			this->name + " places " + U::to_string(add_count) + " " + U::get_plural_for(insert_item_id) + " into the chest.");
 	}
 	else // singular result
 	{
@@ -793,25 +764,37 @@ Update_Messages Character::look_inside_chest(const World & world) const
 	// validation within
 	return world.room_at(x, y, z)->chest_contents(faction_ID, this->name);
 }
-Update_Messages Character::add_to_table(const std::string & add_item_ID, World & world)
+Update_Messages Character::add_to_table(const std::string & add_item_ID, World & world, const unsigned & count)
 {
-	// check if the player has the item
-	if (!this->contains(add_item_ID))
-	{
-		return Update_Messages("You do not have " + U::get_article_for(add_item_ID) + " " + add_item_ID + ".");
-	}
-
 	// check if there is a table in the room
 	if (!world.room_at(x, y, z)->has_table())
 	{
 		return Update_Messages("There is no table here.");
 	}
 
-	// move the item from the player's inventory to the table
-	world.room_at(x, y, z)->add_item_to_table(this->erase(add_item_ID));
+	// create a counter to determine how many items are actually added to the table
+	unsigned add_count = 0;
 
-	return Update_Messages("You put the " + add_item_ID + " on the table.",
-		name + " puts " + U::get_article_for(add_item_ID) + " " + add_item_ID + " on the table.");
+	// move the item from the player's inventory to the table
+	for (unsigned i = 0; i < count; ++i)
+	{
+		// if the item is successfully added to the table
+		if (world.room_at(x, y, z)->add_item_to_table(this->erase(add_item_ID)))
+		{
+			++add_count;
+		}
+	}
+
+	if (add_count > 1) // plural result
+	{
+		return Update_Messages("You put " + U::to_string(add_count) + " " + U::get_plural_for(add_item_ID) + " on the table.",
+			this->name + " drops " + U::to_string(add_count) + " " + U::get_plural_for(add_item_ID) + " on the table.");
+	}
+	else // singular result
+	{
+		return Update_Messages("You put " + U::get_article_for(add_item_ID) + " " + add_item_ID + " on the table.",
+			this->name + " drops " + U::get_article_for(add_item_ID) + " " + add_item_ID + " on the table.");
+	}
 }
 Update_Messages Character::take_from_table(const std::string remove_item_ID, World & world)
 {
@@ -1220,6 +1203,45 @@ Update_Messages Character::add_to_bloomery(const std::string & item_ID, const un
 	return Update_Messages("Character::add_to_bloomery() is incomplete.");
 }
 
+Update_Messages Character::item_release(std::shared_ptr<Character> & character, item_release_call release_call, World & world, const std::string & item_ID, const std::string & count)
+{
+	// create an unsigned integer to store the number of items to release
+	unsigned release_count = 0;
+
+	// if the user has indicated they wish to release all of a type
+	if (count == C::ALL_COMMAND)
+	{
+		// release as many of the item as the character has
+		release_count = character->count(item_ID);
+	}
+	else // the user likely typed a number
+	{
+		// attempt to convert the string into an unsigned integer
+		release_count = U::to_unsigned(count);
+	}
+
+	// forward the call to this function's overload
+	return item_release(character, release_call, world, item_ID, release_count);
+}
+Update_Messages Character::item_release(std::shared_ptr<Character> & character, item_release_call release_call, World & world, const std::string & item_ID, const unsigned & count)
+{
+	// test if the player contains any of the item specified
+	if (character->count(item_ID) > 0)
+	{
+		return release_call(character, item_ID, world, count);
+	}
+
+	// if the release count is 1
+	if (count == 1)
+	{
+		return Update_Messages("You don't have " + U::get_article_for(item_ID) + " " + item_ID + ".");
+	}
+	else // ensure the return message uses the plural form of the word
+	{
+		return Update_Messages("You don't have any " + U::get_plural_for(item_ID) + ".");
+	}
+}
+
 // movement info
 std::string Character::validate_movement(const int & cx, const int & cy, const int & cz, const std::string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const
 {
@@ -1319,4 +1341,18 @@ std::string Character::validate_movement(const int & cx, const int & cy, const i
 
 	// no issues were detected
 	return C::GOOD_SIGNAL;
+}
+
+// These are used to create function pointers to their corresponding non-static member functions aobve.
+Update_Messages Character::drop_call(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count)
+{
+	return character->drop(item_ID, world, count);
+}
+Update_Messages Character::add_to_chest_call(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count)
+{
+	return character->add_to_chest(item_ID, world, count);
+}
+Update_Messages Character::add_to_table_call(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count)
+{
+	return character->add_to_table(item_ID, world, count);
 }

@@ -21,10 +21,8 @@ Feb 14, 2015 */
 #include <cstring>
 #endif
 
-#include "utilities.h"
 #include "constants.h"
 #include "character.h"
-#include "player_character.h"
 #include "npc.h"
 #include "parse.h"
 #include "world.h"
@@ -48,8 +46,6 @@ private:
 public:
 
 	Game();
-
-	void login(const std::string & user_id);
 
 	// execute a command against the game world
 	Update_Messages execute_command(const std::string & actor_id, const std::vector<std::string> & command);
