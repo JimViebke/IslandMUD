@@ -271,14 +271,6 @@ std::string Room::add_item_to_bloomery(const std::shared_ptr<Forgeable> & item)
 }
 
 // items
-bool Room::add_item(const std::shared_ptr<Item> & item) // pass a copy rather than a reference
-{
-	return this->insert(item);
-}
-void Room::remove_item(const std::string & item_id, const int & count)
-{
-	this->erase(item_id, count);
-}
 bool Room::damage_item(const std::string & item_id, const int & amount)
 {
 	// return a boolean indicating if the target item was destroyed
@@ -287,13 +279,13 @@ bool Room::damage_item(const std::string & item_id, const int & amount)
 	if (contents.find(item_id)->second->get_health() - amount <= C::DEFAULT_ITEM_MIN_HEALTH)
 	{
 		// remove the item from the room
-		remove_item(item_id);
+		erase(item_id);
 
 		// if the removed item was a tree
 		if (item_id == C::TREE_ID)
 		{
 			// add a log
-			add_item(Craft::make(C::LOG_ID));
+			insert(Craft::make(C::LOG_ID));
 		}
 
 		return true;
@@ -448,7 +440,7 @@ Update_Messages Room::damage_surface(const std::string & surface_ID, const std::
 		room_sides.erase(surface_ID);
 
 		// add a debris object to the room
-		this->add_item(Craft::make(C::DEBRIS_ID));
+		this->insert(Craft::make(C::DEBRIS_ID));
 	}
 
 	return Update_Messages(

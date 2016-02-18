@@ -525,7 +525,7 @@ Update_Messages Character::craft(const std::string & craft_item_id, World & worl
 			else // the item can not be taken
 			{
 				// add the item to the room
-				world.room_at(x, y, z)->add_item(item);
+				world.room_at(x, y, z)->insert(item);
 			}
 		}
 
@@ -598,7 +598,7 @@ Update_Messages Character::drop(const std::string & drop_item_id, World & world,
 	for (unsigned i = 0; i < count; ++i)
 	{
 		// if the item is successfully added to the room
-		if (world.room_at(x, y, z)->add_item(this->erase(drop_item_id)))
+		if (world.room_at(x, y, z)->insert(this->erase(drop_item_id)))
 		{
 			++drop_count;
 		}

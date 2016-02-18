@@ -76,8 +76,6 @@ public:
 	std::string add_item_to_bloomery(const std::shared_ptr<Forgeable> & item);
 
 	// items
-	bool add_item(const std::shared_ptr<Item> & item);
-	void remove_item(const std::string & item_id, const int & count = 1);
 	bool damage_item(const std::string & item_id, const int & amount);
 
 	// add surfaces and doors

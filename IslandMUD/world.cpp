@@ -472,7 +472,7 @@ void World::add_room_to_world(pugi::xml_node & room_node, const int & x, const i
 		}
 
 		// add the item to the room
-		room->add_item(item);
+		room->insert(item);
 	}
 
 	// for each surface in the room
@@ -818,7 +818,7 @@ std::unique_ptr<Room> World::create_room(const int & x, const int & y, const int
 		// if the terrain map indicates the room is forest
 		if (terrain->operator[](x)[y] == C::FOREST_CHAR)
 		{
-			room->add_item(Craft::make(C::TREE_ID)); // add a tree
+			room->insert(Craft::make(C::TREE_ID)); // add a tree
 		}
 
 		// if the terrain map indicates the room is water
@@ -830,13 +830,13 @@ std::unique_ptr<Room> World::create_room(const int & x, const int & y, const int
 		// if the iron ore map indicates the room contains an iron deposit
 		if (iron_deposit_map->operator[](x)[y] == C::GENERIC_MINERAL_CHAR)
 		{
-			room->add_item(Craft::make(C::IRON_DEPOSIT_ID)); // add an iron deposit item
+			room->insert(Craft::make(C::IRON_DEPOSIT_ID)); // add an iron deposit item
 		}
 
 		// if the limestone map indicates the room contains limestone
 		if (limestone_deposit_map->operator[](x)[y] == C::GENERIC_MINERAL_CHAR)
 		{
-			room->add_item(Craft::make(C::LIMESTONE_DEPOSIT_ID)); // add a limestone item
+			room->insert(Craft::make(C::LIMESTONE_DEPOSIT_ID)); // add a limestone item
 		}
 	}
 
