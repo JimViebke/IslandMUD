@@ -198,17 +198,6 @@ bool Room::chest_has(const std::string & item_id) const
 
 	return chest->contains(item_id);
 }
-std::shared_ptr<Item> Room::remove_from_chest(const std::string & item_id)
-{
-	// manifest a stone if a chest does not exist
-	// (this would indicate an validation failure in the calling function)
-	if (!has_chest())
-	{
-		return Craft::make(C::STONE_ID);
-	}
-
-	return chest->erase(item_id);
-}
 std::shared_ptr<Chest> Room::get_chest() const
 {
 	return chest;
