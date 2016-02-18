@@ -207,7 +207,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, std::map<std::string, 
 				if (world.room_at(x, y, z)->contains(C::TREE_ID))
 				{
 					// if the axe is not equipped
-					if (equipped_item == nullptr || equipped_item->name != C::AXE_ID)
+					if (equipped_item == nullptr || equipped_item->get_name() != C::AXE_ID)
 					{
 						// equip the axe
 						return equip(C::AXE_ID); // finished
@@ -383,7 +383,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, std::map<std::string, 
 				if (world.room_at(x, y, z)->contains(C::TREE_ID))
 				{
 					// if the axe is not equipped
-					if (equipped_item == nullptr || equipped_item->name != C::AXE_ID)
+					if (equipped_item == nullptr || equipped_item->get_name() != C::AXE_ID)
 					{
 						// equip the axe
 						return equip(C::AXE_ID);; // finished

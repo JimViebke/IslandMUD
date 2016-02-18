@@ -535,7 +535,7 @@ void World::add_room_to_world(pugi::xml_node & room_node, const int & x, const i
 			}
 
 			// add the item to the temporary multimap
-			chest_contents.insert(make_pair(item->name, item));
+			chest_contents.insert(make_pair(item->get_name(), item));
 		}
 
 		// create an anonymous chest object and add it to the room
@@ -572,7 +572,7 @@ void World::add_room_to_world(pugi::xml_node & room_node, const int & x, const i
 			}
 
 			// add the item to the temporary multimap
-			table_contents.insert(make_pair(item->name, item));
+			table_contents.insert(make_pair(item->get_name(), item));
 		}
 
 		// create an anonymous table object and add it to the room
@@ -680,7 +680,7 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 		pugi::xml_node item_node = items_node.append_child(C::XML_ITEM.c_str());
 
 		// append the name of the item: item_ID="limestone deposit"
-		item_node.append_attribute(C::XML_ITEM_ID.c_str()).set_value(item_it->second->name.c_str());
+		item_node.append_attribute(C::XML_ITEM_ID.c_str()).set_value(item_it->second->get_name().c_str());
 
 		// append the item's health as an attribute
 		item_node.append_attribute(C::XML_ITEM_HEALTH.c_str()).set_value(item_it->second->get_health());
@@ -756,7 +756,7 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 		for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = chest_contents.cbegin();
 		item_it != chest_contents.cend(); ++item_it)
 		{
-			pugi::xml_node item_node = items_node.append_child(item_it->second->name.c_str());
+			pugi::xml_node item_node = items_node.append_child(item_it->second->get_name().c_str());
 
 			// if the item is stackable
 			if (std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item_it->second))
@@ -791,7 +791,7 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 		for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = table_contents.cbegin();
 		item_it != table_contents.cend(); ++item_it)
 		{
-			pugi::xml_node item_node = items_node.append_child(item_it->second->name.c_str());
+			pugi::xml_node item_node = items_node.append_child(item_it->second->get_name().c_str());
 
 			// if the item is stackable
 			if (std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item_it->second))

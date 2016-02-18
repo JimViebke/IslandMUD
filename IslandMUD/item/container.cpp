@@ -31,16 +31,16 @@ std::string Container::contents_to_string() const
 		{
 			if (stackable->amount != 1) // and the amount is != 1
 			{
-				output << stackable->amount << " " << U::get_plural_for(stackable->name);
+				output << stackable->amount << " " << U::get_plural_for(stackable->get_name());
 			}
 			else
 			{
-				output << U::get_article_for(it->second->name) << " " << it->second->name; // this is duplicated below, but I'm not sure how to fix this
+				output << U::get_article_for(it->second->get_name()) << " " << it->second->get_name(); // this is duplicated below, but I'm not sure how to fix this
 			}
 		}
 		else // the item is not stackable
 		{
-			output << U::get_article_for(it->second->name) << " " << it->second->name;
+			output << U::get_article_for(it->second->get_name()) << " " << it->second->get_name();
 		}
 
 		// append a period or a comma
@@ -107,14 +107,14 @@ bool Container::insert(const std::shared_ptr<Item> & item)
 {
 	if (item == nullptr) return false; // well, something went wrong
 
-	if (U::is<Stackable>(item) && this->contains(item->name)) // if the item is stackable and already exists in the container
+	if (U::is<Stackable>(item) && this->contains(item->get_name())) // if the item is stackable and already exists in the container
 	{
 		// increment the existing item in the container
-		U::convert_to<Stackable>(contents.find(item->name)->second)->amount++;
+		U::convert_to<Stackable>(contents.find(item->get_name())->second)->amount++;
 	}
 	else // the item is either not stackable, or is not in the container
 	{
-		contents.insert(make_pair(item->name, item));
+		contents.insert(make_pair(item->get_name(), item));
 	}
 
 	return true;

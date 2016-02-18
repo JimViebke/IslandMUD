@@ -426,7 +426,7 @@ Update_Messages Character::move(const std::string & direction_ID, World & world)
 
 		// "Jeb arrives from the south [wielding an axe]."
 		this->name + " arrives from the " + C::opposite_direction_id.find(direction_ID)->second +
-		((this->equipped_item == nullptr) ? "." : (" wielding " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + ".")),
+		((this->equipped_item == nullptr) ? "." : (" wielding " + U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + ".")),
 
 		true); // update required for all users in sight range
 
@@ -626,7 +626,7 @@ Update_Messages Character::equip(const std::string & item_ID)
 	if (!this->contains(item_ID))
 	{
 		// if the player is wielding an instance of the item already
-		if (this->equipped_item->name == item_ID)
+		if (this->equipped_item->get_name() == item_ID)
 		{
 			return Update_Messages("You are holding " + U::get_article_for(item_ID) + " " + item_ID + " and don't have another one to equip.");
 		}
@@ -643,8 +643,8 @@ Update_Messages Character::equip(const std::string & item_ID)
 	// the player does have the item to equip, test if an item is already equipped
 	if (this->equipped_item != nullptr)
 	{
-		user_update << "You replace your " << equipped_item->name << " with ";
-		room_update << this->name << " replaces " << U::get_article_for(equipped_item->name) << " " << equipped_item->name << " with ";
+		user_update << "You replace your " << equipped_item->get_name() << " with ";
+		room_update << this->name << " replaces " << U::get_article_for(equipped_item->get_name()) << " " << equipped_item->get_name() << " with ";
 
 		// save the equipped item
 		const std::shared_ptr<Item> item = equipped_item;
@@ -669,8 +669,8 @@ Update_Messages Character::equip(const std::string & item_ID)
 	else
 	{
 		// complete and return the response message
-		user_update << U::get_article_for(equipped_item->name) << " " << equipped_item->name << ".";
-		room_update << U::get_article_for(equipped_item->name) << " " << equipped_item->name << ".";
+		user_update << U::get_article_for(equipped_item->get_name()) << " " << equipped_item->get_name() << ".";
+		room_update << U::get_article_for(equipped_item->get_name()) << " " << equipped_item->get_name() << ".";
 
 		return Update_Messages(user_update.str(), room_update.str());
 	}
@@ -685,7 +685,7 @@ Update_Messages Character::unequip()
 	}
 
 	// save the ID of the currently equipped item
-	const std::string item_ID = equipped_item->name;
+	const std::string item_ID = equipped_item->get_name();
 
 	// save the existing the item to the player's inventory
 	this->insert(equipped_item);
@@ -1135,13 +1135,13 @@ Update_Messages Character::attack_item(const std::string & target_ID, World & wo
 	if (equipped_item != nullptr)
 	{
 		// if the attacking implement is not in the damage tables
-		if (C::damage_tables.find(equipped_item->name) == C::damage_tables.cend())
+		if (C::damage_tables.find(equipped_item->get_name()) == C::damage_tables.cend())
 		{
-			return Update_Messages("You can't do that with " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + ".");
+			return Update_Messages("You can't do that with " + U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + ".");
 		}
 
 		// extract the damage table for the attacking implement
-		const std::map<std::string, int> damage_table = C::damage_tables.find(equipped_item->name)->second;
+		const std::map<std::string, int> damage_table = C::damage_tables.find(equipped_item->get_name())->second;
 
 		// if the damage table does not have an entry for the target item ID
 		if (damage_table.find(target_ID) == damage_table.cend())
@@ -1152,14 +1152,14 @@ Update_Messages Character::attack_item(const std::string & target_ID, World & wo
 		// damage the item, return a different message depending of if the item was destroyed or damaged
 		if (world.room_at(x, y, z)->damage_item(target_ID, damage_table.find(target_ID)->second))
 		{
-			return Update_Messages("You destroy the " + target_ID + " using your " + equipped_item->name + ".",
-				this->name + " uses " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + " to destroy " + U::get_article_for(target_ID) + " " + target_ID + ".",
+			return Update_Messages("You destroy the " + target_ID + " using your " + equipped_item->get_name() + ".",
+				this->name + " uses " + U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + " to destroy " + U::get_article_for(target_ID) + " " + target_ID + ".",
 				true);
 		}
 		else
 		{
-			return Update_Messages("You damage the " + target_ID + " using your " + equipped_item->name + ".",
-				this->name + " uses " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + " to damage " + U::get_article_for(target_ID) + " " + target_ID + ".");
+			return Update_Messages("You damage the " + target_ID + " using your " + equipped_item->get_name() + ".",
+				this->name + " uses " + U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + " to damage " + U::get_article_for(target_ID) + " " + target_ID + ".");
 		}
 	}
 	else // the user does not have an item equipped, do a barehanded attack

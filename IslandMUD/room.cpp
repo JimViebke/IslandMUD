@@ -270,7 +270,7 @@ std::string Room::add_item_to_bloomery(const std::shared_ptr<Forgeable> & item)
 
 	if (U::is_not<Forgeable>(item))
 	{
-		return "You cannot put a " + item->name + " in a bloomery.";
+		return "You cannot put a " + item->get_name() + " in a bloomery.";
 	}
 
 	// save a new shared_ptr to the bloomery in question
@@ -278,7 +278,7 @@ std::string Room::add_item_to_bloomery(const std::shared_ptr<Forgeable> & item)
 
 	bloomery->add_to_bloomery(item);
 
-	return "You place the " + item->name + " in a bloomery.";
+	return "You place the " + item->get_name() + " in a bloomery.";
 }
 
 // items
@@ -396,7 +396,7 @@ Update_Messages Room::damage_surface(const std::string & surface_ID, const std::
 	}
 
 	// extract the ID of the attacking implement (ATTACK_COMMAND for bare-hands melee attack)
-	const std::string equipped_item_id = ((equipped_item != nullptr) ? equipped_item->name : C::ATTACK_COMMAND);
+	const std::string equipped_item_id = ((equipped_item != nullptr) ? equipped_item->get_name() : C::ATTACK_COMMAND);
 
 	// check if the player's equipped weapon exists in the damage table
 	if (C::damage_tables.find(equipped_item_id) == C::damage_tables.cend())
@@ -504,7 +504,7 @@ Update_Messages Room::damage_door(const std::string & surface_ID, const std::sha
 	}
 
 	// extract the ID of the attacking implement (ATTACK_COMMAND for bare-hands melee attack)
-	const std::string equipped_item_id = ((equipped_item != nullptr) ? equipped_item->name : C::ATTACK_COMMAND);
+	const std::string equipped_item_id = ((equipped_item != nullptr) ? equipped_item->get_name() : C::ATTACK_COMMAND);
 
 	// check if the player's equipped weapon exists in the damage table
 	if (C::damage_tables.find(equipped_item_id) == C::damage_tables.cend())
