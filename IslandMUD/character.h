@@ -50,9 +50,10 @@ public:
 protected:
 
 	Character(const std::string & name, const std::string & set_faction_ID);
-	virtual ~Character(); // make Character into a polymorphic type
 
 public:
+
+	virtual ~Character(); // make Character into a polymorphic type
 
 	typedef Update_Messages(*item_release_call)(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count);
 
