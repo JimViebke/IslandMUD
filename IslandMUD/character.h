@@ -55,8 +55,6 @@ public:
 
 	virtual ~Character(); // make Character into a polymorphic type
 
-	typedef Update_Messages(*item_release_call)(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count);
-
 	void login(World & world);
 	Update_Messages save();
 
@@ -76,15 +74,15 @@ public:
 	// actions
 	Update_Messages craft(const std::string & craft_item_id, World & world);
 	Update_Messages move(const std::string & direction, World & world);
-	Update_Messages take(const std::string & item_id, World & world);
-	Update_Messages drop(const std::string & drop_item_id, World & world, const unsigned & count = 1);
+	Update_Messages take(const std::string & item_id, World & world, const std::string & count = "1");
+	Update_Messages drop(const std::string & drop_item_id, World & world, const std::string & count = "1");
 	Update_Messages equip(const std::string & item_ID);
 	Update_Messages unequip();
-	Update_Messages add_to_chest(std::string insert_item_id, World & world, const unsigned & count = 1);
-	Update_Messages take_from_chest(const std::string & take_item_id, World & world);
+	Update_Messages add_to_chest(std::string insert_item_id, World & world, const std::string & count = "1");
+	Update_Messages take_from_chest(const std::string & take_item_id, World & world, const std::string & count = "1");
 	Update_Messages look_inside_chest(const World & world) const;
-	Update_Messages add_to_table(const std::string & add_item_ID, World & world, const unsigned & count = 1);
-	Update_Messages take_from_table(const std::string remove_item_ID, World & world);
+	Update_Messages add_to_table(const std::string & add_item_ID, World & world, const std::string & count = "1");
+	Update_Messages take_from_table(const std::string take_item_ID, World & world, const std::string & count = "1");
 	Update_Messages look_at_table(const World & world) const;
 	Update_Messages construct_surface(const std::string & material_id, const std::string & surface_id, World & world);
 	Update_Messages construct_surface_with_door(const std::string & material_id, const std::string & surface_id, const std::string & door_material_id, World & world);
@@ -93,16 +91,10 @@ public:
 	Update_Messages attack_item(const std::string & target_ID, World & world);
 	Update_Messages add_to_bloomery(const std::string & item_ID, const unsigned & count, World & world);
 
-	Update_Messages item_release(std::shared_ptr<Character> & character, item_release_call release_call, World & world, const std::string & item_ID, const std::string & count);
-	Update_Messages item_release(std::shared_ptr<Character> & character, item_release_call release_call, World & world, const std::string & item_ID, const unsigned & count);
-
 	// movement info
 	std::string validate_movement(const int & cx, const int & cy, const int & cz, const std::string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const;
 
-	// These are used to create function pointers to their corresponding non-static member functions aobve.
-	static Update_Messages drop_call(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count);
-	static Update_Messages add_to_chest_call(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count);
-	static Update_Messages add_to_table_call(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count);
+	static unsigned move_items(Container & source, Container & destination, const std::string & item_ID, const std::string & count);
 
 };
 
