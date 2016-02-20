@@ -18,6 +18,10 @@ bool Item::is_takable() const
 {
 	return takable;
 }
+std::string Item::get_name() const
+{
+	return name;
+}
 int Item::get_health() const
 {
 	return health;

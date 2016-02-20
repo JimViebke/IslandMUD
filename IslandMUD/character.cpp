@@ -426,7 +426,7 @@ Update_Messages Character::move(const std::string & direction_ID, World & world)
 
 		// "Jeb arrives from the south [wielding an axe]."
 		this->name + " arrives from the " + C::opposite_direction_id.find(direction_ID)->second +
-		((this->equipped_item == nullptr) ? "." : (" wielding " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + ".")),
+		((this->equipped_item == nullptr) ? "." : (" wielding " + U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + ".")),
 
 		true); // update required for all users in sight range
 
@@ -452,8 +452,6 @@ Update_Messages Character::craft(const std::string & craft_item_id, World & worl
 			return Update_Messages("There is already a table here.");
 		}
 	}
-
-
 
 	// return if the recipe does not exist
 	if (!Character::recipes->has_recipe_for(craft_item_id)) { return Update_Messages("There is no way to craft " + U::get_article_for(craft_item_id) + " " + craft_item_id + "."); }
@@ -525,7 +523,7 @@ Update_Messages Character::craft(const std::string & craft_item_id, World & worl
 			else // the item can not be taken
 			{
 				// add the item to the room
-				world.room_at(x, y, z)->add_item(item);
+				world.room_at(x, y, z)->insert(item);
 			}
 		}
 
@@ -546,65 +544,36 @@ Update_Messages Character::craft(const std::string & craft_item_id, World & worl
 
 	return Update_Messages(player_update.str(), room_update.str());
 }
-Update_Messages Character::take(const std::string & take_item_id, World & world)
+Update_Messages Character::take(const std::string & take_item_id, World & world, const std::string & count)
 {
-	// check if the item is in the room
-	if (!world.room_at(x, y, z)->contains(take_item_id))
+	// create a counter to determine how many items are actually acquired
+	const unsigned acquire_count = Character::move_items(*world.room_at(x, y, z), *this, take_item_id, count);
+
+	if (acquire_count == 0)
 	{
-		// the item is not here; assemble a hint for the player based on their surroundings
-
-		const bool chest_present = world.room_at(x, y, z)->has_chest();
-		const bool table_present = world.room_at(x, y, z)->has_table();
-
-		std::string suggestion = "";
-
-		if (chest_present && table_present)
-		{
-			suggestion = " Check the nearby chest or table, or craft a new " + take_item_id + ".";
-		}
-		else if (chest_present)
-		{
-			suggestion = " Check the nearby chest or craft a new " + take_item_id + ".";
-		}
-		else if (table_present)
-		{
-			suggestion = " Check the nearby table or craft a new " + take_item_id + ".";
-		}
-
-		return Update_Messages("There is no " + take_item_id + " here." + suggestion);
+		return Update_Messages("There aren't any " + U::get_plural_for(take_item_id) + " here.");
 	}
-
-	// check if the item is not takable
-	if (!world.room_at(x, y, z)->get_contents().find(take_item_id)->second->is_takable())
+	else if (acquire_count > 1) // plural result
 	{
-		// return failure
-		return Update_Messages("You can't take the " + take_item_id + ".");
+		return Update_Messages("You take " + U::to_string(acquire_count) + " " + U::get_plural_for(take_item_id) + ".",
+			this->name + " takes " + U::to_string(acquire_count) + " " + U::get_plural_for(take_item_id) + ".");
 	}
-
-	// The item is takable. erase() the item from the world, insert() the item to the player.
-	this->insert(world.room_at(x, y, z)->erase(take_item_id));
-
-	return Update_Messages("You take " + U::get_article_for(take_item_id) + " " + take_item_id + ".",
-		this->name + " takes " + U::get_article_for(take_item_id) + " " + take_item_id + ".");
+	else // singular result
+	{
+		return Update_Messages("You take " + U::get_article_for(take_item_id) + " " + take_item_id + ".",
+			this->name + " takes " + U::get_article_for(take_item_id) + " " + take_item_id + ".");
+	}
 }
-Update_Messages Character::drop(const std::string & drop_item_id, World & world, const unsigned & count)
+Update_Messages Character::drop(const std::string & drop_item_id, World & world, const std::string & count)
 {
-	// the caller shall verify that the character has the specified item count
-
 	// create a counter to determine how many items are actually dropped
-	unsigned drop_count = 0;
+	const unsigned drop_count = Character::move_items(*this, *world.room_at(x, y, z), drop_item_id, count);
 
-	// add the item(s) to the world, removing from the player's inventory
-	for (unsigned i = 0; i < count; ++i)
+	if (drop_count == 0)
 	{
-		// if the item is successfully added to the room
-		if (world.room_at(x, y, z)->add_item(this->erase(drop_item_id)))
-		{
-			++drop_count;
-		}
+		return Update_Messages("You don't have " + U::get_article_for(drop_item_id) + " " + drop_item_id + ".");
 	}
-
-	if (drop_count > 1) // plural result
+	else if (drop_count > 1) // plural result
 	{
 		return Update_Messages("You drop " + U::to_string(drop_count) + " " + U::get_plural_for(drop_item_id) + ".",
 			this->name + " drops " + U::to_string(drop_count) + " " + U::get_plural_for(drop_item_id) + ".");
@@ -626,7 +595,7 @@ Update_Messages Character::equip(const std::string & item_ID)
 	if (!this->contains(item_ID))
 	{
 		// if the player is wielding an instance of the item already
-		if (this->equipped_item->name == item_ID)
+		if (this->equipped_item->get_name() == item_ID)
 		{
 			return Update_Messages("You are holding " + U::get_article_for(item_ID) + " " + item_ID + " and don't have another one to equip.");
 		}
@@ -643,8 +612,8 @@ Update_Messages Character::equip(const std::string & item_ID)
 	// the player does have the item to equip, test if an item is already equipped
 	if (this->equipped_item != nullptr)
 	{
-		user_update << "You replace your " << equipped_item->name << " with ";
-		room_update << this->name << " replaces " << U::get_article_for(equipped_item->name) << " " << equipped_item->name << " with ";
+		user_update << "You replace your " << equipped_item->get_name() << " with ";
+		room_update << this->name << " replaces " << U::get_article_for(equipped_item->get_name()) << " " << equipped_item->get_name() << " with ";
 
 		// save the equipped item
 		const std::shared_ptr<Item> item = equipped_item;
@@ -669,8 +638,8 @@ Update_Messages Character::equip(const std::string & item_ID)
 	else
 	{
 		// complete and return the response message
-		user_update << U::get_article_for(equipped_item->name) << " " << equipped_item->name << ".";
-		room_update << U::get_article_for(equipped_item->name) << " " << equipped_item->name << ".";
+		user_update << U::get_article_for(equipped_item->get_name()) << " " << equipped_item->get_name() << ".";
+		room_update << U::get_article_for(equipped_item->get_name()) << " " << equipped_item->get_name() << ".";
 
 		return Update_Messages(user_update.str(), room_update.str());
 	}
@@ -685,7 +654,7 @@ Update_Messages Character::unequip()
 	}
 
 	// save the ID of the currently equipped item
-	const std::string item_ID = equipped_item->name;
+	const std::string item_ID = equipped_item->get_name();
 
 	// save the existing the item to the player's inventory
 	this->insert(equipped_item);
@@ -695,34 +664,30 @@ Update_Messages Character::unequip()
 
 	return Update_Messages("You put your " + item_ID + " away.", this->name + " lowers the " + item_ID + ".");
 }
-Update_Messages Character::add_to_chest(std::string insert_item_id, World & world, const unsigned & count)
+Update_Messages Character::add_to_chest(std::string insert_item_id, World & world, const std::string & count)
 {
+	const std::unique_ptr<Room>::pointer room = world.room_at(x, y, z);
+
 	// if this room does not have a chest
-	if (!world.room_at(x, y, z)->has_chest())
+	if (!room->has_chest())
 	{
 		return Update_Messages("There is no chest here.");
 	}
 
 	// if the chest was crafted by another faction
-	if (world.room_at(x, y, z)->get_chest_faction_id() != this->faction_ID)
+	if (room->get_chest_faction_id() != this->faction_ID)
 	{
 		return Update_Messages("This chest has an unfamiliar lock.");
 	}
 
-	// create a counter to determine how many items are actually added to the chest
-	unsigned add_count = 0;
+	// move the items
+	const unsigned add_count = Character::move_items(*this, *room->get_chest(), insert_item_id, count);
 
-	// add the item(s) to the chest, removing from the player's inventory
-	for (unsigned i = 0; i < count; ++i)
+	if (add_count == 0)
 	{
-		// if the item is successfully added to the chest
-		if (world.room_at(x, y, z)->add_item_to_chest(this->erase(insert_item_id)))
-		{
-			++add_count;
-		}
+		return Update_Messages("You don't have " + U::get_article_for(insert_item_id) + " " + insert_item_id + ".");
 	}
-
-	if (add_count > 1) // plural result
+	else if (add_count > 1) // plural result
 	{
 		return Update_Messages("You place " + U::to_string(add_count) + " " + U::get_plural_for(insert_item_id) + " into the chest.",
 			this->name + " places " + U::to_string(add_count) + " " + U::get_plural_for(insert_item_id) + " into the chest.");
@@ -733,59 +698,63 @@ Update_Messages Character::add_to_chest(std::string insert_item_id, World & worl
 			this->name + " places " + U::get_article_for(insert_item_id) + " " + insert_item_id + " into the chest.");
 	}
 }
-Update_Messages Character::take_from_chest(const std::string & take_item_id, World & world)
+Update_Messages Character::take_from_chest(const std::string & take_item_id, World & world, const std::string & count)
 {
+	const std::unique_ptr<Room>::pointer room = world.room_at(x, y, z);
+
 	// if this room does not have a chest
-	if (!world.room_at(x, y, z)->has_chest())
+	if (!room->has_chest())
 	{
 		return Update_Messages("There is no chest here.");
 	}
 
 	// if the chest was crafted by another faction
-	if (world.room_at(x, y, z)->get_chest_faction_id() != this->faction_ID)
+	if (room->get_chest_faction_id() != this->faction_ID)
 	{
 		return Update_Messages("This chest has an unfamiliar lock.");
 	}
 
-	// if the player doesn't have the item
-	if (!world.room_at(x, y, z)->chest_has(take_item_id))
+	// move the items
+	const unsigned acquire_count = Character::move_items(*room->get_chest(), *this, take_item_id, count);
+
+	if (acquire_count == 0)
 	{
-		return Update_Messages("The chest does not contain " + U::get_article_for(take_item_id) + " " + take_item_id + ".");
+		return Update_Messages("The chest does not contain any " + U::get_plural_for(take_item_id) + ".");
 	}
-
-	this->insert(world.room_at(x, y, z)->remove_from_chest(take_item_id));
-
-	// You place the sword into the chest.
-	return Update_Messages("You take the " + take_item_id + " from the chest.",
-		this->name + " takes " + U::get_article_for(take_item_id) + " " + take_item_id + " from the chest.");
+	else if (acquire_count > 1) // plural result
+	{
+		return Update_Messages("You take " + U::to_string(acquire_count) + " " + U::get_plural_for(take_item_id) + " from the chest.",
+			this->name + " takes " + U::to_string(acquire_count) + " " + U::get_plural_for(take_item_id) + " from the chest.");
+	}
+	else // singular result
+	{
+		return Update_Messages("You take " + U::get_article_for(take_item_id) + " " + take_item_id + " from the chest.",
+			this->name + " takes " + U::get_article_for(take_item_id) + " " + take_item_id + " from the chest.");
+	}
 }
 Update_Messages Character::look_inside_chest(const World & world) const
 {
 	// validation within
 	return world.room_at(x, y, z)->chest_contents(faction_ID, this->name);
 }
-Update_Messages Character::add_to_table(const std::string & add_item_ID, World & world, const unsigned & count)
+Update_Messages Character::add_to_table(const std::string & add_item_ID, World & world, const std::string & count)
 {
+	const std::unique_ptr<Room>::pointer room = world.room_at(x, y, z);
+
 	// check if there is a table in the room
-	if (!world.room_at(x, y, z)->has_table())
+	if (!room->has_table())
 	{
 		return Update_Messages("There is no table here.");
 	}
 
 	// create a counter to determine how many items are actually added to the table
-	unsigned add_count = 0;
+	const unsigned add_count = Character::move_items(*this, *room->get_table(), add_item_ID, count);
 
-	// move the item from the player's inventory to the table
-	for (unsigned i = 0; i < count; ++i)
+	if (add_count == 0)
 	{
-		// if the item is successfully added to the table
-		if (world.room_at(x, y, z)->add_item_to_table(this->erase(add_item_ID)))
-		{
-			++add_count;
-		}
+		return Update_Messages("You don't have " + U::get_article_for(add_item_ID) + " " + add_item_ID + ".");
 	}
-
-	if (add_count > 1) // plural result
+	else if (add_count > 1) // plural result
 	{
 		return Update_Messages("You put " + U::to_string(add_count) + " " + U::get_plural_for(add_item_ID) + " on the table.",
 			this->name + " drops " + U::to_string(add_count) + " " + U::get_plural_for(add_item_ID) + " on the table.");
@@ -796,25 +765,33 @@ Update_Messages Character::add_to_table(const std::string & add_item_ID, World &
 			this->name + " drops " + U::get_article_for(add_item_ID) + " " + add_item_ID + " on the table.");
 	}
 }
-Update_Messages Character::take_from_table(const std::string remove_item_ID, World & world)
+Update_Messages Character::take_from_table(const std::string take_item_ID, World & world, const std::string & count)
 {
+	const std::unique_ptr<Room>::pointer room = world.room_at(x, y, z);
+
 	// check if there is a table in the room
-	if (!world.room_at(x, y, z)->has_table())
+	if (!room->has_table())
 	{
 		return Update_Messages("There is no table here.");
 	}
 
-	// check if the table has the item
-	if (!world.room_at(x, y, z)->table_has(remove_item_ID))
-	{
-		return Update_Messages("There is no " + remove_item_ID + " on the table.");
-	}
-
 	// move the item from the table to the player's inventory
-	this->insert(world.room_at(x, y, z)->remove_from_table(remove_item_ID));
+	const unsigned acquire_count = Character::move_items(*room->get_table(), *this, take_item_ID, count);
 
-	return Update_Messages("You take " + U::get_article_for(remove_item_ID) + " " + remove_item_ID + " from the table.",
-		this->name + " removes " + U::get_article_for(remove_item_ID) + " " + remove_item_ID + " from the table.");
+	if (acquire_count == 0)
+	{
+		return Update_Messages("The table does not contain any " + U::get_plural_for(take_item_ID) + ".");
+	}
+	else if (acquire_count > 1) // plural result
+	{
+		return Update_Messages("You take " + U::to_string(acquire_count) + " " + U::get_plural_for(take_item_ID) + " from the table.",
+			this->name + " takes " + U::to_string(acquire_count) + " " + U::get_plural_for(take_item_ID) + " from the table.");
+	}
+	else // singular result
+	{
+		return Update_Messages("You take " + U::get_article_for(take_item_ID) + " " + take_item_ID + " from the table.",
+			this->name + " takes " + U::get_article_for(take_item_ID) + " " + take_item_ID + " from the table.");
+	}
 }
 Update_Messages Character::look_at_table(const World & world) const
 {
@@ -1135,13 +1112,13 @@ Update_Messages Character::attack_item(const std::string & target_ID, World & wo
 	if (equipped_item != nullptr)
 	{
 		// if the attacking implement is not in the damage tables
-		if (C::damage_tables.find(equipped_item->name) == C::damage_tables.cend())
+		if (C::damage_tables.find(equipped_item->get_name()) == C::damage_tables.cend())
 		{
-			return Update_Messages("You can't do that with " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + ".");
+			return Update_Messages("You can't do that with " + U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + ".");
 		}
 
 		// extract the damage table for the attacking implement
-		const std::map<std::string, int> damage_table = C::damage_tables.find(equipped_item->name)->second;
+		const std::map<std::string, int> damage_table = C::damage_tables.find(equipped_item->get_name())->second;
 
 		// if the damage table does not have an entry for the target item ID
 		if (damage_table.find(target_ID) == damage_table.cend())
@@ -1152,14 +1129,14 @@ Update_Messages Character::attack_item(const std::string & target_ID, World & wo
 		// damage the item, return a different message depending of if the item was destroyed or damaged
 		if (world.room_at(x, y, z)->damage_item(target_ID, damage_table.find(target_ID)->second))
 		{
-			return Update_Messages("You destroy the " + target_ID + " using your " + equipped_item->name + ".",
-				this->name + " uses " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + " to destroy " + U::get_article_for(target_ID) + " " + target_ID + ".",
+			return Update_Messages("You destroy the " + target_ID + " using your " + equipped_item->get_name() + ".",
+				this->name + " uses " + U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + " to destroy " + U::get_article_for(target_ID) + " " + target_ID + ".",
 				true);
 		}
 		else
 		{
-			return Update_Messages("You damage the " + target_ID + " using your " + equipped_item->name + ".",
-				this->name + " uses " + U::get_article_for(equipped_item->name) + " " + equipped_item->name + " to damage " + U::get_article_for(target_ID) + " " + target_ID + ".");
+			return Update_Messages("You damage the " + target_ID + " using your " + equipped_item->get_name() + ".",
+				this->name + " uses " + U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + " to damage " + U::get_article_for(target_ID) + " " + target_ID + ".");
 		}
 	}
 	else // the user does not have an item equipped, do a barehanded attack
@@ -1201,45 +1178,6 @@ Update_Messages Character::add_to_bloomery(const std::string & item_ID, const un
 	// world.room_at(x, y, z)->get_contents
 
 	return Update_Messages("Character::add_to_bloomery() is incomplete.");
-}
-
-Update_Messages Character::item_release(std::shared_ptr<Character> & character, item_release_call release_call, World & world, const std::string & item_ID, const std::string & count)
-{
-	// create an unsigned integer to store the number of items to release
-	unsigned release_count = 0;
-
-	// if the user has indicated they wish to release all of a type
-	if (count == C::ALL_COMMAND)
-	{
-		// release as many of the item as the character has
-		release_count = character->count(item_ID);
-	}
-	else // the user likely typed a number
-	{
-		// attempt to convert the string into an unsigned integer
-		release_count = U::to_unsigned(count);
-	}
-
-	// forward the call to this function's overload
-	return item_release(character, release_call, world, item_ID, release_count);
-}
-Update_Messages Character::item_release(std::shared_ptr<Character> & character, item_release_call release_call, World & world, const std::string & item_ID, const unsigned & count)
-{
-	// test if the player contains any of the item specified
-	if (character->count(item_ID) > 0)
-	{
-		return release_call(character, item_ID, world, count);
-	}
-
-	// if the release count is 1
-	if (count == 1)
-	{
-		return Update_Messages("You don't have " + U::get_article_for(item_ID) + " " + item_ID + ".");
-	}
-	else // ensure the return message uses the plural form of the word
-	{
-		return Update_Messages("You don't have any " + U::get_plural_for(item_ID) + ".");
-	}
 }
 
 // movement info
@@ -1343,16 +1281,28 @@ std::string Character::validate_movement(const int & cx, const int & cy, const i
 	return C::GOOD_SIGNAL;
 }
 
-// These are used to create function pointers to their corresponding non-static member functions aobve.
-Update_Messages Character::drop_call(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count)
+unsigned Character::move_items(Container & source, Container & destination, const std::string & item_ID, const std::string & count)
 {
-	return character->drop(item_ID, world, count);
-}
-Update_Messages Character::add_to_chest_call(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count)
-{
-	return character->add_to_chest(item_ID, world, count);
-}
-Update_Messages Character::add_to_table_call(std::shared_ptr<Character> & character, const std::string & item_ID, World & world, const unsigned & count)
-{
-	return character->add_to_table(item_ID, world, count);
+	unsigned move_count = 0;
+
+	if (count == C::ALL_COMMAND)
+	{
+		move_count = source.count(item_ID);
+	}
+	else
+	{
+		move_count = U::to_unsigned(count);
+	}
+
+	unsigned items_moved = 0;
+
+	for (unsigned int i = 0; i < move_count; ++i)
+	{
+		if (destination.insert(source.erase(item_ID)))
+		{
+			++items_moved;
+		}
+	}
+
+	return items_moved;
 }

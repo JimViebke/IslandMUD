@@ -16,8 +16,6 @@ class Item
 {
 private:
 	bool takable;
-
-public:
 	std::string name;
 	// int weight = 0;
 
@@ -31,6 +29,7 @@ protected:
 
 public:
 	bool is_takable() const;
+	std::string get_name() const;
 	int get_health() const;
 	void set_health(const int & set_health);
 	void update_health(const int & update_health);

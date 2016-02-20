@@ -72,25 +72,22 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	// take: "take branch"
 	else if (command.size() == 2 && command[0] == C::TAKE_COMMAND)
 	{
-		return actors.find(actor_id)->second->take(command[1], world); // (item, worlds)
+		return actors.find(actor_id)->second->take(command[1], world); // (item, world)
+	}
+	// take: "take [n] branches"
+	else if (command.size() == 3 && command[0] == C::TAKE_COMMAND)
+	{
+		return actors.find(actor_id)->second->take(command[2], world, command[1]); // (item, world, count)
 	}
 	// dropping item: "drop staff"
 	else if (command.size() == 2 && command[0] == C::DROP_COMMAND)
 	{
-		// extract the character
-		std::shared_ptr<Character> & character = actors.find(actor_id)->second;
-
-		// call item release
-		return character->item_release(character, &Character::drop_call, world, command[1], 1);
+		return actors.find(actor_id)->second->drop(command[1], world); // (item, world)
 	}
 	// dropping item: drop n staffs" (the tokenizer will have already converted plurals to singular)
 	else if (command.size() == 3 && command[0] == C::DROP_COMMAND)
 	{
-		// extract the character
-		std::shared_ptr<Character> & character = actors.find(actor_id)->second;
-
-		// call item release
-		return character->item_release(character, &Character::drop_call, world, command[2], command[1]);
+		return actors.find(actor_id)->second->drop(command[2], world, command[1]);
 	}
 	// crafting: "craft sword"
 	else if (command.size() == 2 && command[0] == C::CRAFT_COMMAND)
@@ -120,7 +117,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	// waiting: "wait"
 	else if (command.size() == 1 && command[0] == C::WAIT_COMMAND)
 	{
-		return Update_Messages("You wait."); // (item_id, world)
+		return Update_Messages("You wait.");
 	}
 	// printing out the full library of recipes: "recipes"
 	else if (command.size() == 1 && command[0] == C::PRINT_RECIPES_COMMAND)
@@ -164,23 +161,15 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	{
 		return actors.find(actor_id)->second->unequip();
 	}
-	// put item in chest
+	// put [item] in chest
 	else if (command.size() == 4 && command[0] == C::DROP_COMMAND && command[2] == C::INSERT_COMMAND && command[3] == C::CHEST_ID)
 	{
-		// extract the character
-		std::shared_ptr<Character> & character = actors.find(actor_id)->second;
-
-		// call item release
-		return character->item_release(character, &Character::add_to_chest_call, world, command[1], 1);
+		return actors.find(actor_id)->second->add_to_chest(command[1], world);
 	}
-	// put n items in chest
+	// put [n] [items] in chest
 	else if (command.size() == 5 && command[0] == C::DROP_COMMAND && command[3] == C::INSERT_COMMAND && command[4] == C::CHEST_ID)
 	{
-		// extract the character
-		std::shared_ptr<Character> & character = actors.find(actor_id)->second;
-
-		// call multi item release
-		return character->item_release(character, &Character::add_to_chest_call, world, command[2], command[1]);
+		return actors.find(actor_id)->second->add_to_chest(command[2], world, command[1]);
 	}
 	// look at chest: "chest"
 	else if (command.size() == 1 && command[0] == C::CHEST_ID)
@@ -192,23 +181,20 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	{
 		return actors.find(actor_id)->second->take_from_chest(command[1], world);
 	}
+	// take [n] [item] from chest
+	else if (command.size() == 5 && command[0] == C::TAKE_COMMAND && command[3] == C::FROM_COMMAND && command[4] == C::CHEST_ID)
+	{
+		return actors.find(actor_id)->second->take_from_chest(command[2], world, command[1]);
+	}
 	// put [item] on table
 	else if (command.size() == 4 && command[0] == C::DROP_COMMAND && command[2] == C::INSERT_COMMAND && command[3] == C::TABLE_ID)
 	{
-		// extract the character
-		std::shared_ptr<Character> & character = actors.find(actor_id)->second;
-
-		// call item release
-		return character->item_release(character, &Character::add_to_table_call, world, command[1], 1);
+		return actors.find(actor_id)->second->add_to_table(command[1], world);
 	}
 	// put [n] [item] on table
 	else if (command.size() == 5 && command[0] == C::DROP_COMMAND && command[3] == C::INSERT_COMMAND && command[4] == C::TABLE_ID)
 	{
-		// extract the character
-		std::shared_ptr<Character> & character = actors.find(actor_id)->second;
-
-		// call multi item release
-		return character->item_release(character, &Character::add_to_table_call, world, command[2], command[1]);
+		return actors.find(actor_id)->second->add_to_table(command[2], world, command[1]);
 	}
 	// look at table: "table"
 	else if (command.size() == 1 && command[0] == C::TABLE_ID)
@@ -220,15 +206,19 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	{
 		return actors.find(actor_id)->second->take_from_table(command[1], world);
 	}
+	// take [n] [items] from table
+	else if (command.size() == 5 && command[0] == C::TAKE_COMMAND && command[3] == C::FROM_COMMAND && command[4] == C::TABLE_ID)
+	{
+		return actors.find(actor_id)->second->take_from_table(command[2], world, command[1]);
+	}
 	// get equipped item name
 	else if (command.size() == 1 && (command[0] == C::EQUIP_COMMAND || command[0] == C::ITEM_COMMAND))
 	{
-		// extract the actor
-		const std::shared_ptr<Character> actor = actors.find(actor_id)->second;
-		if (U::is<PC>(actor)) // if the actor is a Player_Character
+		// if the actor is a Player_Character
+		if (const std::shared_ptr<PC> & actor = U::convert_to<PC>(actors.find(actor_id)->second))
 		{
 			// convert the actor to a Player_Character
-			return Update_Messages(U::convert_to<PC>(actor)->get_equipped_item_info());
+			return Update_Messages(actor->get_equipped_item_info());
 		}
 	}
 
@@ -314,7 +304,7 @@ void Game::networking_thread(const unsigned & listening_port, client_thread_type
 #ifdef WIN32
 	WSACleanup();
 #endif
-}
+	}
 
 void Game::client_thread(SOCKET client_ID)
 {

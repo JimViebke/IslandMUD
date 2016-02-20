@@ -59,7 +59,6 @@ public:
 	Update_Messages chest_contents(const std::string & faction_ID, const std::string & username) const;
 	void damage_chest();
 	bool chest_has(const std::string & item_id) const;
-	std::shared_ptr<Item> remove_from_chest(const std::string & item_id);
 	std::shared_ptr<Chest> get_chest() const;
 	void set_chest(const std::shared_ptr<Chest> & set_chest);
 
@@ -77,8 +76,6 @@ public:
 	std::string add_item_to_bloomery(const std::shared_ptr<Forgeable> & item);
 
 	// items
-	bool add_item(const std::shared_ptr<Item> & item);
-	void remove_item(const std::string & item_id, const int & count = 1);
 	bool damage_item(const std::string & item_id, const int & amount);
 
 	// add surfaces and doors

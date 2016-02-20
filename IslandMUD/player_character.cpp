@@ -26,7 +26,7 @@ std::string PC::get_equipped_item_info() const
 		return "You don't have anything at the ready.";
 	}
 
-	return "You are wielding " + U::get_article_for(this->equipped_item->name) + " " + this->equipped_item->name + ".";
+	return "You are wielding " + U::get_article_for(this->equipped_item->get_name()) + " " + this->equipped_item->get_name() + ".";
 }
 
 // Build and return a top-down area map around a given coordinate

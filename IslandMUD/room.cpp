@@ -198,17 +198,6 @@ bool Room::chest_has(const std::string & item_id) const
 
 	return chest->contains(item_id);
 }
-std::shared_ptr<Item> Room::remove_from_chest(const std::string & item_id)
-{
-	// manifest a stone if a chest does not exist
-	// (this would indicate an validation failure in the calling function)
-	if (!has_chest())
-	{
-		return Craft::make(C::STONE_ID);
-	}
-
-	return chest->erase(item_id);
-}
 std::shared_ptr<Chest> Room::get_chest() const
 {
 	return chest;
@@ -270,7 +259,7 @@ std::string Room::add_item_to_bloomery(const std::shared_ptr<Forgeable> & item)
 
 	if (U::is_not<Forgeable>(item))
 	{
-		return "You cannot put a " + item->name + " in a bloomery.";
+		return "You cannot put a " + item->get_name() + " in a bloomery.";
 	}
 
 	// save a new shared_ptr to the bloomery in question
@@ -278,18 +267,10 @@ std::string Room::add_item_to_bloomery(const std::shared_ptr<Forgeable> & item)
 
 	bloomery->add_to_bloomery(item);
 
-	return "You place the " + item->name + " in a bloomery.";
+	return "You place the " + item->get_name() + " in a bloomery.";
 }
 
 // items
-bool Room::add_item(const std::shared_ptr<Item> & item) // pass a copy rather than a reference
-{
-	return this->insert(item);
-}
-void Room::remove_item(const std::string & item_id, const int & count)
-{
-	this->erase(item_id, count);
-}
 bool Room::damage_item(const std::string & item_id, const int & amount)
 {
 	// return a boolean indicating if the target item was destroyed
@@ -298,13 +279,13 @@ bool Room::damage_item(const std::string & item_id, const int & amount)
 	if (contents.find(item_id)->second->get_health() - amount <= C::DEFAULT_ITEM_MIN_HEALTH)
 	{
 		// remove the item from the room
-		remove_item(item_id);
+		erase(item_id);
 
 		// if the removed item was a tree
 		if (item_id == C::TREE_ID)
 		{
 			// add a log
-			add_item(Craft::make(C::LOG_ID));
+			insert(Craft::make(C::LOG_ID));
 		}
 
 		return true;
@@ -396,7 +377,7 @@ Update_Messages Room::damage_surface(const std::string & surface_ID, const std::
 	}
 
 	// extract the ID of the attacking implement (ATTACK_COMMAND for bare-hands melee attack)
-	const std::string equipped_item_id = ((equipped_item != nullptr) ? equipped_item->name : C::ATTACK_COMMAND);
+	const std::string equipped_item_id = ((equipped_item != nullptr) ? equipped_item->get_name() : C::ATTACK_COMMAND);
 
 	// check if the player's equipped weapon exists in the damage table
 	if (C::damage_tables.find(equipped_item_id) == C::damage_tables.cend())
@@ -459,7 +440,7 @@ Update_Messages Room::damage_surface(const std::string & surface_ID, const std::
 		room_sides.erase(surface_ID);
 
 		// add a debris object to the room
-		this->add_item(Craft::make(C::DEBRIS_ID));
+		this->insert(Craft::make(C::DEBRIS_ID));
 	}
 
 	return Update_Messages(
@@ -504,7 +485,7 @@ Update_Messages Room::damage_door(const std::string & surface_ID, const std::sha
 	}
 
 	// extract the ID of the attacking implement (ATTACK_COMMAND for bare-hands melee attack)
-	const std::string equipped_item_id = ((equipped_item != nullptr) ? equipped_item->name : C::ATTACK_COMMAND);
+	const std::string equipped_item_id = ((equipped_item != nullptr) ? equipped_item->get_name() : C::ATTACK_COMMAND);
 
 	// check if the player's equipped weapon exists in the damage table
 	if (C::damage_tables.find(equipped_item_id) == C::damage_tables.cend())
