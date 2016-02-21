@@ -20,6 +20,7 @@ public:
 
 private:
 
+	// Contains a vector of Objectives. All objectives belong to the same structure
 	class Structure_Objectives
 	{
 	private:
