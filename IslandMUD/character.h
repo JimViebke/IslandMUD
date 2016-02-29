@@ -8,8 +8,6 @@ Feb 14, 2015 */
 
 #include "constants.h"
 #include "item.h"
-#include "craft.h"
-#include "room.h"
 #include "world.h"
 #include "recipes.h"
 #include "message.h"
