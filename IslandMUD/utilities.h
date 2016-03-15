@@ -5,8 +5,6 @@ Feb 14, 2015 */
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
-#include <vector>
-#include <map>
 #include <iostream>
 #include <algorithm> // std::transform
 #include <memory> // for shared pointers
