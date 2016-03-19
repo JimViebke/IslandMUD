@@ -20,6 +20,7 @@ public:
 
 private:
 
+	// Contains a vector of Objectives. All objectives belong to the same structure
 	class Structure_Objectives
 	{
 	private:
@@ -34,16 +35,6 @@ private:
 
 	bool fortress_planned = false;
 	std::deque<Structure_Objectives> planned_structures;
-
-	class Partition
-	{
-	public:
-		int _x, _y, height, width;
-		Partition(const int & set_x, const int & set_y, const int & set_height, const int & set_width) :
-			_x(set_x), _y(set_y), height(set_height), width(set_width) {}
-	};
-
-	typedef Partition Structure;
 
 	// used during fortress outer wall generation
 	enum class Area_Type { structure, fortress_interior, fortress_exterior };

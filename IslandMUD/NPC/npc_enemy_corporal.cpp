@@ -3,7 +3,6 @@
 Jan 11 2016 */
 
 #include "npc_enemy_corporal.h"
-#include "../message.h"
 
 Hostile_NPC_Corporal::Hostile_NPC_Corporal(const std::string & name) : Hostile_NPC(name) {}
 

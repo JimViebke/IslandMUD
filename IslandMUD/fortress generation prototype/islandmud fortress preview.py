@@ -4,8 +4,6 @@
 # Author:      Jim Viebke
 #
 # Created:     Aug 17 2015
-# Copyright:   (c) Jim Viebke
-# Licence:     <your licence>
 #-----------------------------------------------------------
 
 print "importing..."
@@ -54,7 +52,7 @@ ax6 = fig6.add_subplot(111, aspect='equal')
 
 # for each structure
 for structure in structures:
-    # draw the strucutre to the plot
+    # draw the structure to the plot
     ax6.add_patch(patches.Rectangle(
         (structure[0]/maximum_fortress_dimension, structure[1]/maximum_fortress_dimension),
         structure[2]/maximum_fortress_dimension, structure[3]/maximum_fortress_dimension,

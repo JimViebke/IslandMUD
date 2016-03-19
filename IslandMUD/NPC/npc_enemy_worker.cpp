@@ -894,7 +894,7 @@ void Hostile_NPC_Worker::Structure_Objectives::plan_doors(const World & world)
 		structure_surface_objectives[U::random_int_from(0, (int)structure_surface_objectives.size() - 1)].modifier = true;
 	}
 
-	// an eight of buildings may have a third door 
+	// a fifth of buildings may have a third door 
 	if (U::random_int_from(1, 10) > 8)
 	{
 		structure_surface_objectives[U::random_int_from(0, (int)structure_surface_objectives.size() - 1)].modifier = true;

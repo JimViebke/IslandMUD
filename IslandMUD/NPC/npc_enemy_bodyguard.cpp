@@ -26,16 +26,15 @@ Update_Messages Hostile_NPC_Bodyguard::update(World & world, std::map<std::strin
 	if (hunt_target_id != "")
 	{
 		// extract the hunt_target
-		std::shared_ptr<Character> hunt_target = actors.find(hunt_target_id)->second;
-
+		auto hunt_target_it = actors.find(hunt_target_id);
 		// if the target is not in the actors list, the target is no longer in game
-		if (hunt_target == nullptr)
+		if (hunt_target_it == actors.cend())
 		{
 			hunt_target_id = ""; // reset target
 		}
 		else // the target is online
 		{
-			return this->hunt_target(hunt_target, protect_target, world, actors);
+			return this->hunt_target(hunt_target_it->second, protect_target, world, actors);
 		}
 	}
 
@@ -79,36 +78,12 @@ void Hostile_NPC_Bodyguard::set_protect_target(const std::string & set_protect_t
 
 bool Hostile_NPC_Bodyguard::attempt_set_new_hunt_target(World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
-	std::vector<std::string> hostile_ids;
+	const std::string hunt_target_id = get_new_hostile_id(world, actors);
 
-	// for each visible room
-	for (int cx = x - (int)C::VIEW_DISTANCE; cx <= x + (int)C::VIEW_DISTANCE; ++cx)
-	{
-		for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
-		{
-			// for each actor in the room
-			for (const std::string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
-			{
-				// if the actor is a player character
-				if (U::is<PC>(actors.find(actor_ID)->second))
-				{
-					// save the player character's ID
-					hostile_ids.push_back(actor_ID);
-				}
-			}
-		}
-	}
-
-	// no players are visible, no target was found
-	if (hostile_ids.size() == 0) { return false; }
-
-	// at least one player character is in range
-
-	// pick a random player character, save their ID
-	this->hunt_target_id = U::random_element_from(hostile_ids);
+	if (hunt_target_id.size() == 0) { return false; }
 
 	// create a pointer to the player
-	std::shared_ptr<Character> hunt_target = actors.find(hunt_target_id)->second;
+	const std::shared_ptr<Character> hunt_target = actors.find(hunt_target_id)->second;
 
 	// save the player's current location as the player's last know location (in case they walk out of visible range)
 	hunt_target_last_known_location._x = hunt_target->x;

@@ -243,7 +243,6 @@ void Generator::to_file(const std::vector<std::vector<char>> & v, const std::str
 	std::ofstream myfile;
 	myfile.open(path);
 	myfile << oss.str();
-	myfile.close(); // with RAII this shouldn't be necessary
 }
 
 std::string Generator::get_generator_pattern() const
