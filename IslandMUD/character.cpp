@@ -546,6 +546,11 @@ Update_Messages Character::craft(const std::string & craft_item_id, World & worl
 }
 Update_Messages Character::take(const std::string & take_item_id, World & world, const std::string & count)
 {
+	if (!Craft::make(take_item_id)->is_takable)
+	{
+		return Update_Messages("You cannot take " + U::get_article_for(take_item_id) + " " + take_item_id + ".");
+	}
+
 	// create a counter to determine how many items are actually acquired
 	const unsigned acquire_count = Character::move_items(*world.room_at(x, y, z), *this, take_item_id, count);
 
