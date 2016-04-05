@@ -22,7 +22,7 @@ Feb 14, 2015 */
 
 #include "constants.h"
 
-namespace Utilities {} // "forward delcaring"...
+namespace Utilities {} // forward declaring...
 
 namespace U = Utilities; // ...to do this here
 
