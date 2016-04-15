@@ -467,7 +467,7 @@ void Game::NPC_thread()
 		const std::vector<std::string> workers = { "Jeb", "Bill", "Bob" };
 		const std::vector<std::string> bodyguards = { "Alpha", "Beta", "Gamma" };
 
-		// create a worker NPCs
+		// create worker NPCs with bodyguards
 		for (unsigned i = 0; i < std::min(workers.size(), bodyguards.size()); ++i)
 		{
 			std::lock_guard<std::mutex> lock(actors_mutex);
