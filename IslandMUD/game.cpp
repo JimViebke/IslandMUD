@@ -43,6 +43,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 			"\nconstruct [compass direction] [material] wall" +
 			"\nconstruct [compass direction] [material] wall with [material] door");
 	}
+	// "legend"
 	else if (command.size() == 1 && command[0] == C::LEGEND_COMMAND)
 	{
 		return Update_Messages(std::string("legend:\n") +
@@ -543,7 +544,7 @@ void Game::close_socket(const SOCKET socket)
 #else
 	close(socket);
 #endif
-}
+	}
 
 std::string Game::login_or_signup(const SOCKET client_ID)
 {
