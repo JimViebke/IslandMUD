@@ -304,7 +304,7 @@ void Game::networking_thread(const unsigned & listening_port, client_thread_type
 #ifdef WIN32
 	WSACleanup();
 #endif
-	}
+}
 
 void Game::client_thread(SOCKET client_ID)
 {
@@ -480,6 +480,15 @@ void Game::NPC_thread()
 			bodyguard->login(world);
 			actors.insert(make_pair(bodyguard->name, bodyguard));
 		}
+	}
+
+	// add a corporal
+	{
+		std::lock_guard<std::mutex> lock(actors_mutex);
+
+		std::shared_ptr<Hostile_NPC_Corporal> hunter = std::make_shared<Hostile_NPC_Corporal>("Hunter");
+		hunter->login(world);
+		actors.insert(make_pair(hunter->name, hunter));
 	}
 
 	std::this_thread::sleep_for(std::chrono::seconds(15)); // put a delay between server startup and NPCs' first action

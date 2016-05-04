@@ -13,6 +13,26 @@ public:
 	Hostile_NPC_Corporal(const std::string & name);
 
 	Update_Messages update(World & world, std::map<std::string, std::shared_ptr<Character>> & actors);
+
+	// AI subroutines
+
+	void acquire_new_hunt_target(World & world, std::map<std::string, std::shared_ptr<Character>> & actors);
+	Update_Messages wander(World & world);
+	bool hunt(World & world, std::map<std::string, std::shared_ptr<Character>> & actors, Update_Messages & update_messages);
+
+private:
+
+	enum class Stored_Path_Type { to_hunt_target, to_hunt_target_last_known_location, to_wander_target };
+
+	// The NPC selects a random x,y coordinate within the world to wander to.
+	// The NPC will stop wandering and engage any Player Characters it sees.
+	// The NPC fights to the death. If the Player Character dies, the NPC attempts to
+	// pick another target.
+	// If no target is found, the NPC will resume wandering
+	Stored_Path_Type stored_path_type;
+	int wander_x = -1, wander_y = -1;
+	std::shared_ptr<Coordinate> destination;
+	std::string hunt_target_id = "";
 };
 
 #endif
