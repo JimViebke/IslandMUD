@@ -4,17 +4,17 @@ May 15 2015 */
 #include "player_character.h"
 #include "npc.h"
 
-std::string PC::print() const
+std::string PC::get_inventory_info() const
 {
-	const std::string contents_summary = this->contents_to_string();
+	const std::string inventory_info = this->contents_to_string();
 
-	if (contents_summary.size() == 0)
+	if (inventory_info.size() == 0)
 	{
 		return "\n\nYou aren't carrying anything.";
 	}
 	else
 	{
-		return "You have" + contents_summary;
+		return "You have" + inventory_info;
 	}
 }
 

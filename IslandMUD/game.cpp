@@ -30,6 +30,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	{
 		return Update_Messages(std::string("help:\n") +
 			"\nlegend" +
+			"\ninventory / inv / i" +
 			"\nrecipes" +
 			"\nrecipes [search keyword]" +
 			"\nmove [compass direction]" +
@@ -63,6 +64,15 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 			"\n " + C::WALL_CHAR + C::WALL_CHAR + C::WALL_CHAR + "   a wall" +
 			"\n " + C::WALL_CHAR + C::DOOR_CHAR + C::WALL_CHAR + "   a wall with a door" +
 			"\n " + C::WALL_CHAR + C::RUBBLE_CHAR + C::WALL_CHAR + "   a smashed door or wall (traversable)");
+	}
+	// "i", "inv", "inventory"
+	else if (command.size() == 1 && command[0] == C::INVENTORY_COMMAND)
+	{
+		// if the actor is a Player_Character
+		if (const std::shared_ptr<PC> & actor = U::convert_to<PC>(actors.find(actor_id)->second))
+		{
+			return Update_Messages(actor->get_inventory_info());
+		}
 	}
 	// moving: "move northeast" OR "northeast"
 	else if ((command.size() == 2 && command[0] == C::MOVE_COMMAND)
@@ -533,7 +543,7 @@ void Game::outbound_thread()
 		// dispatch data to the user (because we're using TCP, data is lossless unless total failure occurs)
 		send(message.user_socket_ID, message.data.c_str(), message.data.size(), 0);
 	}
-}
+	}
 
 // helper functions
 
@@ -544,7 +554,7 @@ void Game::close_socket(const SOCKET socket)
 #else
 	close(socket);
 #endif
-	}
+}
 
 std::string Game::login_or_signup(const SOCKET client_ID)
 {
@@ -671,7 +681,7 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 
 		action_result << "Your coordinates are " << player->x << ", " << player->y << " (index " << player->z << ")"
 			<< this->world.room_at(player->x, player->y, player->z)->summary(player->name) // "You look around and notice..."
-			<< "\n\n" << player->print() << "\n\n"; // "You have..."
+			<< "\n\n";
 	}
 
 	// add the update message to the end of the outbound message
