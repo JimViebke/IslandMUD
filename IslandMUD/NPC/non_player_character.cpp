@@ -35,11 +35,11 @@ std::string NPC::get_objectives() const
 
 // NPC objective constructors
 NPC::Objective::Objective(const std::string & verb, const std::string & noun, const std::string & purpose) :
-verb(verb), noun(noun), purpose(purpose) {}
+	verb(verb), noun(noun), purpose(purpose) {}
 NPC::Objective::Objective(const std::string & verb, const std::string & noun, const int & objective_x, const int & objective_y, const int & objective_z) :
-verb(verb), noun(noun), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z) {}
+	verb(verb), noun(noun), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z) {}
 NPC::Objective::Objective(const std::string & verb, const std::string & noun, const std::string & material, const std::string & direction, const int & objective_x, const int & objective_y, const int & objective_z, const bool & modifier) :
-verb(verb), noun(noun), material(material), direction(direction), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z), modifier(modifier) {}
+	verb(verb), noun(noun), material(material), direction(direction), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z), modifier(modifier) {}
 
 // NPC Coordinate constructor
 NPC::Coordinate::Coordinate(const int & set_x, const int & set_y, const int & set_z) : _x(set_x), _y(set_y), _z(set_z) {}
@@ -88,7 +88,7 @@ void NPC::erase_goto_objective_matching(const std::string & purpose)
 
 	// for each objective
 	for (std::deque<Objective>::iterator objective_iterator = objectives.begin();
-		objective_iterator != objectives.end(); ++objective_iterator)
+	objective_iterator != objectives.end(); ++objective_iterator)
 	{
 		// if the objective is a go-to objective matching the passed purpose
 		if (objective_iterator->verb == C::AI_OBJECTIVE_GOTO && objective_iterator->purpose == purpose)
@@ -105,7 +105,7 @@ void NPC::erase_acquire_objective_matching(const std::string & noun)
 
 	// for each objective
 	for (std::deque<Objective>::iterator objective_iterator = objectives.begin();
-		objective_iterator != objectives.end(); ++objective_iterator)
+	objective_iterator != objectives.end(); ++objective_iterator)
 	{
 		// if the objective is an acquire objective matching the passed noun
 		if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE && objective_iterator->noun == noun)
@@ -157,7 +157,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const World & w
 
 	// check both types of inventory requirements
 	for (std::map<std::string, int>::const_iterator inventory_need = recipe.inventory_need.cbegin();
-		inventory_need != recipe.inventory_need.cend(); ++inventory_need)
+	inventory_need != recipe.inventory_need.cend(); ++inventory_need)
 	{
 		if (!this->contains(inventory_need->first, inventory_need->second))
 		{
@@ -165,7 +165,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const World & w
 		}
 	}
 	for (std::map<std::string, int>::const_iterator inventory_remove = recipe.inventory_remove.cbegin();
-		inventory_remove != recipe.inventory_remove.cend(); ++inventory_remove)
+	inventory_remove != recipe.inventory_remove.cend(); ++inventory_remove)
 	{
 		if (!this->contains(inventory_remove->first, inventory_remove->second))
 		{
@@ -175,7 +175,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const World & w
 
 	// check both types of local requirements
 	for (std::map<std::string, int>::const_iterator local_need = recipe.local_need.cbegin();
-		local_need != recipe.local_need.cend(); ++local_need)
+	local_need != recipe.local_need.cend(); ++local_need)
 	{
 		if (!world.room_at(x, y, z)->contains(local_need->first, local_need->second))
 		{
@@ -183,7 +183,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const World & w
 		}
 	}
 	for (std::map<std::string, int>::const_iterator local_remove = recipe.local_remove.cbegin();
-		local_remove != recipe.local_remove.cend(); ++local_remove)
+	local_remove != recipe.local_remove.cend(); ++local_remove)
 	{
 		if (!world.room_at(x, y, z)->contains(local_remove->first, local_remove->second))
 		{
@@ -193,7 +193,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const World & w
 
 	// for each objective
 	for (std::deque<Objective>::const_iterator objective_iterator = objectives.cbegin();
-		objective_iterator != objectives.cend(); ++objective_iterator)
+	objective_iterator != objectives.cend(); ++objective_iterator)
 	{
 		// if I am still planning on acquiring an item for the purpose of crafting item_ID
 		if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE && objective_iterator->purpose == item_ID)
@@ -716,6 +716,9 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, World & world, U
 }
 bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
 {
+	// Returns a boolean indicating if a path was found. If a path was found,
+	// the path is now saved.
+
 	// leave this for debugging
 	// cout << "\nSearching for path from " << x << "," << y << " to " << x_dest << "," << y_dest << ".\n";
 
@@ -910,6 +913,17 @@ bool NPC::make_path_movement(World & world, Update_Messages & update_messages)
 	}
 
 	// there was no path to follow or the next planned move in the path could not be made
+	return false;
+}
+
+// other pathfinding utilities
+bool NPC::coordinates_are_on_path(const int & find_x, const int & find_y) const
+{
+	for (const Coordinate & coordinate : path)
+	{
+		if (coordinate._x == find_x && coordinate._y == find_y) return true;
+	}
+
 	return false;
 }
 
