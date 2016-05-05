@@ -1,3 +1,4 @@
+*.exe
 *.idb
 *.ilk
 *.iobj
@@ -12,3 +13,4 @@
 *.user
 IslandMUD/nbproject/private/
 Debug/
+Release/
