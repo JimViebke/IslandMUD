@@ -256,7 +256,6 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	// debugging
 	else if (command.size() == 1 && command[0] == "coord")
 	{
-		// gather some more information to add to the response message
 		if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(actor_id)->second))
 		{
 			std::stringstream coord;
