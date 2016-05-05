@@ -34,7 +34,6 @@ void Parse::initialize()
 		P::dict["drop"] = P::dict["release"] = P::dict["unhand"] = P::dict["add"] = P::dict["place"] = P::dict["put"] = C::DROP_COMMAND;
 		P::dict["into"] = P::dict["in"] = P::dict["to"] = P::dict["within"] = P::dict["on"] = P::dict["onto"] = C::INSERT_COMMAND;
 		P::dict["from"] = P::dict["form"] = C::FROM_COMMAND;
-		P::dict["wait"] = P::dict["pause"] = P::dict["consider"] = P::dict["delay"] = P::dict["advance"] = C::WAIT_COMMAND;
 		P::dict["with"] = C::WITH_COMMAND;
 		P::dict["construct"] = P::dict["build"] = P::dict["erect"] = C::CONSTRUCT_COMMAND;
 		P::dict["attack"] = P::dict["smash"] = P::dict["strike"] = P::dict["bash"] = P::dict["break"] = P::dict["damage"] = P::dict["stab"] = P::dict["slash"] = P::dict["chop"] = C::ATTACK_COMMAND;

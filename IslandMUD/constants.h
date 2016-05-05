@@ -129,7 +129,6 @@ public:
 		INSERT_COMMAND,
 		FROM_COMMAND,
 		CONSTRUCT_COMMAND, // room sides
-		WAIT_COMMAND, // dev only. World is real-time.
 		WITH_COMMAND,
 		PRINT_RECIPES_COMMAND, // dev only. No full recipe printout in normal game.
 		ATTACK_COMMAND,

@@ -118,7 +118,6 @@ const std::string C::DROP_COMMAND = "drop";
 const std::string C::INSERT_COMMAND = "insert";
 const std::string C::FROM_COMMAND = "from";
 const std::string C::CONSTRUCT_COMMAND = "construct";
-const std::string C::WAIT_COMMAND = "wait"; // for debugging (see constants.h)
 const std::string C::WITH_COMMAND = "with";
 const std::string C::PRINT_RECIPES_COMMAND = "recipes"; // for debugging (see constants.h)
 const std::string C::ATTACK_COMMAND = "attack";

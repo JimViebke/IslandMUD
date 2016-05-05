@@ -146,11 +146,6 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	{
 		return actors.find(actor_id)->second->construct_surface_with_door(command[2], command[1], command[5], world); // material, direction, world
 	}
-	// waiting: "wait"
-	else if (command.size() == 1 && command[0] == C::WAIT_COMMAND)
-	{
-		return Update_Messages("You wait.");
-	}
 	// printing out the full library of recipes: "recipes"
 	else if (command.size() == 1 && command[0] == C::PRINT_RECIPES_COMMAND)
 	{
