@@ -88,7 +88,18 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	else if ((command.size() == 2 && command[0] == C::MOVE_COMMAND)
 		|| command.size() == 1 && U::contains(C::direction_ids, command[0]))
 	{
-		return actors.find(actor_id)->second->move(command[command.size() - 1], world); // passes direction (last element in command) and world
+		// get a shared_ptr to the acting charater
+		std::shared_ptr<Character> character = actors.find(actor_id)->second;
+
+		// get the result of making the move
+		Update_Messages result = character->move(command[command.size() - 1], world); // passes direction (last element in command) and world
+
+		// if the acting character is a player character
+		if (const std::shared_ptr<PC> player = U::convert_to<PC>(character))
+			// append a summary of the new area
+			result.to_user += world.room_at(player->x, player->y, player->z)->summary(player->name);
+
+		return result;
 	}
 	// take: "take branch"
 	else if (command.size() == 2 && command[0] == C::TAKE_COMMAND)
@@ -240,6 +251,17 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		{
 			// convert the actor to a Player_Character
 			return Update_Messages(actor->get_equipped_item_info());
+		}
+	}
+	// debugging
+	else if (command.size() == 1 && command[0] == "coord")
+	{
+		// gather some more information to add to the response message
+		if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(actor_id)->second))
+		{
+			std::stringstream coord;
+			coord << "Your coordinates are " << player->x << ", " << player->y << " (index " << player->z << ")";
+			return Update_Messages(coord.str());
 		}
 	}
 
@@ -676,23 +698,12 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 
 	// create a stringstream to assemble the return message
 	std::stringstream action_result;
-	action_result << "\n\n";
 
 	const std::shared_ptr<Character> character = actors.find(user_ID)->second;
 
 	// save the player's coordinates in case a map update is required
 	const int player_x = character->x;
 	const int player_y = character->y;
-
-	// gather some more information to add to the response message
-	if (U::is<PC>(character))
-	{
-		const std::shared_ptr<PC> player = U::convert_to<PC>(character);
-
-		action_result << "Your coordinates are " << player->x << ", " << player->y << " (index " << player->z << ")"
-			<< this->world.room_at(player->x, player->y, player->z)->summary(player->name) // "You look around and notice..."
-			<< "\n\n";
-	}
 
 	// add the update message to the end of the outbound message
 	action_result << update_messages.to_user;
