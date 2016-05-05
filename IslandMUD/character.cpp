@@ -424,7 +424,7 @@ Update_Messages Character::move(const std::string & direction_ID, World & world)
 	// prepare responses
 	Update_Messages updates("You move " + direction_ID + ".",
 
-		// "Jeb arrives from the south [wielding an axe]."
+		// "[name] arrives from the [direction] wielding an [item]."
 		this->name + " arrives from the " + C::opposite_direction_id.find(direction_ID)->second +
 		((this->equipped_item == nullptr) ? "." : (" wielding " + U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + ".")),
 
