@@ -113,6 +113,9 @@ protected:
 	bool save_path_to(const int & x_dest, const int & y_dest, World & world);
 	bool make_path_movement(World & world, Update_Messages & update_messages);
 
+	// other pathfinding utilities
+	bool coordinates_are_on_path(const int & find_x, const int & find_y) const;
+
 private:
 
 	/* F = G + H

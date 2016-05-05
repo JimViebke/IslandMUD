@@ -22,7 +22,7 @@ Feb 14, 2015 */
 
 #include "constants.h"
 
-namespace Utilities {} // "forward delcaring"...
+namespace Utilities {} // forward declaring...
 
 namespace U = Utilities; // ...to do this here
 
@@ -141,7 +141,7 @@ namespace Utilities
 	{
 		vec.erase(find(vec.begin(), vec.end(), erase_element));
 	}
-	template <typename T> void append_b_to_a(std::vector<T> & dest, const std::vector<T> & source)
+	template <typename T> inline void append_b_to_a(std::vector<T> & dest, const std::vector<T> & source)
 	{
 		dest.insert(dest.end(), source.begin(), source.end());
 	}

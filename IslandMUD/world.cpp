@@ -11,8 +11,6 @@ World::World()
 {
 	create_world_container();
 	load_or_generate_terrain_and_mineral_maps();
-
-	Parse::initialize();
 }
 
 // access a room given coordinates

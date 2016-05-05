@@ -18,12 +18,12 @@ class Parse
 {
 private:
 	Parse() = delete; // deliberately not implemented
-	
+
 	static std::map<std::string, std::string> dict; // first string maps to second string
-	
-public:
 
 	static void initialize();
+
+public:
 
 	static std::vector<std::string> tokenize(const std::string & s);
 };

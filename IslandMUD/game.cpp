@@ -30,6 +30,8 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	{
 		return Update_Messages(std::string("help:\n") +
 			"\nlegend" +
+			"\ninventory / inv / i" +
+			"\nlook / l" +
 			"\nrecipes" +
 			"\nrecipes [search keyword]" +
 			"\nmove [compass direction]" +
@@ -43,6 +45,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 			"\nconstruct [compass direction] [material] wall" +
 			"\nconstruct [compass direction] [material] wall with [material] door");
 	}
+	// "legend"
 	else if (command.size() == 1 && command[0] == C::LEGEND_COMMAND)
 	{
 		return Update_Messages(std::string("legend:\n") +
@@ -63,11 +66,40 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 			"\n " + C::WALL_CHAR + C::DOOR_CHAR + C::WALL_CHAR + "   a wall with a door" +
 			"\n " + C::WALL_CHAR + C::RUBBLE_CHAR + C::WALL_CHAR + "   a smashed door or wall (traversable)");
 	}
+	// "i", "inv", "inventory"
+	else if (command.size() == 1 && command[0] == C::INVENTORY_COMMAND)
+	{
+		// if the actor is a Player_Character
+		if (const std::shared_ptr<PC> & actor = U::convert_to<PC>(actors.find(actor_id)->second))
+		{
+			return Update_Messages(actor->get_inventory_info());
+		}
+	}
+	// "l", "look"
+	else if (command.size() == 1 && command[0] == C::LOOK_COMMAND)
+	{
+		// if the actor is a Player_Character
+		if (const std::shared_ptr<PC> & player = U::convert_to<PC>(actors.find(actor_id)->second))
+		{
+			return Update_Messages(world.room_at(player->x, player->y, player->z)->summary(player->name));
+		}
+	}
 	// moving: "move northeast" OR "northeast"
 	else if ((command.size() == 2 && command[0] == C::MOVE_COMMAND)
 		|| command.size() == 1 && U::contains(C::direction_ids, command[0]))
 	{
-		return actors.find(actor_id)->second->move(command[command.size() - 1], world); // passes direction (last element in command) and world
+		// get a shared_ptr to the acting charater
+		std::shared_ptr<Character> character = actors.find(actor_id)->second;
+
+		// get the result of making the move
+		Update_Messages result = character->move(command[command.size() - 1], world); // passes direction (last element in command) and world
+
+		// if the acting character is a player character
+		if (const std::shared_ptr<PC> player = U::convert_to<PC>(character))
+			// append a summary of the new area
+			result.to_user += world.room_at(player->x, player->y, player->z)->summary(player->name);
+
+		return result;
 	}
 	// take: "take branch"
 	else if (command.size() == 2 && command[0] == C::TAKE_COMMAND)
@@ -113,11 +145,6 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	else if (command.size() == 7 && command[0] == C::CONSTRUCT_COMMAND && command[3] == C::WALL && command[4] == C::WITH_COMMAND && command[6] == C::DOOR)
 	{
 		return actors.find(actor_id)->second->construct_surface_with_door(command[2], command[1], command[5], world); // material, direction, world
-	}
-	// waiting: "wait"
-	else if (command.size() == 1 && command[0] == C::WAIT_COMMAND)
-	{
-		return Update_Messages("You wait.");
 	}
 	// printing out the full library of recipes: "recipes"
 	else if (command.size() == 1 && command[0] == C::PRINT_RECIPES_COMMAND)
@@ -221,6 +248,16 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 			return Update_Messages(actor->get_equipped_item_info());
 		}
 	}
+	// debugging
+	else if (command.size() == 1 && command[0] == "coord")
+	{
+		if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(actor_id)->second))
+		{
+			std::stringstream coord;
+			coord << "Your coordinates are " << player->x << ", " << player->y << " (index " << player->z << ")";
+			return Update_Messages(coord.str());
+		}
+	}
 
 	return Update_Messages("Nothing happens.");
 }
@@ -304,7 +341,7 @@ void Game::networking_thread(const unsigned & listening_port, client_thread_type
 #ifdef WIN32
 	WSACleanup();
 #endif
-	}
+}
 
 void Game::client_thread(SOCKET client_ID)
 {
@@ -467,7 +504,7 @@ void Game::NPC_thread()
 		const std::vector<std::string> workers = { "Jeb", "Bill", "Bob" };
 		const std::vector<std::string> bodyguards = { "Alpha", "Beta", "Gamma" };
 
-		// create a worker NPCs
+		// create worker NPCs with bodyguards
 		for (unsigned i = 0; i < std::min(workers.size(), bodyguards.size()); ++i)
 		{
 			std::lock_guard<std::mutex> lock(actors_mutex);
@@ -480,6 +517,15 @@ void Game::NPC_thread()
 			bodyguard->login(world);
 			actors.insert(make_pair(bodyguard->name, bodyguard));
 		}
+	}
+
+	// add a corporal
+	{
+		std::lock_guard<std::mutex> lock(actors_mutex);
+
+		std::shared_ptr<Hostile_NPC_Corporal> hunter = std::make_shared<Hostile_NPC_Corporal>("Hunter");
+		hunter->login(world);
+		actors.insert(make_pair(hunter->name, hunter));
 	}
 
 	std::this_thread::sleep_for(std::chrono::seconds(15)); // put a delay between server startup and NPCs' first action
@@ -646,23 +692,12 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 
 	// create a stringstream to assemble the return message
 	std::stringstream action_result;
-	action_result << "\n\n";
 
 	const std::shared_ptr<Character> character = actors.find(user_ID)->second;
 
 	// save the player's coordinates in case a map update is required
 	const int player_x = character->x;
 	const int player_y = character->y;
-
-	// gather some more information to add to the response message
-	if (U::is<PC>(character))
-	{
-		const std::shared_ptr<PC> player = U::convert_to<PC>(character);
-
-		action_result << "Your coordinates are " << player->x << ", " << player->y << " (index " << player->z << ")"
-			<< this->world.room_at(player->x, player->y, player->z)->summary(player->name) // "You look around and notice..."
-			<< "\n\n" << player->print() << "\n\n"; // "You have..."
-	}
 
 	// add the update message to the end of the outbound message
 	action_result << update_messages.to_user;

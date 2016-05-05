@@ -116,6 +116,8 @@ public:
 		SAVE_COMMAND,
 		SHOW_HELP_COMMAND,
 		LEGEND_COMMAND,
+		INVENTORY_COMMAND,
+		LOOK_COMMAND,
 		CRAFT_COMMAND,
 		MINE_COMMAND,
 		TAKE_COMMAND,
@@ -127,7 +129,6 @@ public:
 		INSERT_COMMAND,
 		FROM_COMMAND,
 		CONSTRUCT_COMMAND, // room sides
-		WAIT_COMMAND, // dev only. World is real-time.
 		WITH_COMMAND,
 		PRINT_RECIPES_COMMAND, // dev only. No full recipe printout in normal game.
 		ATTACK_COMMAND,

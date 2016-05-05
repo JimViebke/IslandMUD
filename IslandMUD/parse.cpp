@@ -21,7 +21,8 @@ void Parse::initialize()
 		// verbs
 		P::dict["help"] = P::dict["h"] = P::dict["q"] = P::dict["?"] = P::dict["assist"] = P::dict["command"] = P::dict["commands"] = C::SHOW_HELP_COMMAND;
 		P::dict["legend"] = C::LEGEND_COMMAND;
-		// P::dict["login"] = C::LOGIN_COMMAND; // not used yet
+		P::dict["i"] = P::dict["inv"] = P::dict["inventory"] = C::INVENTORY_COMMAND;
+		P::dict["l"] = P::dict["look"] = C::LOOK_COMMAND;
 		P::dict["save"] = P::dict["logout"] = P::dict["quit"] = P::dict["leave"] = P::dict["exit"] = C::SAVE_COMMAND;
 		P::dict["move"] = P::dict["m"] = P::dict["walk"] = P::dict["run"] = P::dict["head"] = P::dict["go"] = P::dict["continue"] = P::dict["work"] = C::MOVE_COMMAND;
 		P::dict["take"] = P::dict["get"] = P::dict["pick"] = P::dict["choose"] = P::dict["grab"] = P::dict["acquire"] = C::TAKE_COMMAND;
@@ -33,7 +34,6 @@ void Parse::initialize()
 		P::dict["drop"] = P::dict["release"] = P::dict["unhand"] = P::dict["add"] = P::dict["place"] = P::dict["put"] = C::DROP_COMMAND;
 		P::dict["into"] = P::dict["in"] = P::dict["to"] = P::dict["within"] = P::dict["on"] = P::dict["onto"] = C::INSERT_COMMAND;
 		P::dict["from"] = P::dict["form"] = C::FROM_COMMAND;
-		P::dict["wait"] = P::dict["pause"] = P::dict["consider"] = P::dict["delay"] = P::dict["advance"] = C::WAIT_COMMAND;
 		P::dict["with"] = C::WITH_COMMAND;
 		P::dict["construct"] = P::dict["build"] = P::dict["erect"] = C::CONSTRUCT_COMMAND;
 		P::dict["attack"] = P::dict["smash"] = P::dict["strike"] = P::dict["bash"] = P::dict["break"] = P::dict["damage"] = P::dict["stab"] = P::dict["slash"] = P::dict["chop"] = C::ATTACK_COMMAND;
