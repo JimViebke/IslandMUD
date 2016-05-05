@@ -22,6 +22,7 @@ void Parse::initialize()
 		P::dict["help"] = P::dict["h"] = P::dict["q"] = P::dict["?"] = P::dict["assist"] = P::dict["command"] = P::dict["commands"] = C::SHOW_HELP_COMMAND;
 		P::dict["legend"] = C::LEGEND_COMMAND;
 		P::dict["i"] = P::dict["inv"] = P::dict["inventory"] = C::INVENTORY_COMMAND;
+		P::dict["l"] = P::dict["look"] = C::LOOK_COMMAND;
 		P::dict["save"] = P::dict["logout"] = P::dict["quit"] = P::dict["leave"] = P::dict["exit"] = C::SAVE_COMMAND;
 		P::dict["move"] = P::dict["m"] = P::dict["walk"] = P::dict["run"] = P::dict["head"] = P::dict["go"] = P::dict["continue"] = P::dict["work"] = C::MOVE_COMMAND;
 		P::dict["take"] = P::dict["get"] = P::dict["pick"] = P::dict["choose"] = P::dict["grab"] = P::dict["acquire"] = C::TAKE_COMMAND;

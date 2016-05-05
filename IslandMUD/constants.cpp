@@ -106,6 +106,7 @@ const std::string C::SAVE_COMMAND = "save";
 const std::string C::SHOW_HELP_COMMAND = "help";
 const std::string C::LEGEND_COMMAND = "legend";
 const std::string C::INVENTORY_COMMAND = "inventory";
+const std::string C::LOOK_COMMAND = "look";
 const std::string C::TAKE_COMMAND = "take";
 const std::string C::EQUIP_COMMAND = "equip";
 const std::string C::ITEM_COMMAND = "item"; // view equipped item

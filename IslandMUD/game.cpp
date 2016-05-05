@@ -31,6 +31,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		return Update_Messages(std::string("help:\n") +
 			"\nlegend" +
 			"\ninventory / inv / i" +
+			"\nlook / l" +
 			"\nrecipes" +
 			"\nrecipes [search keyword]" +
 			"\nmove [compass direction]" +
@@ -72,6 +73,15 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		if (const std::shared_ptr<PC> & actor = U::convert_to<PC>(actors.find(actor_id)->second))
 		{
 			return Update_Messages(actor->get_inventory_info());
+		}
+	}
+	// "l", "look"
+	else if (command.size() == 1 && command[0] == C::LOOK_COMMAND)
+	{
+		// if the actor is a Player_Character
+		if (const std::shared_ptr<PC> & player = U::convert_to<PC>(actors.find(actor_id)->second))
+		{
+			return Update_Messages(world.room_at(player->x, player->y, player->z)->summary(player->name));
 		}
 	}
 	// moving: "move northeast" OR "northeast"
@@ -543,7 +553,7 @@ void Game::outbound_thread()
 		// dispatch data to the user (because we're using TCP, data is lossless unless total failure occurs)
 		send(message.user_socket_ID, message.data.c_str(), message.data.size(), 0);
 	}
-	}
+}
 
 // helper functions
 
