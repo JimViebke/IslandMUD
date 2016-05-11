@@ -15,7 +15,10 @@ Basic Equipment types for IslandMUD.
 class Equipment : public Item
 {
 protected:
-	Equipment(const std::string & name) : Item(name, true) {}
+	Equipment(const std::string & name);
+
+	// returns the amount of damage that this item will deal in combat
+	unsigned get_combat_damage() const;
 };
 
 class Staff : public Equipment
