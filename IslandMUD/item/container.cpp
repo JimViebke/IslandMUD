@@ -23,20 +23,15 @@ std::string Container::contents_to_string() const
 	const auto last_it = --contents.end();
 
 	// for each item
-	for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator it = contents.begin();
-		it != contents.end(); ++it)
+	for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator it = contents.begin(); it != contents.end(); ++it)
 	{
-		// if the item is stackable
-		if (const std::shared_ptr<Stackable> & stackable = U::convert_to<Stackable>(it->second))
+		// attempt to convert the item to a stackable type
+		const std::shared_ptr<Stackable> & stackable = U::convert_to<Stackable>(it->second);
+
+		// if the item is stackable and the amount is not equal to one
+		if (stackable && stackable->amount != 1)
 		{
-			if (stackable->amount != 1) // and the amount is != 1
-			{
-				output << stackable->amount << " " << U::get_plural_for(stackable->get_name());
-			}
-			else
-			{
-				output << U::get_article_for(it->second->get_name()) << " " << it->second->get_name(); // this is duplicated below, but I'm not sure how to fix this
-			}
+			output << stackable->amount << " " << U::get_plural_for(stackable->get_name());
 		}
 		else // the item is not stackable
 		{
