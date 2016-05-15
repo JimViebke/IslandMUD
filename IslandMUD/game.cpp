@@ -473,9 +473,10 @@ void Game::client_map_thread(SOCKET client_map_ID)
 		// add user to the lookup
 		clients.set_map_socket(user_ID, client_map_ID);
 
+		// generate an area map from the current player's perspective, send it to the newly connect map socket
+		std::lock_guard<std::mutex> lock(game_state);
 		if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(user_ID)->second))
 		{
-			// generate an area map from the current player's perspective, send it to the newly connect map socket
 			outbound_queue.put(Message(client_map_ID, "\n\n" + player->generate_area_map(world, actors)));
 		}
 	}
