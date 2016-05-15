@@ -14,6 +14,9 @@ std::string Hostile_NPC::get_new_hostile_id(const World & world, const std::map<
 	{
 		for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 		{
+			// skip over rooms that are out of bounds
+			if (!U::bounds_check(cx, cy)) continue;
+
 			// for each actor in the room
 			for (const std::string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
 			{
