@@ -39,7 +39,7 @@ private:
 	threadsafe::socket_lookup clients;
 
 	std::map<std::string, std::shared_ptr<Character>> actors; // active/online PC and NPC ids
-	std::mutex actors_mutex; // serves for both of the above types
+	std::mutex game_state; // serves for both of the above types
 
 	World world; // the game world object
 

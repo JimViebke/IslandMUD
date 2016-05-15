@@ -275,7 +275,7 @@ void Game::processing_thread()
 		const std::string user_ID = clients.get_user_ID(inbound_message.user_socket_ID);
 
 		// don't allow the actors structure to be modified
-		std::unique_lock<std::mutex> lock(actors_mutex);
+		std::unique_lock<std::mutex> lock(game_state);
 
 		// execute the user's parsed command against the world
 		const Update_Messages update_messages = execute_command(user_ID, Parse::tokenize(inbound_message.data));
@@ -360,7 +360,7 @@ void Game::client_thread(SOCKET client_ID)
 		clients.set_socket(user_ID, client_ID);
 
 		// log the player in
-		std::lock_guard<std::mutex> lock(actors_mutex); // lock the actors structure while we modify it
+		std::lock_guard<std::mutex> lock(game_state); // lock the actors structure while we modify it
 		std::shared_ptr<PC> player = std::make_shared<PC>(user_ID);
 		player->login(world);
 		actors.insert(std::make_pair(user_ID, player));
@@ -369,6 +369,7 @@ void Game::client_thread(SOCKET client_ID)
 		outbound_queue.put(Message(client_ID, "Welcome to IslandMUD! You are playing as \"" + user_ID + "\".\n\n"));
 	}
 
+	// continuously read data from the client until the client disconnects
 	for (;;)
 	{
 		// execution pauses inside of recv() until the user sends data
@@ -377,7 +378,7 @@ void Game::client_thread(SOCKET client_ID)
 		// check if reading the socket failed
 		if (data_read == 0 || data_read == -1) // graceful disconnect, less graceful disconnect (respectively)
 		{
-			std::lock_guard<std::mutex> lock(actors_mutex); // gain exclusive hold of the client map for modification
+			std::lock_guard<std::mutex> lock(game_state); // gain exclusive hold of the client map for modification
 			close_socket(client_ID); // close socket (platform-independent)
 
 			const std::string user_ID = clients.get_user_ID(client_ID); // find username
@@ -435,7 +436,7 @@ void Game::client_map_thread(SOCKET client_map_ID)
 		if (input.size() == 2) // only valid input size
 		{
 			{ // temporary scope to destroy mutex as soon as possible
-				std::lock_guard<std::mutex> lock(actors_mutex);
+				std::lock_guard<std::mutex> lock(game_state);
 				if (actors.find(input[0]) == actors.cend()) continue; // repeat message if the user is not logged in
 			}
 
@@ -507,7 +508,7 @@ void Game::NPC_thread()
 		// create worker NPCs with bodyguards
 		for (unsigned i = 0; i < std::min(workers.size(), bodyguards.size()); ++i)
 		{
-			std::lock_guard<std::mutex> lock(actors_mutex);
+			std::lock_guard<std::mutex> lock(game_state);
 
 			std::shared_ptr<Hostile_NPC_Worker> worker = std::make_shared<Hostile_NPC_Worker>(workers[i]);
 			worker->login(world);
@@ -521,7 +522,7 @@ void Game::NPC_thread()
 
 	// add a corporal
 	{
-		std::lock_guard<std::mutex> lock(actors_mutex);
+		std::lock_guard<std::mutex> lock(game_state);
 
 		std::shared_ptr<Hostile_NPC_Corporal> hunter = std::make_shared<Hostile_NPC_Corporal>("Hunter");
 		hunter->login(world);
@@ -536,9 +537,9 @@ void Game::NPC_thread()
 	{
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 
-		std::cout << "NPC thread locking actors_mutex...";
-		std::lock_guard<std::mutex> lock(actors_mutex);
-		std::cout << " done.\n";
+		std::cout << "NPC thread locking game_state...";
+		std::lock_guard<std::mutex> lock(game_state);
+		std::cout << " game_state locked.\n";
 
 		for (auto & actor : actors) // for each actor
 		{
@@ -658,7 +659,7 @@ std::string Game::login_or_signup(const SOCKET client_ID)
 
 			// check if the user is already logged in
 			{ // temporary scope to delete mutex lock
-				std::lock_guard<std::mutex> lock(actors_mutex);
+				std::lock_guard<std::mutex> lock(game_state);
 				if (actors.find(input[0]) != actors.cend())
 				{
 					outbound_queue.put(Message(client_ID, "User \"" + input[0] + "\" already logged in.\n"));
