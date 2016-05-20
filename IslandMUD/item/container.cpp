@@ -132,7 +132,7 @@ std::shared_ptr<Item> Container::erase(const std::string & item_id)
 		if (stackable->amount < 1)
 		{
 			// destroy the container's reference to the item
-			contents.erase(item_id);
+			contents.erase(item_it);
 		}
 
 		// return a new instance of the stackable item
@@ -144,7 +144,7 @@ std::shared_ptr<Item> Container::erase(const std::string & item_id)
 		std::shared_ptr<Item> item = item_it->second;
 
 		// destroy the container's reference to the item
-		contents.erase(item_id);
+		contents.erase(item_it);
 
 		// return the local shared_ptr to the item
 		return item;
@@ -176,8 +176,14 @@ void Container::erase(const std::string & item_id, const unsigned & count)
 		// for as many times as specified
 		for (unsigned i = 0; i < count; ++i)
 		{
-			// erase the container's reference to the item
-			contents.erase(item_id);
+			// get an iterator to an instance of the item
+			const auto erase_item_it = contents.find(item_id);
+
+			// if the iterator is valid, erase the item
+			if (erase_item_it != contents.cend())
+				contents.erase(erase_item_it);
+			else
+				break; // the first time an iterator is not valid, break out of the loop
 		}
 	}
 }
