@@ -12,7 +12,7 @@ unsigned Equipment::get_combat_damage() const
 	const std::map<std::string, std::map<std::string, int>>::const_iterator implement_table_it = C::damage_tables.find(this->get_name());
 
 	// if no damage table exists for this item, return 0
-	if (implement_table_it == C::damage_tables.cend()) return 0;
+	if (implement_table_it == C::damage_tables.cend()) return 1;
 
 	// a damage table exists for this item, extract it from the iterator
 	const std::map<std::string, int> implement_table = implement_table_it->second;
@@ -21,8 +21,8 @@ unsigned Equipment::get_combat_damage() const
 	const std::map<std::string, int>::const_iterator implement_damage = implement_table.find("");
 
 	// if a damage table exists for this item but does not have an entry for attacking a character, return 0
-	if (implement_damage == implement_table.cend()) return 0;
+	if (implement_damage == implement_table.cend()) return 1;
 
 	// return the damage
-	return implement_damage->second;
+	return std::max(implement_damage->second, 1);
 }

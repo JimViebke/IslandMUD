@@ -96,6 +96,9 @@
     <ClCompile Include="XML\pugixml.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Item\equipment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="NPC\npc_neutral.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

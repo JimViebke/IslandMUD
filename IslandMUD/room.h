@@ -44,6 +44,7 @@ public:
 	std::string can_move_in_direction(const std::string & direction_ID, const std::string & faction_ID);
 	bool contains_no_items() const;
 	bool is_unloadable() const;
+	bool is_occupied_by(const std::string & actor_id) const;
 	bool is_observed_by(const std::string & actor_id) const;
 	bool is_water() const;
 	bool is_forest() const;

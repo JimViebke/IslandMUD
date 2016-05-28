@@ -117,13 +117,13 @@ bool Container::insert(const std::shared_ptr<Item> & item)
 std::shared_ptr<Item> Container::erase(const std::string & item_id)
 {
 	// get an iterator to the item in question
-	const std::multimap<std::string, std::shared_ptr<Item>>::iterator item_it = contents.find(item_id);
+	const auto item_it = contents.find(item_id);
 
 	// if the item does not exist to take, return a null pointer
 	if (item_it == contents.cend()) return nullptr;
 
 	// if the item is a stackable type
-	if (std::shared_ptr<Stackable> & stackable = U::convert_to<Stackable>(item_it->second))
+	if (auto & stackable = U::convert_to<Stackable>(item_it->second))
 	{
 		// count one less item in storage
 		stackable->amount--;

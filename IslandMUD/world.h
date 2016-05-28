@@ -42,6 +42,9 @@ public:
 	// loading and unloading rooms at the edge of vision
 	void remove_viewer_and_attempt_unload(const int & x, const int & y, const int & z, const std::string & viewer_ID);
 
+	// unloading of all rooms in view distance (for logging out or dying)
+	void attempt_unload_radius(const int & x, const int & y, const std::string & player_ID);
+
 	// test if a room can be removed from memory
 	bool is_unloadable(const int & x, const int & y, const int & z) const;
 

@@ -264,6 +264,10 @@ void Character::set_health_max(const int & level_value)
 		max_health = level_value;
 	}
 }
+void Character::reset_health()
+{
+	current_health = max_health;
+}
 
 // setters
 void Character::set_current_health(const int & health_value)
@@ -1184,6 +1188,90 @@ Update_Messages Character::add_to_bloomery(const std::string & item_ID, const un
 
 	return Update_Messages("Character::add_to_bloomery() is incomplete.");
 }
+Update_Messages Character::attack_character(std::shared_ptr<Character> & target, World & world)
+{
+	if (this->equipped_item == nullptr)
+	{
+		// do an unarmed attack
+		target->current_health -= std::min(target->current_health, C::damage_tables.find(C::ATTACK_COMMAND)->second.find("")->second);
+	}
+	// an attack using a type of equipment
+	else if (std::shared_ptr<Equipment> weapon = U::convert_to<Equipment>(equipped_item))
+	{
+		const int base_attack = U::random_int_from(1u, weapon->get_combat_damage());
+		const int base_defense = U::random_int_from(1u, target->get_defense());
+
+		target->current_health -= std::min(target->current_health, base_attack - base_defense);
+	}
+	else // an attempted attack using a non-equipment item
+	{
+		return Update_Messages("You can't attack using " + U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + ".");
+	}
+
+	// if the target is dead
+	if (target->current_health == 0)
+	{
+		// die() handleds the dying target's inventory
+		Update_Messages update_messages = target->die(world);
+
+		// remove the target from their current destination
+		world.room_at(x, y, z)->remove_actor(target->name);
+
+		// attempt to unload the rooms around the player
+		world.attempt_unload_radius(target->x, target->y, target->name);
+
+		// move the dead player to the spawn location
+		world.load_view_radius_around(C::DEFAULT_SPAWN_X, C::DEFAULT_SPAWN_Y, target->name);
+		target->x = C::DEFAULT_SPAWN_X;
+		target->y = C::DEFAULT_SPAWN_Y;
+
+		// restore the player's health
+		target->reset_health();
+
+		return update_messages;
+	}
+
+	return Update_Messages("You attack " + target->name + " with " +
+		((equipped_item == nullptr) ? "your bare hands." : U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + "."),
+
+		name + " attacks " + target->name + " with " +
+		((equipped_item == nullptr) ? "their bare hands." : (U::get_article_for(equipped_item->get_name() + " " + equipped_item->get_name() + "."))));
+}
+Update_Messages Character::die(World & world)
+{
+	// The player drops the item they are holding, all equipment from their inventory, a random amount of each stackable type from their inventory (at least one of each), and keeps any other item.
+
+	const std::unique_ptr<Room> & room = world.room_pointer_at(x, y, z);
+
+	// the player drops the item they're holding
+	room->insert(std::move(equipped_item));
+
+	// The following use of "erase(item_it++)" is a subtle way of making sure our traversing iterator
+	// is always valid, whether an entry from the map is removed or not. This is a feature
+	// of post-incrementing.
+
+	for (auto item_it = contents.begin(); item_it != contents.cend(); )
+	{
+		// all equipment is dropped
+		if (U::is<Equipment>(item_it->second))
+		{
+			room->insert(this->erase(item_it++->first));
+		}
+		// a random amount of each stackable is dropped (at least one of each)
+		else if (U::is<Stackable>(item_it->second))
+		{
+			const unsigned amount = U::random_int_from(1u, this->count(item_it->first));
+			for (unsigned i = 0; i < amount; ++i)
+				room->insert(this->erase(item_it++->first));
+		}
+		else // items that are neither equipment nor stackable stay with the killed player
+		{
+			++item_it;
+		}
+	}
+
+	return Update_Messages(name + " dies.", name + " dies.", std::make_pair(name, "You die."));
+}
 
 // movement info
 std::string Character::validate_movement(const int & cx, const int & cy, const int & cz, const std::string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const
@@ -1310,4 +1398,10 @@ unsigned Character::move_items(Container & source, Container & destination, cons
 	}
 
 	return items_moved;
+}
+
+// combat helper functions
+unsigned Character::get_defense() const
+{
+	return 1; // soak
 }
