@@ -100,7 +100,7 @@
     <ClCompile Include="NPC\npc_enemy_corporal.cpp" />
     <ClCompile Include="NPC\npc_enemy_fighter.cpp" />
     <ClCompile Include="NPC\npc_enemy_worker.cpp" />
-    <ClCompile Include="NPC\npc_unaffiliated.cpp" />
+    <ClCompile Include="NPC\npc_neutral.cpp" />
     <ClCompile Include="parse.cpp" />
     <ClCompile Include="player_character.cpp" />
     <ClCompile Include="XML\pugixml.cpp" />
@@ -134,7 +134,7 @@
     <ClInclude Include="NPC\npc_enemy_corporal.h" />
     <ClInclude Include="NPC\npc_enemy_fighter.h" />
     <ClInclude Include="NPC\npc_enemy_worker.h" />
-    <ClInclude Include="NPC\npc_unaffiliated.h" />
+    <ClInclude Include="NPC\npc_neutral.h" />
     <ClInclude Include="parse.h" />
     <ClInclude Include="player_character.h" />
     <ClInclude Include="XML\pugiconfig.hpp" />

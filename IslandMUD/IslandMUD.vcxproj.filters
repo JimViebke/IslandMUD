@@ -90,13 +90,13 @@
     <ClCompile Include="NPC\non_player_character.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NPC\npc_unaffiliated.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="NPC\npc_enemy_corporal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="XML\pugixml.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NPC\npc_neutral.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -197,9 +197,6 @@
     <ClInclude Include="NPC\non_player_character.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NPC\npc_unaffiliated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="npc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -210,6 +207,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="XML\pugiconfig.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NPC\npc_neutral.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
