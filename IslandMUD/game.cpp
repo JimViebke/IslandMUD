@@ -402,12 +402,25 @@ void Game::client_thread(SOCKET client_ID)
 			std::lock_guard<std::mutex> lock(game_state); // gain exclusive hold of the client map for modification
 			close_socket(client_ID); // close socket (platform-independent)
 
+			// get the user's ID
 			const std::string user_ID = clients.get_user_ID(client_ID); // find username
 			if (user_ID == "") return; // should never happen
-			actors.find(user_ID)->second->save(); // save the user's data
-			actors.erase(user_ID); // erase the user
+			
+			// create a reference to the user's Character object
+			std::shared_ptr<Character> user = actors.find(user_ID)->second; // save the user's data
+			
+			// clean up the world
+			world.attempt_unload_radius(user->x, user->y, user_ID);
+			
+			// clean up the user
+			user->save(); // save the user's data
+			actors.erase(user_ID); // erase the user from the actor's map
+
+			// clean up networking stuff
 			clients.erase(user_ID); // erase the client record
-			return; // the client's personal thread is destroyed
+
+			// clean up the user's thread
+			return;
 		}
 
 		std::stringstream user_input;
