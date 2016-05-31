@@ -120,8 +120,18 @@ bool Hostile_NPC_Corporal::hunt(World & world, std::map<std::string, std::shared
 		return false;
 	}
 
+	// extract a const iterator to the target
+	const auto target_it = actors.find(hunt_target_id);
+
+	// reset hunt target ID and return failure if the target is no longer online
+	if (target_it == actors.cend())
+	{
+		hunt_target_id = "";
+		return false;
+	}
+
 	// extract a constant reference to the target
-	const std::shared_ptr<Character> target = actors.find(hunt_target_id)->second;
+	const std::shared_ptr<Character> target = target_it->second;
 
 	if (x == target->x && y == target->y)
 	{
