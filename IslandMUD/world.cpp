@@ -14,7 +14,7 @@ World::World()
 }
 
 // access a room given coordinates
-std::unique_ptr<Room>::pointer World::room_at(const int & x, const int & y, const int & z = C::GROUND_INDEX)
+std::unique_ptr<Room>::pointer World::room_at(const int & x, const int & y, const int & z)
 {
 	if (!U::bounds_check(x, y, z))
 	{
@@ -23,7 +23,7 @@ std::unique_ptr<Room>::pointer World::room_at(const int & x, const int & y, cons
 
 	return (world.begin() + ((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + z))->get();
 }
-const std::unique_ptr<Room>::pointer World::room_at(const int & x, const int & y, const int & z = C::GROUND_INDEX) const
+const std::unique_ptr<Room>::pointer World::room_at(const int & x, const int & y, const int & z) const
 {
 	if (!U::bounds_check(x, y, z))
 	{
@@ -32,7 +32,7 @@ const std::unique_ptr<Room>::pointer World::room_at(const int & x, const int & y
 
 	return (world.cbegin() + ((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + z))->get();
 }
-std::unique_ptr<Room> & World::room_pointer_at(const int & x, const int & y, const int & z = C::GROUND_INDEX)
+std::unique_ptr<Room> & World::room_pointer_at(const int & x, const int & y, const int & z)
 {
 	return *(world.begin() + ((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + z));
 }

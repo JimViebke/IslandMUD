@@ -29,9 +29,9 @@ public:
 	World();
 
 	// access a room given coordinates
-	std::unique_ptr<Room>::pointer room_at(const int & x, const int & y, const int & z);
-	const std::unique_ptr<Room>::pointer room_at(const int & x, const int & y, const int & z) const;
-	std::unique_ptr<Room> & room_pointer_at(const int & x, const int & y, const int & z);
+	std::unique_ptr<Room>::pointer room_at(const int & x, const int & y, const int & z = C::GROUND_INDEX);
+	const std::unique_ptr<Room>::pointer room_at(const int & x, const int & y, const int & z = C::GROUND_INDEX) const;
+	std::unique_ptr<Room> & room_pointer_at(const int & x, const int & y, const int & z = C::GROUND_INDEX);
 
 	// debugging
 	unsigned count_loaded_rooms() const;
