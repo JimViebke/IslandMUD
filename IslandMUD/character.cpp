@@ -1190,18 +1190,40 @@ Update_Messages Character::add_to_bloomery(const std::string & item_ID, const un
 }
 Update_Messages Character::attack_character(std::shared_ptr<Character> & target, World & world)
 {
+	/*
+
+	The attacking implement has a base damage of a random value from 1 to the implement's damage, inclusive.
+
+	The target has a base defense of a random value from 0 to the target's defense rating, inclusive.
+
+	The base defense is subtracted from the base attack, and the result is subtracted from the target's health.
+	- The resulting damage will always be 0 or greater.
+	- The target's health will never go below 0.
+	- If the target's health reaches 0, the target dies.
+
+	*/
+
+	// an unarmed attack
 	if (this->equipped_item == nullptr)
 	{
-		// do an unarmed attack
-		target->current_health -= std::min(target->current_health, C::damage_tables.find(C::ATTACK_COMMAND)->second.find("")->second);
+		const int base_attack = U::random_int_from(1, C::damage_tables.find(C::ATTACK_COMMAND)->second.find("")->second);
+		const int base_defense = U::random_int_from(0u, target->get_defense());
+
+		// calculate the damage
+		const int damage = std::max(0, base_attack - base_defense);
+
+		// subtract the damage from the target's health, ensuring the target's health does not go below 0
+		target->current_health -= std::min(target->current_health, damage);
 	}
 	// an attack using a type of equipment
 	else if (std::shared_ptr<Equipment> weapon = U::convert_to<Equipment>(equipped_item))
 	{
 		const int base_attack = U::random_int_from(1u, weapon->get_combat_damage());
-		const int base_defense = U::random_int_from(1u, target->get_defense());
+		const int base_defense = U::random_int_from(0u, target->get_defense());
 
-		target->current_health -= std::min(target->current_health, base_attack - base_defense);
+		const int damage = std::max(0, base_attack - base_defense);
+
+		target->current_health -= std::min(target->current_health, damage);
 	}
 	else // an attempted attack using a non-equipment item
 	{
