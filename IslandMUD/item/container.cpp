@@ -117,13 +117,13 @@ bool Container::insert(const std::shared_ptr<Item> & item)
 std::shared_ptr<Item> Container::erase(const std::string & item_id)
 {
 	// get an iterator to the item in question
-	const auto item_it = contents.find(item_id);
+	auto item_it = contents.find(item_id);
 
 	// if the item does not exist to take, return a null pointer
 	if (item_it == contents.cend()) return nullptr;
 
 	// if the item is a stackable type
-	if (auto & stackable = U::convert_to<Stackable>(item_it->second))
+	if (auto stackable = U::convert_to<Stackable>(item_it->second))
 	{
 		// count one less item in storage
 		stackable->amount--;
@@ -153,13 +153,13 @@ std::shared_ptr<Item> Container::erase(const std::string & item_id)
 void Container::erase(const std::string & item_id, const unsigned & count)
 {
 	// get an iterator to the item in question
-	const std::multimap<std::string, std::shared_ptr<Item>>::iterator item_it = contents.find(item_id);
+	std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = contents.find(item_id);
 
 	// if the item is not present in the container, remove the item
 	if (item_it == contents.cend()) return;
 
 	// if the item is stackable
-	if (std::shared_ptr<Stackable> & stackable = U::convert_to<Stackable>(item_it->second))
+	if (std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item_it->second))
 	{
 		// erase the amount required
 		stackable->amount -= std::min(stackable->amount, count);

@@ -41,7 +41,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/NPC/npc_enemy_corporal.o \
 	${OBJECTDIR}/NPC/npc_enemy_fighter.o \
 	${OBJECTDIR}/NPC/npc_enemy_worker.o \
-	${OBJECTDIR}/NPC/npc_unaffiliated.o \
 	${OBJECTDIR}/XML/pugixml.o \
 	${OBJECTDIR}/character.o \
 	${OBJECTDIR}/constants.o \
@@ -53,6 +52,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/item/bloomery.o \
 	${OBJECTDIR}/item/chest.o \
 	${OBJECTDIR}/item/container.o \
+	${OBJECTDIR}/item/equipment.o \
 	${OBJECTDIR}/item/table.o \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/message.o \
@@ -119,11 +119,6 @@ ${OBJECTDIR}/NPC/npc_enemy_worker.o: NPC/npc_enemy_worker.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/NPC/npc_enemy_worker.o NPC/npc_enemy_worker.cpp
 
-${OBJECTDIR}/NPC/npc_unaffiliated.o: NPC/npc_unaffiliated.cpp 
-	${MKDIR} -p ${OBJECTDIR}/NPC
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/NPC/npc_unaffiliated.o NPC/npc_unaffiliated.cpp
-
 ${OBJECTDIR}/XML/pugixml.o: XML/pugixml.cpp 
 	${MKDIR} -p ${OBJECTDIR}/XML
 	${RM} "$@.d"
@@ -178,6 +173,11 @@ ${OBJECTDIR}/item/container.o: item/container.cpp
 	${MKDIR} -p ${OBJECTDIR}/item
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/item/container.o item/container.cpp
+
+${OBJECTDIR}/item/equipment.o: item/equipment.cpp 
+	${MKDIR} -p ${OBJECTDIR}/item
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/item/equipment.o item/equipment.cpp
 
 ${OBJECTDIR}/item/table.o: item/table.cpp 
 	${MKDIR} -p ${OBJECTDIR}/item

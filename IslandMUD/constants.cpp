@@ -24,7 +24,7 @@ const unsigned C::GAME_MAP_PORT_NUMBER = 8051;
 #ifdef _WIN32
 const std::string C::game_directory = "C:/IslandMUD"; // Windows path
 #else
-const std::string C::game_directory = "/home/IslandMUD"; // Linux path
+const std::string C::game_directory = "$HOME/IslandMUD"; // Linux path
 #endif
 const std::string C::world_terrain_file_location = C::game_directory + "/world_terrain.txt";
 const std::string C::iron_deposit_map_file_location = C::game_directory + "/iron_deposit_map.txt";
