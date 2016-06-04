@@ -405,13 +405,13 @@ void Game::client_thread(SOCKET client_ID)
 			// get the user's ID
 			const std::string user_ID = clients.get_user_ID(client_ID); // find username
 			if (user_ID == "") return; // should never happen
-			
+
 			// create a reference to the user's Character object
 			std::shared_ptr<Character> user = actors.find(user_ID)->second; // save the user's data
-			
+
 			// clean up the world
 			world.attempt_unload_radius(user->x, user->y, user_ID);
-			
+
 			// clean up the user
 			user->save(); // save the user's data
 			actors.erase(user_ID); // erase the user from the actor's map
@@ -556,7 +556,7 @@ void Game::NPC_thread()
 	}
 
 	// add a corporal
-	{
+	/* {
 		std::lock_guard<std::mutex> lock(game_state);
 
 		std::shared_ptr<Hostile_NPC_Corporal> hunter = std::make_shared<Hostile_NPC_Corporal>("Hunter");
@@ -569,7 +569,7 @@ void Game::NPC_thread()
 			corporal->login(world);
 			actors.insert(make_pair(corporal->name, corporal));
 		}
-	}
+	} */
 
 	std::this_thread::sleep_for(std::chrono::seconds(15)); // put a delay between server startup and NPCs' first action
 
