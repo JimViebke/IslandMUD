@@ -100,6 +100,8 @@ unsigned Container::size() const
 
 bool Container::insert(const std::shared_ptr<Item> & item)
 {
+	// any stackable type passed in will only increment the type's count by one
+
 	if (item == nullptr) return false; // well, something went wrong
 
 	if (U::is<Stackable>(item) && this->contains(item->get_name())) // if the item is stackable and already exists in the container
