@@ -1282,7 +1282,9 @@ Update_Messages Character::die(World & world)
 		// a random amount of each stackable is dropped (at least one of each)
 		else if (U::is<Stackable>(item_it->second))
 		{
+			// calculate the number of items to be dropped
 			const unsigned amount = U::random_int_from(1u, this->count(item_it->first));
+			// add that number of items to the room
 			for (unsigned i = 0; i < amount; ++i)
 				room->insert(this->erase(item_it++->first));
 		}
