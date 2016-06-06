@@ -11,7 +11,7 @@ class Hostile_NPC_Bodyguard : public Hostile_NPC
 {
 public:
 	Hostile_NPC_Bodyguard(const std::string & name, const std::string & set_protect_target_id) : Hostile_NPC(name),
-		protect_target_id(set_protect_target_id), hunt_target_last_known_location(-1, -1), guard_radius(5), hunt_radius(15) {}
+		protect_target_id(set_protect_target_id), hunt_target_last_known_location(-1, -1), guard_radius(C::VIEW_DISTANCE), hunt_radius(15) {}
 
 	Update_Messages update(World & world, std::map<std::string, std::shared_ptr<Character>> & actors);
 
