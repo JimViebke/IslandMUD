@@ -1286,7 +1286,9 @@ Update_Messages Character::die(World & world)
 			const unsigned amount = U::random_int_from(1u, this->count(item_it->first));
 			// add that number of items to the room
 			for (unsigned i = 0; i < amount; ++i)
-				room->insert(this->erase(item_it++->first));
+				room->insert(Craft::make(item_it->first));
+			// remove that number of items from the player
+			this->erase(item_it++->first, amount);
 		}
 		else // items that are neither equipment nor stackable stay with the killed player
 		{
