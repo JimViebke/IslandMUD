@@ -614,7 +614,7 @@ Update_Messages Character::equip(const std::string & item_ID)
 		}
 	}
 
-	// the player can equip the item create a stringstream to accumulate feedback
+	// the player can equip the item; create a stringstream to accumulate feedback
 	std::stringstream user_update;
 	std::stringstream room_update;
 
