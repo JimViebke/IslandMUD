@@ -568,12 +568,12 @@ void Game::NPC_thread()
 		actors.insert(make_pair(hunter->name, hunter));
 	}
 
-	// add a bodyguard (this doesn't do much since Bodyguards always idle if they don't have a target to protect)
 	if (false)
+	// add a bodyguard
 	{
 		std::lock_guard<std::mutex> lock(game_state);
 
-		std::shared_ptr<Hostile_NPC_Bodyguard> guardian = std::make_shared<Hostile_NPC_Bodyguard>("Guardian", "");
+		std::shared_ptr<Hostile_NPC_Bodyguard> guardian = std::make_shared<Hostile_NPC_Bodyguard>("Guardian", "Hunter");
 		guardian->login(world);
 		actors.insert(make_pair(guardian->name, guardian));
 	}
