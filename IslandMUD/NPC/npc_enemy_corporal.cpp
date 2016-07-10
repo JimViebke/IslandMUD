@@ -130,12 +130,13 @@ bool Hostile_NPC_Corporal::hunt(World & world, std::map<std::string, std::shared
 		return false;
 	}
 
-	// extract a constant reference to the target
-	const std::shared_ptr<Character> target = target_it->second;
+	// extract a reference to the target
+	std::shared_ptr<Character> target = target_it->second;
 
 	if (x == target->x && y == target->y)
 	{
-		// combat logic
+		// do combat logic
+		update_messages = attack_character(target, world);
 		return true;
 	}
 	// else, I have a path AND the target is on the path in view or out of view
