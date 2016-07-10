@@ -127,7 +127,8 @@ Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & 
 	// if I am at the target's location, do combat logic
 	if (hunt_target->x == x && hunt_target->y == y && hunt_target->z == z)
 	{
-		return Update_Messages(""); // combat logic here
+		// run combat logic
+		return attack_character(hunt_target, world);
 	}
 
 	// else the target is online and I am not at the target's location
