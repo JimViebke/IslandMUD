@@ -115,6 +115,22 @@ void World::remove_viewer_and_attempt_unload(const int & x, const int & y, const
 	}
 }
 
+// unloading of all rooms in view distance (for logging out or dying)
+void World::attempt_unload_radius(const int & x, const int & y, const std::string & player_ID)
+{
+	// remove the player from the room
+	if (U::bounds_check(x, y))
+		room_at(x, y)->remove_actor(player_ID);
+
+	// for each room within the player's view distance
+	for (int cx = x - C::VIEW_DISTANCE; cx <= x + C::VIEW_DISTANCE; ++cx)
+		for (int cy = y - C::VIEW_DISTANCE; cy <= y + C::VIEW_DISTANCE; ++cy)
+			// if the room is in bounds
+			if (U::bounds_check(cx, cy))
+				// remove the player as a viewer and attempt to move the room to disk
+				remove_viewer_and_attempt_unload(cx, cy, C::WORLD_Z_DIMENSION, player_ID);
+}
+
 // test if a room can be removed from memory
 bool World::is_unloadable(const int & x, const int & y, const int & z) const
 {

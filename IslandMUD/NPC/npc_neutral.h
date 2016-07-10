@@ -1,8 +1,8 @@
 /* Jim Viebke
 Jun 3 2015 */
 
-#ifndef NPC_UNAFFILIATED_H
-#define NPC_UNAFFILIATED_H
+#ifndef NPC_NEUTRAL_H
+#define NPC_NEUTRAL_H
 
 #include "non_player_character.h"
 

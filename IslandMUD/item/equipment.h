@@ -17,6 +17,7 @@ class Equipment : public Item
 protected:
 	Equipment(const std::string & name);
 
+public:
 	// returns the amount of damage that this item will deal in combat
 	unsigned get_combat_damage() const;
 };

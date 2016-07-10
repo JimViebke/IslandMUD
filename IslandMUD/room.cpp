@@ -101,6 +101,10 @@ bool Room::is_unloadable() const
 {
 	return actor_ids.size() == 0 && viewing_actor_ids.size() == 0;
 }
+bool Room::is_occupied_by(const std::string & actor_id) const
+{
+	return U::contains(actor_ids, actor_id);
+}
 bool Room::is_observed_by(const std::string & actor_id) const
 {
 	return U::contains(viewing_actor_ids, actor_id);

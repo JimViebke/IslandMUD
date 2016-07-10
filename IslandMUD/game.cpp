@@ -41,6 +41,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 			"\ntake [item] from chest" +
 			"\nchest" +
 			"\nattack [compass direction] wall / door" +
+			"\nattack [name]" +
 			"\nconstruct [material] ceiling / floor" +
 			"\nconstruct [compass direction] [material] wall" +
 			"\nconstruct [compass direction] [material] wall with [material] door");
@@ -168,10 +169,30 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	{
 		return actors.find(actor_id)->second->attack_door(command[1], world);
 	}
-	// the player is attacking an item
+	// the player is attacking a person or item
 	else if (command.size() == 2 && command[0] == C::ATTACK_COMMAND)
 	{
-		return actors.find(actor_id)->second->attack_item(command[1], world);
+		// extract a shared pointer to the player
+		const auto & player = actors.find(actor_id)->second;
+
+		// if the target is another player or NPC in the room
+		if (world.room_at(player->x, player->y, player->z)->is_occupied_by(command[1]))
+		{
+			// if the target is not a friendly player character
+			auto & target = actors.find(command[1])->second;
+			if (U::is<NPC>(target)) // the player exists, and can be attacked
+			{
+				return player->attack_character(target, world);
+			}
+			else // the player exists, but is a human
+			{
+				return Update_Messages(command[1] + " is friendly.");
+			}
+		}
+		else // the second argument is not a nearby NPC
+		{
+			return actors.find(actor_id)->second->attack_item(command[1], world);
+		}
 	}
 	// save
 	else if (command.size() == 1 && command[0] == C::SAVE_COMMAND)
@@ -381,12 +402,25 @@ void Game::client_thread(SOCKET client_ID)
 			std::lock_guard<std::mutex> lock(game_state); // gain exclusive hold of the client map for modification
 			close_socket(client_ID); // close socket (platform-independent)
 
+			// get the user's ID
 			const std::string user_ID = clients.get_user_ID(client_ID); // find username
 			if (user_ID == "") return; // should never happen
-			actors.find(user_ID)->second->save(); // save the user's data
-			actors.erase(user_ID); // erase the user
+
+			// create a reference to the user's Character object
+			std::shared_ptr<Character> user = actors.find(user_ID)->second; // save the user's data
+
+			// clean up the world
+			world.attempt_unload_radius(user->x, user->y, user_ID);
+
+			// clean up the user
+			user->save(); // save the user's data
+			actors.erase(user_ID); // erase the user from the actor's map
+
+			// clean up networking stuff
 			clients.erase(user_ID); // erase the client record
-			return; // the client's personal thread is destroyed
+
+			// clean up the user's thread
+			return;
 		}
 
 		std::stringstream user_input;
@@ -501,7 +535,10 @@ void Game::client_map_thread(SOCKET client_map_ID)
 
 void Game::NPC_thread()
 {
-	// hardcode some NPC workers for startup
+	// use booleans to toggle spawning of certain NPCs for debugging purposes
+
+	// create three workers, each with a bodyguards
+	if (false)
 	{
 		const std::vector<std::string> workers = { "Jeb", "Bill", "Bob" };
 		const std::vector<std::string> bodyguards = { "Alpha", "Beta", "Gamma" };
@@ -522,12 +559,34 @@ void Game::NPC_thread()
 	}
 
 	// add a corporal
+	if (false)
 	{
 		std::lock_guard<std::mutex> lock(game_state);
 
 		std::shared_ptr<Hostile_NPC_Corporal> hunter = std::make_shared<Hostile_NPC_Corporal>("Hunter");
 		hunter->login(world);
 		actors.insert(make_pair(hunter->name, hunter));
+	}
+
+	if (false)
+	// add a bodyguard
+	{
+		std::lock_guard<std::mutex> lock(game_state);
+
+		std::shared_ptr<Hostile_NPC_Bodyguard> guardian = std::make_shared<Hostile_NPC_Bodyguard>("Guardian", "Hunter");
+		guardian->login(world);
+		actors.insert(make_pair(guardian->name, guardian));
+	}
+
+	// add a bunch more corporals
+	if (false)
+	{
+		for (char name = 'A'; name < 'z'; ++name) // test code
+		{
+			std::shared_ptr<Hostile_NPC_Corporal> corporal = std::make_shared<Hostile_NPC_Corporal>(std::string() + name);
+			corporal->login(world);
+			actors.insert(make_pair(corporal->name, corporal));
+		}
 	}
 
 	std::this_thread::sleep_for(std::chrono::seconds(15)); // put a delay between server startup and NPCs' first action
@@ -780,5 +839,12 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 				outbound_queue.put(Message(clients.get_socket(actor_id), *update_messages.to_room));
 			}
 		}
+	}
+
+	// if a custom message needs to be sent to a specific user
+	if (update_messages.custom_message)
+	{
+		// add the message to the queue
+		outbound_queue.put(Message(clients.get_socket(update_messages.custom_message->first), update_messages.custom_message->second));
 	}
 }

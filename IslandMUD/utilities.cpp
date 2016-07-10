@@ -1,6 +1,6 @@
 
 /* Jim Viebke
-Oct 21, 2015*/
+Oct 21, 2015 */
 
 #include "utilities.h"
 

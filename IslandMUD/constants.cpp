@@ -24,7 +24,7 @@ const unsigned C::GAME_MAP_PORT_NUMBER = 8051;
 #ifdef _WIN32
 const std::string C::game_directory = "C:/IslandMUD"; // Windows path
 #else
-const std::string C::game_directory = "/home/IslandMUD"; // Linux path
+const std::string C::game_directory = "$HOME/IslandMUD"; // Linux path
 #endif
 const std::string C::world_terrain_file_location = C::game_directory + "/world_terrain.txt";
 const std::string C::iron_deposit_map_file_location = C::game_directory + "/iron_deposit_map.txt";
@@ -338,13 +338,15 @@ const int C::MAX_SURFACE_HEALTH = 100;
 const int C::MAX_DOOR_HEALTH = 100;
 
 /* Create a two-dimensional map to calculate damamge values.
-Associate each attacking implement with a map of target, value pairs. */
+Associate each attacking implement with a map of target, value pairs, like so:
+map<implement_id, map<target_id, damage>> */
 
 const std::map<std::string, std::map<std::string, int>> C::damage_tables =
 {
 	// unarmed attacks are deliberately set high for testing
-
+	
 	{ std::string(C::ATTACK_COMMAND), { // attack command is also used to represent an unarmed attack
+		{ "", 49 }, // empty string represents a human target
 		{ C::STICK_ID, 49 }, // formerly 6
 		{ C::WOOD_ID, 49 }, // formerly 3
 		{ C::STONE_ID, 49, }, // formerly 1
@@ -353,12 +355,14 @@ const std::map<std::string, std::map<std::string, int>> C::damage_tables =
 	} },
 
 	{ std::string(C::STAFF_ID), {
+		{ "", 4 },
 		{ C::STICK_ID, 8 },
 		{ C::WOOD_ID, 5 },
 		{ C::STONE_ID, 1 }
 	} },
 
 	{ std::string(C::AXE_ID), {
+		{ "", 8 },
 		{ C::STICK_ID, 10 },
 		{ C::WOOD_ID, 10 },
 		{ C::STONE_ID, 5 },
@@ -366,6 +370,7 @@ const std::map<std::string, std::map<std::string, int>> C::damage_tables =
 	} },
 
 	{ std::string(C::SWORD_ID), {
+		{ "", 10 },
 		{ C::STICK_ID, 8 },
 		{ C::WOOD_ID, 7 },
 		{ C::STONE_ID, 2 }

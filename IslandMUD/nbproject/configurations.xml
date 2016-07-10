@@ -9,6 +9,7 @@
         <itemPath>item/chest.h</itemPath>
         <itemPath>item/container.cpp</itemPath>
         <itemPath>item/container.h</itemPath>
+        <itemPath>item/equipment.cpp</itemPath>
         <itemPath>item/equipment.h</itemPath>
         <itemPath>item/item.h</itemPath>
         <itemPath>item/misc.h</itemPath>
@@ -29,8 +30,6 @@
         <itemPath>NPC/npc_enemy_fighter.h</itemPath>
         <itemPath>NPC/npc_enemy_worker.cpp</itemPath>
         <itemPath>NPC/npc_enemy_worker.h</itemPath>
-        <itemPath>NPC/npc_unaffiliated.cpp</itemPath>
-        <itemPath>NPC/npc_unaffiliated.h</itemPath>
       </logicalFolder>
       <logicalFolder name="XML" displayName="XML" projectFiles="true">
         <logicalFolder name="New Folder" displayName="New Folder" projectFiles="true">
@@ -132,10 +131,6 @@
       </item>
       <item path="NPC/npc_enemy_worker.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="NPC/npc_unaffiliated.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="NPC/npc_unaffiliated.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="XML/pugiconfig.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="XML/pugixml.cpp" ex="false" tool="1" flavor2="0">
@@ -181,6 +176,8 @@
       <item path="item/container.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="item/container.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/equipment.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="item/equipment.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -288,10 +285,6 @@
       </item>
       <item path="NPC/npc_enemy_worker.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="NPC/npc_unaffiliated.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="NPC/npc_unaffiliated.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="XML/pugiconfig.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="XML/pugixml.cpp" ex="false" tool="1" flavor2="0">
@@ -337,6 +330,8 @@
       <item path="item/container.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="item/container.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="item/equipment.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="item/equipment.h" ex="false" tool="3" flavor2="0">
       </item>

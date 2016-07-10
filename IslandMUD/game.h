@@ -39,9 +39,9 @@ private:
 	threadsafe::socket_lookup clients;
 
 	std::map<std::string, std::shared_ptr<Character>> actors; // active/online PC and NPC ids
-	std::mutex game_state; // serves for both of the above types
-
 	World world; // the game world object
+
+	std::mutex game_state; // provides safe access and modification of the above two structures
 
 public:
 
@@ -80,7 +80,7 @@ private:
 
 	// return the user_ID of a user after they log in or sign up
 	std::string login_or_signup(SOCKET client_ID);
-	
+
 	// use an Update_Messages object to generate outbound messages to players
 	void generate_outbound_messages(const std::string & user_ID, const Update_Messages & message_updates);
 };

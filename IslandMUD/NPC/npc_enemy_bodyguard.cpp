@@ -78,7 +78,7 @@ void Hostile_NPC_Bodyguard::set_protect_target(const std::string & set_protect_t
 
 bool Hostile_NPC_Bodyguard::attempt_set_new_hunt_target(World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
-	const std::string hunt_target_id = get_new_hostile_id(world, actors);
+	this->hunt_target_id = get_new_hostile_id(world, actors);
 
 	if (hunt_target_id.size() == 0) { return false; }
 
@@ -127,7 +127,8 @@ Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & 
 	// if I am at the target's location, do combat logic
 	if (hunt_target->x == x && hunt_target->y == y && hunt_target->z == z)
 	{
-		return Update_Messages(""); // combat logic here
+		// run combat logic
+		return attack_character(hunt_target, world);
 	}
 
 	// else the target is online and I am not at the target's location

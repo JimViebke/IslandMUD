@@ -100,6 +100,8 @@ unsigned Container::size() const
 
 bool Container::insert(const std::shared_ptr<Item> & item)
 {
+	// any stackable type passed in will only increment the type's count by one
+
 	if (item == nullptr) return false; // well, something went wrong
 
 	if (U::is<Stackable>(item) && this->contains(item->get_name())) // if the item is stackable and already exists in the container
@@ -117,13 +119,13 @@ bool Container::insert(const std::shared_ptr<Item> & item)
 std::shared_ptr<Item> Container::erase(const std::string & item_id)
 {
 	// get an iterator to the item in question
-	const std::multimap<std::string, std::shared_ptr<Item>>::iterator item_it = contents.find(item_id);
+	auto item_it = contents.find(item_id);
 
 	// if the item does not exist to take, return a null pointer
 	if (item_it == contents.cend()) return nullptr;
 
 	// if the item is a stackable type
-	if (std::shared_ptr<Stackable> & stackable = U::convert_to<Stackable>(item_it->second))
+	if (auto stackable = U::convert_to<Stackable>(item_it->second))
 	{
 		// count one less item in storage
 		stackable->amount--;
@@ -132,7 +134,7 @@ std::shared_ptr<Item> Container::erase(const std::string & item_id)
 		if (stackable->amount < 1)
 		{
 			// destroy the container's reference to the item
-			contents.erase(item_id);
+			contents.erase(item_it);
 		}
 
 		// return a new instance of the stackable item
@@ -144,7 +146,7 @@ std::shared_ptr<Item> Container::erase(const std::string & item_id)
 		std::shared_ptr<Item> item = item_it->second;
 
 		// destroy the container's reference to the item
-		contents.erase(item_id);
+		contents.erase(item_it);
 
 		// return the local shared_ptr to the item
 		return item;
@@ -153,13 +155,13 @@ std::shared_ptr<Item> Container::erase(const std::string & item_id)
 void Container::erase(const std::string & item_id, const unsigned & count)
 {
 	// get an iterator to the item in question
-	const std::multimap<std::string, std::shared_ptr<Item>>::iterator item_it = contents.find(item_id);
+	std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = contents.find(item_id);
 
 	// if the item is not present in the container, remove the item
 	if (item_it == contents.cend()) return;
 
 	// if the item is stackable
-	if (std::shared_ptr<Stackable> & stackable = U::convert_to<Stackable>(item_it->second))
+	if (std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item_it->second))
 	{
 		// erase the amount required
 		stackable->amount -= std::min(stackable->amount, count);
@@ -176,8 +178,14 @@ void Container::erase(const std::string & item_id, const unsigned & count)
 		// for as many times as specified
 		for (unsigned i = 0; i < count; ++i)
 		{
-			// erase the container's reference to the item
-			contents.erase(item_id);
+			// get an iterator to an instance of the item
+			const auto erase_item_it = contents.find(item_id);
+
+			// if the iterator is valid, erase the item
+			if (erase_item_it != contents.cend())
+				contents.erase(erase_item_it);
+			else
+				break; // the first time an iterator is not valid, break out of the loop
 		}
 	}
 }

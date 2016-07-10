@@ -40,11 +40,16 @@ public:
 	std::shared_ptr<std::string> to_area; // an update may be sent to all players in the area
 	std::shared_ptr<std::vector<std::string>> additional_map_update_users; // users that require a map update AND are not in sight range of the player
 	bool map_update_required; // if true, all users in sight range of the player will receive a map update
+	std::shared_ptr<std::pair<std::string, std::string>> custom_message; // stores <user_ID, message>
 
 	explicit Update_Messages(const std::string & user_message, const bool set_map_update = false) : to_user(user_message), map_update_required(set_map_update) {}
 	explicit Update_Messages(const std::string & user_message, const std::string & room_message, const bool set_map_update = false) : Update_Messages(user_message, set_map_update)
 	{
 		to_room = std::make_shared<std::string>(room_message);
+	}
+	explicit Update_Messages(const std::string & user_message, const std::string & room_message, const std::pair<std::string, std::string> & set_custom_message) : Update_Messages(user_message, room_message)
+	{
+		custom_message = std::make_shared<std::pair<std::string, std::string>>(set_custom_message);
 	}
 	explicit Update_Messages(const std::string & user_message, const std::string & room_message, const std::string & area_message, const bool set_map_update = false) : Update_Messages(user_message, room_message, set_map_update)
 	{

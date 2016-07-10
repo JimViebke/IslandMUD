@@ -61,6 +61,7 @@ public:
 	void set_archery_level(const int & level_value);
 	void set_forest_visibilty_level(const int & level_value);
 	void set_health_max(const int & level_value);
+	void reset_health();
 
 	// setters
 	void set_current_health(const int & current_health);
@@ -88,12 +89,16 @@ public:
 	Update_Messages attack_door(const std::string & surface_ID, World & world);
 	Update_Messages attack_item(const std::string & target_ID, World & world);
 	Update_Messages add_to_bloomery(const std::string & item_ID, const unsigned & count, World & world);
+	Update_Messages attack_character(std::shared_ptr<Character> & target, World & world);
+	Update_Messages die(World & world);
 
 	// movement info
 	std::string validate_movement(const int & cx, const int & cy, const int & cz, const std::string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const;
 
 	static unsigned move_items(Container & source, Container & destination, const std::string & item_ID, const std::string & count);
 
+	// combat helper functions
+	unsigned get_defense() const;
 };
 
 #endif
