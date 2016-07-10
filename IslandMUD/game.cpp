@@ -535,7 +535,10 @@ void Game::client_map_thread(SOCKET client_map_ID)
 
 void Game::NPC_thread()
 {
-	// hardcode some NPC workers for startup
+	// use booleans to toggle spawning of certain NPCs for debugging purposes
+
+	// create three workers, each with a bodyguards
+	if (false)
 	{
 		const std::vector<std::string> workers = { "Jeb", "Bill", "Bob" };
 		const std::vector<std::string> bodyguards = { "Alpha", "Beta", "Gamma" };
@@ -556,20 +559,35 @@ void Game::NPC_thread()
 	}
 
 	// add a corporal
-	/* {
+	if (false)
+	{
 		std::lock_guard<std::mutex> lock(game_state);
 
 		std::shared_ptr<Hostile_NPC_Corporal> hunter = std::make_shared<Hostile_NPC_Corporal>("Hunter");
 		hunter->login(world);
 		actors.insert(make_pair(hunter->name, hunter));
+	}
 
+	// add a bodyguard (this doesn't do much since Bodyguards always idle if they don't have a target to protect)
+	if (false)
+	{
+		std::lock_guard<std::mutex> lock(game_state);
+
+		std::shared_ptr<Hostile_NPC_Bodyguard> guardian = std::make_shared<Hostile_NPC_Bodyguard>("Guardian", "");
+		guardian->login(world);
+		actors.insert(make_pair(guardian->name, guardian));
+	}
+
+	// add a bunch more corporals
+	if (false)
+	{
 		for (char name = 'A'; name < 'z'; ++name) // test code
 		{
 			std::shared_ptr<Hostile_NPC_Corporal> corporal = std::make_shared<Hostile_NPC_Corporal>(std::string() + name);
 			corporal->login(world);
 			actors.insert(make_pair(corporal->name, corporal));
 		}
-	} */
+	}
 
 	std::this_thread::sleep_for(std::chrono::seconds(15)); // put a delay between server startup and NPCs' first action
 
