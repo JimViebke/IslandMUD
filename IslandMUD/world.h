@@ -90,6 +90,12 @@ private:
 
 	// remove a room from memory
 	void erase_room_from_memory(const int & x, const int & y, const int & z);
+
+	// calculate room position
+	static inline unsigned hash(const int & x, const int & y, const int & z)
+	{
+		return (x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + z;
+	}
 };
 
 #endif

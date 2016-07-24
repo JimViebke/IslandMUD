@@ -21,7 +21,7 @@ std::unique_ptr<Room>::pointer World::room_at(const int & x, const int & y, cons
 		return world.begin()->get();
 	}
 
-	return (world.begin() + ((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + z))->get();
+	return (world.begin() + hash(x, y, z))->get();
 }
 const std::unique_ptr<Room>::pointer World::room_at(const int & x, const int & y, const int & z) const
 {
@@ -30,11 +30,11 @@ const std::unique_ptr<Room>::pointer World::room_at(const int & x, const int & y
 		return world.cbegin()->get();
 	}
 
-	return (world.cbegin() + ((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + z))->get();
+	return (world.cbegin() + hash(x, y, z))->get();
 }
 std::unique_ptr<Room> & World::room_pointer_at(const int & x, const int & y, const int & z)
 {
-	return *(world.begin() + ((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + z));
+	return *(world.begin() + hash(x, y, z));
 }
 
 // debugging
@@ -857,7 +857,8 @@ std::unique_ptr<Room> World::create_room(const int & x, const int & y, const int
 	return room;
 }
 
+// remove a room from memory
 void World::erase_room_from_memory(const int & x, const int & y, const int & z)
 {
-	(world.begin() + ((x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + z))->reset();
+	(world.begin() + hash(x, y, z))->reset();
 }
