@@ -94,8 +94,8 @@ int U::diagonal_movement_cost(const int & x1, const int & y1, const int & x2, co
 	// not so much for determining if a coordinate is visible from another coordinate.
 
 	// a diagonal move = (sqrt(2) * straight move)
-	int dx = abs(x1 - x2);
-	int dy = abs(y1 - y2);
+	const int dx = abs(x1 - x2);
+	const int dy = abs(y1 - y2);
 	return C::AI_MOVEMENT_COST * (dx + dy) + (C::AI_MOVEMENT_COST_DIAGONAL - 2 * C::AI_MOVEMENT_COST) * std::min(dx, dy);
 }
 

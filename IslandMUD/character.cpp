@@ -1233,7 +1233,7 @@ Update_Messages Character::attack_character(std::shared_ptr<Character> & target,
 	// if the target is dead
 	if (target->current_health == 0)
 	{
-		// die() handleds the dying target's inventory
+		// die() handles the dying target's inventory
 		Update_Messages update_messages = target->die(world);
 
 		// remove the target from their current destination
