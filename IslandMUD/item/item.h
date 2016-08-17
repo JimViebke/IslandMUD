@@ -48,7 +48,7 @@ class Fire_Container : public Item
 {
 protected:
 	unsigned fuel_units_remaining = 0;
-	unsigned temperature = C::AMBIENT_AIR_TEMPERATURE;
+	unsigned temperature = C::AIR_TEMPERATURE;
 	bool lit = false;
 
 	time_t timestamp = U::current_time_in_ms();
@@ -69,22 +69,30 @@ protected:
 
 class Forgeable : public Item
 {
-protected:
-	Forgeable(const std::string & item_ID) : Item(item_ID, true) {}
+private:
+	friend class Bloomery; // bloomeries can access the private members (specs/stats) of forgeable items
 
-public:
+	// contents
 	unsigned iron_units = 0; // units are arbitrary, but consistent
 	unsigned carbon_units = 0;
 	unsigned impurity_units = 0;
 
+	// attributes
 	unsigned hardness;
 	unsigned toughness;
-	unsigned grain_size;
 
-	unsigned temperature;
+	// the... well, there it is
+	unsigned temperature = C::AIR_TEMPERATURE; // the default
 
+	// Forgeable stores a state and a time.
+	// Whenever the forgeable [thing] is observed, we update the [thing]'s specs and the timestamp.
 	long long last_update_timestamp = U::current_time_in_ms();
 
+protected:
+	// this cannot be directly instantiated - specific items can inherit forgeability
+	Forgeable(const std::string & item_ID) : Item(item_ID, true) {}
+
+public:
 	unsigned get_size() const
 	{
 		return iron_units + carbon_units + impurity_units;
@@ -105,30 +113,38 @@ public:
 		// first update the timestamp
 		last_update_timestamp = U::current_time_in_ms();
 
-		// don't do anything if the item is already at the ambient temperature
-		if (this->temperature == ambient_temperature) return;
-
 		// calculate the time that has elapsed between now and the last update time
 		const long long milliseconds_since_last_update = U::current_time_in_ms() - last_update_timestamp;
 
-		// Calculate how much the item's temperature has changed. This always moves in the direction of the ambient temperature.
-		const unsigned change_in_degrees = unsigned(milliseconds_since_last_update / 100); // 1 degree per 100 milliseconds
+		// Calculate how much the item's temperature has changed. This moves in the direction of the ambient temperature.
+		const unsigned change_in_degrees = unsigned(milliseconds_since_last_update / 100); // 1 degree per 100 milliseconds, or 10 degrees per second.
 
-		// if the temperature has reached the ambient temperature
+		// if the change is greater than the difference, the temperature doesn't pass the ambient temperature, it is the ambient temperature
 		if (change_in_degrees > U::difference(this->temperature, ambient_temperature))
 		{
-			// update the item's temperature
 			this->temperature = ambient_temperature;
 		}
 		// the temperature has not yet reached the ambient temperature
 		else if (this->temperature > ambient_temperature) // test if the item is cooling
 		{
-			this->temperature -= change_in_degrees; // decrease the temperature
+			this->temperature -= change_in_degrees; // decrease the temperature towards the ambient
 		}
-		else // the item is less than the ambient temperature, increase the temperature
+		else // the item is less than the ambient temperature, 
 		{
-			this->temperature += change_in_degrees;
+			this->temperature += change_in_degrees; // increase the temperature towards the ambient
 		}
+
+		/*
+		
+		If the item passed a temperature range since the last update, we need to calculate how much time was spent in that range
+		in order to determine how to update the item's stats.
+		
+		*/
+	}
+
+	void set_temperature(const unsigned & set_temperature)
+	{
+		temperature = set_temperature;
 	}
 };
 

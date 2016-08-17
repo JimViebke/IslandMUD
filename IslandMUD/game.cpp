@@ -559,7 +559,7 @@ void Game::NPC_thread()
 	}
 
 	// add a corporal
-	if (false)
+	if (true)
 	{
 		std::lock_guard<std::mutex> lock(game_state);
 
@@ -568,8 +568,8 @@ void Game::NPC_thread()
 		actors.insert(make_pair(hunter->name, hunter));
 	}
 
-	if (false)
 	// add a bodyguard
+	if (true)
 	{
 		std::lock_guard<std::mutex> lock(game_state);
 

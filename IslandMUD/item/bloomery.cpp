@@ -48,7 +48,7 @@ void Bloomery::update_bloomery() // update the bloomery's temperature and fuel s
 		melt_contents[i]->update_specs(this->temperature);
 
 		// test if the item has melted
-		if (melt_contents[i]->temperature > 0 /*the forgeable item's melting point*/)
+		if (melt_contents[i]->temperature > 0 /* <-- placeholder for the forgeable item's melting point */)
 		{
 			// the item melts, adding its contents to the bloom
 			bloom.carbon_units += melt_contents[i]->carbon_units;

@@ -413,4 +413,10 @@ const int C::FORTRESS_MAX_X = 20;
 const int C::FORTRESS_MIN_Y = 20;
 const int C::FORTRESS_MAX_Y = 20;
 
-const unsigned C::AMBIENT_AIR_TEMPERATURE = 15;
+// blacksmithing constants
+const unsigned C::AIR_TEMPERATURE = 20;
+const unsigned C::MIN_WORKING_TEMPERATURE = 100;
+const unsigned C::MIN_CARBON_GAIN_TEMPERATURE = 120;
+const unsigned C::MAX_FORGE_TEMPERATURE = 130;
+const unsigned C::MIN_MELTING_TEMPERATURE = 150;
+const unsigned C::MAX_SMELT_TEMPERATURE = 170;
