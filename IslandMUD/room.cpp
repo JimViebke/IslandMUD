@@ -14,7 +14,7 @@ bool Room::has_wall() const // used to determine if a ceiling can be placed
 
 	// for each surface
 	for (std::map<std::string, Room_Side>::const_iterator it = room_sides.begin();
-		it != room_sides.cend(); ++it)
+	it != room_sides.cend(); ++it)
 	{
 		// if the surface is a wall
 		if (it->first == C::NORTH || it->first == C::EAST ||
@@ -37,7 +37,7 @@ bool Room::has_standing_wall() const
 
 	// for each surface
 	for (std::map<std::string, Room_Side>::const_iterator it = room_sides.begin();
-		it != room_sides.cend(); ++it)
+	it != room_sides.cend(); ++it)
 	{
 		// if the surface is an intact wall
 		if (it->second.is_intact() && (
@@ -424,8 +424,8 @@ Update_Messages Room::damage_surface(const std::string & surface_ID, const std::
 			// Bob uses
 			username + " uses " +
 			((equipped_item_id == C::ATTACK_COMMAND)
-			// bare hands / an axe
-			? "bare hands" : U::get_article_for(equipped_item_id) + " " + equipped_item_id) +
+				// bare hands / an axe
+				? "bare hands" : U::get_article_for(equipped_item_id) + " " + equipped_item_id) +
 			// to damage the
 			" to damage the " +
 			// ceiling. / wall to your west.
@@ -455,10 +455,10 @@ Update_Messages Room::damage_surface(const std::string & surface_ID, const std::
 		// Bob collapses the
 		username + " collapses the " +
 		((surface_ID == C::CEILING || surface_ID == C::FLOOR)
-		// ceiling/floor
-		? surface_ID + "."
-		// wall to your west
-		: "wall to your " + surface_ID + "."),
+			// ceiling/floor
+			? surface_ID + "."
+			// wall to your west
+			: "wall to your " + surface_ID + "."),
 		true);
 }
 Update_Messages Room::damage_door(const std::string & surface_ID, const std::shared_ptr<Item> & equipped_item, const std::string & username)
@@ -540,8 +540,8 @@ Update_Messages Room::damage_door(const std::string & surface_ID, const std::sha
 			// Bob damages the west door with
 			username + " damages the " + surface_ID + " door with " +
 			((equipped_item_id == C::ATTACK_COMMAND)
-			// bare hands. / an axe.
-			? "bare hands." : U::get_article_for(equipped_item_id) + " " + equipped_item_id + "."),
+				// bare hands. / an axe.
+				? "bare hands." : U::get_article_for(equipped_item_id) + " " + equipped_item_id + "."),
 
 			true);
 	}
@@ -590,7 +590,7 @@ std::string Room::summary(const std::string & player_ID) const
 	// report on the sides of the room (walls, ceiling, floor)
 	if (room_sides.size() > 0)
 	{
-		summary_stream << "\n\nThis room consists of";
+		summary_stream << " This room consists of";
 
 		// create a pointer pointing to the last side in the room
 		std::map<std::string, Room_Side>::const_iterator last_side_it = room_sides.cend(); // one past the actual last item
@@ -598,7 +598,7 @@ std::string Room::summary(const std::string & player_ID) const
 
 		// for each room side
 		for (std::map<std::string, Room_Side>::const_iterator it = room_sides.cbegin();
-			it != room_sides.cend(); ++it)
+		it != room_sides.cend(); ++it)
 		{
 			// if there are more than one sides, append " and"
 			if (it == last_side_it && room_sides.size() > 1) // "and" precedes last surface
@@ -652,7 +652,7 @@ std::string Room::summary(const std::string & player_ID) const
 	// report on the items in the room
 	if (contents.size() > 0) // if there are items present
 	{
-		summary_stream << "\n\nHere there is" << this->contents_to_string();
+		summary_stream << " Here there is" << this->contents_to_string();
 	}
 
 	// if the room contains a table or chest
@@ -669,21 +669,24 @@ std::string Room::summary(const std::string & player_ID) const
 		summary_stream << " There is a chest here.";
 	}
 
-	if (actor_ids.size() > 1)
+	if (actor_ids.size() > 1) // there will always be at least one, because of the player
 	{
-		summary_stream << "\n\n";
+		summary_stream << " ";
 		for (const std::string & actor_ID : actor_ids)
 		{
-			if (actor_ID == player_ID) { continue; } // skip the player themself.
-			summary_stream << actor_ID << " is here. ";
+			if (actor_ID == player_ID) { continue; } // don't report a player's own presence to that player
+			summary_stream << actor_ID << " is here.";
 		}
 	}
 
 	// if there are no items or surfaces
 	if (summary_stream.str().length() == 0)
 	{
-		summary_stream << "\n\nThere is nothing of interest here.";
+		summary_stream << " There is nothing of interest here.";
 	}
+
+	// end with a newline
+	summary_stream << "\n";
 
 	return summary_stream.str();
 }

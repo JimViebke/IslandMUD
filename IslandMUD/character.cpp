@@ -1254,10 +1254,10 @@ Update_Messages Character::attack_character(std::shared_ptr<Character> & target,
 	}
 
 	return Update_Messages("You attack " + target->name + " with " +
-		((equipped_item == nullptr) ? "your bare hands." : U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + "."),
+		((equipped_item == nullptr) ? "your bare hands.\n" : U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + ".\n"),
 
 		name + " attacks " + target->name + " with " +
-		((equipped_item == nullptr) ? "their bare hands." : (U::get_article_for(equipped_item->get_name() + " " + equipped_item->get_name() + "."))));
+		((equipped_item == nullptr) ? "their bare hands.\n" : (U::get_article_for(equipped_item->get_name() + " " + equipped_item->get_name() + ".\n"))));
 }
 Update_Messages Character::die(World & world)
 {
