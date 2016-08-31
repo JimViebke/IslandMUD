@@ -69,6 +69,8 @@ private:
 
 	// handle everything to do with NPCs
 	void NPC_thread();
+	void NPC_spawn_logic();
+	void NPC_update_logic();
 
 	// remove data from the outbound queue and send it the to specified client
 	void outbound_thread();
