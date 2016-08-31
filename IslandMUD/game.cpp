@@ -559,7 +559,7 @@ void Game::NPC_thread()
 	}
 
 	// add a corporal
-	if (true)
+	if (false)
 	{
 		std::lock_guard<std::mutex> lock(game_state);
 
@@ -569,7 +569,7 @@ void Game::NPC_thread()
 	}
 
 	// add a bodyguard
-	if (true)
+	if (false)
 	{
 		std::lock_guard<std::mutex> lock(game_state);
 
