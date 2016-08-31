@@ -27,25 +27,23 @@ private:
 	int current_health = C::FULL_HEALTH_MIN; // the player's current health
 
 public:
+
 	int x = C::DEFAULT_SPAWN_X; // location coordinates
 	int y = C::DEFAULT_SPAWN_Y; // it's handy to have these signed for validation reasons
 	int z = C::DEFAULT_SPAWN_Z;
 	std::string name;
 
-protected:
-
-	std::string faction_ID;
-	std::shared_ptr<Item> equipped_item;
-
-	std::string leader_ID;
-	std::vector<std::string> follower_IDs;
-
-public:
-
 	// Item dragging_item; // a character can drag an item if they don't want to carry it.	
 	static std::unique_ptr<Recipes> recipes; // exists in memory once for all PCs and NPCs
 
 protected:
+
+	std::shared_ptr<Item> equipped_item;
+
+	std::string faction_ID;
+
+	std::string leader_ID;
+	std::vector<std::string> follower_IDs;
 
 	Character(const std::string & name, const std::string & set_faction_ID);
 
