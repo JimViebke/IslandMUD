@@ -10,7 +10,7 @@ class Neutral_NPC : public Non_Player_Character
 {
 public:
 	
-	Neutral_NPC(const std::string & name) : Non_Player_Character(name, C::NPC_NEUTRAL_FACTION_ID) {}
+	Neutral_NPC(const std::string & name, World & world) : Non_Player_Character(name, C::NPC_NEUTRAL_FACTION_ID, world) {}
 	
 	// virtual void update(World & world, map<string, shared_ptr<Character>> & actors) = 0;
 };

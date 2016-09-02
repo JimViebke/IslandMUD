@@ -4,7 +4,7 @@ Jan 11 2016 */
 
 #include "npc_enemy_corporal.h"
 
-Hostile_NPC_Corporal::Hostile_NPC_Corporal(const std::string & name) : Hostile_NPC(name) {}
+Hostile_NPC_Corporal::Hostile_NPC_Corporal(const std::string & name, World & world) : Hostile_NPC(name, world) {}
 
 Update_Messages Hostile_NPC_Corporal::update(World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {

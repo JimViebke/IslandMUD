@@ -9,7 +9,7 @@ Jeb 16 2015 */
 
 std::unique_ptr<Recipes> Character::recipes;
 
-Character::Character(const std::string & name, const std::string & set_faction_ID) : name(name)
+Character::Character(const std::string & name, const std::string & set_faction_ID, World & world) : name(name)
 {
 	if (Character::recipes == nullptr)
 	{
@@ -29,6 +29,8 @@ Character::Character(const std::string & name, const std::string & set_faction_I
 		// Raise an error in the console
 		std::cout << "ERROR: attempted to create character with invalid faction: [" << set_faction_ID << "]\n";
 	}
+
+	login(world);
 }
 Character::~Character() {}
 

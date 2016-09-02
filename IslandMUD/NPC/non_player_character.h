@@ -54,7 +54,7 @@ protected:
 	std::deque<Coordinate> path;
 
 	// this can only be instantiated by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
-	Non_Player_Character(const std::string & name, const std::string & faction_ID);
+	Non_Player_Character(const std::string & name, const std::string & faction_ID, World & world);
 
 	// objective creating and deletion
 	void add_objective(const Objective_Priority & priority, const std::string & verb, const std::string & noun, const std::string & purpose);

@@ -3,7 +3,7 @@ Jun 3 2015 */
 
 #include "npc_enemy.h"
 
-Hostile_NPC::Hostile_NPC(const std::string & name) : Non_Player_Character(name, C::NPC_HOSTILE_FACTION_ID) {}
+Hostile_NPC::Hostile_NPC(const std::string & name, World & world) : Non_Player_Character(name, C::NPC_HOSTILE_FACTION_ID, world) {}
 
 std::string Hostile_NPC::get_new_hostile_id(const World & world, const std::map<std::string, std::shared_ptr<Character>> & actors) const
 {

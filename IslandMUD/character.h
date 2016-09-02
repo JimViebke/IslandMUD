@@ -45,13 +45,12 @@ protected:
 	std::string leader_ID;
 	std::vector<std::string> follower_IDs;
 
-	Character(const std::string & name, const std::string & set_faction_ID);
+	Character(const std::string & name, const std::string & set_faction_ID, World & world);
 
 public:
 
 	virtual ~Character(); // make Character into a polymorphic type
 
-	void login(World & world);
 	Update_Messages save();
 
 	// levels
@@ -97,6 +96,10 @@ public:
 
 	// combat helper functions
 	unsigned get_defense() const;
+
+private:
+
+	void login(World & world); // called from constructor
 };
 
 #endif
