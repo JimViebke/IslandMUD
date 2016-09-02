@@ -382,8 +382,7 @@ void Game::client_thread(SOCKET client_ID)
 
 		// log the player in
 		std::lock_guard<std::mutex> lock(game_state); // lock the actors structure while we modify it
-		std::shared_ptr<PC> player = std::make_shared<PC>(user_ID);
-		player->login(world);
+		std::shared_ptr<PC> player = std::make_shared<PC>(user_ID, world);
 		actors.insert(std::make_pair(user_ID, player));
 
 		// send a welcome message through the outbound queue
@@ -548,12 +547,10 @@ void Game::NPC_thread()
 		{
 			std::lock_guard<std::mutex> lock(game_state);
 
-			std::shared_ptr<Hostile_NPC_Worker> worker = std::make_shared<Hostile_NPC_Worker>(workers[i]);
-			worker->login(world);
+			std::shared_ptr<Hostile_NPC_Worker> worker = std::make_shared<Hostile_NPC_Worker>(workers[i], world);
 			actors.insert(make_pair(worker->name, worker));
 
-			std::shared_ptr<Hostile_NPC_Bodyguard> bodyguard = std::make_shared<Hostile_NPC_Bodyguard>(bodyguards[i], workers[i]);
-			bodyguard->login(world);
+			std::shared_ptr<Hostile_NPC_Bodyguard> bodyguard = std::make_shared<Hostile_NPC_Bodyguard>(bodyguards[i], workers[i], world);
 			actors.insert(make_pair(bodyguard->name, bodyguard));
 		}
 	}
@@ -563,18 +560,16 @@ void Game::NPC_thread()
 	{
 		std::lock_guard<std::mutex> lock(game_state);
 
-		std::shared_ptr<Hostile_NPC_Corporal> hunter = std::make_shared<Hostile_NPC_Corporal>("Hunter");
-		hunter->login(world);
+		std::shared_ptr<Hostile_NPC_Corporal> hunter = std::make_shared<Hostile_NPC_Corporal>("Hunter", world);
 		actors.insert(make_pair(hunter->name, hunter));
 	}
 
-	if (false)
 	// add a bodyguard
+	if (false)
 	{
 		std::lock_guard<std::mutex> lock(game_state);
 
-		std::shared_ptr<Hostile_NPC_Bodyguard> guardian = std::make_shared<Hostile_NPC_Bodyguard>("Guardian", "Hunter");
-		guardian->login(world);
+		std::shared_ptr<Hostile_NPC_Bodyguard> guardian = std::make_shared<Hostile_NPC_Bodyguard>("Guardian", "Hunter", world);
 		actors.insert(make_pair(guardian->name, guardian));
 	}
 
@@ -583,8 +578,7 @@ void Game::NPC_thread()
 	{
 		for (char name = 'A'; name < 'z'; ++name) // test code
 		{
-			std::shared_ptr<Hostile_NPC_Corporal> corporal = std::make_shared<Hostile_NPC_Corporal>(std::string() + name);
-			corporal->login(world);
+			std::shared_ptr<Hostile_NPC_Corporal> corporal = std::make_shared<Hostile_NPC_Corporal>(std::string() + name, world);
 			actors.insert(make_pair(corporal->name, corporal));
 		}
 	}
@@ -601,22 +595,77 @@ void Game::NPC_thread()
 		std::lock_guard<std::mutex> lock(game_state);
 		std::cout << " game_state locked.\n";
 
-		for (auto & actor : actors) // for each actor
+		std::cout << "Running NPC update logic...\n";
+		NPC_update_logic();
+
+		std::cout << "Running NPC spawn logic...\n";
+		NPC_spawn_logic();
+
+		std::cout << "Done NPC loop...\n\n";
+	}
+}
+
+void Game::NPC_spawn_logic()
+{
+	int player_count = 0;
+	int NPC_corporal_count = 0;
+
+	// count players and hostile NPC corporals
+	for (auto & actor : actors) // for each actor
+	{
+		if (U::is<Player_Character>(actor.second))
+			++player_count;
+		else if (U::is<Hostile_NPC_Corporal>(actor.second))
+			++NPC_corporal_count;
+	}
+
+	// if players outnumber NPC corporals, spawn more NPC corporals, each with 3-5 followers
+	if (player_count > NPC_corporal_count)
+	{
+		const unsigned spawn_count = player_count - NPC_corporal_count;
+
+		std::cout << "There are " << spawn_count << " more players than NPC corproals. Spawning " << spawn_count << " corporal NPCs with followers.\n";
+
+		for (unsigned i = 0; i < spawn_count; ++i)
 		{
-			if (std::shared_ptr<NPC> npc = U::convert_to<NPC>(actor.second)) // if the actor is an NPC
-			{
-				std::cout << "Calling NPC::update() on " << actor.first << "...";
+			// spawn a corporal
+			const std::string corporal_ID = U::to_string(U::random_int_from(0u, (unsigned)-2));
 
-				const Update_Messages update_messages = npc->update(world, actors); // call update, passing in the world and actors
-
-				std::cout << " (located at " << npc->x << ", " << npc->y << ") ";
-
-				std::cout << " done.\nGenerating outbound messages...";
-
-				generate_outbound_messages(npc->name, update_messages);
-
-				std::cout << " done.\n";
+			{ // temporary scope to erase the local "NPC" after creation
+				auto NPC = std::make_shared<Hostile_NPC_Corporal>(corporal_ID, world);
+				actors.insert(make_pair(corporal_ID, NPC));
 			}
+
+			// spawn and assigned 1-4 followers
+			const unsigned number_of_followers = U::random_int_from(1u, 4u);
+			for (unsigned j = 0; j < number_of_followers; ++j)
+			{
+				const std::string follower_ID = U::to_string(U::random_int_from(0u, (unsigned)-2));
+
+				auto NPC = std::make_shared<Hostile_NPC_Bodyguard>(follower_ID, corporal_ID, world);
+				actors.insert(make_pair(follower_ID, NPC));
+			}
+		}
+	}
+}
+
+void Game::NPC_update_logic()
+{
+	for (auto & actor : actors) // for each actor
+	{
+		if (std::shared_ptr<NPC> npc = U::convert_to<NPC>(actor.second)) // if the actor is an NPC
+		{
+			std::cout << "Calling NPC::update() on " << actor.first << "...";
+
+			const Update_Messages update_messages = npc->update(world, actors); // call update, passing in the world and actors
+
+			std::cout << " (located at " << npc->x << ", " << npc->y << ") ";
+
+			std::cout << " done.\nGenerating outbound messages...";
+
+			generate_outbound_messages(npc->name, update_messages);
+
+			std::cout << " done.\n";
 		}
 	}
 }
@@ -754,6 +803,7 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 	// create a stringstream to assemble the return message
 	std::stringstream action_result;
 
+	// get the user that triggered the action
 	const std::shared_ptr<Character> character = actors.find(user_ID)->second;
 
 	// save the player's coordinates in case a map update is required

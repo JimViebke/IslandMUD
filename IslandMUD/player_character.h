@@ -13,7 +13,7 @@ using PC = Player_Character;
 class Player_Character : public Character
 {
 public:
-	Player_Character(const std::string & name) : Character(name, C::PC_FACTION_ID) {}
+	Player_Character(const std::string & name, World & world) : Character(name, C::PC_FACTION_ID, world) {}
 
 	std::string get_inventory_info() const;
 

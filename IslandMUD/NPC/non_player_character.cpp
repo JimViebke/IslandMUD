@@ -4,7 +4,7 @@ Jun 3 2015 */
 #include "non_player_character.h"
 
 // this can only be instantiated by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
-NPC::Non_Player_Character(const std::string & name, const std::string & faction_ID) : Character(name, faction_ID) {}
+NPC::Non_Player_Character(const std::string & name, const std::string & faction_ID, World & world) : Character(name, faction_ID, world) {}
 
 // objective debugging
 std::string NPC::get_objectives() const

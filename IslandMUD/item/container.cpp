@@ -9,12 +9,10 @@
 std::string Container::contents_to_string() const
 {
 	// The calling function could construct the beginning of the sentence, like
-	// "You have" or "The chest contains".
+	// "You have" or "The chest contains". This function should only be called if
+	// the container is non-empty.
 
-	if (contents.size() == 0)
-	{
-		return "";
-	}
+	if (is_empty()) return "";
 
 	std::stringstream output;
 	output << " ";
@@ -96,6 +94,12 @@ unsigned Container::count(const std::string & item_id) const
 unsigned Container::size() const
 {
 	return contents.size();
+}
+bool Container::is_empty() const
+{
+	// Convention says this should be called "empty". I say "empty" is ambiguous as being either a noun or a verb.
+
+	return contents.empty();
 }
 
 bool Container::insert(const std::shared_ptr<Item> & item)

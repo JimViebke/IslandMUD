@@ -10,7 +10,7 @@ Jun 3 2015 */
 class Hostile_NPC : public Non_Player_Character
 {
 protected:
-	Hostile_NPC(const std::string & name);
+	Hostile_NPC(const std::string & name, World & world);
 
 	virtual Update_Messages update(World & world, std::map<std::string, std::shared_ptr<Character>> & actors) = 0;
 

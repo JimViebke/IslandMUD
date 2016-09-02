@@ -270,7 +270,12 @@ public:
 
 	// blacksmithing constants
 	static const unsigned
-		AMBIENT_AIR_TEMPERATURE; // air temperature (in Celcius)
+		AIR_TEMPERATURE,
+		MIN_WORKING_TEMPERATURE,
+		MIN_CARBON_GAIN_TEMPERATURE,
+		MAX_FORGE_TEMPERATURE,
+		MIN_MELTING_TEMPERATURE,
+		MAX_SMELT_TEMPERATURE;
 };
 
 #endif

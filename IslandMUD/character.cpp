@@ -9,7 +9,7 @@ Jeb 16 2015 */
 
 std::unique_ptr<Recipes> Character::recipes;
 
-Character::Character(const std::string & name, const std::string & set_faction_ID) : name(name)
+Character::Character(const std::string & name, const std::string & set_faction_ID, World & world) : name(name)
 {
 	if (Character::recipes == nullptr)
 	{
@@ -29,6 +29,8 @@ Character::Character(const std::string & name, const std::string & set_faction_I
 		// Raise an error in the console
 		std::cout << "ERROR: attempted to create character with invalid faction: [" << set_faction_ID << "]\n";
 	}
+
+	login(world);
 }
 Character::~Character() {}
 
@@ -1254,10 +1256,10 @@ Update_Messages Character::attack_character(std::shared_ptr<Character> & target,
 	}
 
 	return Update_Messages("You attack " + target->name + " with " +
-		((equipped_item == nullptr) ? "your bare hands." : U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + "."),
+		((equipped_item == nullptr) ? "your bare hands.\n" : U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + ".\n"),
 
 		name + " attacks " + target->name + " with " +
-		((equipped_item == nullptr) ? "their bare hands." : (U::get_article_for(equipped_item->get_name() + " " + equipped_item->get_name() + "."))));
+		((equipped_item == nullptr) ? "their bare hands.\n" : (U::get_article_for(equipped_item->get_name() + " " + equipped_item->get_name() + ".\n"))));
 }
 Update_Messages Character::die(World & world)
 {

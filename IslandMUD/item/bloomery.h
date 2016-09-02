@@ -21,6 +21,8 @@ public:
 	Bloom remove_bloom();
 
 private:
+	friend class Forgeable;
+
 	Bloom bloom;
 
 	std::vector<std::shared_ptr<Forgeable>> melt_contents; // an item will melt and join the bloom when it reaches temperature and melts
