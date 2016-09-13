@@ -622,11 +622,11 @@ void Game::NPC_spawn_logic()
 	// if players outnumber NPC corporals, spawn more NPC corporals, each with 3-5 followers
 	if (player_count > NPC_corporal_count)
 	{
-		const unsigned spawn_count = player_count - NPC_corporal_count;
+		const unsigned difference = player_count - NPC_corporal_count;
 
-		std::cout << "There are " << spawn_count << " more players than NPC corproals. Spawning " << spawn_count << " corporal NPCs with followers.\n";
+		std::cout << "There are " << difference << " more players than NPC corproals. Spawning " << difference << " corporal NPCs with followers.\n";
 
-		for (unsigned i = 0; i < spawn_count; ++i)
+		for (unsigned i = 0; i < difference; ++i)
 		{
 			// spawn a corporal
 			const std::string corporal_ID = U::to_string(U::random_int_from(0u, (unsigned)-2));
