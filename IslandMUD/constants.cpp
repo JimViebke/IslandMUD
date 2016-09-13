@@ -371,6 +371,7 @@ const std::map<std::string, std::map<std::string, int>> C::damage_tables =
 
 	{ std::string(C::SWORD_ID), {
 		{ "", 10 },
+		{ C::TREE_ID, 10 },
 		{ C::STICK_ID, 8 },
 		{ C::WOOD_ID, 7 },
 		{ C::STONE_ID, 2 }
