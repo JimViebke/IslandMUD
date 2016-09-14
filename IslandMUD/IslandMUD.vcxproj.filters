@@ -102,6 +102,9 @@
     <ClCompile Include="NPC\npc_neutral.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Threadsafe\threadsafe_socket_lookup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="player_character.h">

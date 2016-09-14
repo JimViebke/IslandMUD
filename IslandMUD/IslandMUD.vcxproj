@@ -104,6 +104,7 @@
     <ClCompile Include="NPC\npc_neutral.cpp" />
     <ClCompile Include="parse.cpp" />
     <ClCompile Include="player_character.cpp" />
+    <ClCompile Include="Threadsafe\threadsafe_socket_lookup.cpp" />
     <ClCompile Include="XML\pugixml.cpp" />
     <ClCompile Include="recipes.cpp" />
     <ClCompile Include="room.cpp" />
