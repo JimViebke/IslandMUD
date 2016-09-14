@@ -26,8 +26,8 @@ Feb 14, 2015 */
 #include "npc.h"
 #include "parse.h"
 #include "world.h"
-#include "threadsafe_queue.h"
-#include "threadsafe_socket_lookup.h"
+#include "Threadsafe\threadsafe_queue.h"
+#include "Threadsafe\threadsafe_socket_lookup.h"
 #include "message.h"
 
 class Game

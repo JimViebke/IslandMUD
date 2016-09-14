@@ -609,6 +609,7 @@ void Game::NPC_spawn_logic()
 {
 	int player_count = 0;
 	int NPC_corporal_count = 0;
+	int NPC_worker_count = 0;
 
 	// count players and hostile NPC corporals
 	for (auto & actor : actors) // for each actor
@@ -617,21 +618,25 @@ void Game::NPC_spawn_logic()
 			++player_count;
 		else if (U::is<Hostile_NPC_Corporal>(actor.second))
 			++NPC_corporal_count;
+		else if (U::is<Hostile_NPC_Worker>(actor.second))
+			++NPC_worker_count;
 	}
 
 	// if players outnumber NPC corporals, spawn more NPC corporals, each with 3-5 followers
 	if (player_count > NPC_corporal_count)
 	{
-		const unsigned spawn_count = player_count - NPC_corporal_count;
+		const unsigned difference = player_count - NPC_corporal_count;
 
-		std::cout << "There are " << spawn_count << " more players than NPC corproals. Spawning " << spawn_count << " corporal NPCs with followers.\n";
+		std::cout << "There are " << difference << " more players than NPC corproals. Spawning " << difference << " corporal NPCs with followers.\n";
 
-		for (unsigned i = 0; i < spawn_count; ++i)
+		for (unsigned i = 0; i < difference; ++i)
 		{
 			// spawn a corporal
+
+			// generate an ID
 			const std::string corporal_ID = U::to_string(U::random_int_from(0u, (unsigned)-2));
 
-			{ // temporary scope to erase the local "NPC" after creation
+			{ // temporary scope to erase the local reference after creation
 				auto NPC = std::make_shared<Hostile_NPC_Corporal>(corporal_ID, world);
 				actors.insert(make_pair(corporal_ID, NPC));
 			}
@@ -643,6 +648,35 @@ void Game::NPC_spawn_logic()
 				const std::string follower_ID = U::to_string(U::random_int_from(0u, (unsigned)-2));
 
 				auto NPC = std::make_shared<Hostile_NPC_Bodyguard>(follower_ID, corporal_ID, world);
+				actors.insert(make_pair(follower_ID, NPC));
+			}
+		}
+	}
+
+	// if players outnumber NPC workers, spawn more NPC workers, each with one bodyguard
+	if (player_count > NPC_worker_count)
+	{
+		const unsigned difference = player_count - NPC_worker_count;
+
+		std::cout << "There are " << difference << " more players than NPC workers. Spawning " << difference << " worker NPCs with bodyguards.\n";
+
+		for (unsigned i = 0; i < difference; ++i)
+		{
+			// spawn a worker
+
+			// generate an ID
+			const std::string worker_ID = U::to_string(U::random_int_from(0u, (unsigned)-2));
+
+			{ // temporary scope to erase the local reference after creation
+				auto NPC = std::make_shared<Hostile_NPC_Worker>(worker_ID, world);
+				actors.insert(make_pair(worker_ID, NPC));
+			}
+
+			// spawn a bodyguard
+			{ // temporary scope to erase the local reference after creation
+				const std::string follower_ID = U::to_string(U::random_int_from(0u, (unsigned)-2));
+
+				auto NPC = std::make_shared<Hostile_NPC_Bodyguard>(follower_ID, worker_ID, world);
 				actors.insert(make_pair(follower_ID, NPC));
 			}
 		}
@@ -850,7 +884,7 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 	{
 		// for each player that requires an update
 		for (auto player_it = (*update_messages.additional_map_update_users).cbegin();
-		player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
+			player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
 		{
 			// if the referenced character is a player character
 			if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(*player_it)->second))
