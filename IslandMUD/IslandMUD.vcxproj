@@ -145,8 +145,8 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="room.h" />
     <ClInclude Include="room_side.h" />
-    <ClInclude Include="threadsafe_socket_lookup.h" />
-    <ClInclude Include="threadsafe_queue.h" />
+    <ClInclude Include="Threadsafe\threadsafe_socket_lookup.h" />
+    <ClInclude Include="Threadsafe\threadsafe_queue.h" />
     <ClInclude Include="utilities.h" />
     <ClInclude Include="world.h" />
   </ItemGroup>

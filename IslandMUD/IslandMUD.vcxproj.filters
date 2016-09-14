@@ -149,13 +149,7 @@
     <ClInclude Include="parse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="threadsafe_queue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="message.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="threadsafe_socket_lookup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Item\item.h">
@@ -213,6 +207,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NPC\npc_neutral.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Threadsafe\threadsafe_socket_lookup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Threadsafe\threadsafe_queue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
