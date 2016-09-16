@@ -24,7 +24,7 @@ Update_Messages Hostile_NPC_Fighter::update(World & world, std::map<std::string,
 		if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE)
 		{
 			// if the item is here, take it, remove the current objective, and return
-			if (world.room_at(x, y, z)->contains(objective_iterator->noun))
+			if (world.room_at(x, y)->contains(objective_iterator->noun))
 			{
 				Update_Messages update_messages = take(objective_iterator->noun, world);
 
@@ -157,7 +157,7 @@ Update_Messages Hostile_NPC_Fighter::update(World & world, std::map<std::string,
 				if (!U::bounds_check(cx, cy)) { continue; }
 
 				// for each actor in the room
-				for (const std::string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
+				for (const std::string & actor_ID : world.room_at(cx, cy)->get_actor_ids())
 				{
 					// if the character is a player character
 					if (U::is<PC>(actors.find(actor_ID)->second))

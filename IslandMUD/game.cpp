@@ -82,7 +82,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		// if the actor is a Player_Character
 		if (const std::shared_ptr<PC> & player = U::convert_to<PC>(actors.find(actor_id)->second))
 		{
-			return Update_Messages(world.room_at(player->x, player->y, player->z)->summary(player->name));
+			return Update_Messages(world.room_at(player->x, player->y)->summary(player->name));
 		}
 	}
 	// moving: "move northeast" OR "northeast"
@@ -98,7 +98,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		// if the acting character is a player character
 		if (const std::shared_ptr<PC> player = U::convert_to<PC>(character))
 			// append a summary of the new area
-			result.to_user += world.room_at(player->x, player->y, player->z)->summary(player->name);
+			result.to_user += world.room_at(player->x, player->y)->summary(player->name);
 
 		return result;
 	}
@@ -176,7 +176,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		const auto & player = actors.find(actor_id)->second;
 
 		// if the target is another player or NPC in the room
-		if (world.room_at(player->x, player->y, player->z)->is_occupied_by(command[1]))
+		if (world.room_at(player->x, player->y)->is_occupied_by(command[1]))
 		{
 			// if the target is not a friendly player character
 			auto & target = actors.find(command[1])->second;
@@ -275,7 +275,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(actor_id)->second))
 		{
 			std::stringstream coord;
-			coord << "Your coordinates are " << player->x << ", " << player->y << " (index " << player->z << ")";
+			coord << "Your coordinates are " << player->x << ", " << player->y;
 			return Update_Messages(coord.str());
 		}
 	}
@@ -856,10 +856,10 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 			for (int cy = player_y - (int)C::VIEW_DISTANCE; cy <= player_y + (int)C::VIEW_DISTANCE; ++cy)
 			{
 				// skip if the room is out of bounds
-				if (!U::bounds_check(cx, cy, C::GROUND_INDEX)) continue;
+				if (!U::bounds_check(cx, cy)) continue;
 
 				// get a list of the users in the room
-				const std::vector<std::string> users_in_range = world.room_at(cx, cy, C::GROUND_INDEX)->get_actor_ids();
+				const std::vector<std::string> users_in_range = world.room_at(cx, cy)->get_actor_ids();
 				// for each user in the room
 				for (const std::string & user : users_in_range)
 				{
@@ -912,7 +912,7 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 	if (update_messages.to_room != nullptr)
 	{
 		// get a list of all players in the room
-		const std::vector<std::string> area_actor_ids = world.room_at(character->x, character->y, character->z)->get_actor_ids();
+		const std::vector<std::string> area_actor_ids = world.room_at(character->x, character->y)->get_actor_ids();
 
 		for (const std::string & actor_id : area_actor_ids) // for each player in the room
 		{

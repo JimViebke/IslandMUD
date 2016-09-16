@@ -58,14 +58,6 @@ namespace Utilities
 			x < C::WORLD_X_DIMENSION &&
 			y < C::WORLD_Y_DIMENSION);
 	}
-	inline bool bounds_check(const int & x, const int & y, const int & z)
-	{
-		// ensure x, y, and z are from 0 to dimension inclusive
-		return (x >= 0 && y >= 0 && z >= 0 &&
-			x < C::WORLD_X_DIMENSION &&
-			y < C::WORLD_Y_DIMENSION &&
-			z < C::WORLD_Z_DIMENSION);
-	}
 
 	// movement
 	inline void assign_movement_deltas(const std::string & direction_ID, int & dx, int & dy)
@@ -81,24 +73,6 @@ namespace Utilities
 		else if (direction_ID == C::NORTH_EAST) { --dx; ++dy; }
 		else if (direction_ID == C::SOUTH_EAST) { ++dx; ++dy; }
 		else if (direction_ID == C::SOUTH_WEST) { ++dx; --dy; }
-
-		// nothing to return, values passed by reference
-	}
-	inline void assign_movement_deltas(const std::string & direction_ID, int & dx, int & dy, int & dz)
-	{
-		// express movement through three dimensions in dx, dy, dz
-		// If direction_ID is invalid, output arguments will not be modified.
-
-		if (direction_ID == C::NORTH) { --dx; }
-		else if (direction_ID == C::SOUTH) { ++dx; }
-		else if (direction_ID == C::WEST) { --dy; }
-		else if (direction_ID == C::EAST) { ++dy; }
-		else if (direction_ID == C::NORTH_WEST) { --dx; --dy; }
-		else if (direction_ID == C::NORTH_EAST) { --dx; ++dy; }
-		else if (direction_ID == C::SOUTH_EAST) { ++dx; ++dy; }
-		else if (direction_ID == C::SOUTH_WEST) { ++dx; --dy; }
-		else if (direction_ID == C::UP) { ++dz; }
-		else if (direction_ID == C::DOWN) { --dz; }
 
 		// nothing to return, values passed by reference
 	}
