@@ -17,16 +17,13 @@ class Constants
 public:
 	// general
 	static const int
-		GROUND_INDEX,
 		VIEW_DISTANCE,
 
 		WORLD_X_DIMENSION,
 		WORLD_Y_DIMENSION,
-		WORLD_Z_DIMENSION,
 
 		DEFAULT_SPAWN_X,
-		DEFAULT_SPAWN_Y,
-		DEFAULT_SPAWN_Z;
+		DEFAULT_SPAWN_Y;
 
 	static const unsigned
 		GAME_PORT_NUMBER,

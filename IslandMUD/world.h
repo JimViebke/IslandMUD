@@ -29,9 +29,9 @@ public:
 	World();
 
 	// access a room given coordinates
-	std::unique_ptr<Room>::pointer room_at(const int & x, const int & y, const int & z = C::GROUND_INDEX);
-	const std::unique_ptr<Room>::pointer room_at(const int & x, const int & y, const int & z = C::GROUND_INDEX) const;
-	std::unique_ptr<Room> & room_pointer_at(const int & x, const int & y, const int & z = C::GROUND_INDEX);
+	std::unique_ptr<Room>::pointer room_at(const int & x, const int & y);
+	const std::unique_ptr<Room>::pointer room_at(const int & x, const int & y) const;
+	std::unique_ptr<Room> & room_pointer_at(const int & x, const int & y);
 
 	// debugging
 	unsigned count_loaded_rooms() const;
@@ -40,19 +40,19 @@ public:
 	void load_view_radius_around(const int & x, const int & y, const std::string & character_ID);
 
 	// loading and unloading rooms at the edge of vision
-	void remove_viewer_and_attempt_unload(const int & x, const int & y, const int & z, const std::string & viewer_ID);
+	void remove_viewer_and_attempt_unload(const int & x, const int & y, const std::string & viewer_ID);
 
 	// unloading of all rooms in view distance (for logging out or dying)
 	void attempt_unload_radius(const int & x, const int & y, const std::string & player_ID);
 
 	// test if a room can be removed from memory
-	bool is_unloadable(const int & x, const int & y, const int & z) const;
+	bool is_unloadable(const int & x, const int & y) const;
 
 	// move a room from world to disk
-	void unload_room(const int & x, const int & y, const int & z);
+	void unload_room(const int & x, const int & y);
 
 	// room information
-	bool room_has_surface(const int & x, const int & y, const int & z, const std::string & direction_ID) const;
+	bool room_has_surface(const int & x, const int & y, const std::string & direction_ID) const;
 
 
 
@@ -68,33 +68,33 @@ private:
 	bool load_existing_limestone_deposit_map();
 
 	// a room at x,y,z does not exist on the disk; create it
-	void generate_room_at(const int & x, const int & y, const int & z);
+	void generate_room_at(const int & x, const int & y);
 
-	// load in all rooms at x,y to an xml_document
-	void load_vertical_rooms_to_XML(const int & ix, const int & iy, pugi::xml_document & vertical_rooms);
+	// load the room x,y to an xml_document
+	void load_room_to_XML(const int & ix, const int & iy, pugi::xml_document & vertical_rooms);
 
 	// build a room given an XML node, add to world at x,y,z
-	void add_room_to_world(pugi::xml_node & room_node, const int & x, const int & y, const int & z);
+	void add_room_to_world(pugi::xml_node & room_document, const int & x, const int & y);
 
 	// move specific room into memory
-	void load_room_to_world(const int & x, const int & y, const int & z);
+	void load_room_to_world(const int & x, const int & y);
 
 	// move a passed room to disk
-	void unload_room(const int & x, const int & y, const int & z, const std::unique_ptr<Room>::pointer room);
+	void unload_room(const int & x, const int & y, const std::unique_ptr<Room>::pointer room);
 
-	// add a room to a z_stack at a given index
-	void add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::pointer room, pugi::xml_document & z_stack) const;
+	// save the contents of a room to an XML file in memory
+	void save_room_to_XML(const std::unique_ptr<Room>::pointer room, pugi::xml_document & room_document) const;
 
 	// create a new empty room given its coordinates and the world terrain
-	std::unique_ptr<Room> create_room(const int & x, const int & y, const int & z) const;
+	std::unique_ptr<Room> create_room(const int & x, const int & y) const;
 
 	// remove a room from memory
-	void erase_room_from_memory(const int & x, const int & y, const int & z);
+	void erase_room_from_memory(const int & x, const int & y);
 
 	// calculate room position
-	static inline unsigned hash(const int & x, const int & y, const int & z)
+	static inline unsigned hash(const int & x, const int & y)
 	{
-		return (x * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION) + (y * C::WORLD_Z_DIMENSION) + z;
+		return (x * C::WORLD_Y_DIMENSION) + y;
 	}
 };
 

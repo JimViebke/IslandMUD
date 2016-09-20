@@ -45,7 +45,7 @@ void Character::login(World & world)
 
 
 	// create holder values to save the coordinates from the file
-	int loaded_x = -1, loaded_y = -1, loaded_z = -1;
+	int loaded_x = -1, loaded_y = -1;
 
 	// load the three values from the node
 	const pugi::xml_node location_node = user_data_xml.child(C::XML_USER_LOCATION.c_str());
@@ -53,33 +53,29 @@ void Character::login(World & world)
 	// extract the attributes as well as the values for the attributes
 	const pugi::xml_attribute x_attribute = location_node.attribute(std::string("x").c_str());
 	const pugi::xml_attribute y_attribute = location_node.attribute(std::string("y").c_str());
-	const pugi::xml_attribute z_attribute = location_node.attribute(std::string("z").c_str());
 	loaded_x = x_attribute.as_int();
 	loaded_y = y_attribute.as_int();
-	loaded_z = z_attribute.as_int();
 
 	// if any of the attributes are empty or the extracted values fail bounds-checking
-	if (x_attribute.empty() || y_attribute.empty() || z_attribute.empty() ||
-		!U::bounds_check(loaded_x, loaded_y, loaded_z))
+	if (x_attribute.empty() || y_attribute.empty() ||
+		!U::bounds_check(loaded_x, loaded_y))
 	{
 		// set the player to the default spawn
 		this->x = C::DEFAULT_SPAWN_X;
 		this->y = C::DEFAULT_SPAWN_Y;
-		this->z = C::DEFAULT_SPAWN_Z;
 	}
 	else
 	{
 		// set the player to the valid loaded coordinates
 		this->x = loaded_x;
 		this->y = loaded_y;
-		this->z = loaded_z;
 	}
 
 	// load the rooms around the player's spawn
 	world.load_view_radius_around(x, y, name);
 
 	// spawn in the player
-	world.room_at(x, y, z)->add_actor(this->name);
+	world.room_at(x, y)->add_actor(this->name);
 
 	// select the level node
 	const pugi::xml_node level_node = user_data_xml.child(C::XML_USER_LEVELS.c_str());
@@ -173,7 +169,6 @@ Update_Messages Character::save()
 	// add x, y, and z attributes to the location node
 	location_node.append_attribute(std::string("x").c_str()).set_value(this->x);
 	location_node.append_attribute(std::string("y").c_str()).set_value(this->y);
-	location_node.append_attribute(std::string("z").c_str()).set_value(this->z);
 
 	// add each level to the location node
 	level_node.append_attribute(C::XML_LEVEL_SWORDSMANSHIP.c_str()).set_value(this->swordsmanship_level);
@@ -183,7 +178,7 @@ Update_Messages Character::save()
 
 	// for each item in the user's inventory
 	for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator it = contents.cbegin();
-	it != contents.cend(); ++it)
+		it != contents.cend(); ++it)
 	{
 		// save the item to a new node under the items node
 		pugi::xml_node item_node = items_node.append_child(it->first.c_str());
@@ -305,12 +300,12 @@ std::string Character::get_inventory() const // debugging
 Update_Messages Character::move(const std::string & direction_ID, World & world)
 {
 	// movement deltas
-	int dx = 0, dy = 0, dz = 0;
+	int dx = 0, dy = 0;
 
-	U::assign_movement_deltas(direction_ID, dx, dy, dz);
+	U::assign_movement_deltas(direction_ID, dx, dy);
 
 	// validate movement deltas
-	if (!U::bounds_check(x + dx, y + dy, z + dz))
+	if (!U::bounds_check(x + dx, y + dy))
 	{
 		return Update_Messages("You can't go there.");
 	}
@@ -319,7 +314,7 @@ Update_Messages Character::move(const std::string & direction_ID, World & world)
 	// world.load_room_to_world(x + dx, y + dy, z + dz);
 
 	// test if the environment (structures) allow the player to move in a given direction
-	const std::string validate_movement = this->validate_movement(x, y, z, direction_ID, dx, dy, dz, world);
+	const std::string validate_movement = this->validate_movement(x, y, direction_ID, dx, dy, world);
 
 	// if the validation failed for any reason
 	if (validate_movement != C::GOOD_SIGNAL)
@@ -344,12 +339,12 @@ Update_Messages Character::move(const std::string & direction_ID, World & world)
 		for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
 		{
 			// Skip this room if it is not loaded. This occurs when a player moves diagonally, and both room unload passes overlap at the corner of the map.
-			if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
+			if (world.room_at(rx, ry) == nullptr) continue;
 
-			U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids()); // save any users in the room
+			U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry)->get_actor_ids()); // save any users in the room
 
 			// remove the character from the room's viewer list, trying to unload the room in the process
-			world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name); // bounds checking takes place in here
+			world.remove_viewer_and_attempt_unload(rx, ry, this->name); // bounds checking takes place in here
 		}
 	}
 	else if (direction_ID == C::WEST || direction_ID == C::EAST)
@@ -358,9 +353,9 @@ Update_Messages Character::move(const std::string & direction_ID, World & world)
 		const int ry = (direction_ID == C::WEST) ? y + C::VIEW_DISTANCE : y - C::VIEW_DISTANCE;
 		for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 		{
-			if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
-			U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
-			world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
+			if (world.room_at(rx, ry) == nullptr) continue;
+			U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry)->get_actor_ids());
+			world.remove_viewer_and_attempt_unload(rx, ry, this->name);
 		}
 	}
 	else if (direction_ID == C::UP) { return Update_Messages("[moving up not available yet]"); }
@@ -376,9 +371,9 @@ Update_Messages Character::move(const std::string & direction_ID, World & world)
 			const int rx = x + C::VIEW_DISTANCE;
 			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
 			{
-				if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
-				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
-				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
+				if (world.room_at(rx, ry) == nullptr) continue;
+				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry)->get_actor_ids());
+				world.remove_viewer_and_attempt_unload(rx, ry, this->name);
 			}
 		}
 
@@ -387,9 +382,9 @@ Update_Messages Character::move(const std::string & direction_ID, World & world)
 			const int ry = y - C::VIEW_DISTANCE;
 			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 			{
-				if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
-				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
-				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
+				if (world.room_at(rx, ry) == nullptr) continue;
+				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry)->get_actor_ids());
+				world.remove_viewer_and_attempt_unload(rx, ry, this->name);
 			}
 		}
 
@@ -398,9 +393,9 @@ Update_Messages Character::move(const std::string & direction_ID, World & world)
 			const int rx = x - C::VIEW_DISTANCE;
 			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
 			{
-				if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
-				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
-				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
+				if (world.room_at(rx, ry) == nullptr) continue;
+				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry)->get_actor_ids());
+				world.remove_viewer_and_attempt_unload(rx, ry, this->name);
 			}
 		}
 
@@ -409,23 +404,22 @@ Update_Messages Character::move(const std::string & direction_ID, World & world)
 			const int ry = y + C::VIEW_DISTANCE;
 			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 			{
-				if (world.room_at(rx, ry, C::GROUND_INDEX) == nullptr) continue;
-				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry, C::GROUND_INDEX)->get_actor_ids());
-				world.remove_viewer_and_attempt_unload(rx, ry, C::GROUND_INDEX, this->name);
+				if (world.room_at(rx, ry) == nullptr) continue;
+				U::append_b_to_a(additional_users_to_notify, world.room_at(rx, ry)->get_actor_ids());
+				world.remove_viewer_and_attempt_unload(rx, ry, this->name);
 			}
 		}
 	}
 
 	// the movement validated, remove character id from area
-	world.room_at(x, y, z)->remove_actor(this->name);
+	world.room_at(x, y)->remove_actor(this->name);
 
 	// update character internal coordinates
 	x += dx;
-	y += dy;
-	z += dz; // x, y, and z now refer to the destination room
+	y += dy; // x and y now refer to the destination room
 
 	// add character id to new area using the new x and y coordinates
-	world.room_at(x, y, z)->add_actor(this->name);
+	world.room_at(x, y)->add_actor(this->name);
 
 	// prepare responses
 	Update_Messages updates("You move " + direction_ID + ".",
@@ -446,14 +440,14 @@ Update_Messages Character::craft(const std::string & craft_item_id, World & worl
 	// check for special cases
 	if (craft_item_id == C::CHEST_ID)
 	{
-		if (world.room_at(x, y, z)->has_chest())
+		if (world.room_at(x, y)->has_chest())
 		{
 			return Update_Messages("There is already a chest here.");
 		}
 	}
 	else if (craft_item_id == C::TABLE_ID)
 	{
-		if (world.room_at(x, y, z)->has_table())
+		if (world.room_at(x, y)->has_table())
 		{
 			return Update_Messages("There is already a table here.");
 		}
@@ -476,11 +470,11 @@ Update_Messages Character::craft(const std::string & craft_item_id, World & worl
 	}
 	for (std::map<std::string, int>::const_iterator it = recipe.local_need.cbegin(); it != recipe.local_need.cend(); ++it)
 	{
-		if (it->first != "" && !world.room_at(x, y, z)->contains(it->first)) { return Update_Messages(U::get_article_for(craft_item_id) + " " + craft_item_id + " requires " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first); }
+		if (it->first != "" && !world.room_at(x, y)->contains(it->first)) { return Update_Messages(U::get_article_for(craft_item_id) + " " + craft_item_id + " requires " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first); }
 	}
 	for (std::map<std::string, int>::const_iterator it = recipe.local_remove.cbegin(); it != recipe.local_remove.cend(); ++it)
 	{
-		if (it->first != "" && !world.room_at(x, y, z)->contains(it->first)) { return Update_Messages(U::get_article_for(craft_item_id) + " " + craft_item_id + " uses " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first); }
+		if (it->first != "" && !world.room_at(x, y)->contains(it->first)) { return Update_Messages(U::get_article_for(craft_item_id) + " " + craft_item_id + " uses " + ((it->second == 1) ? "a" : U::to_string(it->second)) + " nearby " + it->first); }
 	}
 
 	// remove ingredients from inventory
@@ -507,13 +501,13 @@ Update_Messages Character::craft(const std::string & craft_item_id, World & worl
 			if (craft_item_id == C::CHEST_ID)
 			{
 				// add a chest to the room
-				world.room_at(x, y, z)->add_chest(this->faction_ID);
+				world.room_at(x, y)->add_chest(this->faction_ID);
 				continue;
 			}
 			else if (craft_item_id == C::TABLE_ID)
 			{
 				// add a table to the room
-				world.room_at(x, y, z)->add_table();
+				world.room_at(x, y)->add_table();
 				continue;
 			}
 
@@ -529,7 +523,7 @@ Update_Messages Character::craft(const std::string & craft_item_id, World & worl
 			else // the item can not be taken
 			{
 				// add the item to the room
-				world.room_at(x, y, z)->insert(item);
+				world.room_at(x, y)->insert(item);
 			}
 		}
 
@@ -558,7 +552,7 @@ Update_Messages Character::take(const std::string & take_item_id, World & world,
 	}
 
 	// create a counter to determine how many items are actually acquired
-	const unsigned acquire_count = Character::move_items(*world.room_at(x, y, z), *this, take_item_id, count);
+	const unsigned acquire_count = Character::move_items(*world.room_at(x, y), *this, take_item_id, count);
 
 	if (acquire_count == 0)
 	{
@@ -578,7 +572,7 @@ Update_Messages Character::take(const std::string & take_item_id, World & world,
 Update_Messages Character::drop(const std::string & drop_item_id, World & world, const std::string & count)
 {
 	// create a counter to determine how many items are actually dropped
-	const unsigned drop_count = Character::move_items(*this, *world.room_at(x, y, z), drop_item_id, count);
+	const unsigned drop_count = Character::move_items(*this, *world.room_at(x, y), drop_item_id, count);
 
 	if (drop_count == 0)
 	{
@@ -677,7 +671,7 @@ Update_Messages Character::unequip()
 }
 Update_Messages Character::add_to_chest(std::string insert_item_id, World & world, const std::string & count)
 {
-	const std::unique_ptr<Room>::pointer room = world.room_at(x, y, z);
+	const std::unique_ptr<Room>::pointer room = world.room_at(x, y);
 
 	// if this room does not have a chest
 	if (!room->has_chest())
@@ -711,7 +705,7 @@ Update_Messages Character::add_to_chest(std::string insert_item_id, World & worl
 }
 Update_Messages Character::take_from_chest(const std::string & take_item_id, World & world, const std::string & count)
 {
-	const std::unique_ptr<Room>::pointer room = world.room_at(x, y, z);
+	const std::unique_ptr<Room>::pointer room = world.room_at(x, y);
 
 	// if this room does not have a chest
 	if (!room->has_chest())
@@ -746,11 +740,11 @@ Update_Messages Character::take_from_chest(const std::string & take_item_id, Wor
 Update_Messages Character::look_inside_chest(const World & world) const
 {
 	// validation within
-	return world.room_at(x, y, z)->chest_contents(faction_ID, this->name);
+	return world.room_at(x, y)->chest_contents(faction_ID, this->name);
 }
 Update_Messages Character::add_to_table(const std::string & add_item_ID, World & world, const std::string & count)
 {
-	const std::unique_ptr<Room>::pointer room = world.room_at(x, y, z);
+	const std::unique_ptr<Room>::pointer room = world.room_at(x, y);
 
 	// check if there is a table in the room
 	if (!room->has_table())
@@ -778,7 +772,7 @@ Update_Messages Character::add_to_table(const std::string & add_item_ID, World &
 }
 Update_Messages Character::take_from_table(const std::string take_item_ID, World & world, const std::string & count)
 {
-	const std::unique_ptr<Room>::pointer room = world.room_at(x, y, z);
+	const std::unique_ptr<Room>::pointer room = world.room_at(x, y);
 
 	// check if there is a table in the room
 	if (!room->has_table())
@@ -807,11 +801,11 @@ Update_Messages Character::take_from_table(const std::string take_item_ID, World
 Update_Messages Character::look_at_table(const World & world) const
 {
 	// validation within
-	return world.room_at(x, y, z)->table_contents(this->name);
+	return world.room_at(x, y)->table_contents(this->name);
 }
 Update_Messages Character::construct_surface(const std::string & material_id, const std::string & surface_id, World & world)
 {
-	if (world.room_at(x, y, z)->is_forest())
+	if (world.room_at(x, y)->is_forest())
 	{
 		return Update_Messages("You are in a forest and cannot build a structure here.");
 	}
@@ -823,10 +817,10 @@ Update_Messages Character::construct_surface(const std::string & material_id, co
 	}
 
 	// check if the surface already exists
-	if (world.room_at(x, y, z)->has_surface(surface_id)) // bounds checking not necissary because the player is standing here
+	if (world.room_at(x, y)->has_surface(surface_id)) // bounds checking not necissary because the player is standing here
 	{
 		// test if construction is prevented by an intact wall or a pile of rubble
-		if (world.room_at(x, y, z)->get_room_sides().find(surface_id)->second.is_rubble())
+		if (world.room_at(x, y)->get_room_sides().find(surface_id)->second.is_rubble())
 		{
 			return Update_Messages("A pile of rubble prevents construction.");
 		}
@@ -846,7 +840,7 @@ Update_Messages Character::construct_surface(const std::string & material_id, co
 
 	// if the surface is a ceiling, check that any intact wall exists
 	if (surface_id == C::CEILING && // the user is constructing a ceiling
-		!world.room_at(x, y, z)->has_standing_wall()) // the room does not have a wall
+		!world.room_at(x, y)->has_standing_wall()) // the room does not have a wall
 	{
 		return Update_Messages("You need at least one standing wall to support a ceiling.");
 	}
@@ -868,7 +862,7 @@ Update_Messages Character::construct_surface(const std::string & material_id, co
 	this->erase(material_id, C::SURFACE_REQUIREMENTS.find(material_id)->second);
 
 	// create a Room_Side and add it to Room::room_side using the surface ID
-	world.room_at(x, y, z)->add_surface(surface_id, material_id);
+	world.room_at(x, y)->add_surface(surface_id, material_id);
 
 	// "You construct a stone floor/ceiling." OR "You construct a stone wall to your north."
 	return Update_Messages("You construct a " + material_id + // you construct a [material]
@@ -889,7 +883,7 @@ Update_Messages Character::construct_surface_with_door(const std::string & surfa
 
 
 
-	if (world.room_at(x, y, z)->is_forest())
+	if (world.room_at(x, y)->is_forest())
 	{
 		return Update_Messages("You are in a forest and cannot build a structure here.");
 	}
@@ -901,10 +895,10 @@ Update_Messages Character::construct_surface_with_door(const std::string & surfa
 	}
 
 	// check if the surface already exists
-	if (world.room_at(x, y, z)->has_surface(surface_id)) // bounds checking not necissary because the player is standing here
+	if (world.room_at(x, y)->has_surface(surface_id)) // bounds checking not necissary because the player is standing here
 	{
 		// test if construction is prevented by an intact wall or a pile of rubble
-		if (world.room_at(x, y, z)->get_room_sides().find(surface_id)->second.is_rubble())
+		if (world.room_at(x, y)->get_room_sides().find(surface_id)->second.is_rubble())
 		{
 			return Update_Messages("A pile of rubble prevents construction.");
 		}
@@ -924,7 +918,7 @@ Update_Messages Character::construct_surface_with_door(const std::string & surfa
 
 	// if the surface is a ceiling, check that any intact wall exists
 	if (surface_id == C::CEILING && // the user is construction a ceiling
-		!world.room_at(x, y, z)->has_standing_wall()) // the room does not have a wall
+		!world.room_at(x, y)->has_standing_wall()) // the room does not have a wall
 	{
 		return Update_Messages("You need at least one standing wall to support a ceiling.");
 	}
@@ -980,7 +974,7 @@ Update_Messages Character::construct_surface_with_door(const std::string & surfa
 	this->erase(surface_material_id, C::SURFACE_REQUIREMENTS.find(surface_material_id)->second);
 
 	// add the surface to the room
-	world.room_at(x, y, z)->add_surface(surface_id, surface_material_id);
+	world.room_at(x, y)->add_surface(surface_id, surface_material_id);
 
 
 
@@ -992,7 +986,7 @@ Update_Messages Character::construct_surface_with_door(const std::string & surfa
 	this->erase(door_material_id, C::DOOR_REQUIREMENTS.find(door_material_id)->second);
 
 	// add a door to the surface in the room
-	world.room_at(x, y, z)->add_door(surface_id, C::MAX_SURFACE_HEALTH, door_material_id, this->faction_ID);
+	world.room_at(x, y)->add_door(surface_id, C::MAX_SURFACE_HEALTH, door_material_id, this->faction_ID);
 
 
 
@@ -1033,10 +1027,10 @@ Update_Messages Character::attack_surface(const std::string & surface_ID, World 
 	}
 
 	// if the current room has an intact surface
-	if (world.room_at(x, y, z)->is_standing_wall(surface_ID))
+	if (world.room_at(x, y)->is_standing_wall(surface_ID))
 	{
 		// apply damage to the surface
-		return world.room_at(x, y, z)->damage_surface(surface_ID, this->equipped_item, this->name);
+		return world.room_at(x, y)->damage_surface(surface_ID, this->equipped_item, this->name);
 	}
 
 	// this room does not have an intact surface, the neighboring room might
@@ -1045,21 +1039,21 @@ Update_Messages Character::attack_surface(const std::string & surface_ID, World 
 	int new_x = x, new_y = y;
 	{
 		int new_z = 0;
-		U::assign_movement_deltas(surface_ID, new_x, new_y, new_z);
+		U::assign_movement_deltas(surface_ID, new_x, new_y);
 	} // dz falls out of scope to prevent accidental use - we're only working in two dimensions right now
 
 	// if the neighboring room has the opposite surface intact (our west wall borders next room's east wall)
-	if (world.room_at(new_x, new_y, z)->is_standing_wall(C::opposite_surface_id.find(surface_ID)->second)) // deliberately using just "z" throughout this block
+	if (world.room_at(new_x, new_y)->is_standing_wall(C::opposite_surface_id.find(surface_ID)->second)) // deliberately using just "z" throughout this block
 	{
 		// inflict damage upon the surface
-		return world.room_at(new_x, new_y, z)->damage_surface(C::opposite_surface_id.find(surface_ID)->second, this->equipped_item, this->name);
+		return world.room_at(new_x, new_y)->damage_surface(C::opposite_surface_id.find(surface_ID)->second, this->equipped_item, this->name);
 	}
 
 	// neither room has an intact surface
 
 	// test if both walls do not exist
-	if (!world.room_at(x, y, z)->has_surface(surface_ID) &&
-		!world.room_at(new_x, new_y, z)->has_surface(C::opposite_surface_id.find(surface_ID)->second))
+	if (!world.room_at(x, y)->has_surface(surface_ID) &&
+		!world.room_at(new_x, new_y)->has_surface(C::opposite_surface_id.find(surface_ID)->second))
 	{
 		return Update_Messages("There is no " + surface_ID + " wall here.");
 	}
@@ -1085,10 +1079,10 @@ Update_Messages Character::attack_door(const std::string & surface_ID, World & w
 	}
 
 	// if the current room has an intact surface with an intact door in it
-	if (world.room_at(x, y, z)->has_surface(surface_ID) && world.room_at(x, y, z)->get_room_sides().find(surface_ID)->second.has_intact_door())
+	if (world.room_at(x, y)->has_surface(surface_ID) && world.room_at(x, y)->get_room_sides().find(surface_ID)->second.has_intact_door())
 	{
 		// applied damage to the door
-		return world.room_at(x, y, z)->damage_door(surface_ID, this->equipped_item, this->name);
+		return world.room_at(x, y)->damage_door(surface_ID, this->equipped_item, this->name);
 	}
 
 	// the current room does not have an intact door in the specified direction,
@@ -1098,14 +1092,14 @@ Update_Messages Character::attack_door(const std::string & surface_ID, World & w
 	int new_x = x, new_y = y;
 	{
 		int new_z = 0;
-		U::assign_movement_deltas(surface_ID, new_x, new_y, new_z);
+		U::assign_movement_deltas(surface_ID, new_x, new_y);
 	} // new_z falls out of scope to prevent accidental use - we're only working in two dimensions right now
 
 	// if the neighboring room has the opposite surface intact
-	if (world.room_at(new_x, new_y, z)->is_standing_wall(C::opposite_surface_id.find(surface_ID)->second)) // deliberately using just "z" throughout this block
+	if (world.room_at(new_x, new_y)->is_standing_wall(C::opposite_surface_id.find(surface_ID)->second)) // deliberately using just "z" throughout this block
 	{
 		// inflict damaage upon the surface or door
-		return world.room_at(new_x, new_y, z)->damage_door(C::opposite_surface_id.find(surface_ID)->second, this->equipped_item, this->name);
+		return world.room_at(new_x, new_y)->damage_door(C::opposite_surface_id.find(surface_ID)->second, this->equipped_item, this->name);
 	}
 
 	// this feedback might not be correct for all cases
@@ -1114,7 +1108,7 @@ Update_Messages Character::attack_door(const std::string & surface_ID, World & w
 Update_Messages Character::attack_item(const std::string & target_ID, World & world)
 {
 	// if the target isn't here
-	if (!world.room_at(x, y, z)->contains(target_ID))
+	if (!world.room_at(x, y)->contains(target_ID))
 	{
 		return Update_Messages("There is no " + target_ID + " here.");
 	}
@@ -1138,7 +1132,7 @@ Update_Messages Character::attack_item(const std::string & target_ID, World & wo
 		}
 
 		// damage the item, return a different message depending of if the item was destroyed or damaged
-		if (world.room_at(x, y, z)->damage_item(target_ID, damage_table.find(target_ID)->second))
+		if (world.room_at(x, y)->damage_item(target_ID, damage_table.find(target_ID)->second))
 		{
 			return Update_Messages("You destroy the " + target_ID + " using your " + equipped_item->get_name() + ".",
 				this->name + " uses " + U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + " to destroy " + U::get_article_for(target_ID) + " " + target_ID + ".",
@@ -1162,7 +1156,7 @@ Update_Messages Character::attack_item(const std::string & target_ID, World & wo
 		}
 
 		// the damage table does contain an entry for the target
-		if (world.room_at(x, y, z)->damage_item(target_ID, damage_table.find(target_ID)->second))
+		if (world.room_at(x, y)->damage_item(target_ID, damage_table.find(target_ID)->second))
 		{
 			return Update_Messages("You destroy the " + target_ID + " using your bare hands.",
 				this->name + " uses bare hands to destroy " + U::get_article_for(target_ID) + " " + target_ID + ".",
@@ -1179,7 +1173,7 @@ Update_Messages Character::add_to_bloomery(const std::string & item_ID, const un
 {
 	// ****** here
 
-	if (!world.room_at(x, y, z)->contains(C::BLOOMERY_ID))
+	if (!world.room_at(x, y)->contains(C::BLOOMERY_ID))
 	{
 		return Update_Messages("There is no bloomery here.");
 	}
@@ -1239,7 +1233,7 @@ Update_Messages Character::attack_character(std::shared_ptr<Character> & target,
 		Update_Messages update_messages = target->die(world);
 
 		// remove the target from their current destination
-		world.room_at(x, y, z)->remove_actor(target->name);
+		world.room_at(x, y)->remove_actor(target->name);
 
 		// attempt to unload the rooms around the player
 		world.attempt_unload_radius(target->x, target->y, target->name);
@@ -1265,7 +1259,7 @@ Update_Messages Character::die(World & world)
 {
 	// The player drops the item they are holding, all equipment from their inventory, a random amount of each stackable type from their inventory (at least one of each), and keeps any other item.
 
-	const std::unique_ptr<Room> & room = world.room_pointer_at(x, y, z);
+	const std::unique_ptr<Room> & room = world.room_pointer_at(x, y);
 
 	// the player drops the item they're holding
 	room->insert(std::move(equipped_item));
@@ -1302,7 +1296,7 @@ Update_Messages Character::die(World & world)
 }
 
 // movement info
-std::string Character::validate_movement(const int & cx, const int & cy, const int & cz, const std::string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const
+std::string Character::validate_movement(const int & cx, const int & cy, const std::string & direction_ID, const int & dx, const int & dy, const World & world) const
 {
 	// determine if a character can move in a given direction (8 compass points, up, or down)
 
@@ -1314,7 +1308,7 @@ std::string Character::validate_movement(const int & cx, const int & cy, const i
 		direction_ID == C::SOUTH || direction_ID == C::WEST)
 	{
 		// save the value of an attempt to move out of the current room
-		std::string move_attempt = world.room_at(cx, cy, cz)->can_move_in_direction(direction_ID, faction_ID);
+		std::string move_attempt = world.room_at(cx, cy)->can_move_in_direction(direction_ID, faction_ID);
 
 		if (move_attempt != C::GOOD_SIGNAL)
 		{
@@ -1323,7 +1317,7 @@ std::string Character::validate_movement(const int & cx, const int & cy, const i
 		}
 
 		// save the value of an attempt to move into the destination room
-		move_attempt = world.room_at(cx + dx, cy + dy, cz)->can_move_in_direction(C::opposite_surface_id.find(direction_ID)->second, faction_ID);
+		move_attempt = world.room_at(cx + dx, cy + dy)->can_move_in_direction(C::opposite_surface_id.find(direction_ID)->second, faction_ID);
 
 		if (move_attempt != C::GOOD_SIGNAL)
 		{
@@ -1337,15 +1331,15 @@ std::string Character::validate_movement(const int & cx, const int & cy, const i
 		direction_ID == C::NORTH_WEST || direction_ID == C::NORTH_EAST ||
 		direction_ID == C::SOUTH_EAST || direction_ID == C::SOUTH_WEST)
 	{
-		const std::unique_ptr<Room>::pointer current_room = world.room_at(cx, cy, cz);
-		const std::unique_ptr<Room>::pointer destination_room = world.room_at(cx + dx, cy + dy, cz);
+		const std::unique_ptr<Room>::pointer current_room = world.room_at(cx, cy);
+		const std::unique_ptr<Room>::pointer destination_room = world.room_at(cx + dx, cy + dy);
 
 		if (direction_ID == C::NORTH_WEST)
 		{
 			if (current_room->has_surface(C::NORTH) || current_room->has_surface(C::WEST) ||
 				destination_room->has_surface(C::SOUTH) || destination_room->has_surface(C::EAST) ||
-				(world.room_has_surface(cx - 1, cy, cz, C::WEST) && world.room_has_surface(cx, cy - 1, cz, C::NORTH)) ||
-				(world.room_has_surface(cx - 1, cy, cz, C::SOUTH) && world.room_has_surface(cx, cy - 1, cz, C::EAST)))
+				(world.room_has_surface(cx - 1, cy, C::WEST) && world.room_has_surface(cx, cy - 1, C::NORTH)) ||
+				(world.room_has_surface(cx - 1, cy, C::SOUTH) && world.room_has_surface(cx, cy - 1, C::EAST)))
 			{
 				return "There are walls in your way to the " + direction_ID + ".";
 			}
@@ -1354,8 +1348,8 @@ std::string Character::validate_movement(const int & cx, const int & cy, const i
 		{
 			if (current_room->has_surface(C::NORTH) || current_room->has_surface(C::EAST) ||
 				destination_room->has_surface(C::SOUTH) || destination_room->has_surface(C::WEST) ||
-				(world.room_has_surface(cx - 1, cy, cz, C::EAST) && world.room_has_surface(cx, cy + 1, cz, C::NORTH)) ||
-				(world.room_has_surface(cx - 1, cy, cz, C::SOUTH) && world.room_has_surface(cx, cy + 1, cz, C::WEST)))
+				(world.room_has_surface(cx - 1, cy, C::EAST) && world.room_has_surface(cx, cy + 1, C::NORTH)) ||
+				(world.room_has_surface(cx - 1, cy, C::SOUTH) && world.room_has_surface(cx, cy + 1, C::WEST)))
 			{
 				return "There are walls in your way to the " + direction_ID + ".";
 			}
@@ -1364,8 +1358,8 @@ std::string Character::validate_movement(const int & cx, const int & cy, const i
 		{
 			if (current_room->has_surface(C::SOUTH) || current_room->has_surface(C::EAST) ||
 				destination_room->has_surface(C::NORTH) || destination_room->has_surface(C::WEST) ||
-				(world.room_has_surface(cx + 1, cy, cz, C::EAST) && world.room_has_surface(cx, cy + 1, cz, C::SOUTH)) ||
-				(world.room_has_surface(cx + 1, cy, cz, C::NORTH) && world.room_has_surface(cx, cy + 1, cz, C::WEST)))
+				(world.room_has_surface(cx + 1, cy, C::EAST) && world.room_has_surface(cx, cy + 1, C::SOUTH)) ||
+				(world.room_has_surface(cx + 1, cy, C::NORTH) && world.room_has_surface(cx, cy + 1, C::WEST)))
 			{
 				return "There are walls in your way to the " + direction_ID + ".";
 			}
@@ -1374,29 +1368,13 @@ std::string Character::validate_movement(const int & cx, const int & cy, const i
 		{
 			if (current_room->has_surface(C::SOUTH) || current_room->has_surface(C::WEST) ||
 				destination_room->has_surface(C::NORTH) || destination_room->has_surface(C::EAST) ||
-				(world.room_has_surface(cx + 1, cy, cz, C::WEST) && world.room_has_surface(cx, cy - 1, cz, C::SOUTH)) ||
-				(world.room_has_surface(cx + 1, cy, cz, C::NORTH) && world.room_has_surface(cx, cy - 1, cz, C::EAST)))
+				(world.room_has_surface(cx + 1, cy, C::WEST) && world.room_has_surface(cx, cy - 1, C::SOUTH)) ||
+				(world.room_has_surface(cx + 1, cy, C::NORTH) && world.room_has_surface(cx, cy - 1, C::EAST)))
 			{
 				return "There are walls in your way to the " + direction_ID + ".";
 			}
 		}
 	}
-	// condition for up is (opening AND ladder/stair/ramp)
-	/*else if (direction_ID == C::UP || )
-	{
-	if ()
-	{
-	return "You [walk]/[climb] up to the [...]." //... ground level, second level, ...
-	}
-	}
-	// condition for down is (ceiling) AND (ceiling has opening)
-	else if (direction_ID == C::DOWN)
-	{
-	if ()
-	{
-	return "You drop down."; // ... to [ground level]/[the second level]
-	}
-	}*/
 
 	// no issues were detected
 	return C::GOOD_SIGNAL;

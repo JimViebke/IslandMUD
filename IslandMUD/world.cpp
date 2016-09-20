@@ -14,27 +14,27 @@ World::World()
 }
 
 // access a room given coordinates
-std::unique_ptr<Room>::pointer World::room_at(const int & x, const int & y, const int & z)
+std::unique_ptr<Room>::pointer World::room_at(const int & x, const int & y)
 {
-	if (!U::bounds_check(x, y, z))
+	if (!U::bounds_check(x, y))
 	{
 		return world.begin()->get();
 	}
 
-	return (world.begin() + hash(x, y, z))->get();
+	return (world.begin() + hash(x, y))->get();
 }
-const std::unique_ptr<Room>::pointer World::room_at(const int & x, const int & y, const int & z) const
+const std::unique_ptr<Room>::pointer World::room_at(const int & x, const int & y) const
 {
-	if (!U::bounds_check(x, y, z))
+	if (!U::bounds_check(x, y))
 	{
 		return world.cbegin()->get();
 	}
 
-	return (world.cbegin() + hash(x, y, z))->get();
+	return (world.cbegin() + hash(x, y))->get();
 }
-std::unique_ptr<Room> & World::room_pointer_at(const int & x, const int & y, const int & z)
+std::unique_ptr<Room> & World::room_pointer_at(const int & x, const int & y)
 {
-	return *(world.begin() + hash(x, y, z));
+	return *(world.begin() + hash(x, y));
 }
 
 // debugging
@@ -50,12 +50,9 @@ unsigned World::count_loaded_rooms() const
 	{
 		for (int y = 0; y < C::WORLD_Y_DIMENSION; ++y)
 		{
-			for (int z = 0; z < C::WORLD_Z_DIMENSION; ++z)
+			if (room_at(x, y) != nullptr)
 			{
-				if (room_at(x, y, z) != nullptr)
-				{
-					++loaded_rooms;
-				}
+				++loaded_rooms;
 			}
 		}
 	}
@@ -78,40 +75,40 @@ void World::load_view_radius_around(const int & x, const int & y, const std::str
 			}
 
 			// if the room is not already in memory
-			if (room_at(cx, cy, C::GROUND_INDEX) == nullptr)
+			if (room_at(cx, cy) == nullptr)
 			{
 				// move the room from disk to world
-				load_room_to_world(cx, cy, C::GROUND_INDEX);
+				load_room_to_world(cx, cy);
 			}
 
 			// whoever loaded this can see it
-			room_at(cx, cy, C::GROUND_INDEX)->add_viewing_actor(character_ID);
+			room_at(cx, cy)->add_viewing_actor(character_ID);
 		}
 	}
 }
 
 // loading and unloading rooms at the edge of vision
-void World::remove_viewer_and_attempt_unload(const int & x, const int & y, const int & z, const std::string & viewer_ID)
+void World::remove_viewer_and_attempt_unload(const int & x, const int & y, const std::string & viewer_ID)
 {
 	// if the referenced room is out of bounds
-	if (!U::bounds_check(x, y, z))
+	if (!U::bounds_check(x, y))
 	{
 		return; // nothing to remove or unload
 	}
 
 	// if the referenced room is not loaded
-	if (room_at(x, y, z) == nullptr)
+	if (room_at(x, y) == nullptr)
 	{
 		return; // nothing to remove or unload
 	}
 
 	// remove the viewer from the room's viewing list
-	room_at(x, y, z)->remove_viewing_actor(viewer_ID);
+	room_at(x, y)->remove_viewing_actor(viewer_ID);
 
 	// if there is no one in the room or able to see it, remove the room from memory
-	if (room_at(x, y, z)->is_unloadable())
+	if (room_at(x, y)->is_unloadable())
 	{
-		unload_room(x, y, z);
+		unload_room(x, y);
 	}
 }
 
@@ -128,36 +125,36 @@ void World::attempt_unload_radius(const int & x, const int & y, const std::strin
 			// if the room is in bounds
 			if (U::bounds_check(cx, cy))
 				// remove the player as a viewer and attempt to move the room to disk
-				remove_viewer_and_attempt_unload(cx, cy, C::WORLD_Z_DIMENSION, player_ID);
+				remove_viewer_and_attempt_unload(cx, cy, player_ID);
 }
 
 // test if a room can be removed from memory
-bool World::is_unloadable(const int & x, const int & y, const int & z) const
+bool World::is_unloadable(const int & x, const int & y) const
 {
-	return room_at(x, y, z)->is_unloadable();
+	return room_at(x, y)->is_unloadable();
 }
 
 // move a room from world to disk
-void World::unload_room(const int & x, const int & y, const int & z)
+void World::unload_room(const int & x, const int & y)
 {
 	// pass the coordinates and a shared_ptr to the room
-	unload_room(x, y, z, room_at(x, y, z));
+	unload_room(x, y, room_at(x, y));
 
 	// set the pointer at x,y,z to null
-	erase_room_from_memory(x, y, z);
+	erase_room_from_memory(x, y);
 }
 
 // room information
-bool World::room_has_surface(const int & x, const int & y, const int & z, const std::string & direction_ID) const
+bool World::room_has_surface(const int & x, const int & y, const std::string & direction_ID) const
 {
 	// if the room is outside of bounds
-	if (!U::bounds_check(x, y, z)) { return false; }
+	if (!U::bounds_check(x, y)) return false;
 
 	// if the room is not loaded
-	if (room_at(x, y, z) == nullptr) { return false; }
+	if (room_at(x, y) == nullptr) return false;
 
 	// test if the passed direction_ID exists as a wall
-	return room_at(x, y, z)->has_surface(direction_ID);
+	return room_at(x, y)->has_surface(direction_ID);
 }
 
 
@@ -170,7 +167,7 @@ void World::create_world_container()
 {
 	std::cout << "\nCreating world container...";
 
-	world = std::vector<std::unique_ptr<Room>>(C::WORLD_X_DIMENSION * C::WORLD_Y_DIMENSION * C::WORLD_Z_DIMENSION);
+	world = std::vector<std::unique_ptr<Room>>(C::WORLD_X_DIMENSION * C::WORLD_Y_DIMENSION);
 }
 void World::load_or_generate_terrain_and_mineral_maps()
 {
@@ -388,83 +385,62 @@ bool World::load_existing_limestone_deposit_map()
 	return terrain_loaded_from_file_good;
 }
 
-// a room at x,y,z does not exist on the disk; create it and add it to the world
-void World::generate_room_at(const int & x, const int & y, const int & z)
+// a room at x,y does not exist on the disk; create it and add it to the world
+void World::generate_room_at(const int & x, const int & y)
 {
 	// ensure the folder exists
-	std::string z_stack_path = C::room_directory + "/" + U::to_string(x);
-	U::create_path_if_not_exists(z_stack_path);
+	std::string path = C::room_directory + "/" + U::to_string(x);
+	U::create_path_if_not_exists(path);
 
 	// extend the path to include the file
-	z_stack_path += "/" + U::to_string(x) + "-" + U::to_string(y) + ".xml";
+	path += "/" + U::to_string(x) + "-" + U::to_string(y) + ".xml";
 
 	// create an XML document to store the Z stack
-	pugi::xml_document z_stack;
+	pugi::xml_document room_document;
 
 	// if the file exists
-	if (U::file_exists(z_stack_path))
+	if (U::file_exists(path))
 	{
-		// load the z-stack to the document
-		load_vertical_rooms_to_XML(x, y, z_stack);
+		// load the saved room to XML
+		load_room_to_XML(x, y, room_document);
 
-		// attempt to extract the specified room
-		const pugi::xml_node room_node = z_stack.child(("room-" + U::to_string(z)).c_str());
-
-		// if the specified room is not in the stack
-		if (!room_node)
-		{
-			// create the room
-			std::unique_ptr<Room> room = create_room(x, y, z);
-
-			// add it to the world...
-			room_pointer_at(x, y, z) = std::move(room);
-
-			// ...and the z-stack
-			this->add_room_to_z_stack(z, room_at(x, y, z), z_stack);
-		}
+		// load the XML to the game world
+		add_room_to_world(room_document, x, y);
 	}
-	else
+	else // the room does not exist on the disk
 	{
-		// the entire z-stack does not exist on the disk
-		// create specified room and add it to it
+		// create the room and add it to the world
+		room_pointer_at(x, y) = create_room(x, y); // this should invoke the funtionality of move() automatically
 
-		// create the room
-		std::unique_ptr<Room> room = create_room(x, y, z);
-
-		// add it to the world...
-		room_pointer_at(x, y, z) = std::move(room);
-
-		// ...and the z-stack
-		this->add_room_to_z_stack(z, room_at(x, y, z), z_stack);
-
-		// save the stack to disk
-		z_stack.save_file(z_stack_path.c_str());
+		// this is empty, but save it to the disk
+		room_document.save_file(path.c_str());
 	}
-
-	// save the stack to disk
-	z_stack.save_file(z_stack_path.c_str());
 }
 
-// load in all rooms at x,y to an xml_document
-void World::load_vertical_rooms_to_XML(const int & ix, const int & iy, pugi::xml_document & vertical_rooms)
+// load the room x,y to an xml_document
+void World::load_room_to_XML(const int & ix, const int & iy, pugi::xml_document & room)
 {
 	// convert integers to strings, since they'll be used multiple times
 	const std::string x = U::to_string(ix);
 	const std::string y = U::to_string(iy);
 
-	// populate the document using the file for the vertical stack of rooms at x,y
-	vertical_rooms.load_file((C::room_directory + "/" + x + "/" + x + "-" + y + ".xml").c_str());
+	// populate the document using the file for the room at (x, y)
+	room.load_file((C::room_directory + "/" + x + "/" + x + "-" + y + ".xml").c_str());
 }
 
 // build a room given an XML node, add to world at x,y,z
-void World::add_room_to_world(pugi::xml_node & room_node, const int & x, const int & y, const int & z)
+void World::add_room_to_world(pugi::xml_node & room_document, const int & x, const int & y)
 {
 	// create an empty room
 	std::unique_ptr<Room> room(std::make_unique<Room>());
 
+	// get the root node that represents the room
+	const pugi::xml_node room_node = room_document.child(C::XML_ROOM.c_str());
+
 	// set whether or not the room is water (off-island or river/lake)
 	room->set_water_status(room_node.attribute(C::XML_IS_WATER.c_str()).as_bool());
 
+	// extract the items node
 	const pugi::xml_node items_node = room_node.child(C::XML_ITEMS.c_str());
 
 	// for each item under the item node
@@ -504,7 +480,7 @@ void World::add_room_to_world(pugi::xml_node & room_node, const int & x, const i
 			? health_attribute.as_int() // set the surface health to the attribute's value
 			: C::MAX_SURFACE_HEALTH // else set the room to full health
 
-			);
+		);
 
 		// select the door node
 		const pugi::xml_node door_node = surface.child(C::XML_DOOR.c_str());
@@ -597,87 +573,67 @@ void World::add_room_to_world(pugi::xml_node & room_node, const int & x, const i
 	}
 
 	// add room to world
-	room_pointer_at(x, y, z) = std::move(room);
+	room_pointer_at(x, y) = std::move(room);
 }
 
 // move specific room into memory
-void World::load_room_to_world(const int & x, const int & y, const int & z)
+void World::load_room_to_world(const int & x, const int & y)
 {
-	// if the room is already loaded
-	if (room_at(x, y, z) != nullptr)
-	{
-		// nothing left to do here
-		return;
-	}
-
-	// create an XML document to hold the vertical stack of rooms
-	pugi::xml_document vertical_rooms;
+	// If the room is already loaded, return. This should never happen.
+	if (room_at(x, y) != nullptr) return;
 
 	// get the path to the z_stack
 	const std::string str_x = U::to_string(x);
 	const std::string str_y = U::to_string(y);
-	const std::string z_stack_path = C::room_directory + "/" + str_x + "/" + str_x + "-" + str_y + ".xml";
+	const std::string path = C::room_directory + "/" + str_x + "/" + str_x + "-" + str_y + ".xml";
 
 	// if the z_stack does not exist
-	if (!U::file_exists(z_stack_path))
+	if (!U::file_exists(path))
 	{
-		// generate the room (adds it to disk and the world)
-		generate_room_at(x, y, z);
+		// generate the room and create the file
+		generate_room_at(x, y);
 		return; // we're done
 	}
 
 	// the file exists, load it
-	vertical_rooms.load_file(z_stack_path.c_str());
+	pugi::xml_document room_document;
+	room_document.load_file(path.c_str());
 
-	// attempt to extract the room from the file
-	pugi::xml_node room_node = vertical_rooms.child(("room-" + U::to_string(z)).c_str());
-
-	// if the room nodes exists in the file
-	if (room_node)
-	{
-		// add it to the world
-		add_room_to_world(room_node, x, y, z);
-	}
-	else // the node does not exist on the disk
-	{
-		// create the room and add it to disk and the world
-		generate_room_at(x, y, z);
-	}
+	// load the room's data to the world
+	add_room_to_world(room_document, x, y);
 }
 
 // move a passed room to disk
-void World::unload_room(const int & x, const int & y, const int & z, const std::unique_ptr<Room>::pointer room)
+void World::unload_room(const int & x, const int & y, const std::unique_ptr<Room>::pointer room)
 {
 	// Unloads passed room. Can be called even if the room doesn't exist in the world structure
 
-	// ensure the path exists up to \x
-	std::string room_path = (C::room_directory + "/" + U::to_string(x) + "/");
-	U::create_path_if_not_exists(room_path);
+	// ensure the path exists up to /x
+	std::string path = (C::room_directory + "/" + U::to_string(x) + "/");
+	U::create_path_if_not_exists(path);
 
-	// ensure the path exists up to \x-y.xml
-	room_path += (U::to_string(x) + "-" + U::to_string(y) + ".xml");
+	// ensure the path exists up to x/x-y.xml
+	path += (U::to_string(x) + "-" + U::to_string(y) + ".xml");
 
-	// create an XML document to represent the stack of rooms
-	pugi::xml_document z_stack;
-
-	// load the stack of rooms into the XML
-	load_vertical_rooms_to_XML(x, y, z_stack);
+	// load the room to XML
+	pugi::xml_document room_document;
+	load_room_to_XML(x, y, room_document);
 
 	// process the room into the XML
-	add_room_to_z_stack(z, room, z_stack);
+	save_room_to_XML(room, room_document);
 
-	// save the document
-	z_stack.save_file(room_path.c_str()); // returns an unused boolean
+	// save the XML document to disk
+	room_document.save_file(path.c_str()); // returns an unused boolean indicated success or failure
 }
 
-// add a room to a z_stack at a given index
-void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::pointer room, pugi::xml_document & z_stack) const
+// save the contents of a room to an XML file in memory
+void World::save_room_to_XML(const std::unique_ptr<Room>::pointer room, pugi::xml_document & room_document) const
 {
-	// delete the room node if it already exists
-	z_stack.remove_child(("room-" + U::to_string(z)).c_str());
+	// clear any existing data
+	room_document.reset();
 
-	// create a new node for the room
-	pugi::xml_node room_node = z_stack.append_child(("room-" + U::to_string(z)).c_str());
+	// create a root node to represent the room
+	pugi::xml_node room_node = room_document.append_child(C::XML_ROOM.c_str());
 
 	// add a boolean representing if the room is water (off-island or a lake/river)
 	room_node.append_attribute(C::XML_IS_WATER.c_str()).set_value(room->is_water());
@@ -688,7 +644,7 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 	// for each item in the room
 	const std::multimap<std::string, std::shared_ptr<Item>> room_item_contents = room->get_contents();
 	for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = room_item_contents.cbegin();
-	item_it != room_item_contents.cend(); ++item_it)
+		item_it != room_item_contents.cend(); ++item_it)
 	{
 		// create a node for the item, append it to the items node
 		pugi::xml_node item_node = items_node.append_child(C::XML_ITEM.c_str());
@@ -710,7 +666,7 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 	// for each side of the room
 	const std::map<std::string, Room_Side> room_sides = room->get_room_sides();
 	for (std::map<std::string, Room_Side>::const_iterator surface_it = room_sides.cbegin();
-	surface_it != room_sides.cend(); ++surface_it)
+		surface_it != room_sides.cend(); ++surface_it)
 	{
 		// create a node for a surface
 		pugi::xml_node surface_node = room_node.append_child(C::XML_SURFACE.c_str());
@@ -768,7 +724,7 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 		// for each equipment item
 		const std::multimap<std::string, std::shared_ptr<Item>> chest_contents = chest->get_contents(); // extract contents
 		for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = chest_contents.cbegin();
-		item_it != chest_contents.cend(); ++item_it)
+			item_it != chest_contents.cend(); ++item_it)
 		{
 			pugi::xml_node item_node = items_node.append_child(item_it->second->get_name().c_str());
 
@@ -803,7 +759,7 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 		// for each equipment item
 		const std::multimap<std::string, std::shared_ptr<Item>> table_contents = table->get_contents(); // extract contents
 		for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = table_contents.cbegin();
-		item_it != table_contents.cend(); ++item_it)
+			item_it != table_contents.cend(); ++item_it)
 		{
 			pugi::xml_node item_node = items_node.append_child(item_it->second->get_name().c_str());
 
@@ -822,43 +778,39 @@ void World::add_room_to_z_stack(const int & z, const std::unique_ptr<Room>::poin
 }
 
 // create a new empty room given its coordinates and the world terrain
-std::unique_ptr<Room> World::create_room(const int & x, const int & y, const int & z) const
+std::unique_ptr<Room> World::create_room(const int & x, const int & y) const
 {
 	std::unique_ptr<Room> room = std::make_unique<Room>();
 
-	// if the room is ground level
-	if (z == C::GROUND_INDEX)
+	// if the terrain map indicates the room is forest
+	if (terrain->operator[](x)[y] == C::FOREST_CHAR)
 	{
-		// if the terrain map indicates the room is forest
-		if (terrain->operator[](x)[y] == C::FOREST_CHAR)
-		{
-			room->insert(Craft::make(C::TREE_ID)); // add a tree
-		}
+		room->insert(Craft::make(C::TREE_ID)); // add a tree
+	}
 
-		// if the terrain map indicates the room is water
-		if (terrain->operator[](x)[y] == C::WATER_CHAR)
-		{
-			room->set_water_status(true);
-		}
+	// if the terrain map indicates the room is water
+	if (terrain->operator[](x)[y] == C::WATER_CHAR)
+	{
+		room->set_water_status(true);
+	}
 
-		// if the iron ore map indicates the room contains an iron deposit
-		if (iron_deposit_map->operator[](x)[y] == C::GENERIC_MINERAL_CHAR)
-		{
-			room->insert(Craft::make(C::IRON_DEPOSIT_ID)); // add an iron deposit item
-		}
+	// if the iron ore map indicates the room contains an iron deposit
+	if (iron_deposit_map->operator[](x)[y] == C::GENERIC_MINERAL_CHAR)
+	{
+		room->insert(Craft::make(C::IRON_DEPOSIT_ID)); // add an iron deposit item
+	}
 
-		// if the limestone map indicates the room contains limestone
-		if (limestone_deposit_map->operator[](x)[y] == C::GENERIC_MINERAL_CHAR)
-		{
-			room->insert(Craft::make(C::LIMESTONE_DEPOSIT_ID)); // add a limestone item
-		}
+	// if the limestone map indicates the room contains limestone
+	if (limestone_deposit_map->operator[](x)[y] == C::GENERIC_MINERAL_CHAR)
+	{
+		room->insert(Craft::make(C::LIMESTONE_DEPOSIT_ID)); // add a limestone item
 	}
 
 	return room;
 }
 
 // remove a room from memory
-void World::erase_room_from_memory(const int & x, const int & y, const int & z)
+void World::erase_room_from_memory(const int & x, const int & y)
 {
-	(world.begin() + hash(x, y, z))->reset();
+	(world.begin() + hash(x, y))->reset();
 }

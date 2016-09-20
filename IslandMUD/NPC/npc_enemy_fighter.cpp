@@ -24,7 +24,7 @@ Update_Messages Hostile_NPC_Fighter::update(World & world, std::map<std::string,
 		if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE)
 		{
 			// if the item is here, take it, remove the current objective, and return
-			if (world.room_at(x, y, z)->contains(objective_iterator->noun))
+			if (world.room_at(x, y)->contains(objective_iterator->noun))
 			{
 				Update_Messages update_messages = take(objective_iterator->noun, world);
 
@@ -48,25 +48,7 @@ Update_Messages Hostile_NPC_Fighter::update(World & world, std::map<std::string,
 			{
 				return update_messages;
 			}
-
-			// what's the difference between the above and below block?
-
-			/*for (int cx = x - (int)C::VIEW_DISTANCE; cx <= x + (int)C::VIEW_DISTANCE; ++cx)
-			{
-			for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
-			{
-			if (!U::bounds_check(cx, cy)) { continue; } // skip if out of bounds
-
-			if (world.room_at(cx, cy, z)->contains_item(objective_iterator->noun))
-			{
-			if (pathfind(cx, cy, world))
-			{
-			return;
-			}
-			}
-			}
-			}*/
-
+			
 			// a path could not be found to the item, plan to craft it if it is craftable and the NPC isn't planning to already
 
 			// if i'm not already planning on crafting the item
@@ -157,7 +139,7 @@ Update_Messages Hostile_NPC_Fighter::update(World & world, std::map<std::string,
 				if (!U::bounds_check(cx, cy)) { continue; }
 
 				// for each actor in the room
-				for (const std::string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
+				for (const std::string & actor_ID : world.room_at(cx, cy)->get_actor_ids())
 				{
 					// if the character is a player character
 					if (U::is<PC>(actors.find(actor_ID)->second))

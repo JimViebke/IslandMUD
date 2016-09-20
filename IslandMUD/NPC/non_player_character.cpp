@@ -24,8 +24,7 @@ std::string NPC::get_objectives() const
 			<< "][" << ((objectives[i].already_planning_to_craft) ? std::string("true") : std::string("false"))
 			<< "] ("
 			<< objectives[i].objective_x << ","
-			<< objectives[i].objective_y << ","
-			<< objectives[i].objective_z << ")" << std::endl;
+			<< objectives[i].objective_y << ")" << std::endl;
 	}
 
 	return result.str();
@@ -34,13 +33,13 @@ std::string NPC::get_objectives() const
 // NPC objective constructors
 NPC::Objective::Objective(const std::string & verb, const std::string & noun, const std::string & purpose) :
 	verb(verb), noun(noun), purpose(purpose) {}
-NPC::Objective::Objective(const std::string & verb, const std::string & noun, const int & objective_x, const int & objective_y, const int & objective_z) :
-	verb(verb), noun(noun), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z) {}
-NPC::Objective::Objective(const std::string & verb, const std::string & noun, const std::string & material, const std::string & direction, const int & objective_x, const int & objective_y, const int & objective_z, const bool & modifier) :
-	verb(verb), noun(noun), material(material), direction(direction), objective_x(objective_x), objective_y(objective_y), objective_z(objective_z), modifier(modifier) {}
+NPC::Objective::Objective(const std::string & verb, const std::string & noun, const int & objective_x, const int & objective_y) :
+	verb(verb), noun(noun), objective_x(objective_x), objective_y(objective_y) {}
+NPC::Objective::Objective(const std::string & verb, const std::string & noun, const std::string & material, const std::string & direction, const int & objective_x, const int & objective_y, const bool & modifier) :
+	verb(verb), noun(noun), material(material), direction(direction), objective_x(objective_x), objective_y(objective_y), modifier(modifier) {}
 
 // NPC Coordinate constructor
-NPC::Coordinate::Coordinate(const int & set_x, const int & set_y, const int & set_z) : _x(set_x), _y(set_y), _z(set_z) {}
+NPC::Coordinate::Coordinate(const int & set_x, const int & set_y) : _x(set_x), _y(set_y) {}
 
 // objective creating and deletion
 void NPC::add_objective(const Objective_Priority & priority, const std::string & verb, const std::string & noun, const std::string & purpose)
@@ -52,8 +51,8 @@ void NPC::add_objective(const Objective_Priority & priority, const std::string &
 void NPC::add_objective(const Objective_Priority & priority, const std::string & verb, const std::string & noun, const int & objective_x, const int & objective_y, const int & objective_z)
 {
 	(priority == Objective_Priority::high_priority) ?
-		objectives.push_front(Objective(verb, noun, x, y, z)) :
-		objectives.push_back(Objective(verb, noun, x, y, z));
+		objectives.push_front(Objective(verb, noun, x, y)) :
+		objectives.push_back(Objective(verb, noun, x, y));
 }
 void NPC::erase_objective(const std::deque<Objective>::iterator & objective_iterator)
 {
@@ -175,7 +174,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const World & w
 	for (std::map<std::string, int>::const_iterator local_need = recipe.local_need.cbegin();
 	local_need != recipe.local_need.cend(); ++local_need)
 	{
-		if (!world.room_at(x, y, z)->contains(local_need->first, local_need->second))
+		if (!world.room_at(x, y)->contains(local_need->first, local_need->second))
 		{
 			return false;
 		}
@@ -183,7 +182,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const World & w
 	for (std::map<std::string, int>::const_iterator local_remove = recipe.local_remove.cbegin();
 	local_remove != recipe.local_remove.cend(); ++local_remove)
 	{
-		if (!world.room_at(x, y, z)->contains(local_remove->first, local_remove->second))
+		if (!world.room_at(x, y)->contains(local_remove->first, local_remove->second))
 		{
 			return false;
 		}
@@ -293,17 +292,17 @@ bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world, Update
 			if (direction == C::UP || direction == C::DOWN) { continue; } // only pathfinding in 2D now
 
 			// calculate the location deltas
-			int dx = 0, dy = 0, dz = 0;
-			U::assign_movement_deltas(direction, dx, dy, dz);
+			int dx = 0, dy = 0;
+			U::assign_movement_deltas(direction, dx, dy);
 
 			// skip if the room if it is out of bounds,
-			if (!U::bounds_check(current_room.x + dx, current_room.y + dy, C::GROUND_INDEX)) { continue; }
+			if (!U::bounds_check(current_room.x + dx, current_room.y + dy)) { continue; }
 			// or it is not loaded,
-			if (world.room_at(current_room.x + dx, current_room.y + dy, C::GROUND_INDEX) == nullptr) { continue; }
+			if (world.room_at(current_room.x + dx, current_room.y + dy) == nullptr) { continue; }
 			// or it is not within view distance,
-			if (!world.room_at(current_room.x + dx, current_room.y + dy, C::GROUND_INDEX)->is_observed_by(this->name)) { continue; }
+			if (!world.room_at(current_room.x + dx, current_room.y + dy)->is_observed_by(this->name)) { continue; }
 			// or we can not travel to it from the current room
-			if (validate_movement(current_room.x, current_room.y, C::GROUND_INDEX, direction, dx, dy, 0, world) != C::GOOD_SIGNAL) { continue; }
+			if (validate_movement(current_room.x, current_room.y, direction, dx, dy, world) != C::GOOD_SIGNAL) { continue; }
 
 			// create a node to select the next adjacent room
 			Node adjacent_room(current_room.x + dx, current_room.y + dy, direction);
@@ -321,7 +320,7 @@ bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world, Update
 				// calculate the movement cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains(C::TREE_ID))
+					(world.room_at(adjacent_room.x, adjacent_room.y)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -351,7 +350,7 @@ bool NPC::pathfind(const int & x_dest, const int & y_dest, World & world, Update
 				// calculate the move cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains(C::TREE_ID))
+					(world.room_at(adjacent_room.x, adjacent_room.y)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -572,17 +571,17 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, World & world, U
 			if (direction == C::UP || direction == C::DOWN) { continue; } // only pathfinding in 2D now
 
 			// calculate the location deltas
-			int dx = 0, dy = 0, dz = 0;
-			U::assign_movement_deltas(direction, dx, dy, dz);
+			int dx = 0, dy = 0;
+			U::assign_movement_deltas(direction, dx, dy);
 
 			// skip if the room if it is out of bounds,
-			if (!U::bounds_check(current_room.x + dx, current_room.y + dy, C::GROUND_INDEX)) { continue; }
+			if (!U::bounds_check(current_room.x + dx, current_room.y + dy)) { continue; }
 			// or it is not loaded,
-			if (world.room_at(current_room.x + dx, current_room.y + dy, C::GROUND_INDEX) == nullptr) { continue; }
+			if (world.room_at(current_room.x + dx, current_room.y + dy) == nullptr) { continue; }
 			// or it is not within view distance,
-			if (!world.room_at(current_room.x + dx, current_room.y + dy, C::GROUND_INDEX)->is_observed_by(this->name)) { continue; }
+			if (!world.room_at(current_room.x + dx, current_room.y + dy)->is_observed_by(this->name)) { continue; }
 			// or we can not travel to it from the current room
-			if (validate_movement(current_room.x, current_room.y, C::GROUND_INDEX, direction, dx, dy, 0, world) != C::GOOD_SIGNAL) { continue; }
+			if (validate_movement(current_room.x, current_room.y, direction, dx, dy, world) != C::GOOD_SIGNAL) { continue; }
 
 			// create a node to select the next adjacent room
 			Node adjacent_room(current_room.x + dx, current_room.y + dy, direction);
@@ -600,7 +599,7 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, World & world, U
 				// calculate the movement cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains(C::TREE_ID))
+					(world.room_at(adjacent_room.x, adjacent_room.y)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -628,7 +627,7 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, World & world, U
 				// calculate the move cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains(C::TREE_ID))
+					(world.room_at(adjacent_room.x, adjacent_room.y)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -663,7 +662,7 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, World & world, U
 	destination_room.g = 999999;
 	for (const Node & node : closed_list)
 	{
-		if (world.room_at(node.x, node.y, C::GROUND_INDEX)->contains(item_id) &&
+		if (world.room_at(node.x, node.y)->contains(item_id) &&
 			node.g < destination_room.g)
 		{
 			destination_room = node;
@@ -756,17 +755,17 @@ bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
 			if (direction == C::UP || direction == C::DOWN) { continue; } // only pathfinding in 2D now
 
 			// calculate the location deltas
-			int dx = 0, dy = 0, dz = 0;
-			U::assign_movement_deltas(direction, dx, dy, dz);
+			int dx = 0, dy = 0;
+			U::assign_movement_deltas(direction, dx, dy);
 
 			// skip if the room if it is out of bounds,
-			if (!U::bounds_check(current_room.x + dx, current_room.y + dy, C::GROUND_INDEX)) { continue; }
+			if (!U::bounds_check(current_room.x + dx, current_room.y + dy)) { continue; }
 			// or it is not loaded,
-			if (world.room_at(current_room.x + dx, current_room.y + dy, C::GROUND_INDEX) == nullptr) { continue; }
+			if (world.room_at(current_room.x + dx, current_room.y + dy) == nullptr) { continue; }
 			// or it is not within view distance,
-			if (!world.room_at(current_room.x + dx, current_room.y + dy, C::GROUND_INDEX)->is_observed_by(this->name)) { continue; }
+			if (!world.room_at(current_room.x + dx, current_room.y + dy)->is_observed_by(this->name)) { continue; }
 			// or we can not travel to it from the current room
-			if (validate_movement(current_room.x, current_room.y, C::GROUND_INDEX, direction, dx, dy, 0, world) != C::GOOD_SIGNAL) { continue; }
+			if (validate_movement(current_room.x, current_room.y, direction, dx, dy, world) != C::GOOD_SIGNAL) { continue; }
 
 			// create a node to select the next adjacent room
 			Node adjacent_room(current_room.x + dx, current_room.y + dy, direction);
@@ -784,7 +783,7 @@ bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
 				// calculate the movement cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains(C::TREE_ID))
+					(world.room_at(adjacent_room.x, adjacent_room.y)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -814,7 +813,7 @@ bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
 				// calculate the move cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.x, adjacent_room.y, C::GROUND_INDEX)->contains(C::TREE_ID))
+					(world.room_at(adjacent_room.x, adjacent_room.y)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -857,7 +856,7 @@ bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
 	else
 	{
 		// the target room is in the closed list, add it to the coordinate path
-		path.push_back(Coordinate(current_room.x, current_room.y, C::GROUND_INDEX));
+		path.push_back(Coordinate(current_room.x, current_room.y));
 	}
 
 	// Starting from the target room, continue finding the parent room until the current room is found
@@ -883,7 +882,7 @@ bool NPC::save_path_to(const int & x_dest, const int & y_dest, World & world)
 		}
 
 		// add the parent room's coordinates to the path
-		path.push_front(Coordinate(parent_room.x, parent_room.y, C::GROUND_INDEX));
+		path.push_front(Coordinate(parent_room.x, parent_room.y));
 
 		// move up the path by one room
 		current_room = parent_room;
@@ -896,13 +895,13 @@ bool NPC::make_path_movement(World & world, Update_Messages & update_messages)
 	if (!path.empty())
 	{
 		// copy current coordinates
-		const int cx = x, cy = y, cz = z;
+		const int cx = x, cy = y;
 
 		// attempt to move
 		update_messages = this->move(U::get_movement_direction(x, y, path.begin()->_x, path.begin()->_y), world);
 
 		// check to see if the NPC's coordinates have changed
-		if (x != cx || y != cy || z != cz)
+		if (x != cx || y != cy)
 		{
 			// if successful, remove the coordinate that we travelled to
 			path.erase(path.begin());

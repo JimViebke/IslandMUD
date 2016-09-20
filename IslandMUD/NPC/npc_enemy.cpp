@@ -18,7 +18,7 @@ std::string Hostile_NPC::get_new_hostile_id(const World & world, const std::map<
 			if (!U::bounds_check(cx, cy)) continue;
 
 			// for each actor in the room
-			for (const std::string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
+			for (const std::string & actor_ID : world.room_at(cx, cy)->get_actor_ids())
 			{
 				// if the actor is a player character
 				if (U::is<PC>(actors.find(actor_ID)->second))

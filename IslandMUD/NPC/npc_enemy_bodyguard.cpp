@@ -88,7 +88,6 @@ bool Hostile_NPC_Bodyguard::attempt_set_new_hunt_target(World & world, std::map<
 	// save the player's current location as the player's last know location (in case they walk out of visible range)
 	hunt_target_last_known_location._x = hunt_target->x;
 	hunt_target_last_known_location._y = hunt_target->y;
-	hunt_target_last_known_location._z = hunt_target->z;
 
 	// we have a target
 	return true;
@@ -101,7 +100,6 @@ bool Hostile_NPC_Bodyguard::attempt_update_hunt_target_last_known_location(const
 		// update hunt_target_last_known_location
 		hunt_target_last_known_location._x = hunt_target->x;
 		hunt_target_last_known_location._y = hunt_target->y;
-		hunt_target_last_known_location._z = hunt_target->z;
 		return true;
 	}
 
@@ -125,7 +123,7 @@ void Hostile_NPC_Bodyguard::check_maximum_hunt_radius(const std::shared_ptr<Char
 Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & hunt_target, const std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
 	// if I am at the target's location, do combat logic
-	if (hunt_target->x == x && hunt_target->y == y && hunt_target->z == z)
+	if (hunt_target->x == x && hunt_target->y == y)
 	{
 		// run combat logic
 		return attack_character(hunt_target, world);
@@ -165,8 +163,7 @@ Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & 
 	{
 		// if my location is not last_known_location
 		if (hunt_target_last_known_location._x != x ||
-			hunt_target_last_known_location._y != y ||
-			hunt_target_last_known_location._z != z)
+			hunt_target_last_known_location._y != y)
 		{
 			// if the path is empty or going to the wrong destination
 			if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_hunt_target)

@@ -29,13 +29,13 @@ protected:
 	{
 	public:
 		// "get [] [] axe", "construct north stone surface", "construct north stone door"
-		int objective_x, objective_y, objective_z;
+		int objective_x, objective_y;
 		bool modifier, already_planning_to_craft = false;
 		std::string verb, direction, material, noun, purpose; // purpose is the reason this objective was added
 
 		Objective(const std::string & verb, const std::string & noun, const std::string & purpose);
-		Objective(const std::string & verb, const std::string & noun, const int & objective_x, const int & objective_y, const int & objective_z);
-		Objective(const std::string & verb, const std::string & noun, const std::string & material, const std::string & direction, const int & objective_x, const int & objective_y, const int & objective_z, const bool & modifier);
+		Objective(const std::string & verb, const std::string & noun, const int & objective_x, const int & objective_y);
+		Objective(const std::string & verb, const std::string & noun, const std::string & material, const std::string & direction, const int & objective_x, const int & objective_y, const bool & modifier);
 	};
 
 	enum class Objective_Priority { low_priority, high_priority };
@@ -45,9 +45,9 @@ protected:
 	protected:
 		Coordinate() {}
 	public:
-		int _x, _y, _z;
-		Coordinate(const int & set_x, const int & set_y, const int & set_z = -1);
-		void reset() { _x = _y = _z = -1; }
+		int _x, _y;
+		Coordinate(const int & set_x, const int & set_y);
+		void reset() { _x = _y = -1; }
 	};
 
 	std::deque<Objective> objectives;
@@ -90,7 +90,7 @@ protected:
 				if (!U::bounds_check(cx, cy)) { continue; }
 
 				// for each actor in the room
-				for (const std::string & actor_ID : world.room_at(cx, cy, z)->get_actor_ids())
+				for (const std::string & actor_ID : world.room_at(cx, cy)->get_actor_ids())
 				{
 					// if the character is the type of character we're looking for
 					if (U::is<ACTOR_TYPE>(actors.find(actor_ID)->second))
@@ -127,7 +127,7 @@ private:
 	class Node
 	{
 	public:
-		int x = -1, y = -1, z = -1,
+		int x = -1, y = -1,
 			parent_x = -1, parent_y = -1,
 			h = 0, g = 0, f = 0;
 		std::string direction_from_parent;

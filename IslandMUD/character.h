@@ -30,7 +30,6 @@ public:
 
 	int x = C::DEFAULT_SPAWN_X; // location coordinates
 	int y = C::DEFAULT_SPAWN_Y; // it's handy to have these signed for validation reasons
-	int z = C::DEFAULT_SPAWN_Z;
 	std::string name;
 
 	// Item dragging_item; // a character can drag an item if they don't want to carry it.	
@@ -90,7 +89,7 @@ public:
 	Update_Messages die(World & world);
 
 	// movement info
-	std::string validate_movement(const int & cx, const int & cy, const int & cz, const std::string & direction_ID, const int & dx, const int & dy, const int & dz, const World & world) const;
+	std::string validate_movement(const int & cx, const int & cy, const std::string & direction_ID, const int & dx, const int & dy, const World & world) const;
 
 	static unsigned move_items(Container & source, Container & destination, const std::string & item_ID, const std::string & count);
 

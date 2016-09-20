@@ -6,16 +6,13 @@ Feb 14, 2015 */
 #include "constants.h"
 
 // general
-const int C::GROUND_INDEX = 3; // there are three levels below this
 const int C::VIEW_DISTANCE = 9; // 5+1+5 to a side == 11*11 total area
 
 const int C::WORLD_X_DIMENSION = 1000;
 const int C::WORLD_Y_DIMENSION = 1000;
-const int C::WORLD_Z_DIMENSION = 8;
 
 const int C::DEFAULT_SPAWN_X = C::WORLD_X_DIMENSION / 2; // N/S center
 const int C::DEFAULT_SPAWN_Y = C::WORLD_Y_DIMENSION / 2; // E/W center
-const int C::DEFAULT_SPAWN_Z = C::GROUND_INDEX; // ground level spawn
 
 const unsigned C::GAME_PORT_NUMBER = 8050;
 const unsigned C::GAME_MAP_PORT_NUMBER = 8051;
@@ -286,8 +283,8 @@ const std::vector<std::string> C::surface_ids = { C::NORTH, C::EAST, C::SOUTH, C
 const std::vector<std::string> C::direction_ids = {
 	C::NORTH, C::EAST, C::SOUTH, C::WEST,
 	C::NORTH_EAST, C::NORTH_WEST,
-	C::SOUTH_EAST, C::SOUTH_WEST,
-	C::UP, C::DOWN };
+	C::SOUTH_EAST, C::SOUTH_WEST
+};
 
 const std::vector<std::string> C::primary_direction_ids = {
 	C::NORTH, C::EAST, C::SOUTH, C::WEST };
@@ -297,9 +294,7 @@ const std::map<std::string, std::string> C::opposite_surface_id = {
 	{ C::NORTH, C::SOUTH },
 	{ C::SOUTH, C::NORTH },
 	{ C::EAST, C::WEST },
-	{ C::WEST, C::EAST },
-	{ C::CEILING, C::FLOOR },
-	{ C::FLOOR, C::CEILING },
+	{ C::WEST, C::EAST }
 };
 
 const std::map<std::string, std::string> C::opposite_direction_id = {
