@@ -129,6 +129,7 @@
     <ClInclude Include="item\misc.h" />
     <ClInclude Include="Item\table.h" />
     <ClInclude Include="message.h" />
+    <ClInclude Include="Network\socket.h" />
     <ClInclude Include="npc.h" />
     <ClInclude Include="NPC\non_player_character.h" />
     <ClInclude Include="NPC\npc_enemy.h" />

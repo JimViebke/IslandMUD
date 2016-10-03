@@ -5,6 +5,7 @@ May 15 2015 */
 #include <memory>
 
 #include "game.h"
+#include "Network/socket.h"
 
 #ifndef WIN32 // define some types and values for Linux builds
 const int INVALID_SOCKET = 0xffff;
@@ -13,6 +14,10 @@ const int INVALID_SOCKET = 0xffff;
 Game::Game()
 {
 	// start the threads for listening on port numbers
+	// std::thread(Socket_Wrapper::listen<Game>, C::GAME_PORT_NUMBER, &Game::client_thread, this).detach();
+
+	// Socket::listen(C::GAME_PORT_NUMBER, this, &Game::client_thread);
+
 	std::thread(&Game::networking_thread, this, C::GAME_PORT_NUMBER, &Game::client_thread).detach();
 	std::thread(&Game::networking_thread, this, C::GAME_MAP_PORT_NUMBER, &Game::client_map_thread).detach();
 

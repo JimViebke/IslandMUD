@@ -212,6 +212,9 @@
     <ClInclude Include="NPC\npc_neutral.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Network\socket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Threadsafe\threadsafe_socket_lookup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
