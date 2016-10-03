@@ -149,7 +149,7 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 
 				/*
 				if a north wall is present
-				-- north_has_door = room_at(x, y, z)...(surface_ID)...has_door();
+				-- north_has_door = room_at(x, y)...(surface_ID)...has_door();
 				-- north_is_rubble = (the wall is rubble OR
 				-- -- (a door exists AND the door is rubble)
 				*/
