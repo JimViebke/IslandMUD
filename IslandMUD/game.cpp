@@ -315,7 +315,7 @@ void Game::processing_thread()
 
 void Game::networking_thread(const unsigned & listening_port, client_thread_type client_thread_pointer)
 {
-	std::cout << "\nStarting a listening thread for port " << listening_port << "...";
+	std::cout << "Starting a listening thread for port " << listening_port << "...\n";
 
 #ifdef WIN32
 	WSADATA lpWSAData;
@@ -353,7 +353,7 @@ void Game::networking_thread(const unsigned & listening_port, client_thread_type
 	sockaddr_in client_address;
 	memset(&client_address, 0, sizeof(sockaddr_in));
 
-	std::cout << "\nListening for port " << listening_port << ".";
+	std::cout << "Listening for port " << listening_port << ".\n";
 
 	for (;;)
 	{
@@ -889,7 +889,7 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 	{
 		// for each player that requires an update
 		for (auto player_it = (*update_messages.additional_map_update_users).cbegin();
-			player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
+		player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
 		{
 			// if the referenced character is a player character
 			if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(*player_it)->second))

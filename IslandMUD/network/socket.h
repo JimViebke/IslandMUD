@@ -27,7 +27,7 @@ public:
 	// this never exits - it listens forever
 	template <typename T_instance, typename T_function> static void listen(const unsigned & port, T_instance & call_back_instance, T_function & call_back)
 	{
-		std::cout << "\nStarting a listening thread for port " << port << "...";
+		std::cout << "Starting a listening thread for port " << port << "...\n";
 
 #ifdef WIN32
 		WSADATA lpWSAData;
@@ -65,7 +65,7 @@ public:
 		sockaddr_in client_address;
 		memset(&client_address, 0, sizeof(sockaddr_in));
 
-		std::cout << "\nListening on port " << port << ".";
+		std::cout << "Listening on port " << port << ".\n";
 
 		for (;;)
 		{
