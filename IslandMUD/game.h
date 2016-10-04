@@ -9,6 +9,7 @@ Feb 14, 2015 */
 #include <thread>
 #include <mutex>
 
+#include "server.h"
 #include "network\socket.h"
 #include "constants.h"
 #include "character.h"
