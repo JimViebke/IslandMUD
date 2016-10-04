@@ -9,14 +9,14 @@ Feb 14, 2015 */
 #include <thread>
 #include <mutex>
 
-#include "Network\socket.h"
+#include "network\socket.h"
 #include "constants.h"
 #include "character.h"
 #include "npc.h"
 #include "parse.h"
 #include "world.h"
-#include "Threadsafe\threadsafe_queue.h"
-#include "Threadsafe\threadsafe_socket_lookup.h"
+#include "threadsafe\threadsafe_queue.h"
+#include "threadsafe\threadsafe_socket_lookup.h"
 #include "message.h"
 
 class Game
