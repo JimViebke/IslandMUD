@@ -104,6 +104,7 @@
     <ClCompile Include="NPC\npc_neutral.cpp" />
     <ClCompile Include="parse.cpp" />
     <ClCompile Include="player_character.cpp" />
+    <ClCompile Include="server\server.cpp" />
     <ClCompile Include="Threadsafe\threadsafe_socket_lookup.cpp" />
     <ClCompile Include="XML\pugixml.cpp" />
     <ClCompile Include="recipes.cpp" />
@@ -129,6 +130,7 @@
     <ClInclude Include="item\misc.h" />
     <ClInclude Include="Item\table.h" />
     <ClInclude Include="message.h" />
+    <ClInclude Include="Network\socket.h" />
     <ClInclude Include="npc.h" />
     <ClInclude Include="NPC\non_player_character.h" />
     <ClInclude Include="NPC\npc_enemy.h" />
@@ -139,6 +141,8 @@
     <ClInclude Include="NPC\npc_neutral.h" />
     <ClInclude Include="parse.h" />
     <ClInclude Include="player_character.h" />
+    <ClInclude Include="server.h" />
+    <ClInclude Include="server\server.h" />
     <ClInclude Include="XML\pugiconfig.hpp" />
     <ClInclude Include="XML\pugixml.hpp" />
     <ClInclude Include="recipe.h" />

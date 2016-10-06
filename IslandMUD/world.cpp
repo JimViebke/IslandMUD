@@ -165,7 +165,7 @@ bool World::room_has_surface(const int & x, const int & y, const std::string & d
 
 void World::create_world_container()
 {
-	std::cout << "\nCreating world container...";
+	std::cout << "Creating world container...\n";
 
 	world = std::vector<std::unique_ptr<Room>>(C::WORLD_X_DIMENSION * C::WORLD_Y_DIMENSION);
 }
@@ -173,12 +173,12 @@ void World::load_or_generate_terrain_and_mineral_maps()
 {
 	// terrain and mineral maps are only used to generate rooms that do not already exist on disk
 
-	std::cout << "\nLoading world terrain and mineral maps...";
+	std::cout << "Loading world terrain and mineral maps...\n";
 
 	// generate a new world terrain map if needed
 	if (load_existing_world_terrain())
 	{
-		std::cout << "\nLoaded existing world terrain map...";
+		std::cout << "Loaded existing world terrain map...\n";
 	}
 	else
 	{
@@ -209,7 +209,7 @@ void World::load_or_generate_terrain_and_mineral_maps()
 	// generate a new iron ore mineral map if needed
 	if (load_existing_iron_deposit_map())
 	{
-		std::cout << "\nLoaded existing iron ore mineral map...";
+		std::cout << "Loaded existing iron ore mineral map...\n";
 	}
 	else
 	{
@@ -238,7 +238,7 @@ void World::load_or_generate_terrain_and_mineral_maps()
 	// generate a new limestone mineral map if needed
 	if (load_existing_limestone_deposit_map())
 	{
-		std::cout << "\nLoaded existing limestone mineral map...";
+		std::cout << "Loaded existing limestone mineral map...\n";
 	}
 	else
 	{
@@ -479,8 +479,7 @@ void World::add_room_to_world(pugi::xml_node & room_document, const int & x, con
 			(!health_attribute.empty()) // if the health attribute exists
 			? health_attribute.as_int() // set the surface health to the attribute's value
 			: C::MAX_SURFACE_HEALTH // else set the room to full health
-
-		);
+			);
 
 		// select the door node
 		const pugi::xml_node door_node = surface.child(C::XML_DOOR.c_str());
@@ -644,7 +643,7 @@ void World::save_room_to_XML(const std::unique_ptr<Room>::pointer room, pugi::xm
 	// for each item in the room
 	const std::multimap<std::string, std::shared_ptr<Item>> room_item_contents = room->get_contents();
 	for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = room_item_contents.cbegin();
-		item_it != room_item_contents.cend(); ++item_it)
+	item_it != room_item_contents.cend(); ++item_it)
 	{
 		// create a node for the item, append it to the items node
 		pugi::xml_node item_node = items_node.append_child(C::XML_ITEM.c_str());
@@ -666,7 +665,7 @@ void World::save_room_to_XML(const std::unique_ptr<Room>::pointer room, pugi::xm
 	// for each side of the room
 	const std::map<std::string, Room_Side> room_sides = room->get_room_sides();
 	for (std::map<std::string, Room_Side>::const_iterator surface_it = room_sides.cbegin();
-		surface_it != room_sides.cend(); ++surface_it)
+	surface_it != room_sides.cend(); ++surface_it)
 	{
 		// create a node for a surface
 		pugi::xml_node surface_node = room_node.append_child(C::XML_SURFACE.c_str());
@@ -724,7 +723,7 @@ void World::save_room_to_XML(const std::unique_ptr<Room>::pointer room, pugi::xm
 		// for each equipment item
 		const std::multimap<std::string, std::shared_ptr<Item>> chest_contents = chest->get_contents(); // extract contents
 		for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = chest_contents.cbegin();
-			item_it != chest_contents.cend(); ++item_it)
+		item_it != chest_contents.cend(); ++item_it)
 		{
 			pugi::xml_node item_node = items_node.append_child(item_it->second->get_name().c_str());
 
@@ -759,7 +758,7 @@ void World::save_room_to_XML(const std::unique_ptr<Room>::pointer room, pugi::xm
 		// for each equipment item
 		const std::multimap<std::string, std::shared_ptr<Item>> table_contents = table->get_contents(); // extract contents
 		for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = table_contents.cbegin();
-			item_it != table_contents.cend(); ++item_it)
+		item_it != table_contents.cend(); ++item_it)
 		{
 			pugi::xml_node item_node = items_node.append_child(item_it->second->get_name().c_str());
 

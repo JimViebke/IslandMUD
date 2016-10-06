@@ -9,25 +9,15 @@ Feb 14, 2015 */
 #include <thread>
 #include <mutex>
 
-#ifdef WIN32
-#define NOMINMAX // fix min() and max() errors
-#include <WinSock2.h>
-#include <Windows.h>
-#pragma comment (lib, "Ws2_32.lib")
-#else
-#include <sys/socket.h>
-#include <netinet/ip.h>
-#include <unistd.h>
-#include <cstring>
-#endif
-
+#include "server.h"
+#include "network\socket.h"
 #include "constants.h"
 #include "character.h"
 #include "npc.h"
 #include "parse.h"
 #include "world.h"
-#include "Threadsafe\threadsafe_queue.h"
-#include "Threadsafe\threadsafe_socket_lookup.h"
+#include "threadsafe\threadsafe_queue.h"
+#include "threadsafe\threadsafe_socket_lookup.h"
 #include "message.h"
 
 class Game
@@ -44,6 +34,8 @@ private:
 	std::mutex game_state; // provides safe access and modification of the above two structures
 
 public:
+	
+	typedef void(Game::*client_thread_type)(SOCKET);
 
 	Game();
 
@@ -55,7 +47,7 @@ public:
 
 private:
 
-	typedef void(Game::*client_thread_type)(SOCKET);
+	// typedef void(Game::*client_thread_type)(SOCKET);
 
 	// Listen on port [listening_port].
 	// When a user connects, start a thread using [client_thread_pointer], passing in the user's unique socket ID

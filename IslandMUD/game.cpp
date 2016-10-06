@@ -12,6 +12,14 @@ const int INVALID_SOCKET = 0xffff;
 
 Game::Game()
 {
+	// Calling start() makes sure the "running" flag is set to true.
+	// Other threads periodically check this flag, and will cleanly terminate themselves if the flag is ever disabled.
+	Server::start();
+
+	// experimental stuff
+	// std::thread(Socket_Wrapper::listen<Game>, C::GAME_PORT_NUMBER, &Game::client_thread, this).detach();
+	// Socket::listen(C::GAME_PORT_NUMBER, this, &Game::client_thread);
+
 	// start the threads for listening on port numbers
 	std::thread(&Game::networking_thread, this, C::GAME_PORT_NUMBER, &Game::client_thread).detach();
 	std::thread(&Game::networking_thread, this, C::GAME_MAP_PORT_NUMBER, &Game::client_map_thread).detach();
@@ -310,7 +318,7 @@ void Game::processing_thread()
 
 void Game::networking_thread(const unsigned & listening_port, client_thread_type client_thread_pointer)
 {
-	std::cout << "\nStarting a listening thread for port " << listening_port << "...";
+	std::cout << "Starting a listening thread for port " << listening_port << "...\n";
 
 #ifdef WIN32
 	WSADATA lpWSAData;
@@ -348,7 +356,7 @@ void Game::networking_thread(const unsigned & listening_port, client_thread_type
 	sockaddr_in client_address;
 	memset(&client_address, 0, sizeof(sockaddr_in));
 
-	std::cout << "\nListening for port " << listening_port << ".";
+	std::cout << "Listening for port " << listening_port << ".\n";
 
 	for (;;)
 	{
@@ -884,7 +892,7 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 	{
 		// for each player that requires an update
 		for (auto player_it = (*update_messages.additional_map_update_users).cbegin();
-			player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
+		player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
 		{
 			// if the referenced character is a player character
 			if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(*player_it)->second))

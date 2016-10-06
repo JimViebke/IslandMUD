@@ -190,7 +190,7 @@ namespace // anonymous namespace to prevent access outside this file
 {
 	std::map<std::string, std::string> generate_articles_map()
 	{
-		std::cout << "\nLoading article lookup...";
+		std::cout << "Loading article lookup...\n";
 
 		std::map<std::string, std::string> temp_articles;
 
@@ -237,7 +237,7 @@ namespace // anonymous namespace to prevent access outside this file
 
 	std::map<std::string, std::string> generate_plurals_map()
 	{
-		std::cout << "\nLoading plurals lookup...";
+		std::cout << "Loading plurals lookup...\n";
 
 		std::map<std::string, std::string> temp_plurals;
 

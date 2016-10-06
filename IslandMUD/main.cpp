@@ -15,6 +15,7 @@ int main()
 	U::create_path_if_not_exists(C::room_directory);
 	U::create_path_if_not_exists(C::user_data_directory);
 
+	// create the game object
 	Game game;
 
 	// run the processing thread using the main thread
