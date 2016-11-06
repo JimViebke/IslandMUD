@@ -163,7 +163,7 @@ Update_Messages Character::save()
 	pugi::xml_node level_node = user_data_xml.append_child(C::XML_USER_LEVELS.c_str());
 	pugi::xml_node items_node = user_data_xml.append_child(C::XML_ITEM.c_str());
 
-	/// add health attribute to status node
+	// add health attribute to status node
 	status_node.append_attribute(C::XML_USER_STATUS_CURRENT_HEALTH.c_str()).set_value(this->current_health);
 
 	// add x, y, and z attributes to the location node

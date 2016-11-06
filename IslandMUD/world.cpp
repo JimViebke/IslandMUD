@@ -140,7 +140,7 @@ void World::unload_room(const int & x, const int & y)
 	// pass the coordinates and a shared_ptr to the room
 	unload_room(x, y, room_at(x, y));
 
-	// set the pointer at x,y,z to null
+	// set the pointer at x,y to null
 	erase_room_from_memory(x, y);
 }
 
@@ -395,7 +395,7 @@ void World::generate_room_at(const int & x, const int & y)
 	// extend the path to include the file
 	path += "/" + U::to_string(x) + "-" + U::to_string(y) + ".xml";
 
-	// create an XML document to store the Z stack
+	// create an XML document to store the room
 	pugi::xml_document room_document;
 
 	// if the file exists
@@ -428,7 +428,7 @@ void World::load_room_to_XML(const int & ix, const int & iy, pugi::xml_document 
 	room.load_file((C::room_directory + "/" + x + "/" + x + "-" + y + ".xml").c_str());
 }
 
-// build a room given an XML node, add to world at x,y,z
+// build a room given an XML node, add to world at x,y
 void World::add_room_to_world(pugi::xml_node & room_document, const int & x, const int & y)
 {
 	// create an empty room
