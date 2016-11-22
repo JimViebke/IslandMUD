@@ -12,6 +12,7 @@ class Server
 private:
 
 	static std::mutex mutex;
+	static std::condition_variable cv;
 	static bool running;
 
 	Server() = delete;
@@ -22,4 +23,5 @@ public:
 	static void shutdown();
 
 	static bool is_running();
+	static void wait_for_shutdown();
 };
