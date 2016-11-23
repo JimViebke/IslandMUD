@@ -287,8 +287,21 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 			return Update_Messages(coord.str());
 		}
 	}
+	// debugging
+	else if (command.size() == 1 && command[0] == "shutdown")
+	{
+		Server::shutdown();
+		return Update_Messages("Server is shutting down.");
+	}
 
 	return Update_Messages("Nothing happens.");
+}
+
+void Game::run()
+{
+	std::thread(&Game::processing_thread, this).detach();
+
+	shutdown_listener();
 }
 
 void Game::processing_thread()
@@ -941,4 +954,22 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 		// add the message to the queue
 		outbound_queue.put(Message(clients.get_socket(update_messages.custom_message->first), update_messages.custom_message->second));
 	}
+}
+
+void Game::shutdown_listener()
+{
+	// Check for a server shutdown. Since the get() call is blocking, do this check here, likely for free.
+	Server::wait_for_shutdown();
+
+	// lock game state
+	std::unique_lock<std::mutex> lock(game_state);
+
+	// for each actor, remove the room around them
+	for (auto & actor : actors) world.attempt_unload_radius(actor.second->x, actor.second->y, actor.first);
+
+	// for each actor, save the actor's data
+	for (auto & actor : actors) actor.second->save();
+
+	// this is on the main thread, so "return;" destroys the game object
+	return;
 }

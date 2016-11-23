@@ -34,7 +34,7 @@ private:
 	std::mutex game_state; // provides safe access and modification of the above two structures
 
 public:
-	
+
 	typedef void(Game::*client_thread_type)(SOCKET);
 
 	Game();
@@ -42,10 +42,12 @@ public:
 	// execute a command against the game world
 	Update_Messages execute_command(const std::string & actor_id, const std::vector<std::string> & command);
 
-	// process data, moving it from the input queue to the output queue
-	void processing_thread();
+	void run();
 
 private:
+
+	// process data, moving it from the input queue to the output queue
+	void processing_thread();
 
 	// typedef void(Game::*client_thread_type)(SOCKET);
 
@@ -77,6 +79,9 @@ private:
 
 	// use an Update_Messages object to generate outbound messages to players
 	void generate_outbound_messages(const std::string & user_ID, const Update_Messages & message_updates);
+
+	// when the server shutdown is triggered, this will save all game data and destroy the game object
+	void shutdown_listener();
 };
 
 #endif
