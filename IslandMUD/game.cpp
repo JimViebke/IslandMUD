@@ -311,7 +311,7 @@ void Game::processing_thread()
 	for (;;)
 	{
 		// destructively get the next inbound message
-		const Message inbound_message = inbound_queue.get(); // user return by reference (blocking) to get the next message in the inbound_queue
+		const Message inbound_message = inbound_queue.get(); // blocking
 
 		// get the user ID for the inbound socket
 		const std::string user_ID = clients.get_user_ID(inbound_message.user_socket_ID);
@@ -557,7 +557,7 @@ void Game::NPC_thread()
 {
 	// use booleans to toggle spawning of certain NPCs for debugging purposes
 
-	// create three workers, each with a bodyguards
+	// create three workers, each with a bodyguard
 	if (false)
 	{
 		const std::vector<std::string> workers = { "Jeb", "Bill", "Bob" };
@@ -731,7 +731,7 @@ void Game::outbound_thread()
 {
 	for (;;)
 	{
-		const Message message = outbound_queue.get(); // (blocking)
+		const Message message = outbound_queue.get(); // blocking
 
 		// dispatch data to the user (because we're using TCP, data is lossless unless total failure occurs)
 		send(message.user_socket_ID, message.data.c_str(), message.data.size(), 0);
@@ -907,7 +907,7 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 	{
 		// for each player that requires an update
 		for (auto player_it = (*update_messages.additional_map_update_users).cbegin();
-			player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
+		player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
 		{
 			// if the referenced character is a player character
 			if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(*player_it)->second))
