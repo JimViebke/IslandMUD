@@ -33,6 +33,6 @@ bool Server::is_running()
 void Server::wait_for_shutdown()
 {
 	std::unique_lock<std::mutex> lock(mutex);
-	while (is_running())
+	while (running)
 		cv.wait(lock);
 }
