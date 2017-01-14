@@ -6,19 +6,13 @@ May 15 2015 */
 
 #include "game.h"
 
-#ifndef WIN32 // define some types and values for Linux builds
-const int INVALID_SOCKET = 0xffff;
-#endif
+
 
 Game::Game()
 {
 	// Calling start() makes sure the "running" flag is set to true.
 	// Other threads periodically check this flag, and will cleanly terminate themselves if the flag is ever disabled.
 	Server::start();
-
-	// experimental stuff
-	// std::thread(Socket_Wrapper::listen<Game>, C::GAME_PORT_NUMBER, &Game::client_thread, this).detach();
-	// Socket::listen(C::GAME_PORT_NUMBER, this, &Game::client_thread);
 
 	// start the threads for listening on port numbers
 	std::thread(&Game::networking_thread, this, C::GAME_PORT_NUMBER, &Game::client_thread).detach();
@@ -314,7 +308,7 @@ void Game::processing_thread()
 		const Message inbound_message = inbound_queue.get(); // blocking
 
 		// get the user ID for the inbound socket
-		const std::string user_ID = clients.get_user_ID(inbound_message.user_socket_ID);
+		const std::string user_ID = this->players.get_user_ID(inbound_message.connection);
 
 		// don't allow the actors structure to be modified
 		std::unique_lock<std::mutex> lock(game_state);
@@ -331,99 +325,72 @@ void Game::processing_thread()
 
 void Game::networking_thread(const unsigned & listening_port, client_thread_type client_thread_pointer)
 {
-	std::cout << "Starting a listening thread for port " << listening_port << "...\n";
+	network::port_ptr port;
 
-#ifdef WIN32
-	WSADATA lpWSAData;
-	WSAStartup(MAKEWORD(2, 2), &lpWSAData);
-#endif
-
-	const SOCKET socket_1 = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-
-	if (socket_1 == INVALID_SOCKET)
+	try
 	{
-#ifdef WIN32
-		std::cout << "invalid socket, error code: " << WSAGetLastError() << std::endl;
-#else
-		std::cout << "invalid socket, error code: " << errno << std::endl;
-#endif
+		port = network::Port::open_port(listening_port);
+	}
+	catch (std::exception & ex)
+	{
+		std::cout << "Failed to listen on port " << listening_port << ". Reason: " << ex.what() << "\n";
+		return;
 	}
 
-	sockaddr_in name;
-	memset(&name, 0, sizeof(sockaddr_in));
-	name.sin_family = AF_INET;
-	name.sin_port = htons(listening_port);
-#ifdef WIN32
-	name.sin_addr.S_un.S_addr = 0; // open port on all network interfaces
-#else
-	name.sin_addr.s_addr = 0;
-#endif
-
-	// bind the socket
-	::bind(socket_1, (sockaddr*)&name, sizeof(sockaddr_in));
-
-	// open the port for clients to connect, maintaining a backlog of up to 3 waiting connections
-	int listen_result = listen(socket_1, 3); // non-blocking
-
-	// create a holder for incoming client information
-	sockaddr_in client_address;
-	memset(&client_address, 0, sizeof(sockaddr_in));
-
-	std::cout << "Listening for port " << listening_port << ".\n";
+	std::cout << "Listening on port " << listening_port << ".\n";
 
 	for (;;)
 	{
 		// execution pauses inside of accept() until an incoming connection is received
-		SOCKET client = accept(socket_1, (sockaddr*)&client_address, NULL); // blocking
+		network::connection_ptr connection = port->get_connection(); // blocking
 
 		// start a thread to receive messages from this client
-		std::thread(client_thread_pointer, this, client).detach(); // detach() because the thread is responsible for destroying itself
+		std::thread(client_thread_pointer, this, connection).detach(); // detach() because the thread is responsible for destroying itself
 	}
-
-#ifdef WIN32
-	WSACleanup();
-#endif
 }
 
-void Game::client_thread(SOCKET client_ID)
+void Game::client_thread(network::connection_ptr connection)
 {
-	outbound_queue.put(Message(client_ID, "Welcome to IslandMUD!\n\n"));
+	outbound_queue.put(Message(connection, "Welcome to IslandMUD!\n\n"));
 
-	// allocate a buffer on the stack to store incoming messages
-	char input[1024];
-
-	const std::string user_ID = login_or_signup(client_ID); // execution stays in here until the user is signed in
-
+	const std::string user_ID = login_or_signup(connection); // execution stays in here until the user is signed in
 	if (user_ID == "") return; // the user disconnected before signing in, the function above already cleaned up
 
 	// finish other login/connection details
-	{
-		// add user to the lookup
-		clients.set_socket(user_ID, client_ID);
 
+	// add user to the lookup
+	players.set_connection(user_ID, connection);
+
+	{
 		// log the player in
 		std::lock_guard<std::mutex> lock(game_state); // lock the actors structure while we modify it
 		std::shared_ptr<PC> player = std::make_shared<PC>(user_ID, world);
 		actors.insert(std::make_pair(user_ID, player));
-
-		// send a welcome message through the outbound queue
-		outbound_queue.put(Message(client_ID, "Welcome to IslandMUD! You are playing as \"" + user_ID + "\".\n\n"));
 	}
+
+	// send a welcome message through the outbound queue
+	outbound_queue.put(Message(connection, "Welcome to IslandMUD! You are playing as \"" + user_ID + "\".\n\n"));
 
 	// continuously read data from the client until the client disconnects
 	for (;;)
 	{
-		// execution pauses inside of recv() until the user sends data
-		int data_read = recv(client_ID, input, 1024, 0);
+		// create a holder for the next message
+		std::string data;
 
-		// check if reading the socket failed
-		if (data_read == 0 || data_read == -1) // graceful disconnect, less graceful disconnect (respectively)
+		try
 		{
-			std::lock_guard<std::mutex> lock(game_state); // gain exclusive hold of the client map for modification
-			close_socket(client_ID); // close socket (platform-independent)
+			// read data from the user (blocking)
+			data = connection->read();
+		}
+		catch (std::exception &)
+		{
+			connection->close();
+
+			// lock the game state so we can clean up
+			std::lock_guard<std::mutex> lock(game_state);
 
 			// get the user's ID
-			const std::string user_ID = clients.get_user_ID(client_ID); // find username
+			const std::string user_ID = players.get_user_ID(connection); // find username
 			if (user_ID == "") return; // should never happen
 
 			// create a reference to the user's Character object
@@ -437,26 +404,19 @@ void Game::client_thread(SOCKET client_ID)
 			actors.erase(user_ID); // erase the user from the actor's map
 
 			// clean up networking stuff
-			clients.erase(user_ID); // erase the client record
+			players.erase(user_ID); // erase the client record
 
 			// clean up the user's thread
 			return;
 		}
 
-		std::stringstream user_input;
-		for (int i = 0; i < data_read; ++i)
-			user_input << input[i];
-
-		inbound_queue.put(Message(client_ID, user_input.str()));
+		inbound_queue.put(Message(connection, data));
 	}
 }
 
-void Game::client_map_thread(SOCKET client_map_ID)
+void Game::client_map_thread(network::connection_ptr map_connection)
 {
-	outbound_queue.put(Message(client_map_ID, "Welcome to IslandMUD!\n\n"));
-
-	// allocate a buffer on the stack to store incoming messages
-	char input[1024];
+	outbound_queue.put(Message(map_connection, "Welcome to IslandMUD!\n\n"));
 
 	std::string user_ID;
 
@@ -468,54 +428,54 @@ void Game::client_map_thread(SOCKET client_map_ID)
 			"To create an account or play the game, use port " + U::to_string(C::GAME_PORT_NUMBER) + " in another window.\n\n";
 
 		// set instructions
-		outbound_queue.put(Message(client_map_ID, login_instructions));
+		outbound_queue.put(Message(map_connection, login_instructions));
+
+		// a holder for the next message
+		std::stringstream input;
 
 		// execution pauses inside of recv() until the user sends data (one of these for each user in their own thread)
-		int data_read = recv(client_map_ID, input, 1024, 0);
-
-		// check if reading the socket failed
-		if (data_read == 0 || data_read == -1) // graceful disconnect, less graceful disconnect (respectively)
+		try
 		{
-			close_socket(client_map_ID); // close socket (platform-independent)
-			return; // the user lost connection before logging in
+			input << map_connection->read();
+		}
+		catch (std::exception &)
+		{
+			return; // the user lost connection before logging in. return (connection and thread clean themselves up)
 		}
 
-		// convert user input to parsed vector of words
-		std::stringstream user_input;
-		for (int i = 0; i < data_read; ++i)
-			user_input << input[i];
-		const std::istream_iterator<std::string> begin(user_input);
-		const std::vector<std::string> input(begin, std::istream_iterator<std::string>());
+		// tokenize user input
+		const std::istream_iterator<std::string> begin(input);
+		const std::vector<std::string> commands(begin, std::istream_iterator<std::string>());
 
-		if (input.size() == 2) // only valid input size
+		if (commands.size() == 2) // only valid input size
 		{
 			{ // temporary scope to destroy mutex as soon as possible
 				std::lock_guard<std::mutex> lock(game_state);
-				if (actors.find(input[0]) == actors.cend()) continue; // repeat message if the user is not logged in
+				if (actors.find(commands[0]) == actors.cend()) continue; // repeat message if the user is not logged in
 			}
 
-			const std::string user_file = C::user_data_directory + "/" + input[0] + ".xml";
+			const std::string user_file = C::user_data_directory + "/" + commands[0] + ".xml";
 
 			if (!U::file_exists(user_file))
 			{
-				outbound_queue.put(Message(client_map_ID, "User \"" + input[0] + "\" does not exist."));
+				outbound_queue.put(Message(map_connection, "User \"" + commands[0] + "\" does not exist."));
 				continue;
 			}
 
 			pugi::xml_document user_data_xml;
 			user_data_xml.load_file(user_file.c_str());
 
-			if (input[1] != user_data_xml
+			if (commands[1] != user_data_xml
 				.child(C::XML_USER_ACCOUNT.c_str())
 				.attribute(C::XML_USER_PASSWORD.c_str())
 				.as_string())
 			{
-				outbound_queue.put(Message(client_map_ID, "Incorrect password for user \"" + input[0] + "\"."));
+				outbound_queue.put(Message(map_connection, "Incorrect password for user \"" + commands[0] + "\"."));
 				continue;
 			}
 
-			// the password was correct
-			user_ID = input[0];
+			// the password was correct, save the user's name (their ID)
+			user_ID = commands[0];
 			break;
 		}
 
@@ -525,30 +485,34 @@ void Game::client_map_thread(SOCKET client_map_ID)
 	// finish other login/connection details
 	{
 		// add user to the lookup
-		clients.set_map_socket(user_ID, client_map_ID);
+		players.set_map_connection(user_ID, map_connection);
 
 		// generate an area map from the current player's perspective, send it to the newly connect map socket
 		std::lock_guard<std::mutex> lock(game_state);
 		if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(user_ID)->second))
 		{
-			outbound_queue.put(Message(client_map_ID, "\n\n" + player->generate_area_map(world, actors)));
+			outbound_queue.put(Message(map_connection, "\n\n" + player->generate_area_map(world, actors)));
 		}
 	}
 
 	// loop in here forever
 	for (;;)
 	{
-		outbound_queue.put(Message(client_map_ID, "\n\nThis is your overhead map client. Use your other client on port " + U::to_string(C::GAME_PORT_NUMBER) + " to play."));
+		outbound_queue.put(Message(map_connection, "\n\nThis is your overhead map client. Use your other client on port " + U::to_string(C::GAME_PORT_NUMBER) + " to play."));
 
-		// execution pauses inside of recv() until the user sends data
-		int data_read = recv(client_map_ID, input, 1024, 0);
+		std::string input;
 
-		// check if reading the socket failed
-		if (data_read == 0 || data_read == -1) // graceful disconnect, less graceful disconnect (respectively)
+		try
 		{
-			close_socket(client_map_ID); // close socket (platform-independent)
-			clients.set_map_socket(user_ID, -1); // reset map socket
-			return; // the client's personal map thread is destroyed
+			input = map_connection->read();
+		}
+		catch (std::exception &)
+		{
+			// close the connection
+			map_connection->close();
+			// reset the player's map connection
+			players.set_map_connection(user_ID, nullptr);
+			return; // destroy this thread
 		}
 	}
 }
@@ -733,28 +697,15 @@ void Game::outbound_thread()
 	{
 		const Message message = outbound_queue.get(); // blocking
 
-		// dispatch data to the user (because we're using TCP, data is lossless unless total failure occurs)
-		send(message.user_socket_ID, message.data.c_str(), message.data.size(), 0);
+		message.connection->send(message.data);
 	}
 }
 
 // helper functions
 
-void Game::close_socket(const SOCKET socket)
-{
-#ifdef WIN32
-	closesocket(socket);
-#else
-	close(socket);
-#endif
-}
-
-std::string Game::login_or_signup(const SOCKET client_ID)
+std::string Game::login_or_signup(const network::connection_ptr & connection)
 {
 	// return the user_ID of a user after they log in or sign up
-
-	// allocate a buffer on the stack to store incoming messages
-	char input[1024];
 
 	for (;;) // return after the user logs in or creates an account
 	{
@@ -764,22 +715,20 @@ std::string Game::login_or_signup(const SOCKET client_ID)
 			"*** Password encryption has not yet been implemented. ***";
 
 		// set instructions
-		outbound_queue.put(Message(client_ID, login_instructions));
+		outbound_queue.put(Message(connection, login_instructions));
 
-		// execution pauses inside of recv() until the user sends data (one of these for each user in their own thread)
-		int data_read = recv(client_ID, input, 1024, 0);
+		std::stringstream user_input;
 
-		// check if reading the socket failed
-		if (data_read == 0 || data_read == -1) // graceful disconnect, less graceful disconnect (respectively)
+		try
 		{
-			close_socket(client_ID); // close socket (platform-independent wrapper)
+			user_input << connection->read();
+		}
+		catch (std::exception &)
+		{
+			connection->close();
 			return ""; // the user lost connection before logging in
 		}
 
-		// convert user input to parsed vector of words
-		std::stringstream user_input;
-		for (int i = 0; i < data_read; ++i)
-			user_input << input[i];
 		const std::istream_iterator<std::string> begin(user_input);
 		const std::vector<std::string> input(begin, std::istream_iterator<std::string>());
 
@@ -790,14 +739,14 @@ std::string Game::login_or_signup(const SOCKET client_ID)
 			// check if the username is taken
 			if (U::file_exists(user_file))
 			{
-				outbound_queue.put(Message(client_ID, "User \"" + input[0] + "\" already exists."));
+				outbound_queue.put(Message(connection, "User \"" + input[0] + "\" already exists."));
 				continue;
 			}
 
 			// check if the passwords match
 			if (input[1] != input[2])
 			{
-				outbound_queue.put(Message(client_ID, "Passwords don't match."));
+				outbound_queue.put(Message(connection, "Passwords don't match."));
 				continue;
 			}
 
@@ -819,7 +768,7 @@ std::string Game::login_or_signup(const SOCKET client_ID)
 
 			if (!U::file_exists(user_file))
 			{
-				outbound_queue.put(Message(client_ID, "User \"" + input[0] + "\" does not exist.\n"));
+				outbound_queue.put(Message(connection, "User \"" + input[0] + "\" does not exist.\n"));
 				continue;
 			}
 
@@ -828,7 +777,7 @@ std::string Game::login_or_signup(const SOCKET client_ID)
 				std::lock_guard<std::mutex> lock(game_state);
 				if (actors.find(input[0]) != actors.cend())
 				{
-					outbound_queue.put(Message(client_ID, "User \"" + input[0] + "\" already logged in.\n"));
+					outbound_queue.put(Message(connection, "User \"" + input[0] + "\" already logged in.\n"));
 					continue; // try again
 				}
 			}
@@ -841,7 +790,7 @@ std::string Game::login_or_signup(const SOCKET client_ID)
 				.attribute(C::XML_USER_PASSWORD.c_str())
 				.as_string())
 			{
-				outbound_queue.put(Message(client_ID, "Incorrect password for user \"" + input[0] + "\".\n"));
+				outbound_queue.put(Message(connection, "Incorrect password for user \"" + input[0] + "\".\n"));
 				continue;
 			}
 
@@ -890,12 +839,12 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 					if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(user)->second))
 					{
 						// get the player's map socket
-						SOCKET outbound_socket = clients.get_map_socket(user);
+						network::connection_ptr connection = players.get_map_connection(user);
 						// if the player does not have a map socket, send the map to the player's main socket
-						if (outbound_socket == -1) outbound_socket = clients.get_socket(user);
+						if (connection == nullptr) connection = players.get_connection(user);
 
 						// generate an area map from the current player's perspective, send it to the correct socket
-						outbound_queue.put(Message(outbound_socket, "\n\n" + player->generate_area_map(world, actors)));
+						outbound_queue.put(Message(connection, "\n\n" + player->generate_area_map(world, actors)));
 					}
 				}
 			}
@@ -906,19 +855,18 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 	if (update_messages.additional_map_update_users != nullptr)
 	{
 		// for each player that requires an update
-		for (auto player_it = (*update_messages.additional_map_update_users).cbegin();
-		player_it != (*update_messages.additional_map_update_users).cend(); ++player_it)
+		for (const auto & player_id : *update_messages.additional_map_update_users)
 		{
 			// if the referenced character is a player character
-			if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(*player_it)->second))
+			if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(player_id)->second))
 			{
 				// get the player's map socket
-				SOCKET outbound_socket = clients.get_map_socket(*player_it);
+				network::connection_ptr connection = players.get_map_connection(player_id);
 				// if the player does not have a map socket, send the map to the player's main socket
-				if (outbound_socket == -1) outbound_socket = clients.get_socket(*player_it);
+				if (connection == nullptr) connection = players.get_connection(player_id);
 
 				// generate an area map from the current player's perspective, send it to the correct socket
-				outbound_queue.put(Message(outbound_socket, player->generate_area_map(world, actors)));
+				outbound_queue.put(Message(connection, player->generate_area_map(world, actors)));
 			}
 		}
 	}
@@ -927,8 +875,8 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 	if (U::is<PC>(character))
 	{
 		// create an outbound message to the client in question
-		const SOCKET socket_ID = clients.get_socket(user_ID);
-		if (socket_ID != -1) outbound_queue.put(Message(socket_ID, user_ID + ": " + action_result.str()));
+		const network::connection_ptr connection = players.get_connection(user_ID);
+		if (connection != nullptr) outbound_queue.put(Message(connection, user_ID + ": " + action_result.str()));
 	}
 
 	// if a message needs to be sent to all other player characters in the room
@@ -943,7 +891,7 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 			if (actor_id != user_ID && U::is<PC>(actors.find(actor_id)->second))
 			{
 				// send the room update to the player
-				outbound_queue.put(Message(clients.get_socket(actor_id), *update_messages.to_room));
+				outbound_queue.put(Message(players.get_connection(actor_id), *update_messages.to_room));
 			}
 		}
 	}
@@ -952,7 +900,7 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 	if (update_messages.custom_message)
 	{
 		// add the message to the queue
-		outbound_queue.put(Message(clients.get_socket(update_messages.custom_message->first), update_messages.custom_message->second));
+		outbound_queue.put(Message(players.get_connection(update_messages.custom_message->first), update_messages.custom_message->second));
 	}
 }
 

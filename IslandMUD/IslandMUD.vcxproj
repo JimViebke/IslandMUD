@@ -95,6 +95,9 @@
     <ClCompile Include="Item\table.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="message.cpp" />
+    <ClCompile Include="network\connection.cpp" />
+    <ClCompile Include="network\network.cpp" />
+    <ClCompile Include="network\port.cpp" />
     <ClCompile Include="NPC\non_player_character.cpp" />
     <ClCompile Include="NPC\npc_enemy.cpp" />
     <ClCompile Include="NPC\npc_enemy_bodyguard.cpp" />
@@ -105,7 +108,7 @@
     <ClCompile Include="parse.cpp" />
     <ClCompile Include="player_character.cpp" />
     <ClCompile Include="server\server.cpp" />
-    <ClCompile Include="Threadsafe\threadsafe_socket_lookup.cpp" />
+    <ClCompile Include="Threadsafe\threadsafe_connection_lookup.cpp" />
     <ClCompile Include="XML\pugixml.cpp" />
     <ClCompile Include="recipes.cpp" />
     <ClCompile Include="room.cpp" />
@@ -130,7 +133,10 @@
     <ClInclude Include="item\misc.h" />
     <ClInclude Include="Item\table.h" />
     <ClInclude Include="message.h" />
-    <ClInclude Include="Network\socket.h" />
+    <ClInclude Include="network\connection.h" />
+    <ClInclude Include="network\include.h" />
+    <ClInclude Include="network\network.h" />
+    <ClInclude Include="network\port.h" />
     <ClInclude Include="npc.h" />
     <ClInclude Include="NPC\non_player_character.h" />
     <ClInclude Include="NPC\npc_enemy.h" />
@@ -150,7 +156,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="room.h" />
     <ClInclude Include="room_side.h" />
-    <ClInclude Include="Threadsafe\threadsafe_socket_lookup.h" />
+    <ClInclude Include="Threadsafe\threadsafe_connection_lookup.h" />
     <ClInclude Include="Threadsafe\threadsafe_queue.h" />
     <ClInclude Include="utilities.h" />
     <ClInclude Include="world.h" />

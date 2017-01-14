@@ -10,14 +10,13 @@ Feb 14, 2015 */
 #include <mutex>
 
 #include "server.h"
-#include "network\socket.h"
 #include "constants.h"
 #include "character.h"
 #include "npc.h"
 #include "parse.h"
 #include "world.h"
 #include "threadsafe\threadsafe_queue.h"
-#include "threadsafe\threadsafe_socket_lookup.h"
+#include "threadsafe\threadsafe_connection_lookup.h"
 #include "message.h"
 
 class Game
@@ -26,7 +25,7 @@ private:
 	threadsafe::queue<Message> inbound_queue; // <socket_ID, message>
 	threadsafe::queue<Message> outbound_queue; // <socket_ID, message>
 
-	threadsafe::socket_lookup clients;
+	threadsafe::connection_lookup players;
 
 	std::map<std::string, std::shared_ptr<Character>> actors; // active/online PC and NPC ids
 	World world; // the game world object
@@ -35,7 +34,7 @@ private:
 
 public:
 
-	typedef void(Game::*client_thread_type)(SOCKET);
+	typedef void(Game::*client_thread_type)(network::connection_ptr);
 
 	Game();
 
@@ -49,17 +48,15 @@ private:
 	// process data, moving it from the input queue to the output queue
 	void processing_thread();
 
-	// typedef void(Game::*client_thread_type)(SOCKET);
-
 	// Listen on port [listening_port].
 	// When a user connects, start a thread using [client_thread_pointer], passing in the user's unique socket ID
 	void networking_thread(const unsigned & listening_port, client_thread_type client_thread_pointer);
 
 	// capture incoming data and write it to the input queue
-	void client_thread(SOCKET client_ID);
+	void client_thread(network::connection_ptr connection);
 
 	// send map updates to the user's second client instance
-	void client_map_thread(SOCKET client_ID);
+	void client_map_thread(network::connection_ptr map_connection);
 
 	// handle everything to do with NPCs
 	void NPC_thread();
@@ -71,11 +68,8 @@ private:
 
 	// helper functions
 
-	// close a socket, platform independent
-	void close_socket(SOCKET socket);
-
 	// return the user_ID of a user after they log in or sign up
-	std::string login_or_signup(SOCKET client_ID);
+	std::string login_or_signup(const network::connection_ptr & connection);
 
 	// use an Update_Messages object to generate outbound messages to players
 	void generate_outbound_messages(const std::string & user_ID, const Update_Messages & message_updates);
