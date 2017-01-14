@@ -8,28 +8,16 @@ Nov 14 2015 */
 #include <string>
 #include <memory>
 
-#ifdef WIN32
-#define NOMINMAX // fix min() and max() errors
-#include <WinSock2.h>
-#include <Windows.h>
-#pragma comment (lib, "Ws2_32.lib")
-#else
-#include <sys/socket.h>
-#include <netinet/ip.h>
-#include <unistd.h>
-#include <cstring>
-#include <errno.h>
-using SOCKET = unsigned int;
-#endif
+#include "network\include.h"
 
 #include "utilities.h"
 
 class Message
 {
 public:
+	network::connection_ptr connection;
 	std::string data;
-	SOCKET user_socket_ID;
-	Message(const SOCKET & set_user_socket_ID, const std::string & set_data);
+	Message(const network::connection_ptr & connection, const std::string & data);
 };
 
 class Update_Messages

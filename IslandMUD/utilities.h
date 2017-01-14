@@ -100,16 +100,9 @@ namespace Utilities
 	}
 
 	// vector utilities
-	template <typename T> inline bool contains(const std::vector<T> & v, const T & find_element)
+	template <typename T> inline bool contains(const std::vector<T> & v, const T & element)
 	{
-		for (const T & element : v)
-		{
-			if (element == find_element)
-			{
-				return true;
-			}
-		}
-		return false;
+		return std::find(v.cbegin(), v.cend(), element) != v.cend();
 	}
 	template <typename T> inline void erase_element_from_vector(std::vector<T> & vec, const T & erase_element)
 	{

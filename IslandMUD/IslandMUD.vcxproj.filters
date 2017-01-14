@@ -102,10 +102,19 @@
     <ClCompile Include="Item\table.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Threadsafe\threadsafe_socket_lookup.cpp">
+    <ClCompile Include="server\server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="server\server.cpp">
+    <ClCompile Include="network\connection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="network\network.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="network\port.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Threadsafe\threadsafe_connection_lookup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -215,19 +224,28 @@
     <ClInclude Include="Item\table.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Network\socket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Threadsafe\threadsafe_queue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Threadsafe\threadsafe_socket_lookup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="server\server.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network\connection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network\include.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network\network.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network\port.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Threadsafe\threadsafe_connection_lookup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

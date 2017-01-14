@@ -150,7 +150,7 @@ void Recipes::load()
 
 	// other
 	add_recipe(C::FORGE_ID, {}, { { C::STONE_ID, 20 } }, {}, {}, { { C::FORGE_ID, 1 } }); // 20 stones to build a forge (which is immovable)
-	add_recipe(C::BLOOMERY_ID, {}, { { C::STONE_ID, 30 } }, {}, {}, { { C::BLOOMERY_ID, 1 } }); // 30 stones to build a bloomery (which in immovable)
+	add_recipe(C::BLOOMERY_ID, {}, { { C::STONE_ID, 30 } }, {}, {}, { { C::BLOOMERY_ID, 1 } }); // 30 stones to build a bloomery (which is immovable)
 	add_recipe(C::CHEST_ID, { { C::AXE_ID, 1 } }, { { C::BOARD_ID, 5 } }, {}, {}, { { C::CHEST_ID, 1 } });
 	add_recipe(C::TABLE_ID, { { C::AXE_ID, 1 } }, { { C::BOARD_ID, 1 }, { C::BRANCH_ID, 4 } }, {}, {}, { { C::TABLE_ID, 1 } }); // uses a board and four branches, needs an axe
 

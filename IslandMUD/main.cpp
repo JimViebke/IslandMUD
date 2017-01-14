@@ -18,6 +18,6 @@ int main()
 	// create the game object
 	Game game;
 
-	// run the processing thread using the main thread
-	game.processing_thread();
+	// start the game's main logic from the main thread
+	game.run();
 }
