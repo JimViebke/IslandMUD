@@ -50,55 +50,6 @@ namespace Utilities
 		return val + '0';
 	}
 
-	// verify a set of coordinates against the dimensions of the world
-	inline bool bounds_check(const int & x, const int & y)
-	{
-		// x, and y must be from 0 to dimension inclusive
-		return (x >= 0 && y >= 0 &&
-			x < C::WORLD_X_DIMENSION &&
-			y < C::WORLD_Y_DIMENSION);
-	}
-
-	// movement
-	inline void assign_movement_deltas(const std::string & direction_ID, int & dx, int & dy)
-	{
-		// express movement through two dimensions in dx, dy
-		// If direction_ID is invalid, output arguments will not be modified.
-
-		if (direction_ID == C::NORTH) { --dx; }
-		else if (direction_ID == C::SOUTH) { ++dx; }
-		else if (direction_ID == C::WEST) { --dy; }
-		else if (direction_ID == C::EAST) { ++dy; }
-		else if (direction_ID == C::NORTH_WEST) { --dx; --dy; }
-		else if (direction_ID == C::NORTH_EAST) { --dx; ++dy; }
-		else if (direction_ID == C::SOUTH_EAST) { ++dx; ++dy; }
-		else if (direction_ID == C::SOUTH_WEST) { ++dx; --dy; }
-
-		// nothing to return, values passed by reference
-	}
-	inline std::string get_movement_direction(const int & x, const int & y, const int & dest_x, const int & dest_y)
-	{
-		if (x == dest_x) // east or west
-		{
-			if (y + 1 == dest_y) { return C::EAST; }
-			if (y - 1 == dest_y) { return C::WEST; }
-		}
-		else if (x + 1 == dest_x) // south
-		{
-			if (y + 1 == dest_y) { return C::SOUTH_EAST; }
-			if (y == dest_y) { return C::SOUTH; }
-			if (y - 1 == dest_y) { return C::SOUTH_WEST; }
-		}
-		else if (x - 1 == dest_x) // north
-		{
-			if (y + 1 == dest_y) { return C::NORTH_EAST; }
-			if (y == dest_y) { return C::NORTH; }
-			if (y - 1 == dest_y) { return C::NORTH_WEST; }
-		}
-
-		return ""; // empty string object
-	}
-
 	// vector utilities
 	template <typename T> inline bool contains(const std::vector<T> & v, const T & element)
 	{
@@ -149,11 +100,7 @@ namespace Utilities
 	// math
 	template<typename T> inline T difference(const T & a, const T & b) { return (a - b > 0) ? (a - b) : (b - a); }
 	int euclidean_distance(const int & x1, const int & y1, const int & x2, const int & y2);
-	int diagonal_distance(const int & x1, const int & y1, const int & x2, const int & y2);
-
-	// pathfinding
-	int diagonal_movement_cost(const int & x1, const int & y1, const int & x2, const int & y2);
-
+	
 	// random utils
 	int random_int_from(const int & min, const int & max);
 	unsigned random_int_from(const unsigned & min, const unsigned & max);

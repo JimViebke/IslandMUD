@@ -82,22 +82,6 @@ int U::euclidean_distance(const int & x1, const int & y1, const int & x2, const 
 		(y_diff * y_diff)
 		));
 }
-int U::diagonal_distance(const int & x1, const int & y1, const int & x2, const int & y2)
-{
-	return std::max(difference(x1, x2), difference(x2, y2));
-}
-
-// pathfinding
-int U::diagonal_movement_cost(const int & x1, const int & y1, const int & x2, const int & y2)
-{
-	// Because this uses different movement costs, this works for AI pathfinding, but
-	// not so much for determining if a coordinate is visible from another coordinate.
-
-	// a diagonal move = (sqrt(2) * straight move)
-	const int dx = abs(x1 - x2);
-	const int dy = abs(y1 - y2);
-	return C::AI_MOVEMENT_COST * (dx + dy) + (C::AI_MOVEMENT_COST_DIAGONAL - 2 * C::AI_MOVEMENT_COST) * std::min(dx, dy);
-}
 
 // random utils
 int U::random_int_from(const int & min, const int & max)
