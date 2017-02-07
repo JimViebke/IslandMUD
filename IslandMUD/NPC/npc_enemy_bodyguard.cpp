@@ -41,7 +41,7 @@ Update_Messages Hostile_NPC_Bodyguard::update(World & world, std::map<std::strin
 	// else, I do not have a hunt target
 
 	// if I am out of guard range of my protect_target
-	if (U::diagonal_distance(x, y, protect_target->x, protect_target->y) > guard_radius)
+	if (location.diagonal_distance_to(protect_target->get_location()) > guard_radius)
 	{
 		Update_Messages update_messages("");
 		if (move_toward_protect_target(protect_target, world, actors, update_messages))
@@ -52,7 +52,7 @@ Update_Messages Hostile_NPC_Bodyguard::update(World & world, std::map<std::strin
 		else // approaching the protect_target failed
 		{
 			// attempt remedial pathfinding
-			if (best_attempt_pathfind(protect_target->x, protect_target->y, world, update_messages))
+			if (best_attempt_pathfind(protect_target->get_location(), world, update_messages))
 			{
 				return update_messages;
 			}
@@ -86,8 +86,7 @@ bool Hostile_NPC_Bodyguard::attempt_set_new_hunt_target(World & world, std::map<
 	const std::shared_ptr<Character> hunt_target = actors.find(hunt_target_id)->second;
 
 	// save the player's current location as the player's last know location (in case they walk out of visible range)
-	hunt_target_last_known_location._x = hunt_target->x;
-	hunt_target_last_known_location._y = hunt_target->y;
+	hunt_target_last_known_location = hunt_target->get_location();
 
 	// we have a target
 	return true;
@@ -95,15 +94,14 @@ bool Hostile_NPC_Bodyguard::attempt_set_new_hunt_target(World & world, std::map<
 bool Hostile_NPC_Bodyguard::attempt_update_hunt_target_last_known_location(const std::shared_ptr<Character> & hunt_target)
 {
 	// if the NPC can see the hunt_target
-	if (U::diagonal_distance(x, y, hunt_target->x, hunt_target->y) <= C::VIEW_DISTANCE)
+	if (location.diagonal_distance_to(hunt_target->get_location()) <= C::VIEW_DISTANCE)
 	{
 		// update hunt_target_last_known_location
-		hunt_target_last_known_location._x = hunt_target->x;
-		hunt_target_last_known_location._y = hunt_target->y;
+		hunt_target_last_known_location = hunt_target->get_location();
 		return true;
 	}
 
-	// the NPC cannot see the hunt target, the last_known_location was not updated
+	// the NPC cannot see the hunt target; the last_known_location was not updated
 	return false;
 }
 
@@ -112,7 +110,7 @@ bool Hostile_NPC_Bodyguard::attempt_update_hunt_target_last_known_location(const
 void Hostile_NPC_Bodyguard::check_maximum_hunt_radius(const std::shared_ptr<Character> & protect_target)
 {
 	// if the NPC has hunted a threat beyond the hunt radius
-	if (U::diagonal_distance(x, y, protect_target->x, protect_target->y) > this->hunt_radius)
+	if (location.diagonal_distance_to(protect_target->get_location()) > this->hunt_radius)
 	{
 		// forget about the threat, which will cause the NPC to return to the protect_target
 		hunt_target_last_known_location.reset();
@@ -123,7 +121,7 @@ void Hostile_NPC_Bodyguard::check_maximum_hunt_radius(const std::shared_ptr<Char
 Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & hunt_target, const std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
 	// if I am at the target's location, do combat logic
-	if (hunt_target->x == x && hunt_target->y == y)
+	if (location == hunt_target->get_location())
 	{
 		// run combat logic
 		return attack_character(hunt_target, world);
@@ -136,11 +134,10 @@ Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & 
 	{
 		// if the path is empty or going the wrong direction, or the target has moved
 		if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_hunt_target ||
-			hunt_target->x != path.back()._x ||
-			hunt_target->y != path.back()._y)
+			hunt_target->get_location() != path.back())
 		{
 			// generate a new path
-			save_path_to(hunt_target->x, hunt_target->y, world);
+			save_path_to(hunt_target->get_location(), world);
 			stored_path_type = Stored_Path_Type::to_hunt_target;
 		}
 
@@ -148,7 +145,7 @@ Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & 
 		Update_Messages update_messages("");
 		if (!make_path_movement(world, update_messages)) // if the next movement fails, regenerate the path and try again
 		{
-			save_path_to(hunt_target->x, hunt_target->y, world);
+			save_path_to(hunt_target->get_location(), world);
 			make_path_movement(world, update_messages);
 		}
 
@@ -158,18 +155,16 @@ Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & 
 	// else the hunt target is not visible
 
 	// if have a last_known_location for hunt_target
-	if (hunt_target_last_known_location._x != -1 &&
-		hunt_target_last_known_location._y != -1)
+	if (hunt_target_last_known_location.is_valid())
 	{
 		// if my location is not last_known_location
-		if (hunt_target_last_known_location._x != x ||
-			hunt_target_last_known_location._y != y)
+		if (hunt_target_last_known_location != location)
 		{
 			// if the path is empty or going to the wrong destination
 			if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_hunt_target)
 			{
 				// generate a new path
-				save_path_to(hunt_target_last_known_location._x, hunt_target_last_known_location._y, world);
+				save_path_to(hunt_target_last_known_location, world);
 				stored_path_type = Stored_Path_Type::to_hunt_target;
 			}
 
@@ -177,7 +172,7 @@ Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & 
 			Update_Messages update_messages("");
 			if (!make_path_movement(world, update_messages)) // if the next movement fails, regenerate the path and try again
 			{
-				save_path_to(hunt_target_last_known_location._x, hunt_target_last_known_location._y, world);
+				save_path_to(hunt_target_last_known_location, world);
 				make_path_movement(world, update_messages);
 			}
 
@@ -194,7 +189,7 @@ Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & 
 	if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_protect_target)
 	{
 		// generate a new path
-		save_path_to(protect_target->x, protect_target->y, world);
+		save_path_to(protect_target->get_location(), world);
 		stored_path_type = Stored_Path_Type::to_protect_target;
 	}
 
@@ -205,7 +200,7 @@ Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & 
 	// if the hunt target is (now) visible
 	if (attempt_update_hunt_target_last_known_location(hunt_target))
 	{
-		save_path_to(hunt_target_last_known_location._x, hunt_target_last_known_location._y, world); // save a new path
+		save_path_to(hunt_target_last_known_location, world); // save a new path
 		stored_path_type = Stored_Path_Type::to_hunt_target; // update the stored path type
 	}
 
@@ -218,7 +213,7 @@ bool Hostile_NPC_Bodyguard::move_toward_protect_target(const std::shared_ptr<Cha
 	if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_protect_target)
 	{
 		// generate a new path
-		save_path_to(protect_target->x, protect_target->y, world);
+		save_path_to(protect_target->get_location(), world);
 		stored_path_type = Stored_Path_Type::to_protect_target;
 	}
 
@@ -232,7 +227,7 @@ Update_Messages Hostile_NPC_Bodyguard::approach_new_hunt_target(World & world)
 	if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_hunt_target)
 	{
 		// generate a new path
-		save_path_to(hunt_target_last_known_location._x, hunt_target_last_known_location._y, world);
+		save_path_to(hunt_target_last_known_location, world);
 		stored_path_type = Stored_Path_Type::to_hunt_target;
 	}
 

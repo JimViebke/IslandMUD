@@ -82,6 +82,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="character.cpp" />
+    <ClCompile Include="coordinate.cpp" />
     <ClCompile Include="item\bloomery.cpp" />
     <ClCompile Include="item\chest.cpp" />
     <ClCompile Include="constants.cpp" />
@@ -119,6 +120,7 @@
   <ItemGroup>
     <ClInclude Include="character.h" />
     <ClInclude Include="constants.h" />
+    <ClInclude Include="coordinate.h" />
     <ClInclude Include="craft.h" />
     <ClInclude Include="door.h" />
     <ClInclude Include="game.h" />

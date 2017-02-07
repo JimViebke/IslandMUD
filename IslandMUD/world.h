@@ -12,6 +12,7 @@ April 1, 2014 */
 
 #include "room.h"
 #include "generator.h"
+#include "threadsafe\threadsafe_queue.h"
 
 class World
 {
@@ -29,30 +30,30 @@ public:
 	World();
 
 	// access a room given coordinates
-	std::unique_ptr<Room>::pointer room_at(const int & x, const int & y);
-	const std::unique_ptr<Room>::pointer room_at(const int & x, const int & y) const;
-	std::unique_ptr<Room> & room_pointer_at(const int & x, const int & y);
+	std::unique_ptr<Room>::pointer room_at(const Coordinate & coordinate);
+	const std::unique_ptr<Room>::pointer room_at(const Coordinate & coordinate) const;
+	std::unique_ptr<Room> & room_pointer_at(const Coordinate & coordinate);
 
 	// debugging
 	unsigned count_loaded_rooms() const;
 
 	// load rooms around a player spawning in
-	void load_view_radius_around(const int & x, const int & y, const std::string & character_ID);
+	void load_view_radius_around(const Coordinate & coordinate, const std::string & character_ID);
 
 	// loading and unloading rooms at the edge of vision
-	void remove_viewer_and_attempt_unload(const int & x, const int & y, const std::string & viewer_ID);
+	void remove_viewer_and_attempt_unload(const Coordinate & coordinate, const std::string & viewer_ID);
 
 	// unloading of all rooms in view distance (for logging out or dying)
-	void attempt_unload_radius(const int & x, const int & y, const std::string & player_ID);
+	void attempt_unload_radius(const Coordinate & coordinate, const std::string & player_ID);
 
 	// test if a room can be removed from memory
-	bool is_unloadable(const int & x, const int & y) const;
+	bool is_unloadable(const Coordinate & coordinate) const;
 
 	// move a room from world to disk
-	void unload_room(const int & x, const int & y);
+	void unload_room(const Coordinate & coordinate);
 
 	// room information
-	bool room_has_surface(const int & x, const int & y, const std::string & direction_ID) const;
+	bool room_has_surface(const Coordinate & coordinate, const std::string & direction_ID) const;
 
 
 
@@ -68,34 +69,28 @@ private:
 	bool load_existing_limestone_deposit_map();
 
 	// a room at x,y,z does not exist on the disk; create it
-	void generate_room_at(const int & x, const int & y);
+	void generate_room_at(const Coordinate & coordinate);
 
 	// load the room x,y to an xml_document
-	void load_room_to_XML(const int & ix, const int & iy, pugi::xml_document & vertical_rooms);
+	void load_room_to_XML(const Coordinate & coordinate, pugi::xml_document & vertical_rooms);
 
 	// build a room given an XML node, add to world at x,y,z
-	void add_room_to_world(pugi::xml_node & room_document, const int & x, const int & y);
+	void add_room_to_world(pugi::xml_node & room_document, const Coordinate & coordinate);
 
 	// move specific room into memory
-	void load_room_to_world(const int & x, const int & y);
+	void load_room_to_world(const Coordinate & coordinate);
 
 	// move a passed room to disk
-	void unload_room(const int & x, const int & y, const std::unique_ptr<Room>::pointer room);
+	void unload_room(const Coordinate & coordinate, const std::unique_ptr<Room>::pointer room);
 
 	// save the contents of a room to an XML file in memory
 	void save_room_to_XML(const std::unique_ptr<Room>::pointer room, pugi::xml_document & room_document) const;
 
 	// create a new empty room given its coordinates and the world terrain
-	std::unique_ptr<Room> create_room(const int & x, const int & y) const;
+	std::unique_ptr<Room> create_room(const Coordinate & coordinate) const;
 
 	// remove a room from memory
-	void erase_room_from_memory(const int & x, const int & y);
-
-	// calculate room position
-	static inline unsigned hash(const int & x, const int & y)
-	{
-		return (x * C::WORLD_Y_DIMENSION) + y;
-	}
+	void erase_room_from_memory(const Coordinate & coordinate);
 };
 
 #endif

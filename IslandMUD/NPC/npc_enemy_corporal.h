@@ -30,7 +30,7 @@ private:
 	// pick another target.
 	// If no target is found, the NPC will resume wandering
 	Stored_Path_Type stored_path_type;
-	int wander_x = -1, wander_y = -1;
+	Coordinate wander_location;
 	std::shared_ptr<Coordinate> destination;
 	std::string hunt_target_id = "";
 };

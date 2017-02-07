@@ -24,7 +24,7 @@ Update_Messages Hostile_NPC_Fighter::update(World & world, std::map<std::string,
 		if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE)
 		{
 			// if the item is here, take it, remove the current objective, and return
-			if (world.room_at(x, y)->contains(objective_iterator->noun))
+			if (world.room_at(location)->contains(objective_iterator->noun))
 			{
 				Update_Messages update_messages = take(objective_iterator->noun, world);
 
@@ -129,24 +129,28 @@ Update_Messages Hostile_NPC_Fighter::update(World & world, std::map<std::string,
 	// - it has completed crafting the sword and the axe and has completed all other objectives
 	if (i_have(C::SWORD_ID) && i_have(C::AXE_ID) && objectives.size() == 0)
 	{
+		const int x = location.get_x(), y = location.get_y();
+
 		// for each row in view distance
 		for (int cx = x - (int)C::VIEW_DISTANCE; cx <= x + (int)C::VIEW_DISTANCE; ++cx)
 		{
 			// for each room in the row in view distance
 			for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 			{
+				const Coordinate current(cx, cy);
+
 				// skip this room if it is out of bounds
-				if (!U::bounds_check(cx, cy)) { continue; }
+				if (!current.is_valid()) continue;
 
 				// for each actor in the room
-				for (const std::string & actor_ID : world.room_at(cx, cy)->get_actor_ids())
+				for (const std::string & actor_ID : world.room_at(current)->get_actor_ids())
 				{
 					// if the character is a player character
 					if (U::is<PC>(actors.find(actor_ID)->second))
 					{
 						// [target acquired]
 						Update_Messages update_messages("");
-						pathfind(cx, cy, world, update_messages);
+						pathfind(current, world, update_messages);
 						return update_messages;
 					}
 				}

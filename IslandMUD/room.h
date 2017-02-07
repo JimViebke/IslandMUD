@@ -12,6 +12,7 @@ Feb 14, 2015 */
 #include "item.h"
 #include "room_side.h" // walls, floor, or ceiling
 #include "message.h"
+#include "coordinate.h"
 
 class Room : public Container
 {
@@ -22,10 +23,12 @@ private:
 	std::map<std::string, Room_Side> room_sides = {}; // the floor, walls, and ceiling in the room (present surfaces only)
 	std::vector<std::string> viewing_actor_ids = {}; // the PCs and NPCs who can see this room
 	std::vector<std::string> actor_ids = {}; // the PCs and NPCs in a room
+	Coordinate coordinate;
 
 public:
 
-	Room() : Container() {}
+	Room(const int x, const int y) : Room(Coordinate(x, y)) {} // delegate
+	Room(const Coordinate & coordinate) : Container(), coordinate(coordinate) {}
 
 	// configuration
 	void set_water_status(const bool & is_water) { water = is_water; }
