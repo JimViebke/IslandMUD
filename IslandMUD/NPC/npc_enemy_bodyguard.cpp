@@ -17,7 +17,9 @@ Update_Messages Hostile_NPC_Bodyguard::update(World & world, std::map<std::strin
 	}
 
 	// extract protect_target
-	const std::shared_ptr<Character> protect_target = actors.find(protect_target_id)->second;
+	const std::shared_ptr<Hostile_NPC> protect_target = U::convert_to<Hostile_NPC>(actors.find(protect_target_id)->second);
+
+	if (protect_target == nullptr) std::cout << "Error: Hostile_NPC_Bodyguard [" << name << "] was assinged to proect [" << protect_target_id << "], who is not a Hostile_NPC.\n";
 
 	// return to the protect_target if the NPC pursues the hunt_target to far.
 	check_maximum_hunt_radius(protect_target);
