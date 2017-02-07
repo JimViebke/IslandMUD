@@ -100,6 +100,9 @@ public:
 	// printing
 	std::string summary(const std::string & player_ID) const;
 
+	friend bool operator==(std::unique_ptr<Room> & lhs, std::unique_ptr<Room> & rhs);
 };
+
+bool operator==(std::unique_ptr<Room> & lhs, std::unique_ptr<Room> & rhs);
 
 #endif
