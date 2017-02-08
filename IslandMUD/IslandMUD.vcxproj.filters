@@ -117,6 +117,9 @@
     <ClCompile Include="Threadsafe\threadsafe_connection_lookup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="coordinate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="player_character.h">
@@ -246,6 +249,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Threadsafe\threadsafe_connection_lookup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="coordinate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

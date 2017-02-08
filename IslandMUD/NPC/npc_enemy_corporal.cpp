@@ -4,7 +4,7 @@ Jan 11 2016 */
 
 #include "npc_enemy_corporal.h"
 
-Hostile_NPC_Corporal::Hostile_NPC_Corporal(const std::string & name, World & world) : Hostile_NPC(name, world) {}
+Hostile_NPC_Corporal::Hostile_NPC_Corporal(const std::string & name, World & world) : Hostile_NPC(name, world), wander_location(-1, -1) {}
 
 Update_Messages Hostile_NPC_Corporal::update(World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
@@ -60,17 +60,16 @@ Update_Messages Hostile_NPC_Corporal::wander(World & world)
 	if (path.size() == 0)
 	{
 		// generate and store coordinates if none exist
-		if (wander_x == -1 || wander_y == -1)
+		if (!wander_location.is_valid())
 		{
 			// generate and store new wander coordinates
-			wander_x = U::random_int_from(0, C::WORLD_X_DIMENSION - 1);
-			wander_y = U::random_int_from(0, C::WORLD_Y_DIMENSION - 1);
+			wander_location = Coordinate(U::random_int_from(0, C::WORLD_X_DIMENSION - 1), U::random_int_from(0, C::WORLD_Y_DIMENSION - 1));
 		}
 
 		// test if the destinatino is within range or requires a best attempt pathfind
-		if (U::diagonal_distance(x, y, wander_x, wander_y > C::VIEW_DISTANCE))
+		if (location.diagonal_distance_to(wander_location) > C::VIEW_DISTANCE)
 		{
-			if (best_attempt_pathfind(wander_x, wander_y, world, results))
+			if (best_attempt_pathfind(wander_location, world, results))
 			{
 				return results;
 			}
@@ -80,7 +79,7 @@ Update_Messages Hostile_NPC_Corporal::wander(World & world)
 			}
 		}
 		// the destination is visible, save a path to it
-		else if (save_path_to(wander_x, wander_y, world))
+		else if (save_path_to(wander_location, world))
 		{
 			make_path_movement(world, results);
 			return results;
@@ -133,7 +132,7 @@ bool Hostile_NPC_Corporal::hunt(World & world, std::map<std::string, std::shared
 	// extract a reference to the target
 	std::shared_ptr<Character> target = target_it->second;
 
-	if (x == target->x && y == target->y)
+	if (location == target->get_location())
 	{
 		// do combat logic
 		update_messages = attack_character(target, world);
@@ -141,22 +140,22 @@ bool Hostile_NPC_Corporal::hunt(World & world, std::map<std::string, std::shared
 	}
 	// else, I have a path AND the target is on the path in view or out of view
 	else if (path.size() > 0 &&
-		((U::diagonal_distance(x, y, target->x, target->y) <= C::VIEW_DISTANCE && coordinates_are_on_path(target->x, target->y)
-			|| U::diagonal_distance(x, y, target->x, target->y) > C::VIEW_DISTANCE)))
+		((location.diagonal_distance_to(target->get_location()) <= C::VIEW_DISTANCE && coordinates_are_on_path(target->get_location()))
+			|| location.diagonal_distance_to(target->get_location()) > C::VIEW_DISTANCE))
 	{
 		if (make_path_movement(world, update_messages)) return true;
 
 		// the path failed, generate a new path and try again
-		save_path_to(target->x, target->y, world);
+		save_path_to(target->get_location(), world);
 
 		if (make_path_movement(world, update_messages)) return true;
 	}
 	// hunt target is visible
-	else if (U::diagonal_distance(x, y, target->x, target->y) <= C::VIEW_DISTANCE)
+	else if (location.diagonal_distance_to(target->get_location()) <= C::VIEW_DISTANCE)
 	{
 		// any planned path is no longer good, plan a new path
 
-		save_path_to(target->x, target->y, world);
+		save_path_to(target->get_location(), world);
 
 		if (make_path_movement(world, update_messages)) return true;
 	}

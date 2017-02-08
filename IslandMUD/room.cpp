@@ -690,3 +690,8 @@ std::string Room::summary(const std::string & player_ID) const
 
 	return summary_stream.str();
 }
+
+bool operator==(std::unique_ptr<Room> & lhs, std::unique_ptr<Room> & rhs)
+{
+	return lhs->coordinate == rhs->coordinate;
+}

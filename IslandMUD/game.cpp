@@ -84,7 +84,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		// if the actor is a Player_Character
 		if (const std::shared_ptr<PC> & player = U::convert_to<PC>(actors.find(actor_id)->second))
 		{
-			return Update_Messages(world.room_at(player->x, player->y)->summary(player->name));
+			return Update_Messages(world.room_at(player->get_location())->summary(player->name));
 		}
 	}
 	// moving: "move northeast" OR "northeast"
@@ -100,7 +100,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		// if the acting character is a player character
 		if (const std::shared_ptr<PC> player = U::convert_to<PC>(character))
 			// append a summary of the new area
-			result.to_user += world.room_at(player->x, player->y)->summary(player->name);
+			result.to_user += world.room_at(player->get_location())->summary(player->name);
 
 		return result;
 	}
@@ -178,7 +178,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		const auto & player = actors.find(actor_id)->second;
 
 		// if the target is another player or NPC in the room
-		if (world.room_at(player->x, player->y)->is_occupied_by(command[1]))
+		if (world.room_at(player->get_location())->is_occupied_by(command[1]))
 		{
 			// if the target is not a friendly player character
 			auto & target = actors.find(command[1])->second;
@@ -277,7 +277,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(actor_id)->second))
 		{
 			std::stringstream coord;
-			coord << "Your coordinates are " << player->x << ", " << player->y;
+			coord << "Your coordinates are " << player->get_location().to_string() << ".";
 			return Update_Messages(coord.str());
 		}
 	}
@@ -397,7 +397,7 @@ void Game::client_thread(network::connection_ptr connection)
 			std::shared_ptr<Character> user = actors.find(user_ID)->second; // save the user's data
 
 			// clean up the world
-			world.attempt_unload_radius(user->x, user->y, user_ID);
+			world.attempt_unload_radius(user->get_location(), user_ID);
 
 			// clean up the user
 			user->save(); // save the user's data
@@ -680,7 +680,7 @@ void Game::NPC_update_logic()
 
 			const Update_Messages update_messages = npc->update(world, actors); // call update, passing in the world and actors
 
-			std::cout << " (located at " << npc->x << ", " << npc->y << ") ";
+			std::cout << " (located at " << npc->get_location().to_string() << ") ";
 
 			std::cout << " done.\nGenerating outbound messages...";
 
@@ -813,8 +813,8 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 	const std::shared_ptr<Character> character = actors.find(user_ID)->second;
 
 	// save the player's coordinates in case a map update is required
-	const int player_x = character->x;
-	const int player_y = character->y;
+	const int player_x = character->get_location().get_x();
+	const int player_y = character->get_location().get_y();
 
 	// add the update message to the end of the outbound message
 	action_result << update_messages.to_user;
@@ -827,11 +827,13 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 		{
 			for (int cy = player_y - (int)C::VIEW_DISTANCE; cy <= player_y + (int)C::VIEW_DISTANCE; ++cy)
 			{
+				Coordinate current(cx, cy);
+
 				// skip if the room is out of bounds
-				if (!U::bounds_check(cx, cy)) continue;
+				if (!current.is_valid()) continue;
 
 				// get a list of the users in the room
-				const std::vector<std::string> users_in_range = world.room_at(cx, cy)->get_actor_ids();
+				const std::vector<std::string> users_in_range = world.room_at(current)->get_actor_ids();
 				// for each user in the room
 				for (const std::string & user : users_in_range)
 				{
@@ -883,7 +885,7 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 	if (update_messages.to_room != nullptr)
 	{
 		// get a list of all players in the room
-		const std::vector<std::string> area_actor_ids = world.room_at(character->x, character->y)->get_actor_ids();
+		const std::vector<std::string> area_actor_ids = world.room_at(character->get_location())->get_actor_ids();
 
 		for (const std::string & actor_id : area_actor_ids) // for each player in the room
 		{
@@ -913,7 +915,7 @@ void Game::shutdown_listener()
 	std::unique_lock<std::mutex> lock(game_state);
 
 	// for each actor, remove the room around them
-	for (auto & actor : actors) world.attempt_unload_radius(actor.second->x, actor.second->y, actor.first);
+	for (auto & actor : actors) world.attempt_unload_radius(actor.second->get_location(), actor.first);
 
 	// for each actor, save the actor's data
 	for (auto & actor : actors) actor.second->save();

@@ -38,6 +38,9 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 	// Dimensions are (view+1+view) plus a padding of 1 on each side
 	std::vector<std::vector<bool>> forest_grid((C::VIEW_DISTANCE * 2) + 3, std::vector<bool>((C::VIEW_DISTANCE * 2) + 3, false));
 
+	// extract these for convinence - we're using the x and y a lot here
+	const int x = location.get_x(), y = location.get_y();
+
 	/*
 	We're looking for presence/absence info on trees in a 11*11 radius, and fitting it into a 13x13 grid, with a ring around for bounds padding.
 
@@ -51,13 +54,15 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 	tree_grid index = current index - (player index - (view distance + 1)) */
 	for (int cx = x - (int)C::VIEW_DISTANCE; cx <= x + (int)C::VIEW_DISTANCE; ++cx)
 	{
+		std::cout << '\n';
+
 		const int i = cx - (x - (C::VIEW_DISTANCE + 1));
 		for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 		{
-			if (U::bounds_check(cx, cy))
-			{
-				forest_grid[i][cy - (y - (C::VIEW_DISTANCE + 1))] = world.room_at(cx, cy)->contains(C::TREE_ID);
-			}
+			Coordinate current(cx, cy);
+			
+			if (current.is_valid())
+				forest_grid[i][cy - (y - (C::VIEW_DISTANCE + 1))] = world.room_at(current)->contains(C::TREE_ID);
 		}
 	}
 
@@ -69,8 +74,10 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 		std::vector<char> a, b, c; // three rows
 		for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 		{
+			Coordinate current(cx, cy);
+
 			// if the room is out of bounds
-			if (!U::bounds_check(cx, cy))
+			if (!current.is_valid())
 			{
 				// draw the "room"
 				a.push_back(C::LAND_CHAR); a.push_back(C::LAND_CHAR); a.push_back(C::LAND_CHAR);
@@ -82,7 +89,7 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 			}
 
 			// if the coordinates are valid but the room is not loaded (this would be a major error)
-			if (world.room_at(cx, cy) == nullptr)
+			if (world.room_at(current) == nullptr)
 			{
 				// draw the "room"
 				a.push_back(C::LAND_CHAR); a.push_back(C::LAND_CHAR); a.push_back(C::LAND_CHAR);
@@ -124,7 +131,7 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 				c.push_back(((f_s || f_sw || f_w) ? C::FOREST_CHAR : C::LAND_CHAR)); c.push_back(C::FOREST_CHAR); c.push_back(((f_s || f_se || f_e) ? C::FOREST_CHAR : C::LAND_CHAR));
 			}
 			// if the room is water
-			else if (world.room_at(cx, cy)->is_water())
+			else if (world.room_at(current)->is_water())
 			{
 				// Either draw a 3x3 grid with a "wave", or a 3x3 grid with the player's icon.
 				a.push_back(C::LAND_CHAR); a.push_back(C::LAND_CHAR); a.push_back(C::LAND_CHAR);
@@ -135,10 +142,10 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 			else
 			{
 				// use a boolean value to indicate the presence or absence of a wall in this room
-				const bool n = world.room_at(cx, cy)->has_surface(C::NORTH);
-				const bool e = world.room_at(cx, cy)->has_surface(C::EAST);
-				const bool s = world.room_at(cx, cy)->has_surface(C::SOUTH);
-				const bool w = world.room_at(cx, cy)->has_surface(C::WEST);
+				const bool n = world.room_at(current)->has_surface(C::NORTH);
+				const bool e = world.room_at(current)->has_surface(C::EAST);
+				const bool s = world.room_at(current)->has_surface(C::SOUTH);
+				const bool w = world.room_at(current)->has_surface(C::WEST);
 
 				bool
 					// is there a door present in a given location?
@@ -155,33 +162,33 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 				*/
 				if (n)
 				{
-					nd = world.room_at(cx, cy)->get_room_sides().find(C::NORTH)->second.has_door();
-					nr = (!world.room_at(cx, cy)->is_standing_wall(C::NORTH) ||
-						(nd && world.room_at(cx, cy)->get_room_sides().find(C::NORTH)->second.get_door()->is_rubble()));
+					nd = world.room_at(current)->get_room_sides().find(C::NORTH)->second.has_door();
+					nr = (!world.room_at(current)->is_standing_wall(C::NORTH) ||
+						(nd && world.room_at(current)->get_room_sides().find(C::NORTH)->second.get_door()->is_rubble()));
 				}
 				if (e)
 				{
-					ed = world.room_at(cx, cy)->get_room_sides().find(C::EAST)->second.has_door();
-					er = (!world.room_at(cx, cy)->is_standing_wall(C::EAST) ||
-						(ed && world.room_at(cx, cy)->get_room_sides().find(C::EAST)->second.get_door()->is_rubble()));
+					ed = world.room_at(current)->get_room_sides().find(C::EAST)->second.has_door();
+					er = (!world.room_at(current)->is_standing_wall(C::EAST) ||
+						(ed && world.room_at(current)->get_room_sides().find(C::EAST)->second.get_door()->is_rubble()));
 				}
 				if (s)
 				{
-					sd = world.room_at(cx, cy)->get_room_sides().find(C::SOUTH)->second.has_door();
-					sr = (!world.room_at(cx, cy)->is_standing_wall(C::SOUTH) ||
-						(sd && world.room_at(cx, cy)->get_room_sides().find(C::SOUTH)->second.get_door()->is_rubble()));
+					sd = world.room_at(current)->get_room_sides().find(C::SOUTH)->second.has_door();
+					sr = (!world.room_at(current)->is_standing_wall(C::SOUTH) ||
+						(sd && world.room_at(current)->get_room_sides().find(C::SOUTH)->second.get_door()->is_rubble()));
 				}
 				if (w)
 				{
-					wd = world.room_at(cx, cy)->get_room_sides().find(C::WEST)->second.has_door();
-					wr = (!world.room_at(cx, cy)->is_standing_wall(C::WEST) ||
-						(wd && world.room_at(cx, cy)->get_room_sides().find(C::WEST)->second.get_door()->is_rubble()));
+					wd = world.room_at(current)->get_room_sides().find(C::WEST)->second.has_door();
+					wr = (!world.room_at(current)->is_standing_wall(C::WEST) ||
+						(wd && world.room_at(current)->get_room_sides().find(C::WEST)->second.get_door()->is_rubble()));
 				}
 
 				// count the enemies standing at a coordinate
 				unsigned enemy_count = 0, neutral_count = 0, friendly_count = 0;
 				// for each actor in the room
-				for (const std::string & actor_ID : world.room_at(cx, cy)->get_actor_ids())
+				for (const std::string & actor_ID : world.room_at(current)->get_actor_ids())
 				{
 					// if the actor is a hostile NPC
 					if (U::is<Hostile_NPC>(actors.find(actor_ID)->second))
@@ -207,10 +214,10 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 				char nw_corner = C::LAND_CHAR, ne_corner = C::LAND_CHAR, se_corner = C::LAND_CHAR, sw_corner = C::LAND_CHAR;
 				{
 					// relative to the north west corner of the room, is there a wall to the n/e/s/w
-					const bool wtn = world.room_has_surface(cx - 1, cy, C::WEST);
-					const bool wte = world.room_has_surface(cx, cy, C::NORTH);
-					const bool wts = world.room_has_surface(cx, cy, C::WEST);
-					const bool wtw = world.room_has_surface(cx, cy - 1, C::NORTH);
+					const bool wtn = world.room_has_surface(Coordinate(cx - 1, cy), C::WEST);
+					const bool wte = world.room_has_surface(Coordinate(cx, cy), C::NORTH);
+					const bool wts = world.room_has_surface(Coordinate(cx, cy), C::WEST);
+					const bool wtw = world.room_has_surface(Coordinate(cx, cy - 1), C::NORTH);
 
 					// in order for this corner to render, there must be one adjacent local wall OR two adjacent remote walls
 					if (wte || wts || (wtn && wtw))
@@ -220,10 +227,10 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 				}
 				{
 					// relative to the north east corner of the room, is there a wall to the n/e/s/w
-					const bool wtn = world.room_has_surface(cx - 1, cy, C::EAST);
-					const bool wte = world.room_has_surface(cx, cy + 1, C::NORTH);
-					const bool wts = world.room_has_surface(cx, cy, C::EAST);
-					const bool wtw = world.room_has_surface(cx, cy, C::NORTH);
+					const bool wtn = world.room_has_surface(Coordinate(cx - 1, cy), C::EAST);
+					const bool wte = world.room_has_surface(Coordinate(cx, cy + 1), C::NORTH);
+					const bool wts = world.room_has_surface(Coordinate(cx, cy), C::EAST);
+					const bool wtw = world.room_has_surface(Coordinate(cx, cy), C::NORTH);
 
 					if (wtw || wts || (wtn && wte))
 					{
@@ -232,10 +239,10 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 				}
 				{
 					// relative to the south east corner of the room, is there a wall to the n/e/s/w
-					const bool wtn = world.room_has_surface(cx, cy, C::EAST);
-					const bool wte = world.room_has_surface(cx, cy + 1, C::SOUTH);
-					const bool wts = world.room_has_surface(cx + 1, cy, C::EAST);
-					const bool wtw = world.room_has_surface(cx, cy, C::SOUTH);
+					const bool wtn = world.room_has_surface(Coordinate(cx, cy), C::EAST);
+					const bool wte = world.room_has_surface(Coordinate(cx, cy + 1), C::SOUTH);
+					const bool wts = world.room_has_surface(Coordinate(cx + 1, cy), C::EAST);
+					const bool wtw = world.room_has_surface(Coordinate(cx, cy), C::SOUTH);
 
 					if (wtn || wtw || (wts && wte))
 					{
@@ -244,10 +251,10 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 				}
 				{
 					// relative to the south west corner of the room, is there a wall to the n/e/s/w
-					const bool wtn = world.room_has_surface(cx, cy, C::WEST);
-					const bool wte = world.room_has_surface(cx, cy, C::SOUTH);
-					const bool wts = world.room_has_surface(cx + 1, cy, C::WEST);
-					const bool wtw = world.room_has_surface(cx, cy - 1, C::SOUTH);
+					const bool wtn = world.room_has_surface(Coordinate(cx, cy), C::WEST);
+					const bool wte = world.room_has_surface(Coordinate(cx, cy), C::SOUTH);
+					const bool wts = world.room_has_surface(Coordinate(cx + 1, cy), C::WEST);
+					const bool wtw = world.room_has_surface(Coordinate(cx, cy - 1), C::SOUTH);
 
 					if (wtn || wte || (wts && wtw))
 					{
@@ -270,13 +277,13 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 					// else if there are neutrals, draw neutral count
 					: ((neutral_count > 0) ? C::NPC_NEUTRAL_CHAR
 					// else if there is a table, draw a table
-					: ((world.room_at(cx, cy)->has_table()) ? C::TABLE_CHAR
+					: ((world.room_at(current)->has_table()) ? C::TABLE_CHAR
 					// else if there is a chest, draw a chest
-					: ((world.room_at(cx, cy)->has_chest()) ? C::CHEST_CHAR
+					: ((world.room_at(current)->has_chest()) ? C::CHEST_CHAR
 					// else if there is a non-mineral deposit item, draw an item char
-					: ((world.room_at(cx, cy)->has_non_mineral_deposit_item()) ? C::ITEM_CHAR
+					: ((world.room_at(current)->has_non_mineral_deposit_item()) ? C::ITEM_CHAR
 					// else if there is a mineral deposit, draw a mineral char
-					: ((world.room_at(cx, cy)->has_mineral_deposit()) ? C::GENERIC_MINERAL_CHAR
+					: ((world.room_at(current)->has_mineral_deposit()) ? C::GENERIC_MINERAL_CHAR
 					// else draw a land char
 					: C::LAND_CHAR)))))))));
 				b.push_back(((er) ? C::RUBBLE_CHAR : ((ed) ? C::DOOR_CHAR : ((e) ? C::WALL_CHAR : C::LAND_CHAR))));

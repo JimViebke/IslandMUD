@@ -29,26 +29,16 @@ protected:
 	{
 	public:
 		// "get [] [] axe", "construct north stone surface", "construct north stone door"
-		int objective_x, objective_y;
+		Coordinate objective_location;
 		bool modifier, already_planning_to_craft = false;
 		std::string verb, direction, material, noun, purpose; // purpose is the reason this objective was added
 
 		Objective(const std::string & verb, const std::string & noun, const std::string & purpose);
-		Objective(const std::string & verb, const std::string & noun, const int & objective_x, const int & objective_y);
-		Objective(const std::string & verb, const std::string & noun, const std::string & material, const std::string & direction, const int & objective_x, const int & objective_y, const bool & modifier);
+		Objective(const std::string & verb, const std::string & noun, const Coordinate & objective_location);
+		Objective(const std::string & verb, const std::string & noun, const std::string & material, const std::string & direction, const Coordinate & objective_location, const bool & modifier);
 	};
 
 	enum class Objective_Priority { low_priority, high_priority };
-
-	class Coordinate
-	{
-	protected:
-		Coordinate() {}
-	public:
-		int _x, _y;
-		Coordinate(const int & set_x, const int & set_y);
-		void reset() { _x = _y = -1; }
-	};
 
 	std::deque<Objective> objectives;
 	std::deque<Coordinate> path;
@@ -107,14 +97,15 @@ protected:
 	}
 
 	// returns true if successful
-	bool pathfind(const int & x_dest, const int & y_dest, World & world, Update_Messages & update_messages);
-	bool best_attempt_pathfind(const int & x_dest, const int & y_dest, World & world, Update_Messages & update_messages);
+	bool pathfind(const Coordinate & destination, World & world, Update_Messages & update_messages);
+	bool best_attempt_pathfind(const Coordinate & destination, World & world, Update_Messages & update_messages);
 	bool pathfind_to_closest_item(const std::string & item_id, World & world, Update_Messages & update_messages);
-	bool save_path_to(const int & x_dest, const int & y_dest, World & world);
+	bool save_path_to(const Coordinate & destination, World & world);
 	bool make_path_movement(World & world, Update_Messages & update_messages);
 
 	// other pathfinding utilities
-	bool coordinates_are_on_path(const int & find_x, const int & find_y) const;
+	int diagonal_movement_cost(const Coordinate & coord_1, const Coordinate & coord_2);
+	bool coordinates_are_on_path(const Coordinate & find_coordinate) const;
 
 private:
 
@@ -127,13 +118,12 @@ private:
 	class Node
 	{
 	public:
-		int x = -1, y = -1,
-			parent_x = -1, parent_y = -1,
-			h = 0, g = 0, f = 0;
+		Coordinate location, parent_location;
+		int h = 0, g = 0, f = 0;
 		std::string direction_from_parent;
 
 		Node();
-		Node(const int & set_x, const int & set_y, const std::string & dir);
+		Node(const Coordinate & set_location, const std::string & dir);
 
 		void set_g_h_f(const int & set_g, const int & set_h);
 		void set_g(const int & set_g);
@@ -142,8 +132,8 @@ private:
 	// pathfinding node utilities
 	Node move_and_get_lowest_f_cost(std::vector<Node> & open, std::vector<Node> & closed);
 	Node move_and_get_lowest_g_cost(std::vector<Node> & open, std::vector<Node> & closed);
-	bool room_in_node_list(const int & find_x, const int & find_y, const std::vector<Node> & node_list) const;
-	Node get_node_at(const int & find_x, const int & find_y, const std::vector<Node> & node_list) const;
+	bool room_in_node_list(const Coordinate & find_coord, const std::vector<Node> & node_list) const;
+	Node get_node_at(const Coordinate & find_coordinate, const std::vector<Node> & node_list) const;
 };
 
 #endif

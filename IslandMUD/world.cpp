@@ -14,27 +14,22 @@ World::World()
 }
 
 // access a room given coordinates
-std::unique_ptr<Room>::pointer World::room_at(const int & x, const int & y)
+std::unique_ptr<Room>::pointer World::room_at(const Coordinate & coordinate)
 {
-	if (!U::bounds_check(x, y))
+	if (!coordinate.is_valid())
 	{
 		return world.begin()->get();
 	}
 
-	return (world.begin() + hash(x, y))->get();
+	return (world.begin() + coordinate.get_hash())->get();
 }
-const std::unique_ptr<Room>::pointer World::room_at(const int & x, const int & y) const
+const std::unique_ptr<Room>::pointer World::room_at(const Coordinate & coordinate) const
 {
-	if (!U::bounds_check(x, y))
-	{
-		return world.cbegin()->get();
-	}
-
-	return (world.cbegin() + hash(x, y))->get();
+	return (world.cbegin() + coordinate.get_hash())->get();
 }
-std::unique_ptr<Room> & World::room_pointer_at(const int & x, const int & y)
+std::unique_ptr<Room> & World::room_pointer_at(const Coordinate & coordinate)
 {
-	return *(world.begin() + hash(x, y));
+	return *(world.begin() + coordinate.get_hash());
 }
 
 // debugging
@@ -50,7 +45,7 @@ unsigned World::count_loaded_rooms() const
 	{
 		for (int y = 0; y < C::WORLD_Y_DIMENSION; ++y)
 		{
-			if (room_at(x, y) != nullptr)
+			if (room_at(Coordinate(x, y)) != nullptr)
 			{
 				++loaded_rooms;
 			}
@@ -60,101 +55,116 @@ unsigned World::count_loaded_rooms() const
 }
 
 // load rooms around a player spawning in
-void World::load_view_radius_around(const int & x, const int & y, const std::string & character_ID)
+void World::load_view_radius_around(const Coordinate & coordinate, const std::string & character_ID)
 {
+	const int x = coordinate.get_x(), y = coordinate.get_y();
+
 	// current x ranges from x-view to x+view
 	for (int cx = x - (int)C::VIEW_DISTANCE; cx <= x + (int)C::VIEW_DISTANCE; ++cx)
 	{
 		// current y ranges from y-view to y+view
 		for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 		{
+			// create a temporary coordinate to the room
+			const Coordinate current(cx, cy);
+
 			// if the coordinates are not within world bounds
-			if (!U::bounds_check(cx, cy))
+			if (!current.is_valid())
 			{
 				continue; // go to next coordinate
 			}
 
 			// if the room is not already in memory
-			if (room_at(cx, cy) == nullptr)
+			if (room_at(current) == nullptr)
 			{
 				// move the room from disk to world
-				load_room_to_world(cx, cy);
+				load_room_to_world(current);
 			}
 
 			// whoever loaded this can see it
-			room_at(cx, cy)->add_viewing_actor(character_ID);
+			room_at(current)->add_viewing_actor(character_ID);
 		}
 	}
 }
 
 // loading and unloading rooms at the edge of vision
-void World::remove_viewer_and_attempt_unload(const int & x, const int & y, const std::string & viewer_ID)
+void World::remove_viewer_and_attempt_unload(const Coordinate & coordinate, const std::string & viewer_ID)
 {
 	// if the referenced room is out of bounds
-	if (!U::bounds_check(x, y))
+	if (!coordinate.is_valid())
 	{
 		return; // nothing to remove or unload
 	}
 
 	// if the referenced room is not loaded
-	if (room_at(x, y) == nullptr)
+	if (room_at(coordinate) == nullptr)
 	{
 		return; // nothing to remove or unload
 	}
 
 	// remove the viewer from the room's viewing list
-	room_at(x, y)->remove_viewing_actor(viewer_ID);
+	room_at(coordinate)->remove_viewing_actor(viewer_ID);
 
 	// if there is no one in the room or able to see it, remove the room from memory
-	if (room_at(x, y)->is_unloadable())
+	if (room_at(coordinate)->is_unloadable())
 	{
-		unload_room(x, y);
+		unload_room(coordinate);
 	}
 }
 
 // unloading of all rooms in view distance (for logging out or dying)
-void World::attempt_unload_radius(const int & x, const int & y, const std::string & player_ID)
+void World::attempt_unload_radius(const Coordinate & coordinate, const std::string & player_ID)
 {
 	// remove the player from the room
-	if (U::bounds_check(x, y))
-		room_at(x, y)->remove_actor(player_ID);
+	if (coordinate.is_valid())
+		room_at(coordinate)->remove_actor(player_ID);
+
+	const int x = coordinate.get_x(), y = coordinate.get_y();
 
 	// for each room within the player's view distance
 	for (int cx = x - C::VIEW_DISTANCE; cx <= x + C::VIEW_DISTANCE; ++cx)
+	{
 		for (int cy = y - C::VIEW_DISTANCE; cy <= y + C::VIEW_DISTANCE; ++cy)
+		{
+			const Coordinate current(cx, cy);
+
 			// if the room is in bounds
-			if (U::bounds_check(cx, cy))
+			if (current.is_valid())
+			{
 				// remove the player as a viewer and attempt to move the room to disk
-				remove_viewer_and_attempt_unload(cx, cy, player_ID);
+				remove_viewer_and_attempt_unload(current, player_ID);
+			}
+		}
+	}
 }
 
 // test if a room can be removed from memory
-bool World::is_unloadable(const int & x, const int & y) const
+bool World::is_unloadable(const Coordinate & coordinate) const
 {
-	return room_at(x, y)->is_unloadable();
+	return room_at(coordinate)->is_unloadable();
 }
 
 // move a room from world to disk
-void World::unload_room(const int & x, const int & y)
+void World::unload_room(const Coordinate & coordinate)
 {
 	// pass the coordinates and a shared_ptr to the room
-	unload_room(x, y, room_at(x, y));
+	unload_room(coordinate, room_at(coordinate));
 
 	// set the pointer at x,y to null
-	erase_room_from_memory(x, y);
+	erase_room_from_memory(coordinate);
 }
 
 // room information
-bool World::room_has_surface(const int & x, const int & y, const std::string & direction_ID) const
+bool World::room_has_surface(const Coordinate & coordinate, const std::string & direction_ID) const
 {
 	// if the room is outside of bounds
-	if (!U::bounds_check(x, y)) return false;
+	if (!coordinate.is_valid()) return false;
 
 	// if the room is not loaded
-	if (room_at(x, y) == nullptr) return false;
+	if (room_at(coordinate) == nullptr) return false;
 
 	// test if the passed direction_ID exists as a wall
-	return room_at(x, y)->has_surface(direction_ID);
+	return room_at(coordinate)->has_surface(direction_ID);
 }
 
 
@@ -386,14 +396,14 @@ bool World::load_existing_limestone_deposit_map()
 }
 
 // a room at x,y does not exist on the disk; create it and add it to the world
-void World::generate_room_at(const int & x, const int & y)
+void World::generate_room_at(const Coordinate & coordinate)
 {
 	// ensure the folder exists
-	std::string path = C::room_directory + "/" + U::to_string(x);
+	std::string path = C::room_directory + "/" + U::to_string(coordinate.get_x());
 	U::create_path_if_not_exists(path);
 
 	// extend the path to include the file
-	path += "/" + U::to_string(x) + "-" + U::to_string(y) + ".xml";
+	path += "/" + U::to_string(coordinate.get_x()) + "-" + U::to_string(coordinate.get_y()) + ".xml";
 
 	// create an XML document to store the room
 	pugi::xml_document room_document;
@@ -402,15 +412,15 @@ void World::generate_room_at(const int & x, const int & y)
 	if (U::file_exists(path))
 	{
 		// load the saved room to XML
-		load_room_to_XML(x, y, room_document);
+		load_room_to_XML(coordinate, room_document);
 
 		// load the XML to the game world
-		add_room_to_world(room_document, x, y);
+		add_room_to_world(room_document, coordinate);
 	}
 	else // the room does not exist on the disk
 	{
 		// create the room and add it to the world
-		room_pointer_at(x, y) = create_room(x, y); // this should invoke the funtionality of move() automatically
+		room_pointer_at(coordinate) = create_room(coordinate); // this should invoke the funtionality of move() automatically
 
 		// this is empty, but save it to the disk
 		room_document.save_file(path.c_str());
@@ -418,21 +428,21 @@ void World::generate_room_at(const int & x, const int & y)
 }
 
 // load the room x,y to an xml_document
-void World::load_room_to_XML(const int & ix, const int & iy, pugi::xml_document & room)
+void World::load_room_to_XML(const Coordinate & coordinate, pugi::xml_document & room)
 {
 	// convert integers to strings, since they'll be used multiple times
-	const std::string x = U::to_string(ix);
-	const std::string y = U::to_string(iy);
+	const std::string x = U::to_string(coordinate.get_x());
+	const std::string y = U::to_string(coordinate.get_y());
 
 	// populate the document using the file for the room at (x, y)
 	room.load_file((C::room_directory + "/" + x + "/" + x + "-" + y + ".xml").c_str());
 }
 
 // build a room given an XML node, add to world at x,y
-void World::add_room_to_world(pugi::xml_node & room_document, const int & x, const int & y)
+void World::add_room_to_world(pugi::xml_node & room_document, const Coordinate & coordinate)
 {
 	// create an empty room
-	std::unique_ptr<Room> room(std::make_unique<Room>());
+	std::unique_ptr<Room> room(std::make_unique<Room>(coordinate));
 
 	// get the root node that represents the room
 	const pugi::xml_node room_node = room_document.child(C::XML_ROOM.c_str());
@@ -572,25 +582,25 @@ void World::add_room_to_world(pugi::xml_node & room_document, const int & x, con
 	}
 
 	// add room to world
-	room_pointer_at(x, y) = std::move(room);
+	room_pointer_at(coordinate) = std::move(room);
 }
 
 // move specific room into memory
-void World::load_room_to_world(const int & x, const int & y)
+void World::load_room_to_world(const Coordinate & coordinate)
 {
 	// If the room is already loaded, return. This should never happen.
-	if (room_at(x, y) != nullptr) return;
+	if (room_at(coordinate) != nullptr) return;
 
 	// get the path to the z_stack
-	const std::string str_x = U::to_string(x);
-	const std::string str_y = U::to_string(y);
+	const std::string str_x = U::to_string(coordinate.get_x());
+	const std::string str_y = U::to_string(coordinate.get_y());
 	const std::string path = C::room_directory + "/" + str_x + "/" + str_x + "-" + str_y + ".xml";
 
 	// if the z_stack does not exist
 	if (!U::file_exists(path))
 	{
 		// generate the room and create the file
-		generate_room_at(x, y);
+		generate_room_at(coordinate);
 		return; // we're done
 	}
 
@@ -599,24 +609,24 @@ void World::load_room_to_world(const int & x, const int & y)
 	room_document.load_file(path.c_str());
 
 	// load the room's data to the world
-	add_room_to_world(room_document, x, y);
+	add_room_to_world(room_document, coordinate);
 }
 
 // move a passed room to disk
-void World::unload_room(const int & x, const int & y, const std::unique_ptr<Room>::pointer room)
+void World::unload_room(const Coordinate & coordinate, const std::unique_ptr<Room>::pointer room)
 {
 	// Unloads passed room. Can be called even if the room doesn't exist in the world structure
 
 	// ensure the path exists up to /x
-	std::string path = (C::room_directory + "/" + U::to_string(x) + "/");
+	std::string path = (C::room_directory + "/" + U::to_string(coordinate.get_x()) + "/");
 	U::create_path_if_not_exists(path);
 
 	// ensure the path exists up to x/x-y.xml
-	path += (U::to_string(x) + "-" + U::to_string(y) + ".xml");
+	path += (U::to_string(coordinate.get_x()) + "-" + U::to_string(coordinate.get_y()) + ".xml");
 
 	// load the room to XML
 	pugi::xml_document room_document;
-	load_room_to_XML(x, y, room_document);
+	load_room_to_XML(coordinate, room_document);
 
 	// process the room into the XML
 	save_room_to_XML(room, room_document);
@@ -777,9 +787,11 @@ void World::save_room_to_XML(const std::unique_ptr<Room>::pointer room, pugi::xm
 }
 
 // create a new empty room given its coordinates and the world terrain
-std::unique_ptr<Room> World::create_room(const int & x, const int & y) const
+std::unique_ptr<Room> World::create_room(const Coordinate & coordinate) const
 {
-	std::unique_ptr<Room> room = std::make_unique<Room>();
+	std::unique_ptr<Room> room = std::make_unique<Room>(coordinate);
+
+	const int x = coordinate.get_x(), y = coordinate.get_y();
 
 	// if the terrain map indicates the room is forest
 	if (terrain->operator[](x)[y] == C::FOREST_CHAR)
@@ -809,7 +821,7 @@ std::unique_ptr<Room> World::create_room(const int & x, const int & y) const
 }
 
 // remove a room from memory
-void World::erase_room_from_memory(const int & x, const int & y)
+void World::erase_room_from_memory(const Coordinate & coordinate)
 {
-	(world.begin() + hash(x, y))->reset();
+	(world.begin() + coordinate.get_hash())->reset();
 }
