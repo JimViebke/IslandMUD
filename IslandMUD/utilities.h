@@ -140,4 +140,16 @@ namespace Utilities
 	}
 }
 
+// allow the following:
+// std::cout << (1 << "2" << '3' << std::endl) << "more data";
+template<typename T1, typename T2> std::stringstream operator<<(const T1 & left, const T2 & right)
+{
+	// what happens if this captures std::cout?
+	
+	std::stringstream ss;
+	ss << left << right;
+	return ss;
+}
+
+
 #endif
