@@ -1,4 +1,4 @@
-﻿/* Jim Viebke
+/* Jim Viebke
 April 1, 2014 */
 
 #ifndef WORLD_H
@@ -29,10 +29,11 @@ private:
 	The "main" thread (the thread making calls to World) doesn't have to pay the I/O cost of unloading rooms.
 	The world object internally contains a background thread that does the unloading work.
 	This comes with the tricky caveat that if a room is still in the queue, and that room is requested to be loaded,
-	the room will have to be loaded from this queue, not from disk. */
-	std::deque<std::unique_ptr<Room>> unload_queue;
-	std::mutex unload_queue_mutex;
-	std::condition_variable unload_queue_cv;
+	the room has to be "loaded" from the queue, not from disk. */
+	std::thread background_room_unloading_thread; // the thread
+	std::deque<std::unique_ptr<Room>> unload_queue; // the queue
+	std::mutex unload_queue_mutex; // a mutex for gaurding the queue
+	std::condition_variable unload_queue_cv; // a cv so the main thread can wake the background unloading thread
 
 public:
 
@@ -100,6 +101,87 @@ private:
 
 	// remove a room from memory
 	void erase_room_from_memory(const Coordinate & coordinate);
+	
+	void unload_rooms_to_disk()
+	{
+		// This only unloads one room at a time in order to make sure that the main thread
+		// can access the queue as quickly as possible. The main thread will always try to
+		// "load" a room from the unload queue (if it exists) before resorting to loading
+		// from the disk.
+		
+		for (;;)
+		{
+			std::unique_ptr<Room> room;
+			
+			{
+				std::unique_lock<std::mutex> lock(unload_queue_mutex);
+
+				// wait if there are no rooms in the queue unload
+				while (unload_queue.is_empty() && Server::is_running())
+					unload_queue_cv.wait(lock);
+								
+				// this only clears the queue when the server is running
+				// Upon server shutdown, the main thread adds all remaining rooms in the World to the queue,
+				// and then unloads the queue.
+				if (!Server::is_running()) return; // this thread now releases the unload queue mutex and dies
+				
+				// debug code
+				std::stringstream ss;
+				ss << "Unloading a room from the unload queue. Current size: " << unload_queue.size() << std::endl;
+				std::cout << ss.str();
+				
+				// get the room
+				room = std::move(unload_queue.front());
+				
+				// clear the nullptr at the beginning of the queue
+				unload_queue.pop();
+			
+			} // release the lock on the queue
+			
+			// add a one-second wait here to demonstrate that the performance of this thread interacting with the desk doesn't effect upon the main thread
+			
+			// unload one room
+			unload_room(unload_queue.front()->coordinates(), unload_queue.front());
+			
+		} // repeat until server shutdown
+	}
+	
+	// this snippet will have to be added to the loading logic
+	{ // check if the room is waiting in the unload queue
+		
+		std::unique_lock<std::mutex> lock(unload_queue_mutex);
+		// for each room in the queue
+		for (auto it = unload_queue.cbegin(); it != unload_queue.cend(); ++it)
+		{
+			// if the room we want to load is about to be unloaded
+			if (**it == coordinates) // dereference twice, because we have an iterator to a unique pointer
+			{
+				// move the room back to the world
+				world.at(coordinates.hash()) = std::move(*it);
+				// erase the entry in the unload queue
+				unload_queue.erase(it);
+				// our work here is done; stop searching for the room
+				break;
+			}
+		}
+	}
+	
+	// this snippet will be added in the main thread during server shutdown
+	{
+		std::unique_lock<std::mutex> lock(unload_queue_mutex);
+		
+		// unload every room in the unload queue
+		while (unload_queue.size() > 0)
+		{
+				// pull the room out of the list
+				std::unique_ptr<Room> room = std::move(unload_queue.front());
+				// clear the nullptr at the beginning of the queue
+				unload_queue.pop();
+				// save the room to disk
+				unload_room(room->coordinates(), room);
+		}
+	}
+	
 };
 
 #endif
