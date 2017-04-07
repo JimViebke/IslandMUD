@@ -25,6 +25,15 @@ private:
 
 	std::vector<std::unique_ptr<Room>> world;
 
+	/*
+	The "main" thread (the thread making calls to World) doesn't have to pay the I/O cost of unloading rooms.
+	The world object internally contains a background thread that does the unloading work.
+	This comes with the tricky caveat that if a room is still in the queue, and that room is requested to be loaded,
+	the room will have to be loaded from this queue, not from disk. */
+	std::deque<std::unique_ptr<Room>> unload_queue;
+	std::mutex unload_queue_mutex;
+	std::condition_variable unload_queue_cv;
+
 public:
 
 	World();
