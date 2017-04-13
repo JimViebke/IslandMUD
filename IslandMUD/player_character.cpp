@@ -54,8 +54,6 @@ std::string PC::generate_area_map(const World & world, const std::map<std::strin
 	tree_grid index = current index - (player index - (view distance + 1)) */
 	for (int cx = x - (int)C::VIEW_DISTANCE; cx <= x + (int)C::VIEW_DISTANCE; ++cx)
 	{
-		std::cout << '\n';
-
 		const int i = cx - (x - (C::VIEW_DISTANCE + 1));
 		for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 		{
