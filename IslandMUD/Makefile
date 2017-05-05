@@ -56,7 +56,7 @@ build: .build-post
 .build-pre:
 # Add your pre 'build' code here...
 
-CXXFLAGS=-std=c++14
+CXXFLAGS='-std=c++14 -Wfatal-errors'
 
 .build-post: .build-impl
 # Add your post 'build' code here...
