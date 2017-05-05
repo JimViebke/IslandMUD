@@ -28,7 +28,7 @@ private:
 	threadsafe::connection_lookup players;
 
 	std::map<std::string, std::shared_ptr<Character>> actors; // active/online PC and NPC ids
-	World world; // the game world object
+	std::unique_ptr<World> world; // the game world object
 
 	std::mutex game_state; // provides safe access and modification of the above two structures
 

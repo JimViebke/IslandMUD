@@ -4,7 +4,7 @@ Aug 15 2015 */
 
 #include "npc_enemy_fighter.h"
 
-Update_Messages Hostile_NPC_Fighter::update(World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Fighter::update(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
 	if (i_dont_have(C::AXE_ID) && !im_planning_to_acquire(C::AXE_ID))
 	{
@@ -24,7 +24,7 @@ Update_Messages Hostile_NPC_Fighter::update(World & world, std::map<std::string,
 		if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE)
 		{
 			// if the item is here, take it, remove the current objective, and return
-			if (world.room_at(location)->contains(objective_iterator->noun))
+			if (world->room_at(location)->contains(objective_iterator->noun))
 			{
 				Update_Messages update_messages = take(objective_iterator->noun, world);
 
@@ -143,7 +143,7 @@ Update_Messages Hostile_NPC_Fighter::update(World & world, std::map<std::string,
 				if (!current.is_valid()) continue;
 
 				// for each actor in the room
-				for (const std::string & actor_ID : world.room_at(current)->get_actor_ids())
+				for (const std::string & actor_ID : world->room_at(current)->get_actor_ids())
 				{
 					// if the character is a player character
 					if (U::is<PC>(actors.find(actor_ID)->second))

@@ -6,7 +6,7 @@ Aug 15 2015 */
 
 #include "npc_enemy_worker.h"
 
-Update_Messages Hostile_NPC_Worker::update(World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
 	if (!fortress_planned)
 	{
@@ -41,7 +41,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, std::map<std::string, 
 			if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE)
 			{
 				// if the item is here, take it, remove the current objective, and return
-				if (world.room_at(location)->contains(objective_iterator->noun))
+				if (world->room_at(location)->contains(objective_iterator->noun))
 				{
 					// remove the item from the room
 					update_messages = take(objective_iterator->noun, world);
@@ -194,7 +194,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, std::map<std::string, 
 			if (objective_it->objective_location == location)
 			{
 				// if the surface already exists, erase the objective and continue
-				if (world.room_at(location)->has_surface(objective_it->direction))
+				if (world->room_at(location)->has_surface(objective_it->direction))
 				{
 					// erase() returns the next iterator
 					objective_it = objectives.erase(objective_it);
@@ -204,7 +204,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, std::map<std::string, 
 				}
 
 				// check if there is a tree in the way
-				if (world.room_at(location)->contains(C::TREE_ID))
+				if (world->room_at(location)->contains(C::TREE_ID))
 				{
 					// if the axe is not equipped
 					if (equipped_item == nullptr || equipped_item->get_name() != C::AXE_ID)
@@ -221,7 +221,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, std::map<std::string, 
 				const Coordinate adjacent = location.get_after_move(objective_it->direction);
 
 				// if an opposing surface exists, don't construct a surface here.
-				if (world.room_at(adjacent)->has_surface(C::opposite_surface_id.find(objective_it->direction)->second))
+				if (world->room_at(adjacent)->has_surface(C::opposite_surface_id.find(objective_it->direction)->second))
 				{
 					// If the NPC was about to build a surface with a door, move the door elsewhere.
 					// It is possible that this will move the door to another structure.
@@ -366,7 +366,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, std::map<std::string, 
 			if (objective_it->objective_location == location)
 			{
 				// if the surface already exists, erase the objective and continue
-				if (world.room_at(location)->has_surface(objective_it->direction))
+				if (world->room_at(location)->has_surface(objective_it->direction))
 				{
 					// erase() returns the next iterator
 					objective_it = structure_it->structure_surface_objectives.erase(objective_it);
@@ -376,7 +376,7 @@ Update_Messages Hostile_NPC_Worker::update(World & world, std::map<std::string, 
 				}
 
 				// check if there is a tree in the way
-				if (world.room_at(location)->contains(C::TREE_ID))
+				if (world->room_at(location)->contains(C::TREE_ID))
 				{
 					// if the axe is not equipped
 					if (equipped_item == nullptr || equipped_item->get_name() != C::AXE_ID)
@@ -863,7 +863,7 @@ void Hostile_NPC_Worker::Structure_Objectives::add(const Objective & obj)
 	structure_surface_objectives.push_back(obj);
 }
 
-void Hostile_NPC_Worker::Structure_Objectives::plan_doors(const World & world)
+void Hostile_NPC_Worker::Structure_Objectives::plan_doors(const std::unique_ptr<World> & world)
 {
 	// this function only runs once
 	if (doors_planned) { return; }
@@ -876,7 +876,7 @@ void Hostile_NPC_Worker::Structure_Objectives::plan_doors(const World & world)
 		const Coordinate current = structure_surface_objectives[i].objective_location.get_after_move(structure_surface_objectives[i].direction);
 
 		// determine if the adjacent room has an opposing wall
-		if (world.room_at(current)->has_surface(C::opposite_surface_id.find(structure_surface_objectives[i].direction)->second))
+		if (world->room_at(current)->has_surface(C::opposite_surface_id.find(structure_surface_objectives[i].direction)->second))
 		{
 			// if the adjacent room has an opposing wall, this wall will never be constructed; remove it
 			structure_surface_objectives.erase(structure_surface_objectives.begin() + i);
