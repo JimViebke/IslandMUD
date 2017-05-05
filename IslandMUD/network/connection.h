@@ -19,8 +19,13 @@ namespace network
 	class Connection
 	{
 		friend class Port;
+#ifdef WIN32
 		friend class std::shared_ptr<Connection>;
 		friend class std::_Ref_count_obj<Connection>;
+#else
+        friend class __gnu_cxx::new_allocator<Connection>;
+
+#endif
 
 	private:
 		SOCKET _socket;

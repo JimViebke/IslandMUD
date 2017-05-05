@@ -1,5 +1,8 @@
 
+#include <string>
 #include <sstream>
+
+#include <errno.h>
 
 #include "connection.h"
 
@@ -8,9 +11,11 @@ namespace network
 	Connection::Connection(const std::string & ip_address, const unsigned & port) : Connection(ip_address, port, socket_type::stream, protocol::IPPROTO_TCP) {}
 	Connection::Connection(const std::string & ip_address, const unsigned & port, const socket_type & type, const protocol & protocol)
 	{
+#ifdef WIN32
 		// ensure WSA has started (destroys automatically)
 		detail::WSA_wrapper::startup();
-
+#endif
+        
 		// create the socket
 		_socket = socket(AF_INET, type, protocol);
 
@@ -26,16 +31,22 @@ namespace network
 		// if connection failed
 		if (res == SOCKET_ERROR)
 		{
-			closesocket(_socket);
-			throw std::exception("Error on socket connect: " + WSAGetLastError());
+			network::close_socket(_socket);
+#ifdef WIN32
+			throw std::runtime_error("Error on socket connect: " + WSAGetLastError());
+#else
+            throw std::runtime_error("Error on socket connect: " + std::to_string(errno));
+#endif
 		}
 	}
 
 	// private constructor
 	Connection::Connection(const SOCKET & set_socket) : _socket(set_socket)
 	{
+#ifdef WIN32
 		// ensure WSA has started (destroys automatically)
 		detail::WSA_wrapper::startup();
+#endif
 	}
 
 	void Connection::send(const std::string & message) const
@@ -55,7 +66,7 @@ namespace network
 
 			// check for a graceful disconnect OR a less graceful disconnect, respectively
 			if (data_read == 0 || data_read == -1)
-				throw std::exception("disconnected - socket returned " + data_read);
+				throw std::runtime_error("disconnected - socket returned " + data_read);
 
 			// read received data into a stringstream
 			std::stringstream ss;
@@ -69,13 +80,13 @@ namespace network
 
 	void Connection::close()
 	{
-		closesocket(_socket);
+		network::close_socket(_socket);
 		open = false;
 	}
 
 	Connection::~Connection()
 	{
-		if (open) closesocket(_socket);
+		if (open) network::close_socket(_socket);
 	}
 
 }

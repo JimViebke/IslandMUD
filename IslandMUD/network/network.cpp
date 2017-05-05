@@ -7,6 +7,8 @@ namespace network
 {
 	namespace detail
 	{
+        
+#ifdef WIN32
 		WSA_wrapper::WSA_wrapper()
 		{
 			WSADATA WSAData;
@@ -20,5 +22,17 @@ namespace network
 		{
 			WSACleanup();
 		}
-	}
+#endif // Linux doesn't need anything like this because it initializes its networking code automatically
+
+    }
+
+    void close_socket(const SOCKET & socket)
+    {
+#ifdef WIN32
+        closesocket(socket);
+#else
+        close(socket);
+#endif
+    }
+
 }
