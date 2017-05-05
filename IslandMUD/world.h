@@ -12,7 +12,7 @@ April 1, 2014 */
 
 #include "room.h"
 #include "generator.h"
-#include "threadsafe\threadsafe_queue.h"
+#include "threadsafe/threadsafe_queue.h"
 
 class World
 {

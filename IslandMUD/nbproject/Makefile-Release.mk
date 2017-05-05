@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux-x86
+CND_PLATFORM=None-Linux
 CND_DLIB_EXT=so
 CND_CONF=Release
 CND_DISTDIR=dist
@@ -41,28 +41,19 @@ OBJECTFILES= \
 	${OBJECTDIR}/NPC/npc_enemy_corporal.o \
 	${OBJECTDIR}/NPC/npc_enemy_fighter.o \
 	${OBJECTDIR}/NPC/npc_enemy_worker.o \
+	${OBJECTDIR}/NPC/npc_neutral.o \
 	${OBJECTDIR}/XML/pugixml.o \
-	${OBJECTDIR}/character.o \
-	${OBJECTDIR}/constants.o \
-	${OBJECTDIR}/craft.o \
-	${OBJECTDIR}/door.o \
-	${OBJECTDIR}/game.o \
-	${OBJECTDIR}/generator.o \
-	${OBJECTDIR}/item.o \
+	${OBJECTDIR}/coordinate.o \
 	${OBJECTDIR}/item/bloomery.o \
 	${OBJECTDIR}/item/chest.o \
 	${OBJECTDIR}/item/container.o \
 	${OBJECTDIR}/item/equipment.o \
 	${OBJECTDIR}/item/table.o \
-	${OBJECTDIR}/main.o \
-	${OBJECTDIR}/message.o \
-	${OBJECTDIR}/parse.o \
-	${OBJECTDIR}/player_character.o \
-	${OBJECTDIR}/recipes.o \
-	${OBJECTDIR}/room.o \
-	${OBJECTDIR}/room_side.o \
-	${OBJECTDIR}/utilities.o \
-	${OBJECTDIR}/world.o
+	${OBJECTDIR}/network/connection.o \
+	${OBJECTDIR}/network/network.o \
+	${OBJECTDIR}/network/port.o \
+	${OBJECTDIR}/server/server.o \
+	${OBJECTDIR}/threadsafe/threadsafe_connection_lookup.o
 
 
 # C Compiler Flags
@@ -89,145 +80,100 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/islandmud: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/islandmud ${OBJECTFILES} ${LDLIBSOPTIONS}
 
-${OBJECTDIR}/NPC/non_player_character.o: NPC/non_player_character.cpp 
+${OBJECTDIR}/NPC/non_player_character.o: NPC/non_player_character.cpp
 	${MKDIR} -p ${OBJECTDIR}/NPC
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/NPC/non_player_character.o NPC/non_player_character.cpp
 
-${OBJECTDIR}/NPC/npc_enemy.o: NPC/npc_enemy.cpp 
+${OBJECTDIR}/NPC/npc_enemy.o: NPC/npc_enemy.cpp
 	${MKDIR} -p ${OBJECTDIR}/NPC
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/NPC/npc_enemy.o NPC/npc_enemy.cpp
 
-${OBJECTDIR}/NPC/npc_enemy_bodyguard.o: NPC/npc_enemy_bodyguard.cpp 
+${OBJECTDIR}/NPC/npc_enemy_bodyguard.o: NPC/npc_enemy_bodyguard.cpp
 	${MKDIR} -p ${OBJECTDIR}/NPC
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/NPC/npc_enemy_bodyguard.o NPC/npc_enemy_bodyguard.cpp
 
-${OBJECTDIR}/NPC/npc_enemy_corporal.o: NPC/npc_enemy_corporal.cpp 
+${OBJECTDIR}/NPC/npc_enemy_corporal.o: NPC/npc_enemy_corporal.cpp
 	${MKDIR} -p ${OBJECTDIR}/NPC
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/NPC/npc_enemy_corporal.o NPC/npc_enemy_corporal.cpp
 
-${OBJECTDIR}/NPC/npc_enemy_fighter.o: NPC/npc_enemy_fighter.cpp 
+${OBJECTDIR}/NPC/npc_enemy_fighter.o: NPC/npc_enemy_fighter.cpp
 	${MKDIR} -p ${OBJECTDIR}/NPC
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/NPC/npc_enemy_fighter.o NPC/npc_enemy_fighter.cpp
 
-${OBJECTDIR}/NPC/npc_enemy_worker.o: NPC/npc_enemy_worker.cpp 
+${OBJECTDIR}/NPC/npc_enemy_worker.o: NPC/npc_enemy_worker.cpp
 	${MKDIR} -p ${OBJECTDIR}/NPC
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/NPC/npc_enemy_worker.o NPC/npc_enemy_worker.cpp
 
-${OBJECTDIR}/XML/pugixml.o: XML/pugixml.cpp 
+${OBJECTDIR}/NPC/npc_neutral.o: NPC/npc_neutral.cpp
+	${MKDIR} -p ${OBJECTDIR}/NPC
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/NPC/npc_neutral.o NPC/npc_neutral.cpp
+
+${OBJECTDIR}/XML/pugixml.o: XML/pugixml.cpp
 	${MKDIR} -p ${OBJECTDIR}/XML
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/XML/pugixml.o XML/pugixml.cpp
 
-${OBJECTDIR}/character.o: character.cpp 
+${OBJECTDIR}/coordinate.o: coordinate.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/character.o character.cpp
+	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/coordinate.o coordinate.cpp
 
-${OBJECTDIR}/constants.o: constants.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/constants.o constants.cpp
-
-${OBJECTDIR}/craft.o: craft.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/craft.o craft.cpp
-
-${OBJECTDIR}/door.o: door.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/door.o door.cpp
-
-${OBJECTDIR}/game.o: game.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/game.o game.cpp
-
-${OBJECTDIR}/generator.o: generator.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/generator.o generator.cpp
-
-${OBJECTDIR}/item.o: item.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/item.o item.cpp
-
-${OBJECTDIR}/item/bloomery.o: item/bloomery.cpp 
+${OBJECTDIR}/item/bloomery.o: item/bloomery.cpp
 	${MKDIR} -p ${OBJECTDIR}/item
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/item/bloomery.o item/bloomery.cpp
 
-${OBJECTDIR}/item/chest.o: item/chest.cpp 
+${OBJECTDIR}/item/chest.o: item/chest.cpp
 	${MKDIR} -p ${OBJECTDIR}/item
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/item/chest.o item/chest.cpp
 
-${OBJECTDIR}/item/container.o: item/container.cpp 
+${OBJECTDIR}/item/container.o: item/container.cpp
 	${MKDIR} -p ${OBJECTDIR}/item
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/item/container.o item/container.cpp
 
-${OBJECTDIR}/item/equipment.o: item/equipment.cpp 
+${OBJECTDIR}/item/equipment.o: item/equipment.cpp
 	${MKDIR} -p ${OBJECTDIR}/item
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/item/equipment.o item/equipment.cpp
 
-${OBJECTDIR}/item/table.o: item/table.cpp 
+${OBJECTDIR}/item/table.o: item/table.cpp
 	${MKDIR} -p ${OBJECTDIR}/item
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/item/table.o item/table.cpp
 
-${OBJECTDIR}/main.o: main.cpp 
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/network/connection.o: network/connection.cpp
+	${MKDIR} -p ${OBJECTDIR}/network
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/network/connection.o network/connection.cpp
 
-${OBJECTDIR}/message.o: message.cpp 
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/network/network.o: network/network.cpp
+	${MKDIR} -p ${OBJECTDIR}/network
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/message.o message.cpp
+	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/network/network.o network/network.cpp
 
-${OBJECTDIR}/parse.o: parse.cpp 
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/network/port.o: network/port.cpp
+	${MKDIR} -p ${OBJECTDIR}/network
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/parse.o parse.cpp
+	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/network/port.o network/port.cpp
 
-${OBJECTDIR}/player_character.o: player_character.cpp 
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/server/server.o: server/server.cpp
+	${MKDIR} -p ${OBJECTDIR}/server
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/player_character.o player_character.cpp
+	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/server/server.o server/server.cpp
 
-${OBJECTDIR}/recipes.o: recipes.cpp 
-	${MKDIR} -p ${OBJECTDIR}
+${OBJECTDIR}/threadsafe/threadsafe_connection_lookup.o: threadsafe/threadsafe_connection_lookup.cpp
+	${MKDIR} -p ${OBJECTDIR}/threadsafe
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/recipes.o recipes.cpp
-
-${OBJECTDIR}/room.o: room.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/room.o room.cpp
-
-${OBJECTDIR}/room_side.o: room_side.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/room_side.o room_side.cpp
-
-${OBJECTDIR}/utilities.o: utilities.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/utilities.o utilities.cpp
-
-${OBJECTDIR}/world.o: world.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/world.o world.cpp
+	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/threadsafe/threadsafe_connection_lookup.o threadsafe/threadsafe_connection_lookup.cpp
 
 # Subprojects
 .build-subprojects:
@@ -235,7 +181,6 @@ ${OBJECTDIR}/world.o: world.cpp
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/islandmud
 
 # Subprojects
 .clean-subprojects:

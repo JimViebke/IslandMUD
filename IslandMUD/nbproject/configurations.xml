@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="95">
+<configurationDescriptor version="100">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
-    <logicalFolder name="f1" displayName="source" projectFiles="true">
+    <logicalFolder name="IslandMUD" displayName="IslandMUD" projectFiles="true">
+      <logicalFolder name=".vscode" displayName=".vscode" projectFiles="true">
+        <itemPath>.vscode/settings.json</itemPath>
+      </logicalFolder>
+      <logicalFolder name="fortress generation prototype"
+                     displayName="fortress generation prototype"
+                     projectFiles="true">
+        <itemPath>fortress generation prototype/islandmud fortress preview.py</itemPath>
+        <itemPath>fortress generation prototype/v1 - partitions only.png</itemPath>
+        <itemPath>fortress generation prototype/v2 - structures + partitons.png</itemPath>
+        <itemPath>fortress generation prototype/v2 - structures.png</itemPath>
+        <itemPath>fortress generation prototype/v3 - structures + partitions.png</itemPath>
+        <itemPath>fortress generation prototype/v3 - structures.png</itemPath>
+        <itemPath>fortress generation prototype/v4 - structures.png</itemPath>
+      </logicalFolder>
       <logicalFolder name="item" displayName="item" projectFiles="true">
         <itemPath>item/bloomery.cpp</itemPath>
         <itemPath>item/bloomery.h</itemPath>
@@ -17,6 +31,15 @@
         <itemPath>item/table.cpp</itemPath>
         <itemPath>item/table.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="network" displayName="network" projectFiles="true">
+        <itemPath>network/connection.cpp</itemPath>
+        <itemPath>network/connection.h</itemPath>
+        <itemPath>network/include.h</itemPath>
+        <itemPath>network/network.cpp</itemPath>
+        <itemPath>network/network.h</itemPath>
+        <itemPath>network/port.cpp</itemPath>
+        <itemPath>network/port.h</itemPath>
+      </logicalFolder>
       <logicalFolder name="NPC" displayName="NPC" projectFiles="true">
         <itemPath>NPC/non_player_character.cpp</itemPath>
         <itemPath>NPC/non_player_character.h</itemPath>
@@ -30,50 +53,33 @@
         <itemPath>NPC/npc_enemy_fighter.h</itemPath>
         <itemPath>NPC/npc_enemy_worker.cpp</itemPath>
         <itemPath>NPC/npc_enemy_worker.h</itemPath>
+        <itemPath>NPC/npc_neutral.cpp</itemPath>
+        <itemPath>NPC/npc_neutral.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="server" displayName="server" projectFiles="true">
+        <itemPath>server/server.cpp</itemPath>
+        <itemPath>server/server.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="threadsafe" displayName="threadsafe" projectFiles="true">
+        <itemPath>threadsafe/threadsafe_connection_lookup.cpp</itemPath>
+        <itemPath>threadsafe/threadsafe_connection_lookup.h</itemPath>
+        <itemPath>threadsafe/threadsafe_queue.h</itemPath>
       </logicalFolder>
       <logicalFolder name="XML" displayName="XML" projectFiles="true">
-        <logicalFolder name="New Folder" displayName="New Folder" projectFiles="true">
-        </logicalFolder>
         <itemPath>XML/pugiconfig.hpp</itemPath>
         <itemPath>XML/pugixml.cpp</itemPath>
         <itemPath>XML/pugixml.hpp</itemPath>
       </logicalFolder>
-      <itemPath>character.cpp</itemPath>
-      <itemPath>character.h</itemPath>
-      <itemPath>constants.cpp</itemPath>
-      <itemPath>constants.h</itemPath>
-      <itemPath>craft.cpp</itemPath>
-      <itemPath>craft.h</itemPath>
-      <itemPath>door.cpp</itemPath>
-      <itemPath>door.h</itemPath>
-      <itemPath>game.cpp</itemPath>
-      <itemPath>game.h</itemPath>
-      <itemPath>generator.cpp</itemPath>
-      <itemPath>generator.h</itemPath>
-      <itemPath>item.cpp</itemPath>
-      <itemPath>item.h</itemPath>
-      <itemPath>main.cpp</itemPath>
-      <itemPath>message.cpp</itemPath>
-      <itemPath>message.h</itemPath>
-      <itemPath>npc.h</itemPath>
-      <itemPath>parse.cpp</itemPath>
-      <itemPath>parse.h</itemPath>
-      <itemPath>player_character.cpp</itemPath>
-      <itemPath>player_character.h</itemPath>
-      <itemPath>recipe.h</itemPath>
-      <itemPath>recipes.cpp</itemPath>
-      <itemPath>recipes.h</itemPath>
-      <itemPath>resource.h</itemPath>
-      <itemPath>room.cpp</itemPath>
-      <itemPath>room.h</itemPath>
-      <itemPath>room_side.cpp</itemPath>
-      <itemPath>room_side.h</itemPath>
-      <itemPath>threadsafe_queue.h</itemPath>
-      <itemPath>threadsafe_socket_lookup.h</itemPath>
-      <itemPath>utilities.cpp</itemPath>
-      <itemPath>utilities.h</itemPath>
-      <itemPath>world.cpp</itemPath>
-      <itemPath>world.h</itemPath>
+      <itemPath>.dep.inc</itemPath>
+      <itemPath>Class Diagram.cd</itemPath>
+      <itemPath>IslandMUD.vcxproj</itemPath>
+      <itemPath>IslandMUD.vcxproj.filters</itemPath>
+      <itemPath>IslandMUD.vcxproj.user</itemPath>
+      <itemPath>Makefile</itemPath>
+      <itemPath>coordinate.cpp</itemPath>
+      <itemPath>coordinate.h</itemPath>
+      <itemPath>notes.txt</itemPath>
+      <itemPath>server.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -107,6 +113,20 @@
           <warningLevel>3</warningLevel>
         </ccTool>
       </compileType>
+      <item path=".dep.inc" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path=".vscode/settings.json" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Class Diagram.cd" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="IslandMUD.vcxproj" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="IslandMUD.vcxproj.filters" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="IslandMUD.vcxproj.user" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Makefile" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="NPC/non_player_character.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="NPC/non_player_character.h" ex="false" tool="3" flavor2="0">
@@ -131,39 +151,54 @@
       </item>
       <item path="NPC/npc_enemy_worker.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="NPC/npc_neutral.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="NPC/npc_neutral.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="XML/pugiconfig.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="XML/pugixml.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="XML/pugixml.hpp" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="character.cpp" ex="false" tool="1" flavor2="0">
+      <item path="coordinate.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="character.h" ex="false" tool="3" flavor2="0">
+      <item path="coordinate.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="constants.cpp" ex="false" tool="1" flavor2="0">
+      <item path="fortress generation prototype/islandmud fortress preview.py"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="constants.h" ex="false" tool="3" flavor2="0">
+      <item path="fortress generation prototype/v1 - partitions only.png"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="craft.cpp" ex="false" tool="1" flavor2="0">
+      <item path="fortress generation prototype/v2 - structures + partitons.png"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="craft.h" ex="false" tool="3" flavor2="0">
+      <item path="fortress generation prototype/v2 - structures.png"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="door.cpp" ex="false" tool="1" flavor2="0">
+      <item path="fortress generation prototype/v3 - structures + partitions.png"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="door.h" ex="false" tool="3" flavor2="0">
+      <item path="fortress generation prototype/v3 - structures.png"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="game.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="game.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="generator.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="generator.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="item.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="item.h" ex="false" tool="3" flavor2="0">
+      <item path="fortress generation prototype/v4 - structures.png"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="item/bloomery.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -191,49 +226,39 @@
       </item>
       <item path="item/table.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      <item path="network/connection.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="message.cpp" ex="false" tool="1" flavor2="0">
+      <item path="network/connection.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="message.h" ex="false" tool="3" flavor2="0">
+      <item path="network/include.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="npc.h" ex="false" tool="3" flavor2="0">
+      <item path="network/network.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="parse.cpp" ex="false" tool="1" flavor2="0">
+      <item path="network/network.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="parse.h" ex="false" tool="3" flavor2="0">
+      <item path="network/port.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="player_character.cpp" ex="false" tool="1" flavor2="0">
+      <item path="network/port.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="player_character.h" ex="false" tool="3" flavor2="0">
+      <item path="notes.txt" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="recipe.h" ex="false" tool="3" flavor2="0">
+      <item path="server.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="recipes.cpp" ex="false" tool="1" flavor2="0">
+      <item path="server/server.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="recipes.h" ex="false" tool="3" flavor2="0">
+      <item path="server/server.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="resource.h" ex="false" tool="3" flavor2="0">
+      <item path="threadsafe/threadsafe_connection_lookup.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
-      <item path="room.cpp" ex="false" tool="1" flavor2="0">
+      <item path="threadsafe/threadsafe_connection_lookup.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="room.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="room_side.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="room_side.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="threadsafe_queue.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="threadsafe_socket_lookup.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="utilities.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="utilities.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="world.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="world.h" ex="false" tool="3" flavor2="0">
+      <item path="threadsafe/threadsafe_queue.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -261,6 +286,20 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path=".dep.inc" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path=".vscode/settings.json" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Class Diagram.cd" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="IslandMUD.vcxproj" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="IslandMUD.vcxproj.filters" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="IslandMUD.vcxproj.user" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Makefile" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="NPC/non_player_character.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="NPC/non_player_character.h" ex="false" tool="3" flavor2="0">
@@ -285,39 +324,54 @@
       </item>
       <item path="NPC/npc_enemy_worker.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="NPC/npc_neutral.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="NPC/npc_neutral.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="XML/pugiconfig.hpp" ex="false" tool="3" flavor2="0">
       </item>
       <item path="XML/pugixml.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="XML/pugixml.hpp" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="character.cpp" ex="false" tool="1" flavor2="0">
+      <item path="coordinate.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="character.h" ex="false" tool="3" flavor2="0">
+      <item path="coordinate.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="constants.cpp" ex="false" tool="1" flavor2="0">
+      <item path="fortress generation prototype/islandmud fortress preview.py"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="constants.h" ex="false" tool="3" flavor2="0">
+      <item path="fortress generation prototype/v1 - partitions only.png"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="craft.cpp" ex="false" tool="1" flavor2="0">
+      <item path="fortress generation prototype/v2 - structures + partitons.png"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="craft.h" ex="false" tool="3" flavor2="0">
+      <item path="fortress generation prototype/v2 - structures.png"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="door.cpp" ex="false" tool="1" flavor2="0">
+      <item path="fortress generation prototype/v3 - structures + partitions.png"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="door.h" ex="false" tool="3" flavor2="0">
+      <item path="fortress generation prototype/v3 - structures.png"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="game.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="game.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="generator.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="generator.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="item.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="item.h" ex="false" tool="3" flavor2="0">
+      <item path="fortress generation prototype/v4 - structures.png"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
       <item path="item/bloomery.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -345,49 +399,39 @@
       </item>
       <item path="item/table.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      <item path="network/connection.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="message.cpp" ex="false" tool="1" flavor2="0">
+      <item path="network/connection.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="message.h" ex="false" tool="3" flavor2="0">
+      <item path="network/include.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="npc.h" ex="false" tool="3" flavor2="0">
+      <item path="network/network.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="parse.cpp" ex="false" tool="1" flavor2="0">
+      <item path="network/network.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="parse.h" ex="false" tool="3" flavor2="0">
+      <item path="network/port.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="player_character.cpp" ex="false" tool="1" flavor2="0">
+      <item path="network/port.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="player_character.h" ex="false" tool="3" flavor2="0">
+      <item path="notes.txt" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="recipe.h" ex="false" tool="3" flavor2="0">
+      <item path="server.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="recipes.cpp" ex="false" tool="1" flavor2="0">
+      <item path="server/server.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="recipes.h" ex="false" tool="3" flavor2="0">
+      <item path="server/server.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="resource.h" ex="false" tool="3" flavor2="0">
+      <item path="threadsafe/threadsafe_connection_lookup.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
       </item>
-      <item path="room.cpp" ex="false" tool="1" flavor2="0">
+      <item path="threadsafe/threadsafe_connection_lookup.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
       </item>
-      <item path="room.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="room_side.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="room_side.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="threadsafe_queue.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="threadsafe_socket_lookup.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="utilities.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="utilities.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="world.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="world.h" ex="false" tool="3" flavor2="0">
+      <item path="threadsafe/threadsafe_queue.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>
