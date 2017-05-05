@@ -13,14 +13,15 @@ bool Server::running;
 void Server::start()
 {
 	std::lock_guard<std::mutex> lock(mutex);
-	std::cout << "Server starting.\n";
 	running = true;
+	std::cout << "Server started.\n";
 }
 void Server::shutdown()
 {
 	std::lock_guard<std::mutex> lock(mutex);
 	std::cout << "Server shutting down.\n";
 	running = false;
+	std::cout << "Server shut down.\n";
 	cv.notify_all();
 }
 
