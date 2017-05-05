@@ -355,8 +355,6 @@ Update_Messages Character::move(const std::string & direction_ID, std::unique_pt
 			world->remove_viewer_and_attempt_unload(unload_location, this->name);
 		}
 	}
-	else if (direction_ID == C::UP) { return Update_Messages("[moving up not available yet]"); }
-	else if (direction_ID == C::DOWN) { return Update_Messages("[moving down not available yet]"); }
 	else
 	{
 		/* The direction is a secondary compass direction.
