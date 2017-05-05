@@ -139,6 +139,10 @@ bool Room::has_mineral_deposit() const
 	return contents.find(C::IRON_DEPOSIT_ID) != contents.cend() ||
 		contents.find(C::LIMESTONE_DEPOSIT_ID) != contents.cend();
 }
+Coordinate Room::get_coordinates() const
+{
+	return coordinate;
+}
 
 // chests
 void Room::add_chest(const std::string & set_faction_id)
