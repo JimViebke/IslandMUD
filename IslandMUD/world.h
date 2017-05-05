@@ -7,9 +7,11 @@ April 1, 2014 */
 #include <vector>
 #include <memory>
 #include <map>
+#include <thread>
 
 #include "XML/pugixml.hpp"
 
+#include "server/server.h"
 #include "room.h"
 #include "generator.h"
 #include "threadsafe/threadsafe_queue.h"
@@ -17,32 +19,39 @@ April 1, 2014 */
 class World
 {
 private:
-	
+
 	// 2d terrain (biome) map
 	std::unique_ptr<std::vector<std::vector<char>>> terrain;
 	std::unique_ptr<std::vector<std::vector<char>>> iron_deposit_map;
 	std::unique_ptr<std::vector<std::vector<char>>> limestone_deposit_map;
 
+	// For the world, we store x*y pointers. Most of these pointers will be null most of the time,
+	// but this gives us the luxury of O(1) access time for any room.
 	std::vector<std::unique_ptr<Room>> world;
 
-	/*
-	The "main" thread (the thread making calls to World) doesn't have to pay the I/O cost of unloading rooms.
-	The world object internally contains a background thread that does the unloading work.
-	This comes with the tricky caveat that if a room is still in the queue, and that room is requested to be loaded,
-	the room has to be "loaded" from the queue, not from disk. */
+	// The "main" thread (the thread making calls to World) doesn't have to pay the I/O cost of unloading rooms.
+	// The world object internally contains a background thread that does the unloading work.
+	// One tricky caveat is that if a room is still in the queue, and that room is requested to be loaded,
+	// the room has to be "loaded" from the queue, not from disk.
 	std::thread background_room_unloading_thread; // the thread
-	std::deque<std::unique_ptr<Room>> unload_queue; // the queue
-	std::mutex unload_queue_mutex; // a mutex for gaurding the queue
-	std::condition_variable unload_queue_cv; // a cv so the main thread can wake the background unloading thread
+	std::deque<std::unique_ptr<Room>> unload_queue; // the queue of rooms to unload
+	std::recursive_mutex unload_queue_mutex;
+	std::condition_variable_any unload_queue_cv; // a cv so the main thread can wake the background unloading thread
+
+	// A second caveat is that the room might not be in the queue,
+	std::unique_ptr<Coordinate> writing_to_disk = nullptr; // which room is being written
+	std::mutex writing_to_disk_mutex;
+	std::condition_variable writing_to_disk_cv; // in case the main thread has to sleep while waiting for a room to finish saving
 
 public:
 
 	World();
+	~World();
 
-	// access a room given coordinates
+	// access a room using its coordinates
 	std::unique_ptr<Room>::pointer room_at(const Coordinate & coordinate);
 	const std::unique_ptr<Room>::pointer room_at(const Coordinate & coordinate) const;
-	std::unique_ptr<Room> & room_pointer_at(const Coordinate & coordinate);
+	std::unique_ptr<Room> & reference_room_at(const Coordinate & coordinate);
 
 	// debugging
 	unsigned count_loaded_rooms() const;
@@ -52,15 +61,13 @@ public:
 
 	// loading and unloading rooms at the edge of vision
 	void remove_viewer_and_attempt_unload(const Coordinate & coordinate, const std::string & viewer_ID);
+	void remove_viewer_and_attempt_unload(const std::vector<Coordinate> & coordinates, const std::string & viewer_ID); // wrapper for multiple rooms
 
 	// unloading of all rooms in view distance (for logging out or dying)
 	void attempt_unload_radius(const Coordinate & coordinate, const std::string & player_ID);
 
 	// test if a room can be removed from memory
 	bool is_unloadable(const Coordinate & coordinate) const;
-
-	// move a room from world to disk
-	void unload_room(const Coordinate & coordinate);
 
 	// room information
 	bool room_has_surface(const Coordinate & coordinate, const std::string & direction_ID) const;
@@ -90,98 +97,23 @@ private:
 	// move specific room into memory
 	void load_room_to_world(const Coordinate & coordinate);
 
-	// move a passed room to disk
-	void unload_room(const Coordinate & coordinate, const std::unique_ptr<Room>::pointer room);
-
 	// save the contents of a room to an XML file in memory
-	void save_room_to_XML(const std::unique_ptr<Room>::pointer room, pugi::xml_document & room_document) const;
+	void save_room_to_XML(const std::unique_ptr<Room> & room, pugi::xml_document & room_document) const;
 
 	// create a new empty room given its coordinates and the world terrain
 	std::unique_ptr<Room> create_room(const Coordinate & coordinate) const;
 
 	// remove a room from memory
 	void erase_room_from_memory(const Coordinate & coordinate);
-	
-	void unload_rooms_to_disk()
-	{
-		// This only unloads one room at a time in order to make sure that the main thread
-		// can access the queue as quickly as possible. The main thread will always try to
-		// "load" a room from the unload queue (if it exists) before resorting to loading
-		// from the disk.
-		
-		for (;;)
-		{
-			std::unique_ptr<Room> room;
-			
-			{
-				std::unique_lock<std::mutex> lock(unload_queue_mutex);
 
-				// wait if there are no rooms in the queue unload
-				while (unload_queue.is_empty() && Server::is_running())
-					unload_queue_cv.wait(lock);
-								
-				// this only clears the queue when the server is running
-				// Upon server shutdown, the main thread adds all remaining rooms in the World to the queue,
-				// and then unloads the queue.
-				if (!Server::is_running()) return; // this thread now releases the unload queue mutex and dies
-				
-				// debug code
-				std::stringstream ss;
-				ss << "Unloading a room from the unload queue. Current size: " << unload_queue.size() << std::endl;
-				std::cout << ss.str();
-				
-				// get the room
-				room = std::move(unload_queue.front());
-				
-				// clear the nullptr at the beginning of the queue
-				unload_queue.pop();
-			
-			} // release the lock on the queue
-			
-			// add a one-second wait here to demonstrate that the performance of this thread interacting with the desk doesn't effect upon the main thread
-			
-			// unload one room
-			unload_room(unload_queue.front()->coordinates(), unload_queue.front());
-			
-		} // repeat until server shutdown
-	}
-	
-	// this snippet will have to be added to the loading logic
-	{ // check if the room is waiting in the unload queue
-		
-		std::unique_lock<std::mutex> lock(unload_queue_mutex);
-		// for each room in the queue
-		for (auto it = unload_queue.cbegin(); it != unload_queue.cend(); ++it)
-		{
-			// if the room we want to load is about to be unloaded
-			if (**it == coordinates) // dereference twice, because we have an iterator to a unique pointer
-			{
-				// move the room back to the world
-				world.at(coordinates.hash()) = std::move(*it);
-				// erase the entry in the unload queue
-				unload_queue.erase(it);
-				// our work here is done; stop searching for the room
-				break;
-			}
-		}
-	}
-	
-	// this snippet will be added in the main thread during server shutdown
-	{
-		std::unique_lock<std::mutex> lock(unload_queue_mutex);
-		
-		// unload every room in the unload queue
-		while (unload_queue.size() > 0)
-		{
-				// pull the room out of the list
-				std::unique_ptr<Room> room = std::move(unload_queue.front());
-				// clear the nullptr at the beginning of the queue
-				unload_queue.pop();
-				// save the room to disk
-				unload_room(room->coordinates(), room);
-		}
-	}
-	
+
+
+	// runs in a thread to unload rooms in the background, off of the main thread
+	void unload_rooms_to_disk();
+
+	// move a passed room to disk
+	void unload_room(const std::unique_ptr<Room> & room);
+
 };
 
 #endif
