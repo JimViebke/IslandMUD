@@ -83,7 +83,7 @@ void Hostile_NPC_Bodyguard::set_protect_target(const std::string & set_protect_t
 	this->protect_target_id = set_protect_target_id;
 }
 
-bool Hostile_NPC_Bodyguard::attempt_set_new_hunt_target(World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+bool Hostile_NPC_Bodyguard::attempt_set_new_hunt_target(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
 	this->hunt_target_id = get_new_hostile_id(world, actors);
 
