@@ -14,3 +14,4 @@
 IslandMUD/nbproject/private/
 Debug/
 Release/
+*.db

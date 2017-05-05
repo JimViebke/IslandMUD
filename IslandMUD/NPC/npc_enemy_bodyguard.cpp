@@ -1,7 +1,7 @@
 
 #include "npc_enemy_bodyguard.h"
 
-Update_Messages Hostile_NPC_Bodyguard::update(World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Bodyguard::update(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
 	// NPC bodyguards cheat by knowing their protect_target's location. Gameplay impact should be negligible.
 
@@ -19,7 +19,12 @@ Update_Messages Hostile_NPC_Bodyguard::update(World & world, std::map<std::strin
 	// extract protect_target
 	const std::shared_ptr<Hostile_NPC> protect_target = U::convert_to<Hostile_NPC>(actors.find(protect_target_id)->second);
 
-	if (protect_target == nullptr) std::cout << "Error: Hostile_NPC_Bodyguard [" << name << "] was assinged to proect [" << protect_target_id << "], who is not a Hostile_NPC.\n";
+	if (protect_target == nullptr)
+	{
+		std::stringstream ss;
+		ss << "Error: Hostile_NPC_Bodyguard [" << name << "] was assinged to proect [" << protect_target_id << "], who is not a Hostile_NPC.\n";
+		std::cout << ss.str();
+	}
 
 	// return to the protect_target if the NPC pursues the hunt_target to far.
 	check_maximum_hunt_radius(protect_target);
@@ -78,7 +83,7 @@ void Hostile_NPC_Bodyguard::set_protect_target(const std::string & set_protect_t
 	this->protect_target_id = set_protect_target_id;
 }
 
-bool Hostile_NPC_Bodyguard::attempt_set_new_hunt_target(World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+bool Hostile_NPC_Bodyguard::attempt_set_new_hunt_target(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
 	this->hunt_target_id = get_new_hostile_id(world, actors);
 
@@ -120,7 +125,7 @@ void Hostile_NPC_Bodyguard::check_maximum_hunt_radius(const std::shared_ptr<Char
 	}
 }
 
-Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & hunt_target, const std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & hunt_target, const std::shared_ptr<Character> & protect_target, std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
 	// if I am at the target's location, do combat logic
 	if (location == hunt_target->get_location())
@@ -209,7 +214,7 @@ Update_Messages Hostile_NPC_Bodyguard::hunt_target(std::shared_ptr<Character> & 
 	return update_messages; // action was used
 }
 
-bool Hostile_NPC_Bodyguard::move_toward_protect_target(const std::shared_ptr<Character> & protect_target, World & world, std::map<std::string, std::shared_ptr<Character>> & actors, Update_Messages & update_messages)
+bool Hostile_NPC_Bodyguard::move_toward_protect_target(const std::shared_ptr<Character> & protect_target, std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors, Update_Messages & update_messages)
 {
 	// if the path is empty or going to the wrong destination
 	if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_protect_target)
@@ -223,7 +228,7 @@ bool Hostile_NPC_Bodyguard::move_toward_protect_target(const std::shared_ptr<Cha
 	return make_path_movement(world, update_messages);
 }
 
-Update_Messages Hostile_NPC_Bodyguard::approach_new_hunt_target(World & world)
+Update_Messages Hostile_NPC_Bodyguard::approach_new_hunt_target(std::unique_ptr<World> & world)
 {
 	// if the path is empty or going to the wrong destination
 	if (path.size() == 0 || stored_path_type != Stored_Path_Type::to_hunt_target)

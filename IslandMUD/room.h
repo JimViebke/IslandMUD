@@ -53,6 +53,7 @@ public:
 	bool is_forest() const;
 	bool has_non_mineral_deposit_item() const;
 	bool has_mineral_deposit() const;
+	Coordinate get_coordinates() const;
 
 	// chests
 	void add_chest(const std::string & set_faction_id);

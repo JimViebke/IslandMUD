@@ -31,10 +31,9 @@ namespace Utilities
 	// debugging output
 	template <typename T> inline void print(const std::vector<T> & v)
 	{
-		for (const T & element : v)
-		{
-			std::cout << element << " ";
-		}
+		std::stringstream ss;
+		for (const T & element : v) ss << element << " ";
+		std::cout << ss.str();
 	}
 
 	// string construction
@@ -100,7 +99,7 @@ namespace Utilities
 	// math
 	template<typename T> inline T difference(const T & a, const T & b) { return (a - b > 0) ? (a - b) : (b - a); }
 	int euclidean_distance(const int & x1, const int & y1, const int & x2, const int & y2);
-	
+
 	// random utils
 	int random_int_from(const int & min, const int & max);
 	unsigned random_int_from(const unsigned & min, const unsigned & max);

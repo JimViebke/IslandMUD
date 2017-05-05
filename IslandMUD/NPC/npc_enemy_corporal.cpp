@@ -4,9 +4,9 @@ Jan 11 2016 */
 
 #include "npc_enemy_corporal.h"
 
-Hostile_NPC_Corporal::Hostile_NPC_Corporal(const std::string & name, World & world) : Hostile_NPC(name, world), wander_location(-1, -1) {}
+Hostile_NPC_Corporal::Hostile_NPC_Corporal(const std::string & name, std::unique_ptr<World> & world) : Hostile_NPC(name, world), wander_location(-1, -1) {}
 
-Update_Messages Hostile_NPC_Corporal::update(World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Corporal::update(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
 	Update_Messages update_messages("");
 
@@ -43,7 +43,7 @@ Update_Messages Hostile_NPC_Corporal::update(World & world, std::map<std::string
 
 
 
-void Hostile_NPC_Corporal::acquire_new_hunt_target(World & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+void Hostile_NPC_Corporal::acquire_new_hunt_target(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors)
 {
 	// get a new hunt target. Will reset the hunter target ID if one cannot be found.
 
@@ -52,7 +52,7 @@ void Hostile_NPC_Corporal::acquire_new_hunt_target(World & world, std::map<std::
 
 	// this->hunt_target_id
 }
-Update_Messages Hostile_NPC_Corporal::wander(World & world)
+Update_Messages Hostile_NPC_Corporal::wander(std::unique_ptr<World> & world)
 {
 	Update_Messages results("");
 
@@ -105,7 +105,7 @@ Update_Messages Hostile_NPC_Corporal::wander(World & world)
 	// nothing happens
 	return results;
 }
-bool Hostile_NPC_Corporal::hunt(World & world, std::map<std::string, std::shared_ptr<Character>> & actors, Update_Messages & update_messages)
+bool Hostile_NPC_Corporal::hunt(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors, Update_Messages & update_messages)
 {
 	// if no hunt target is saved
 	if (hunt_target_id == "")

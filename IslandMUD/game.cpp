@@ -14,6 +14,8 @@ Game::Game()
 	// Other threads periodically check this flag, and will cleanly terminate themselves if the flag is ever disabled.
 	Server::start();
 
+	world = std::make_unique<World>();
+
 	// start the threads for listening on port numbers
 	std::thread(&Game::networking_thread, this, C::GAME_PORT_NUMBER, &Game::client_thread).detach();
 	std::thread(&Game::networking_thread, this, C::GAME_MAP_PORT_NUMBER, &Game::client_map_thread).detach();
@@ -84,7 +86,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		// if the actor is a Player_Character
 		if (const std::shared_ptr<PC> & player = U::convert_to<PC>(actors.find(actor_id)->second))
 		{
-			return Update_Messages(world.room_at(player->get_location())->summary(player->name));
+			return Update_Messages(world->room_at(player->get_location())->summary(player->name));
 		}
 	}
 	// moving: "move northeast" OR "northeast"
@@ -100,7 +102,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		// if the acting character is a player character
 		if (const std::shared_ptr<PC> player = U::convert_to<PC>(character))
 			// append a summary of the new area
-			result.to_user += world.room_at(player->get_location())->summary(player->name);
+			result.to_user += world->room_at(player->get_location())->summary(player->name);
 
 		return result;
 	}
@@ -178,7 +180,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		const auto & player = actors.find(actor_id)->second;
 
 		// if the target is another player or NPC in the room
-		if (world.room_at(player->get_location())->is_occupied_by(command[1]))
+		if (world->room_at(player->get_location())->is_occupied_by(command[1]))
 		{
 			// if the target is not a friendly player character
 			auto & target = actors.find(command[1])->second;
@@ -333,11 +335,17 @@ void Game::networking_thread(const unsigned & listening_port, client_thread_type
 	}
 	catch (std::exception & ex)
 	{
-		std::cout << "Failed to listen on port " << listening_port << ". Reason: " << ex.what() << "\n";
+		std::stringstream ss;
+		ss << "Failed to listen on port " << listening_port << ". Reason: " << ex.what() << "\n";
+		std::cout << ss.str();
 		return;
 	}
 
-	std::cout << "Listening on port " << listening_port << ".\n";
+	{
+		std::stringstream ss;
+		ss << "Listening on port " << listening_port << ".\n";
+		std::cout << ss.str();
+	}
 
 	for (;;)
 	{
@@ -397,7 +405,7 @@ void Game::client_thread(network::connection_ptr connection)
 			std::shared_ptr<Character> user = actors.find(user_ID)->second; // save the user's data
 
 			// clean up the world
-			world.attempt_unload_radius(user->get_location(), user_ID);
+			world->attempt_unload_radius(user->get_location(), user_ID);
 
 			// clean up the user
 			user->save(); // save the user's data
@@ -614,7 +622,9 @@ void Game::NPC_spawn_logic()
 	{
 		const unsigned difference = player_count - NPC_corporal_count;
 
-		std::cout << "There are " << difference << " more players than NPC corproals. Spawning " << difference << " corporal NPCs with followers.\n";
+		std::stringstream ss;
+		ss << "There are " << difference << " more players than NPC corproals. Spawning " << difference << " corporal NPCs with followers.\n";
+		std::cout << ss.str();
 
 		for (unsigned i = 0; i < difference; ++i)
 		{
@@ -645,7 +655,9 @@ void Game::NPC_spawn_logic()
 	{
 		const unsigned difference = player_count - NPC_worker_count;
 
-		std::cout << "There are " << difference << " more players than NPC workers. Spawning " << difference << " worker NPCs with bodyguards.\n";
+		std::stringstream ss;
+		ss << "There are " << difference << " more players than NPC workers. Spawning " << difference << " worker NPCs with bodyguards.\n";
+		std::cout << ss.str();
 
 		for (unsigned i = 0; i < difference; ++i)
 		{
@@ -676,11 +688,14 @@ void Game::NPC_update_logic()
 	{
 		if (std::shared_ptr<NPC> npc = U::convert_to<NPC>(actor.second)) // if the actor is an NPC
 		{
-			std::cout << "Calling NPC::update() on " << actor.first << "...";
+			{
+				std::stringstream ss;
+				ss << "Calling NPC::update() on " << actor.first << ", located at "
+					<< npc->get_location().to_string() << "...";
+				std::cout << ss.str();
+			}
 
 			const Update_Messages update_messages = npc->update(world, actors); // call update, passing in the world and actors
-
-			std::cout << " (located at " << npc->get_location().to_string() << ") ";
 
 			std::cout << " done.\nGenerating outbound messages...";
 
@@ -833,7 +848,7 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 				if (!current.is_valid()) continue;
 
 				// get a list of the users in the room
-				const std::vector<std::string> users_in_range = world.room_at(current)->get_actor_ids();
+				const std::vector<std::string> users_in_range = world->room_at(current)->get_actor_ids();
 				// for each user in the room
 				for (const std::string & user : users_in_range)
 				{
@@ -885,7 +900,7 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 	if (update_messages.to_room != nullptr)
 	{
 		// get a list of all players in the room
-		const std::vector<std::string> area_actor_ids = world.room_at(character->get_location())->get_actor_ids();
+		const std::vector<std::string> area_actor_ids = world->room_at(character->get_location())->get_actor_ids();
 
 		for (const std::string & actor_id : area_actor_ids) // for each player in the room
 		{
@@ -915,7 +930,7 @@ void Game::shutdown_listener()
 	std::unique_lock<std::mutex> lock(game_state);
 
 	// for each actor, remove the room around them
-	for (auto & actor : actors) world.attempt_unload_radius(actor.second->get_location(), actor.first);
+	for (auto & actor : actors) world->attempt_unload_radius(actor.second->get_location(), actor.first);
 
 	// for each actor, save the actor's data
 	for (auto & actor : actors) actor.second->save();

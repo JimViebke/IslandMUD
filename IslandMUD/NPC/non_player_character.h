@@ -19,7 +19,7 @@ class Non_Player_Character : public Character
 {
 public:
 	// hostile and neutral NPCs override this in their child classes
-	virtual Update_Messages update(World & world, std::map<std::string, std::shared_ptr<Character>> & actors) = 0;
+	virtual Update_Messages update(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors) = 0;
 
 	// objective debugging
 	std::string get_objectives() const;
@@ -44,7 +44,7 @@ protected:
 	std::deque<Coordinate> path;
 
 	// this can only be instantiated by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
-	Non_Player_Character(const std::string & name, const std::string & faction_ID, World & world);
+	Non_Player_Character(const std::string & name, const std::string & faction_ID, std::unique_ptr<World> & world);
 
 	// objective creating and deletion
 	void add_objective(const Objective_Priority & priority, const std::string & verb, const std::string & noun, const std::string & purpose);
@@ -59,16 +59,18 @@ protected:
 	bool i_have(const std::string & item_id) const;
 	bool i_dont_have(const std::string & item_id) const;
 	bool im_planning_to_acquire(const std::string & item_ID) const;
-	bool crafting_requirements_met(const std::string & item_ID, const World & world) const;
+	bool crafting_requirements_met(const std::string & item_ID, const std::unique_ptr<World> & world) const;
 
 	// objective planning
 	void plan_to_get(const std::string & item_id);
 	void plan_to_craft(const std::string & item_id);
 
 	// used to count friends or foes:   count<Enemy_NPC>(world, actors);
-	template <typename ACTOR_TYPE> unsigned count(World & world, std::map<std::string, std::shared_ptr<Character>> & actors) const
+	template <typename ACTOR_TYPE> unsigned count(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors) const
 	{
 		unsigned players_in_range = 0;
+
+        const int x = location.get_x(), y = location.get_y();
 
 		// for each row of rooms in view distance
 		for (int cx = x - (int)C::VIEW_DISTANCE; cx <= x + (int)C::VIEW_DISTANCE; ++cx)
@@ -76,11 +78,13 @@ protected:
 			// for each room in the row in view distance
 			for (int cy = y - (int)C::VIEW_DISTANCE; cy <= y + (int)C::VIEW_DISTANCE; ++cy)
 			{
+                Coordinate current(cx, cy);
+
 				// skip this room if it is out of bounds
-				if (!U::bounds_check(cx, cy)) { continue; }
+				if (!current.is_valid()) continue;
 
 				// for each actor in the room
-				for (const std::string & actor_ID : world.room_at(cx, cy)->get_actor_ids())
+				for (const std::string & actor_ID : world.room_at(current)->get_actor_ids())
 				{
 					// if the character is the type of character we're looking for
 					if (U::is<ACTOR_TYPE>(actors.find(actor_ID)->second))
@@ -97,11 +101,11 @@ protected:
 	}
 
 	// returns true if successful
-	bool pathfind(const Coordinate & destination, World & world, Update_Messages & update_messages);
-	bool best_attempt_pathfind(const Coordinate & destination, World & world, Update_Messages & update_messages);
-	bool pathfind_to_closest_item(const std::string & item_id, World & world, Update_Messages & update_messages);
-	bool save_path_to(const Coordinate & destination, World & world);
-	bool make_path_movement(World & world, Update_Messages & update_messages);
+	bool pathfind(const Coordinate & destination, std::unique_ptr<World> & world, Update_Messages & update_messages);
+	bool best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<World> & world, Update_Messages & update_messages);
+	bool pathfind_to_closest_item(const std::string & item_id, std::unique_ptr<World> & world, Update_Messages & update_messages);
+	bool save_path_to(const Coordinate & destination, std::unique_ptr<World> & world);
+	bool make_path_movement(std::unique_ptr<World> & world, Update_Messages & update_messages);
 
 	// other pathfinding utilities
 	int diagonal_movement_cost(const Coordinate & coord_1, const Coordinate & coord_2);

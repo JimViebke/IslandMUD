@@ -4,7 +4,7 @@ Jun 3 2015 */
 #include "non_player_character.h"
 
 // this can only be instantiated by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
-NPC::Non_Player_Character(const std::string & name, const std::string & faction_ID, World & world) : Character(name, faction_ID, world) {}
+NPC::Non_Player_Character(const std::string & name, const std::string & faction_ID, std::unique_ptr<World> & world) : Character(name, faction_ID, world) {}
 
 // objective debugging
 std::string NPC::get_objectives() const
@@ -137,7 +137,7 @@ bool NPC::im_planning_to_acquire(const std::string & item_ID) const
 	}
 	return false;
 }
-bool NPC::crafting_requirements_met(const std::string & item_ID, const World & world) const
+bool NPC::crafting_requirements_met(const std::string & item_ID, const std::unique_ptr<World> & world) const
 {
 	// WARNING: this assumes item_ID is craftable
 
@@ -169,7 +169,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const World & w
 	for (std::map<std::string, int>::const_iterator local_need = recipe.local_need.cbegin();
 	local_need != recipe.local_need.cend(); ++local_need)
 	{
-		if (!world.room_at(location)->contains(local_need->first, local_need->second))
+		if (!world->room_at(location)->contains(local_need->first, local_need->second))
 		{
 			return false;
 		}
@@ -177,7 +177,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const World & w
 	for (std::map<std::string, int>::const_iterator local_remove = recipe.local_remove.cbegin();
 	local_remove != recipe.local_remove.cend(); ++local_remove)
 	{
-		if (!world.room_at(location)->contains(local_remove->first, local_remove->second))
+		if (!world->room_at(location)->contains(local_remove->first, local_remove->second))
 		{
 			return false;
 		}
@@ -247,7 +247,7 @@ void NPC::plan_to_craft(const std::string & item_id)
 }
 
 // returns true if successful
-bool NPC::pathfind(const Coordinate & destination, World & world, Update_Messages & update_messages)
+bool NPC::pathfind(const Coordinate & destination, std::unique_ptr<World> & world, Update_Messages & update_messages)
 {
 	// leave this for debugging
 	// cout << "\nSearching for path from " << x << "," << y << " to " << x_dest << "," << y_dest << ".\n";
@@ -290,9 +290,9 @@ bool NPC::pathfind(const Coordinate & destination, World & world, Update_Message
 			// skip if the room if it is out of bounds,
 			if (!destination.is_valid()) continue;
 			// or it is not loaded,
-			if (world.room_at(destination) == nullptr) continue;
+			if (world->room_at(destination) == nullptr) continue;
 			// or it is not within view distance,
-			if (!world.room_at(destination)->is_observed_by(this->name)) continue;
+			if (!world->room_at(destination)->is_observed_by(this->name)) continue;
 			// or we can not travel to it from the current room
 			if (validate_movement(current_room.location, direction, destination, world) != C::GOOD_SIGNAL) { continue; }
 
@@ -311,7 +311,7 @@ bool NPC::pathfind(const Coordinate & destination, World & world, Update_Message
 				// calculate the movement cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.location)->contains(C::TREE_ID))
+					(world->room_at(adjacent_room.location)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -341,7 +341,7 @@ bool NPC::pathfind(const Coordinate & destination, World & world, Update_Message
 				// calculate the move cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.location)->contains(C::TREE_ID))
+					(world->room_at(adjacent_room.location)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -414,7 +414,7 @@ bool NPC::pathfind(const Coordinate & destination, World & world, Update_Message
 
 	} while (true);
 }
-bool NPC::best_attempt_pathfind(const Coordinate & destination, World & world, Update_Messages & update_messages)
+bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<World> & world, Update_Messages & update_messages)
 {
 	// the NPC could not pathfind to the destination, try to move in the direction of the destination.
 
@@ -524,7 +524,7 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, World & world, U
 
 	return false;
 }
-bool NPC::pathfind_to_closest_item(const std::string & item_id, World & world, Update_Messages & update_messages)
+bool NPC::pathfind_to_closest_item(const std::string & item_id, std::unique_ptr<World> & world, Update_Messages & update_messages)
 {
 	// leave this for debugging
 	// cout << "\nSearching for path from " << x << "," << y << " to any " << item_id << ".\n";
@@ -567,9 +567,9 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, World & world, U
 			// skip if the room if it is out of bounds,
 			if (!destination.is_valid()) continue;
 			// or it is not loaded,
-			if (world.room_at(destination) == nullptr) continue;
+			if (world->room_at(destination) == nullptr) continue;
 			// or it is not within view distance,
-			if (!world.room_at(destination)->is_observed_by(this->name)) continue;
+			if (!world->room_at(destination)->is_observed_by(this->name)) continue;
 			// or we can not travel to it from the current room
 			if (validate_movement(current_room.location, direction, destination, world) != C::GOOD_SIGNAL) continue;
 
@@ -588,7 +588,7 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, World & world, U
 				// calculate the movement cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.location)->contains(C::TREE_ID))
+					(world->room_at(adjacent_room.location)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -616,7 +616,7 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, World & world, U
 				// calculate the move cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.location)->contains(C::TREE_ID))
+					(world->room_at(adjacent_room.location)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -650,7 +650,7 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, World & world, U
 	destination_room.g = 999999;
 	for (const Node & node : closed_list)
 	{
-		if (world.room_at(node.location)->contains(item_id) &&
+		if (world->room_at(node.location)->contains(item_id) &&
 			node.g < destination_room.g)
 		{
 			destination_room = node;
@@ -699,7 +699,7 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, World & world, U
 
 	} while (true);
 }
-bool NPC::save_path_to(const Coordinate & destination, World & world)
+bool NPC::save_path_to(const Coordinate & destination, std::unique_ptr<World> & world)
 {
 	// Returns a boolean indicating if a path was found. If a path was found,
 	// the path is now saved.
@@ -746,9 +746,9 @@ bool NPC::save_path_to(const Coordinate & destination, World & world)
 			// skip if the room if it is out of bounds,
 			if (!next_room.is_valid()) continue;
 			// or it is not loaded,
-			if (world.room_at(next_room) == nullptr) continue;
+			if (world->room_at(next_room) == nullptr) continue;
 			// or it is not within view distance,
-			if (!world.room_at(next_room)->is_observed_by(this->name)) continue;
+			if (!world->room_at(next_room)->is_observed_by(this->name)) continue;
 			// or we can not travel to it from the current room
 			if (validate_movement(current_room.location, direction, next_room, world) != C::GOOD_SIGNAL) continue;
 
@@ -767,7 +767,7 @@ bool NPC::save_path_to(const Coordinate & destination, World & world)
 				// calculate the movement cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.location)->contains(C::TREE_ID))
+					(world->room_at(adjacent_room.location)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -797,7 +797,7 @@ bool NPC::save_path_to(const Coordinate & destination, World & world)
 				// calculate the move cost
 				int move_cost = (
 					// check if the NPC will have to move through a forest
-					(world.room_at(adjacent_room.location)->contains(C::TREE_ID))
+					(world->room_at(adjacent_room.location)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
 					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
@@ -872,7 +872,7 @@ bool NPC::save_path_to(const Coordinate & destination, World & world)
 
 	} while (true);
 }
-bool NPC::make_path_movement(World & world, Update_Messages & update_messages)
+bool NPC::make_path_movement(std::unique_ptr<World> & world, Update_Messages & update_messages)
 {
 	// if the NPC is currently pathfinding to a destination
 	if (!path.empty())

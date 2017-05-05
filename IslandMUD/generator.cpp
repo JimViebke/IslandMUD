@@ -5,7 +5,9 @@ May 15 2015 */
 
 Generator::Generator(const std::string & map_type)
 {
-	std::cout << "\nGenerating new " << map_type << "...";
+	std::stringstream ss;
+	ss << "Generating new " << map_type << "...\n";
+	std::cout << ss.str();
 
 	// create the timestamped directory
 	generated_terrain_dir = C::game_directory + "/gen_" + U::to_string(U::current_time_in_ms()) + " (" + map_type + ")";
