@@ -100,7 +100,7 @@ namespace Utilities
 	// math
 	template<typename T> inline T difference(const T & a, const T & b) { return (a - b > 0) ? (a - b) : (b - a); }
 	int euclidean_distance(const int & x1, const int & y1, const int & x2, const int & y2);
-	
+
 	// random utils
 	int random_int_from(const int & min, const int & max);
 	unsigned random_int_from(const unsigned & min, const unsigned & max);
@@ -139,17 +139,5 @@ namespace Utilities
 		return std::dynamic_pointer_cast<Derived_Type>(object);
 	}
 }
-
-// allow the following:
-// std::cout << (1 << "2" << '3' << std::endl) << "more data";
-template<typename T1, typename T2> std::stringstream operator<<(const T1 & left, const T2 & right)
-{
-	// what happens if this captures std::cout?
-	
-	std::stringstream ss;
-	ss << left << right;
-	return ss;
-}
-
 
 #endif
