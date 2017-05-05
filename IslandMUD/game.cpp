@@ -335,11 +335,17 @@ void Game::networking_thread(const unsigned & listening_port, client_thread_type
 	}
 	catch (std::exception & ex)
 	{
-		std::cout << "Failed to listen on port " << listening_port << ". Reason: " << ex.what() << "\n";
+		std::stringstream ss;
+		ss << "Failed to listen on port " << listening_port << ". Reason: " << ex.what() << "\n";
+		std::cout << ss.str();
 		return;
 	}
 
-	std::cout << "Listening on port " << listening_port << ".\n";
+	{
+		std::stringstream ss;
+		ss << "Listening on port " << listening_port << ".\n";
+		std::cout << ss.str();
+	}
 
 	for (;;)
 	{
@@ -616,7 +622,9 @@ void Game::NPC_spawn_logic()
 	{
 		const unsigned difference = player_count - NPC_corporal_count;
 
-		std::cout << "There are " << difference << " more players than NPC corproals. Spawning " << difference << " corporal NPCs with followers.\n";
+		std::stringstream ss;
+		ss << "There are " << difference << " more players than NPC corproals. Spawning " << difference << " corporal NPCs with followers.\n";
+		std::cout << ss.str();
 
 		for (unsigned i = 0; i < difference; ++i)
 		{
@@ -647,7 +655,9 @@ void Game::NPC_spawn_logic()
 	{
 		const unsigned difference = player_count - NPC_worker_count;
 
-		std::cout << "There are " << difference << " more players than NPC workers. Spawning " << difference << " worker NPCs with bodyguards.\n";
+		std::stringstream ss;
+		ss << "There are " << difference << " more players than NPC workers. Spawning " << difference << " worker NPCs with bodyguards.\n";
+		std::cout << ss.str();
 
 		for (unsigned i = 0; i < difference; ++i)
 		{
@@ -678,11 +688,14 @@ void Game::NPC_update_logic()
 	{
 		if (std::shared_ptr<NPC> npc = U::convert_to<NPC>(actor.second)) // if the actor is an NPC
 		{
-			std::cout << "Calling NPC::update() on " << actor.first << "...";
+			{
+				std::stringstream ss;
+				ss << "Calling NPC::update() on " << actor.first << ", located at "
+					<< npc->get_location().to_string() << "...";
+				std::cout << ss.str();
+			}
 
 			const Update_Messages update_messages = npc->update(world, actors); // call update, passing in the world and actors
-
-			std::cout << " (located at " << npc->get_location().to_string() << ") ";
 
 			std::cout << " done.\nGenerating outbound messages...";
 

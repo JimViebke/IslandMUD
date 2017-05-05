@@ -31,10 +31,9 @@ namespace Utilities
 	// debugging output
 	template <typename T> inline void print(const std::vector<T> & v)
 	{
-		for (const T & element : v)
-		{
-			std::cout << element << " ";
-		}
+		std::stringstream ss;
+		for (const T & element : v) ss << element << " ";
+		std::cout << ss.str();
 	}
 
 	// string construction

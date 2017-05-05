@@ -27,7 +27,9 @@ Character::Character(const std::string & name, const std::string & set_faction_I
 	else // the faction is not valid
 	{
 		// Raise an error in the console
-		std::cout << "ERROR: attempted to create character with invalid faction: [" << set_faction_ID << "]\n";
+		std::stringstream ss;
+		ss << "ERROR: attempted to create character with invalid faction: [" << set_faction_ID << "]\n";
+		std::cout << ss.str();
 	}
 
 	login(world);

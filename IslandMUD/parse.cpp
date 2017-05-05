@@ -95,7 +95,9 @@ void Parse::initialize()
 		P::dict["door"] = C::DOOR;
 		P::dict["wall"] = P::dict["surface"] = C::WALL;
 
-		std::cout << "\nLoaded parse dictionary with " << P::dict.size() << " entries.";
+		std::stringstream ss;
+		ss << "\nLoaded parse dictionary with " << P::dict.size() << " entries.";
+		std::cout << ss.str();
 	}
 }
 

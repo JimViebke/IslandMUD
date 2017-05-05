@@ -63,7 +63,9 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 				// see if the item is reachable
 				if (pathfind_to_closest_item(objective_iterator->noun, world, update_messages))
 				{
-					std::cout << "Found a path to " << objective_iterator->noun << std::endl; // debugging
+					std::stringstream ss;
+					ss << "Found a path to " << objective_iterator->noun << std::endl; // debugging
+					std::cout << ss.str();
 					return update_messages;
 				}
 
