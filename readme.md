@@ -13,7 +13,6 @@
 - 600,000 rooms of biome-based wilderness
 - Classless and invisible skill leveling
 - Intelligent and coordinating NPCs
-- Complex blacksmithing system allowing for tools and weapons with unique properties
 - Neutral NPCs scattering the world who barter for the right price and offer quests
 - Allied player characters
 - Free, multiplayer, and open source
