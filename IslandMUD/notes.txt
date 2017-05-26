@@ -1,7 +1,4 @@
 
-
-http://www.lostcrafts.com/Blacksmith-Main.html
-
 For some reason, downsizing the world dimensions then restarting the server results in an empty world. (?!)
 	I suspect this is because world.load() attempts to load the terrain file and correctly fails when it can't, but it
 	makes no attempt to load the biome_map. Try perform the same load-then-verify then save-or-recreate as we do for the world_terrain file.
@@ -15,8 +12,6 @@ If a player tries to move while following, block it.
 	
 taking a second branch: "you now have a branch" (need a smarter message)
 
-Implement ladders/stairs/ramp
-
 The current return for crafting or aquiring is: "You now have a(n) " + craft_item_id
 If the item was yielded, it would be nice if it said "You now have a(n) branch from the tree."
 
@@ -25,5 +20,3 @@ Item wear. A sword wears with every strike, a bow with every fire, an axe with e
 	While offering: "[name] presents/offers a sword that [is mildly worn]".
 	While equipping: "You draw a [mildy-worn] axe."
 	While returning to inventory: "You sheathe your [well-worn] sword."
-
-Security issue for when multiplayer is introduced: user validation / pw encryption
