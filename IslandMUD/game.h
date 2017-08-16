@@ -16,7 +16,7 @@ Feb 14, 2015 */
 #include "parse.h"
 #include "world.h"
 #include "threadsafe/threadsafe_queue.h"
-#include "threadsafe/threadsafe_connection_lookup.h"
+#include "connection_lookup.h"
 #include "message.h"
 
 class Game
@@ -25,7 +25,7 @@ private:
 	threadsafe::queue<Message> inbound_queue; // <socket_ID, message>
 	threadsafe::queue<Message> outbound_queue; // <socket_ID, message>
 
-	threadsafe::connection_lookup players;
+	connection_lookup players;
 
 	std::map<std::string, std::shared_ptr<Character>> actors; // active/online PC and NPC ids
 	std::unique_ptr<World> world; // the game world object

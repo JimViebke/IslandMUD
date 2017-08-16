@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -19,13 +19,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -109,7 +109,7 @@
     <ClCompile Include="parse.cpp" />
     <ClCompile Include="player_character.cpp" />
     <ClCompile Include="server\server.cpp" />
-    <ClCompile Include="Threadsafe\threadsafe_connection_lookup.cpp" />
+    <ClCompile Include="connection_lookup.cpp" />
     <ClCompile Include="XML\pugixml.cpp" />
     <ClCompile Include="recipes.cpp" />
     <ClCompile Include="room.cpp" />
@@ -151,6 +151,7 @@
     <ClInclude Include="player_character.h" />
     <ClInclude Include="server.h" />
     <ClInclude Include="server\server.h" />
+    <ClInclude Include="threadsafe\threadsafe_map.hpp" />
     <ClInclude Include="XML\pugiconfig.hpp" />
     <ClInclude Include="XML\pugixml.hpp" />
     <ClInclude Include="recipe.h" />
@@ -158,7 +159,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="room.h" />
     <ClInclude Include="room_side.h" />
-    <ClInclude Include="Threadsafe\threadsafe_connection_lookup.h" />
+    <ClInclude Include="connection_lookup.h" />
     <ClInclude Include="Threadsafe\threadsafe_queue.h" />
     <ClInclude Include="utilities.h" />
     <ClInclude Include="world.h" />

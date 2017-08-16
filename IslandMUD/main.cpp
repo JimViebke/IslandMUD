@@ -1,13 +1,35 @@
 ﻿/* Jim Viebke
 Feb 14, 2015 */
 
-#include <fstream>
-
 #include "craft.h"
 #include "game.h"
 
+#include "threadsafe\threadsafe_map.hpp"
+
+class Object
+{
+public:
+	int i1, i2, i3, i4;
+};
+
+threadsafe::map<int, std::string> m1;
+
+void test()
+{
+
+	auto write_lock = m1.get_write_lock();
+
+	std::string test = "lalala";
+	m1.insert(34, test, write_lock);
+
+	auto x = m1.find_by_value("lalala");
+}
+
 int main()
 {
+	test();
+	return TRUE;
+
 	srand((unsigned)time(NULL)); // seed rand
 
 	// write game directories to disk

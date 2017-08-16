@@ -114,10 +114,10 @@
     <ClCompile Include="network\port.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Threadsafe\threadsafe_connection_lookup.cpp">
+    <ClCompile Include="coordinate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="coordinate.cpp">
+    <ClCompile Include="connection_lookup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -248,10 +248,13 @@
     <ClInclude Include="network\port.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Threadsafe\threadsafe_connection_lookup.h">
+    <ClInclude Include="coordinate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="coordinate.h">
+    <ClInclude Include="threadsafe\threadsafe_map.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="connection_lookup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
