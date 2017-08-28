@@ -16,3 +16,4 @@ Debug/
 Release/
 *.db
 *.opendb
+/.vs/
