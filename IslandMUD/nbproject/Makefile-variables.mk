@@ -15,13 +15,13 @@ CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux-x86/package
 CND_PACKAGE_NAME_Debug=islandmud.tar
 CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux-x86/package/islandmud.tar
 # Release configuration
-CND_PLATFORM_Release=None-Linux
-CND_ARTIFACT_DIR_Release=dist/Release/None-Linux
+CND_PLATFORM_Release=None-Linux-x86
+CND_ARTIFACT_DIR_Release=dist/Release/None-Linux-x86
 CND_ARTIFACT_NAME_Release=islandmud
-CND_ARTIFACT_PATH_Release=dist/Release/None-Linux/islandmud
-CND_PACKAGE_DIR_Release=dist/Release/None-Linux/package
+CND_ARTIFACT_PATH_Release=dist/Release/None-Linux-x86/islandmud
+CND_PACKAGE_DIR_Release=dist/Release/None-Linux-x86/package
 CND_PACKAGE_NAME_Release=islandmud.tar
-CND_PACKAGE_PATH_Release=dist/Release/None-Linux/package/islandmud.tar
+CND_PACKAGE_PATH_Release=dist/Release/None-Linux-x86/package/islandmud.tar
 #
 # include compiler specific variables
 #
