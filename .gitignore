@@ -1,10 +1,13 @@
+*.db
 *.exe
 *.idb
 *.ilk
 *.iobj
+*.ipch
 *.ipdb
 *.log
 *.obj
+*.opendb
 *.opensdf
 *.pdb
 *.sdf
@@ -14,4 +17,3 @@
 IslandMUD/nbproject/private/
 Debug/
 Release/
-*.db
