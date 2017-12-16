@@ -105,16 +105,20 @@ std::vector<std::string> Parse::tokenize(const std::string & s)
 {
 	// converts an input string to vector of "engine official" keywords/commands
 
-	std::cout << "\nDEBUG inside parse.tokenize: "; // debugging
-
 	if (Parse::dict.size() == 0) Parse::initialize();
 
 	// convert the space-delimited user input to a vector of strings (one word per string)
-	std::stringstream ss(s);
-	const std::istream_iterator<std::string> begin(ss);
+	std::stringstream input_stream(s);
+	const std::istream_iterator<std::string> begin(input_stream);
 	std::vector<std::string> strings(begin, std::istream_iterator<std::string>());
 
-	U::print(strings); // debugging
+	{
+		std::stringstream ss;
+		ss << "Parse::tokenize: ";
+		for (const auto & s : strings) ss << s << " ";
+		ss << '\n';
+		std::cout << ss.str();
+	}
 
 	for (std::string & word : strings) // for each word
 	{

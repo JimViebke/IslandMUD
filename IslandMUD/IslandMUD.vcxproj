@@ -14,18 +14,19 @@
     <ProjectGuid>{317E7714-6815-4795-9D06-E92CA8D95C6C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>IslandMUD</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -81,94 +82,95 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="character.cpp" />
-    <ClCompile Include="coordinate.cpp" />
-    <ClCompile Include="item\bloomery.cpp" />
-    <ClCompile Include="item\chest.cpp" />
-    <ClCompile Include="constants.cpp" />
-    <ClCompile Include="craft.cpp" />
-    <ClCompile Include="door.cpp" />
-    <ClCompile Include="game.cpp" />
-    <ClCompile Include="generator.cpp" />
-    <ClCompile Include="item\container.cpp" />
-    <ClCompile Include="item.cpp" />
-    <ClCompile Include="Item\equipment.cpp" />
-    <ClCompile Include="Item\table.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="message.cpp" />
-    <ClCompile Include="network\connection.cpp" />
-    <ClCompile Include="network\network.cpp" />
-    <ClCompile Include="network\port.cpp" />
-    <ClCompile Include="NPC\non_player_character.cpp" />
-    <ClCompile Include="NPC\npc_enemy.cpp" />
-    <ClCompile Include="NPC\npc_enemy_bodyguard.cpp" />
-    <ClCompile Include="NPC\npc_enemy_corporal.cpp" />
-    <ClCompile Include="NPC\npc_enemy_fighter.cpp" />
-    <ClCompile Include="NPC\npc_enemy_worker.cpp" />
-    <ClCompile Include="NPC\npc_neutral.cpp" />
-    <ClCompile Include="parse.cpp" />
-    <ClCompile Include="player_character.cpp" />
-    <ClCompile Include="server\server.cpp" />
-    <ClCompile Include="connection_lookup.cpp" />
-    <ClCompile Include="XML\pugixml.cpp" />
-    <ClCompile Include="recipes.cpp" />
-    <ClCompile Include="room.cpp" />
-    <ClCompile Include="room_side.cpp" />
-    <ClCompile Include="utilities.cpp" />
-    <ClCompile Include="world.cpp" />
+    <ClCompile Include="src\character.cpp" />
+    <ClCompile Include="src\coordinate.cpp" />
+    <ClCompile Include="src\item\bloomery.cpp" />
+    <ClCompile Include="src\item\chest.cpp" />
+    <ClCompile Include="src\constants.cpp" />
+    <ClCompile Include="src\craft.cpp" />
+    <ClCompile Include="src\door.cpp" />
+    <ClCompile Include="src\game.cpp" />
+    <ClCompile Include="src\generator.cpp" />
+    <ClCompile Include="src\item\container.cpp" />
+    <ClCompile Include="src\item.cpp" />
+    <ClCompile Include="src\item\equipment.cpp" />
+    <ClCompile Include="src\item\table.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\message.cpp" />
+    <ClCompile Include="src\network\connection.cpp" />
+    <ClCompile Include="src\network\network.cpp" />
+    <ClCompile Include="src\network\port.cpp" />
+    <ClCompile Include="src\NPC\non_player_character.cpp" />
+    <ClCompile Include="src\NPC\npc_enemy.cpp" />
+    <ClCompile Include="src\NPC\npc_enemy_bodyguard.cpp" />
+    <ClCompile Include="src\NPC\npc_enemy_corporal.cpp" />
+    <ClCompile Include="src\NPC\npc_enemy_fighter.cpp" />
+    <ClCompile Include="src\NPC\npc_enemy_worker.cpp" />
+    <ClCompile Include="src\NPC\npc_neutral.cpp" />
+    <ClCompile Include="src\parse.cpp" />
+    <ClCompile Include="src\player_character.cpp" />
+    <ClCompile Include="src\server\server.cpp" />
+    <ClCompile Include="src\connection_lookup.cpp" />
+    <ClCompile Include="src\lib\PugiXML\pugixml.cpp" />
+    <ClCompile Include="src\recipes.cpp" />
+    <ClCompile Include="src\room.cpp" />
+    <ClCompile Include="src\room_side.cpp" />
+    <ClCompile Include="src\utilities.cpp" />
+    <ClCompile Include="src\world.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="character.h" />
-    <ClInclude Include="constants.h" />
-    <ClInclude Include="coordinate.h" />
-    <ClInclude Include="craft.h" />
-    <ClInclude Include="door.h" />
-    <ClInclude Include="game.h" />
-    <ClInclude Include="generator.h" />
-    <ClInclude Include="item.h" />
-    <ClInclude Include="item\bloomery.h" />
-    <ClInclude Include="item\chest.h" />
-    <ClInclude Include="item\container.h" />
-    <ClInclude Include="item\equipment.h" />
-    <ClInclude Include="Item\item.h" />
-    <ClInclude Include="item\stackable.h" />
-    <ClInclude Include="item\misc.h" />
-    <ClInclude Include="Item\table.h" />
-    <ClInclude Include="message.h" />
-    <ClInclude Include="network\connection.h" />
-    <ClInclude Include="network\include.h" />
-    <ClInclude Include="network\network.h" />
-    <ClInclude Include="network\port.h" />
-    <ClInclude Include="npc.h" />
-    <ClInclude Include="NPC\non_player_character.h" />
-    <ClInclude Include="NPC\npc_enemy.h" />
-    <ClInclude Include="NPC\npc_enemy_bodyguard.h" />
-    <ClInclude Include="NPC\npc_enemy_corporal.h" />
-    <ClInclude Include="NPC\npc_enemy_fighter.h" />
-    <ClInclude Include="NPC\npc_enemy_worker.h" />
-    <ClInclude Include="NPC\npc_neutral.h" />
-    <ClInclude Include="parse.h" />
-    <ClInclude Include="player_character.h" />
-    <ClInclude Include="server.h" />
-    <ClInclude Include="server\server.h" />
-    <ClInclude Include="threadsafe\threadsafe_map.hpp" />
-    <ClInclude Include="XML\pugiconfig.hpp" />
-    <ClInclude Include="XML\pugixml.hpp" />
-    <ClInclude Include="recipe.h" />
-    <ClInclude Include="recipes.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="room.h" />
-    <ClInclude Include="room_side.h" />
-    <ClInclude Include="connection_lookup.h" />
-    <ClInclude Include="Threadsafe\threadsafe_queue.h" />
-    <ClInclude Include="utilities.h" />
-    <ClInclude Include="world.h" />
+    <ClInclude Include="src\character.h" />
+    <ClInclude Include="src\constants.h" />
+    <ClInclude Include="src\coordinate.h" />
+    <ClInclude Include="src\craft.h" />
+    <ClInclude Include="src\door.h" />
+    <ClInclude Include="src\game.h" />
+    <ClInclude Include="src\generator.h" />
+    <ClInclude Include="src\item.h" />
+    <ClInclude Include="src\item\bloomery.h" />
+    <ClInclude Include="src\item\chest.h" />
+    <ClInclude Include="src\item\container.h" />
+    <ClInclude Include="src\item\equipment.h" />
+    <ClInclude Include="src\item\item.h" />
+    <ClInclude Include="src\item\stackable.h" />
+    <ClInclude Include="src\item\misc.h" />
+    <ClInclude Include="src\item\table.h" />
+    <ClInclude Include="src\lib\contfree_shared_mutex\safe_ptr.hpp" />
+    <ClInclude Include="src\message.h" />
+    <ClInclude Include="src\network\connection.h" />
+    <ClInclude Include="src\network\include.h" />
+    <ClInclude Include="src\network\network.h" />
+    <ClInclude Include="src\network\port.h" />
+    <ClInclude Include="src\npc.h" />
+    <ClInclude Include="src\NPC\non_player_character.h" />
+    <ClInclude Include="src\NPC\npc_enemy.h" />
+    <ClInclude Include="src\NPC\npc_enemy_bodyguard.h" />
+    <ClInclude Include="src\NPC\npc_enemy_corporal.h" />
+    <ClInclude Include="src\NPC\npc_enemy_fighter.h" />
+    <ClInclude Include="src\NPC\npc_enemy_worker.h" />
+    <ClInclude Include="src\NPC\npc_neutral.h" />
+    <ClInclude Include="src\parse.h" />
+    <ClInclude Include="src\player_character.h" />
+    <ClInclude Include="src\server.h" />
+    <ClInclude Include="src\server\server.h" />
+    <ClInclude Include="src\threadsafe\threadsafe_map.hpp" />
+    <ClInclude Include="src\lib\PugiXML\pugiconfig.hpp" />
+    <ClInclude Include="src\lib\PugiXML\pugixml.hpp" />
+    <ClInclude Include="src\recipe.h" />
+    <ClInclude Include="src\recipes.h" />
+    <ClInclude Include="src\resource.h" />
+    <ClInclude Include="src\room.h" />
+    <ClInclude Include="src\room_side.h" />
+    <ClInclude Include="src\connection_lookup.h" />
+    <ClInclude Include="src\threadsafe\threadsafe_queue.h" />
+    <ClInclude Include="src\utilities.h" />
+    <ClInclude Include="src\world.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Class Diagram.cd" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="notes.txt" />
+    <Text Include="src\notes.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

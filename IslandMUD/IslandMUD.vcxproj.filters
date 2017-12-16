@@ -15,246 +15,249 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="utilities.cpp">
+    <ClCompile Include="src\item\bloomery.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="world.cpp">
+    <ClCompile Include="src\item\chest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="character.cpp">
+    <ClCompile Include="src\item\container.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="constants.cpp">
+    <ClCompile Include="src\item\equipment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="craft.cpp">
+    <ClCompile Include="src\item\table.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="door.cpp">
+    <ClCompile Include="src\network\connection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game.cpp">
+    <ClCompile Include="src\network\network.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="generator.cpp">
+    <ClCompile Include="src\network\port.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\NPC\non_player_character.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="parse.cpp">
+    <ClCompile Include="src\NPC\npc_enemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="player_character.cpp">
+    <ClCompile Include="src\NPC\npc_enemy_bodyguard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="recipes.cpp">
+    <ClCompile Include="src\NPC\npc_enemy_corporal.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="room.cpp">
+    <ClCompile Include="src\NPC\npc_enemy_fighter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="room_side.cpp">
+    <ClCompile Include="src\NPC\npc_enemy_worker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="message.cpp">
+    <ClCompile Include="src\NPC\npc_neutral.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="item.cpp">
+    <ClCompile Include="src\server\server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NPC\npc_enemy_bodyguard.cpp">
+    <ClCompile Include="src\character.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NPC\npc_enemy_fighter.cpp">
+    <ClCompile Include="src\connection_lookup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NPC\npc_enemy_worker.cpp">
+    <ClCompile Include="src\constants.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NPC\npc_enemy.cpp">
+    <ClCompile Include="src\coordinate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NPC\non_player_character.cpp">
+    <ClCompile Include="src\craft.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NPC\npc_enemy_corporal.cpp">
+    <ClCompile Include="src\door.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="XML\pugixml.cpp">
+    <ClCompile Include="src\game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NPC\npc_neutral.cpp">
+    <ClCompile Include="src\generator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="item\bloomery.cpp">
+    <ClCompile Include="src\item.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="item\chest.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="item\container.cpp">
+    <ClCompile Include="src\message.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Item\equipment.cpp">
+    <ClCompile Include="src\parse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Item\table.cpp">
+    <ClCompile Include="src\player_character.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="server\server.cpp">
+    <ClCompile Include="src\recipes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="network\connection.cpp">
+    <ClCompile Include="src\room.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="network\network.cpp">
+    <ClCompile Include="src\room_side.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="network\port.cpp">
+    <ClCompile Include="src\utilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="coordinate.cpp">
+    <ClCompile Include="src\world.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="connection_lookup.cpp">
+    <ClCompile Include="src\lib\PugiXML\pugixml.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="player_character.h">
+    <ClInclude Include="src\item\bloomery.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="recipe.h">
+    <ClInclude Include="src\item\chest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="recipes.h">
+    <ClInclude Include="src\item\container.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
+    <ClInclude Include="src\item\equipment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="room.h">
+    <ClInclude Include="src\item\item.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="room_side.h">
+    <ClInclude Include="src\item\misc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utilities.h">
+    <ClInclude Include="src\item\stackable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="world.h">
+    <ClInclude Include="src\item\table.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="character.h">
+    <ClInclude Include="src\network\connection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="constants.h">
+    <ClInclude Include="src\network\include.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="craft.h">
+    <ClInclude Include="src\network\network.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="door.h">
+    <ClInclude Include="src\network\port.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game.h">
+    <ClInclude Include="src\NPC\non_player_character.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="generator.h">
+    <ClInclude Include="src\NPC\npc_enemy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="parse.h">
+    <ClInclude Include="src\NPC\npc_enemy_bodyguard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="message.h">
+    <ClInclude Include="src\NPC\npc_enemy_corporal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="item.h">
+    <ClInclude Include="src\NPC\npc_enemy_fighter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NPC\npc_enemy_bodyguard.h">
+    <ClInclude Include="src\NPC\npc_enemy_worker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NPC\npc_enemy_fighter.h">
+    <ClInclude Include="src\NPC\npc_neutral.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NPC\npc_enemy_worker.h">
+    <ClInclude Include="src\server\server.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NPC\npc_enemy.h">
+    <ClInclude Include="src\threadsafe\threadsafe_map.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NPC\non_player_character.h">
+    <ClInclude Include="src\threadsafe\threadsafe_queue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="npc.h">
+    <ClInclude Include="src\character.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NPC\npc_enemy_corporal.h">
+    <ClInclude Include="src\connection_lookup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="XML\pugixml.hpp">
+    <ClInclude Include="src\constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="XML\pugiconfig.hpp">
+    <ClInclude Include="src\coordinate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NPC\npc_neutral.h">
+    <ClInclude Include="src\craft.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="item\bloomery.h">
+    <ClInclude Include="src\door.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="item\chest.h">
+    <ClInclude Include="src\game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="item\container.h">
+    <ClInclude Include="src\generator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="item\equipment.h">
+    <ClInclude Include="src\item.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Item\item.h">
+    <ClInclude Include="src\message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="item\misc.h">
+    <ClInclude Include="src\npc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="item\stackable.h">
+    <ClInclude Include="src\parse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Item\table.h">
+    <ClInclude Include="src\player_character.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Threadsafe\threadsafe_queue.h">
+    <ClInclude Include="src\recipe.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="server\server.h">
+    <ClInclude Include="src\recipes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="server.h">
+    <ClInclude Include="src\resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="network\connection.h">
+    <ClInclude Include="src\room.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="network\include.h">
+    <ClInclude Include="src\room_side.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="network\network.h">
+    <ClInclude Include="src\server.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="network\port.h">
+    <ClInclude Include="src\utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="coordinate.h">
+    <ClInclude Include="src\world.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="threadsafe\threadsafe_map.hpp">
+    <ClInclude Include="src\lib\PugiXML\pugiconfig.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="connection_lookup.h">
+    <ClInclude Include="src\lib\PugiXML\pugixml.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\contfree_shared_mutex\safe_ptr.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -264,7 +267,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="notes.txt">
+    <Text Include="src\notes.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

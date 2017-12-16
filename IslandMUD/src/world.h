@@ -9,7 +9,7 @@ April 1, 2014 */
 #include <map>
 #include <thread>
 
-#include "XML/pugixml.hpp"
+#include "lib/PugiXML/pugixml.hpp"
 
 #include "server/server.h"
 #include "room.h"

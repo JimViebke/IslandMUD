@@ -14,8 +14,12 @@ read permissions. */
 
 #include <chrono>
 #include <condition_variable>
-#include <shared_mutex>
 #include <map>
+#include <exception>
+#include <shared_mutex>
+
+// for sf::shared_mutexs
+#include "../lib/contfree_shared_mutex/safe_ptr.hpp"
 
 namespace threadsafe
 {
@@ -69,7 +73,7 @@ namespace threadsafe
 			friend class map;
 		};
 
-		using shared_mutex = std::shared_mutex;
+		using shared_mutex = sf::default_contention_free_shared_mutex;
 
 		class lock_type
 		{

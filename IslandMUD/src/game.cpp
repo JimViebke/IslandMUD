@@ -586,22 +586,22 @@ void Game::NPC_thread()
 		// just sleeping for 1 second.
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 
-		std::cout << "NPC thread locking game_state...";
+		std::cout << "NPC_thread locking game_state...\n";
 		std::lock_guard<std::mutex> lock(game_state);
-		std::cout << " game_state locked.\n";
+		std::cout << "NPC_thread locked game_state.\n";
 
-		std::cout << "Running NPC update logic...\n";
 		NPC_update_logic();
 
-		std::cout << "Running NPC spawn logic...\n";
 		NPC_spawn_logic();
 
-		std::cout << "Done NPC loop...\n\n";
+		std::cout << "Done NPC loop...\n";
 	}
 }
 
 void Game::NPC_spawn_logic()
 {
+	std::cout << "Running NPC spawn logic...\n";
+
 	int player_count = 0;
 	int NPC_corporal_count = 0;
 	int NPC_worker_count = 0;
@@ -691,17 +691,17 @@ void Game::NPC_update_logic()
 			{
 				std::stringstream ss;
 				ss << "Calling NPC::update() on " << actor.first << ", located at "
-					<< npc->get_location().to_string() << "...";
+					<< npc->get_location().to_string() << "...\n";
 				std::cout << ss.str();
 			}
 
 			const Update_Messages update_messages = npc->update(world, actors); // call update, passing in the world and actors
 
-			std::cout << " done.\nGenerating outbound messages...";
+			std::cout << "Done NPC::update(). Generating outbound messages...\n";
 
 			generate_outbound_messages(npc->name, update_messages);
 
-			std::cout << " done.\n";
+			std::cout << "Done generating outbound messages.\n";
 		}
 	}
 }
