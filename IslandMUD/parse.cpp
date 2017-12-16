@@ -85,7 +85,7 @@ void Parse::initialize()
 		P::dict["w"] = P::dict["west"] = C::WEST;
 		P::dict["nw"] = P::dict["northwest"] = C::NORTH_WEST;
 		P::dict["u"] = P::dict["up"] = P::dict["upward"] = P::dict["upwards"] = P::dict["upstairs"] = C::UP;
-		P::dict["d"] = P::dict["down"] = P::dict["downward"] = P::dict["downwards"] = P::dict["downstairs"] = C::UP;
+		P::dict["d"] = P::dict["down"] = P::dict["downward"] = P::dict["downwards"] = P::dict["downstairs"] = C::DOWN;
 
 		// surfaces not already in directions
 		P::dict["floor"] = P::dict["ground"] = C::FLOOR;

@@ -43,41 +43,25 @@ OBJECTFILES= \
 	${OBJECTDIR}/NPC/npc_enemy_worker.o \
 	${OBJECTDIR}/NPC/npc_neutral.o \
 	${OBJECTDIR}/XML/pugixml.o \
-	${OBJECTDIR}/character.o \
-	${OBJECTDIR}/constants.o \
 	${OBJECTDIR}/coordinate.o \
-	${OBJECTDIR}/craft.o \
-	${OBJECTDIR}/door.o \
-	${OBJECTDIR}/game.o \
-	${OBJECTDIR}/generator.o \
-	${OBJECTDIR}/item.o \
 	${OBJECTDIR}/item/bloomery.o \
 	${OBJECTDIR}/item/chest.o \
 	${OBJECTDIR}/item/container.o \
 	${OBJECTDIR}/item/equipment.o \
 	${OBJECTDIR}/item/table.o \
-	${OBJECTDIR}/main.o \
-	${OBJECTDIR}/message.o \
 	${OBJECTDIR}/network/connection.o \
 	${OBJECTDIR}/network/network.o \
 	${OBJECTDIR}/network/port.o \
-	${OBJECTDIR}/parse.o \
-	${OBJECTDIR}/player_character.o \
-	${OBJECTDIR}/recipes.o \
-	${OBJECTDIR}/room.o \
-	${OBJECTDIR}/room_side.o \
 	${OBJECTDIR}/server/server.o \
-	${OBJECTDIR}/threadsafe/threadsafe_connection_lookup.o \
-	${OBJECTDIR}/utilities.o \
-	${OBJECTDIR}/world.o
+	${OBJECTDIR}/threadsafe/threadsafe_connection_lookup.o
 
 
 # C Compiler Flags
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=-pthread -std=c++14 -Wfatal-errors
-CXXFLAGS=-pthread -std=c++14 -Wfatal-errors
+CCFLAGS=-pthread -std=c++14
+CXXFLAGS=-pthread -std=c++14
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -136,45 +120,10 @@ ${OBJECTDIR}/XML/pugixml.o: XML/pugixml.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/XML/pugixml.o XML/pugixml.cpp
 
-${OBJECTDIR}/character.o: character.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/character.o character.cpp
-
-${OBJECTDIR}/constants.o: constants.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/constants.o constants.cpp
-
 ${OBJECTDIR}/coordinate.o: coordinate.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/coordinate.o coordinate.cpp
-
-${OBJECTDIR}/craft.o: craft.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/craft.o craft.cpp
-
-${OBJECTDIR}/door.o: door.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/door.o door.cpp
-
-${OBJECTDIR}/game.o: game.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/game.o game.cpp
-
-${OBJECTDIR}/generator.o: generator.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/generator.o generator.cpp
-
-${OBJECTDIR}/item.o: item.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/item.o item.cpp
 
 ${OBJECTDIR}/item/bloomery.o: item/bloomery.cpp 
 	${MKDIR} -p ${OBJECTDIR}/item
@@ -201,16 +150,6 @@ ${OBJECTDIR}/item/table.o: item/table.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/item/table.o item/table.cpp
 
-${OBJECTDIR}/main.o: main.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
-
-${OBJECTDIR}/message.o: message.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/message.o message.cpp
-
 ${OBJECTDIR}/network/connection.o: network/connection.cpp 
 	${MKDIR} -p ${OBJECTDIR}/network
 	${RM} "$@.d"
@@ -226,31 +165,6 @@ ${OBJECTDIR}/network/port.o: network/port.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/network/port.o network/port.cpp
 
-${OBJECTDIR}/parse.o: parse.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/parse.o parse.cpp
-
-${OBJECTDIR}/player_character.o: player_character.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/player_character.o player_character.cpp
-
-${OBJECTDIR}/recipes.o: recipes.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/recipes.o recipes.cpp
-
-${OBJECTDIR}/room.o: room.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/room.o room.cpp
-
-${OBJECTDIR}/room_side.o: room_side.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/room_side.o room_side.cpp
-
 ${OBJECTDIR}/server/server.o: server/server.cpp 
 	${MKDIR} -p ${OBJECTDIR}/server
 	${RM} "$@.d"
@@ -260,16 +174,6 @@ ${OBJECTDIR}/threadsafe/threadsafe_connection_lookup.o: threadsafe/threadsafe_co
 	${MKDIR} -p ${OBJECTDIR}/threadsafe
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/threadsafe/threadsafe_connection_lookup.o threadsafe/threadsafe_connection_lookup.cpp
-
-${OBJECTDIR}/utilities.o: utilities.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/utilities.o utilities.cpp
-
-${OBJECTDIR}/world.o: world.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/world.o world.cpp
 
 # Subprojects
 .build-subprojects:

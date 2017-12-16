@@ -13,7 +13,6 @@
 - 600,000 rooms of biome-based wilderness
 - Classless and invisible skill leveling
 - Intelligent and coordinating NPCs
-- Complex blacksmithing system allowing for tools and weapons with unique properties
 - Neutral NPCs scattering the world who barter for the right price and offer quests
 - Allied player characters
 - Free, multiplayer, and open source
@@ -24,8 +23,8 @@ Open a pull request.
 
 ## Building
 
-Compile and link all .cpp files (requires C++14 support) and run the resulting executable. The console window will display the server's port number.
+Compile and link all .cpp files (requires C++14) and run the resulting executable.
 
-## Connecting
+## Connecting and playing
 
-Connect to your IP address at the displayed port number. For an optional overhead map, use a second client to connect to the second displayed port number.
+Use your MUD client of choice to connect to the port number displayed by the server's console window. For an optional overhead map, use a second client to connect to the second displayed port number.

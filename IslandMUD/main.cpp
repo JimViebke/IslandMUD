@@ -1,8 +1,6 @@
 ﻿/* Jim Viebke
 Feb 14, 2015 */
 
-#include <fstream>
-
 #include "craft.h"
 #include "game.h"
 
