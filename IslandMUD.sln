@@ -7,12 +7,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IslandMUD", "IslandMUD\Isla
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM = Debug|ARM
 		Debug|Win32 = Debug|Win32
+		Release|ARM = Release|ARM
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{317E7714-6815-4795-9D06-E92CA8D95C6C}.Debug|ARM.ActiveCfg = Debug|Win32
 		{317E7714-6815-4795-9D06-E92CA8D95C6C}.Debug|Win32.ActiveCfg = Debug|Win32
 		{317E7714-6815-4795-9D06-E92CA8D95C6C}.Debug|Win32.Build.0 = Debug|Win32
+		{317E7714-6815-4795-9D06-E92CA8D95C6C}.Release|ARM.ActiveCfg = Release|Win32
 		{317E7714-6815-4795-9D06-E92CA8D95C6C}.Release|Win32.ActiveCfg = Release|Win32
 		{317E7714-6815-4795-9D06-E92CA8D95C6C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
