@@ -21,9 +21,9 @@ class World
 private:
 
 	// 2d terrain (biome) map
-	std::unique_ptr<std::vector<std::vector<char>>> terrain;
-	std::unique_ptr<std::vector<std::vector<char>>> iron_deposit_map;
-	std::unique_ptr<std::vector<std::vector<char>>> limestone_deposit_map;
+	std::unique_ptr<std::vector<char>> terrain;
+	std::unique_ptr<std::vector<char>> iron_deposit_map;
+	std::unique_ptr<std::vector<char>> limestone_deposit_map;
 
 	// For the world, we store x*y pointers. Most of these pointers will be null most of the time,
 	// but this gives us the luxury of O(1) access time for any room.
