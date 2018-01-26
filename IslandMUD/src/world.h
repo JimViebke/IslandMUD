@@ -85,13 +85,13 @@ private:
 	bool load_existing_iron_deposit_map();
 	bool load_existing_limestone_deposit_map();
 
-	// a room at x,y,z does not exist on the disk; create it
+	// a room at x,y does not exist on the disk; create it
 	void generate_room_at(const Coordinate & coordinate);
 
 	// load the room x,y to an xml_document
 	void load_room_to_XML(const Coordinate & coordinate, pugi::xml_document & vertical_rooms);
 
-	// build a room given an XML node, add to world at x,y,z
+	// build a room given an XML node, add to world at x,y
 	void add_room_to_world(pugi::xml_node & room_document, const Coordinate & coordinate);
 
 	// move specific room into memory

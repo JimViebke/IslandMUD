@@ -1172,7 +1172,7 @@ Update_Messages Character::add_to_bloomery(const std::string & item_ID, const un
 
 	// std::shared_ptr<Item> item = this->equipment_inventory
 
-	// world->room_at(x, y, z)->get_contents
+	// world->room_at(x, y)->get_contents
 
 	return Update_Messages("Character::add_to_bloomery() is incomplete.");
 }
