@@ -23,7 +23,7 @@ Open a pull request.
 
 ## Building
 
-Compile and link all .cpp files (requires C++14) and run the resulting executable.
+Compile and link all .cpp files (requires C++17) and run the resulting executable.
 
 ## Connecting and playing
 
