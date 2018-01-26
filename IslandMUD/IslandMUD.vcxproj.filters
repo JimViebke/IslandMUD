@@ -257,9 +257,6 @@
     <ClInclude Include="src\lib\PugiXML\pugixml.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\contfree_shared_mutex\safe_ptr.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Class Diagram.cd">

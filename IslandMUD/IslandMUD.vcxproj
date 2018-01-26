@@ -135,7 +135,6 @@
     <ClInclude Include="src\item\stackable.h" />
     <ClInclude Include="src\item\misc.h" />
     <ClInclude Include="src\item\table.h" />
-    <ClInclude Include="src\lib\contfree_shared_mutex\safe_ptr.hpp" />
     <ClInclude Include="src\message.h" />
     <ClInclude Include="src\network\connection.h" />
     <ClInclude Include="src\network\include.h" />

@@ -18,9 +18,6 @@ read permissions. */
 #include <exception>
 #include <shared_mutex>
 
-// for sf::shared_mutexs
-#include "../lib/contfree_shared_mutex/safe_ptr.hpp"
-
 namespace threadsafe
 {
 	// Cannot be instantiated or thrown. Can be caught as a parent.
@@ -73,7 +70,7 @@ namespace threadsafe
 			friend class map;
 		};
 
-		using shared_mutex = sf::default_contention_free_shared_mutex;
+		using shared_mutex = std::shared_mutex;
 
 		class lock_type
 		{
