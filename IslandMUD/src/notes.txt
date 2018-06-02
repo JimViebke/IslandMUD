@@ -1,0 +1,22 @@
+
+For some reason, downsizing the world dimensions then restarting the server results in an empty world. (?!)
+	I suspect this is because world.load() attempts to load the terrain file and correctly fails when it can't, but it
+	makes no attempt to load the biome_map. Try perform the same load-then-verify then save-or-recreate as we do for the world_terrain file.
+
+Add followers feature, so each character has follower_IDs and following_ID, which are mutually exclusive.
+In player->move manually move all IDs when the leader moves.
+If a player is following an player who isn't signed in, clear following string
+If a player tries to move while following, block it.
+	follow [name]
+	unfollow (2nd arg is optional and ignored)
+	
+taking a second branch: "you now have a branch" (need a smarter message)
+
+The current return for crafting or aquiring is: "You now have a(n) " + craft_item_id
+If the item was yielded, it would be nice if it said "You now have a(n) branch from the tree."
+
+Item wear. A sword wears with every strike, a bow with every fire, an axe with every strike.
+	While fighing: "You notice your sword [shows use]/[has become mildly worn]/[has become worn]/[is slightly damaged]/[is damaged]/[is badly damaged]/[is damaged beyond use]."
+	While offering: "[name] presents/offers a sword that [is mildly worn]".
+	While equipping: "You draw a [mildy-worn] axe."
+	While returning to inventory: "You sheathe your [well-worn] sword."
