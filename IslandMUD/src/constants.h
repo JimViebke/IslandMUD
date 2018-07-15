@@ -16,6 +16,9 @@ class Constants
 {
 public:
 	// general
+	static const unsigned
+		MS_PER_TICK;
+
 	static const int
 		VIEW_DISTANCE,
 

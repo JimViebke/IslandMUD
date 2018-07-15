@@ -580,21 +580,33 @@ void Game::NPC_thread()
 
 	std::cout << std::endl;
 
+	auto next_tick = U::current_time_in_ms();
+
 	for (;;)
 	{
-		// This call should be smarter, and sleep for the rest of 1 second instead of 
-		// just sleeping for 1 second.
-		std::this_thread::sleep_for(std::chrono::seconds(1));
-
-		std::cout << "NPC_thread locking game_state...\n";
-		std::lock_guard<std::mutex> lock(game_state);
-		std::cout << "NPC_thread locked game_state.\n";
+		std::cout << "NPC thread starting tick at " << U::current_time_in_ms() << ".\n";
+		std::unique_lock<std::mutex> lock(game_state);
+		std::cout << "NPC thread running.\n";
 
 		NPC_update_logic();
 
 		NPC_spawn_logic();
 
-		std::cout << "Done NPC loop...\n";
+		lock.unlock();
+		std::cout << "Done NPC loop.\n";
+		
+		// advance the tick forward
+		next_tick += C::MS_PER_TICK;
+
+		// if the start of the next tick is in the future, that is,
+		// if this tick finished on time
+		const auto now = U::current_time_in_ms();
+		if (now < next_tick)
+		{
+			const auto sleep_for = next_tick - now;
+			std::cout << "NPC thread sleeping for " << sleep_for << " ms.\n";
+			std::this_thread::sleep_for(std::chrono::milliseconds(sleep_for));
+		}
 	}
 }
 
