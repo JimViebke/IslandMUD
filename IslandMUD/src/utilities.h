@@ -110,10 +110,9 @@ namespace Utilities
 	}
 
 	// time
-	inline long long current_time_in_ms()
+	inline auto current_time_in_ms()
 	{
-		// return chrono::system_clock::to_time_t(chrono::system_clock::now());
-		return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+		return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 	}
 
 	// polymorphic testing and conversion
