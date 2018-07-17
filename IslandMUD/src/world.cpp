@@ -836,9 +836,9 @@ void World::unload_rooms_to_disk()
 			if (!Server::is_running()) return; // this thread now releases the unload queue mutex and dies
 
 			// debug code
-			std::stringstream ss;
-			ss << "Unloading a room from the unload queue. Current size: " << unload_queue.size() << std::endl;
-			std::cout << ss.str();
+			//std::stringstream ss;
+			//ss << "Unloading a room from the unload queue. Current size: " << unload_queue.size() << std::endl;
+			//std::cout << ss.str();
 
 			// get the room
 			room = std::move(unload_queue.front());
