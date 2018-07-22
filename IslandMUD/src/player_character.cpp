@@ -260,7 +260,6 @@ std::string PC::generate_area_map(const std::unique_ptr<World> & world, const st
 					}
 				}
 
-				// time for glorious nested ternary statements to do this cheap
 				a.push_back(nw_corner);
 				a.push_back(((nr) ? C::RUBBLE_CHAR : ((nd) ? C::DOOR_CHAR : ((n) ? C::WALL_CHAR : C::LAND_CHAR))));
 				a.push_back(ne_corner);
