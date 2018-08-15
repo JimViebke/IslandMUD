@@ -125,7 +125,7 @@ void Recipes::load()
 	map of item IDs that need to be in the room, are removed
 	map of item IDs to be yielded */
 
-	std::cout << "\nLoading crafting recipes...";
+	std::cout << "Loading crafting recipes...\n";
 
 	// add_recipe("recipe name", {}, {}, {}, {}, {});
 

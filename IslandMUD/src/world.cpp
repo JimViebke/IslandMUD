@@ -46,15 +46,15 @@ World::~World()
 // access a room using its coordinates
 std::unique_ptr<Room>::pointer World::room_at(const Coordinate & coordinate)
 {
-	return (world.begin() + coordinate.get_hash())->get();
+	return (world.data() + coordinate.get_hash())->get();
 }
 const std::unique_ptr<Room>::pointer World::room_at(const Coordinate & coordinate) const
 {
-	return (world.cbegin() + coordinate.get_hash())->get();
+	return (world.data() + coordinate.get_hash())->get();
 }
 std::unique_ptr<Room> & World::reference_room_at(const Coordinate & coordinate)
 {
-	return *(world.begin() + coordinate.get_hash());
+	return *(world.data() + coordinate.get_hash());
 }
 
 // debugging
@@ -454,7 +454,7 @@ void World::add_room_to_world(pugi::xml_node & room_document, const Coordinate &
 
 		// construct a new surface to add to the room
 		room->add_surface(
-			surface.child(C::XML_SURFACE_DIRECTION.c_str()).child_value(),
+			U::to_surface(std::string(surface.child(C::XML_SURFACE_DIRECTION.c_str()).child_value())),
 			surface.child(C::XML_SURFACE_MATERIAL.c_str()).child_value(),
 
 			(!health_attribute.empty()) // if the health attribute exists
@@ -474,7 +474,8 @@ void World::add_room_to_world(pugi::xml_node & room_document, const Coordinate &
 			const std::string faction_ID = door_node.attribute(C::XML_DOOR_FACTION.c_str()).value();
 
 			// add a door to the surface
-			room->add_door(surface.child(C::XML_SURFACE_DIRECTION.c_str()).child_value(),
+			room->add_door(
+				U::to_surface(std::string(surface.child(C::XML_SURFACE_DIRECTION.c_str()).child_value())),
 				health, material_ID, faction_ID);
 		}
 	}
@@ -651,32 +652,34 @@ void World::save_room_to_XML(const std::unique_ptr<Room> & room, pugi::xml_docum
 	}
 
 	// for each side of the room
-	const std::map<std::string, Room_Side> room_sides = room->get_room_sides();
-	for (std::map<std::string, Room_Side>::const_iterator surface_it = room_sides.cbegin();
-	surface_it != room_sides.cend(); ++surface_it)
+	C::surface surface = (C::surface)0;
+	for (auto surface_it = room->get_room_sides().cbegin();
+	surface_it != room->get_room_sides().cend(); ++surface_it, surface = C::surface((size_t)surface + 1))
 	{
+		if (!surface_it->has_value()) continue;
+
 		// create a node for a surface
 		pugi::xml_node surface_node = room_node.append_child(C::XML_SURFACE.c_str());
 
 		// add an attribute to the surface containing the health of the surface (example: health="90")
-		surface_node.append_attribute(C::XML_SURFACE_HEALTH.c_str()).set_value(surface_it->second.get_health());
+		surface_node.append_attribute(C::XML_SURFACE_HEALTH.c_str()).set_value((*surface_it)->get_health());
 
 		// create nodes for surface direction and surface material
 		pugi::xml_node direction_node = surface_node.append_child(C::XML_SURFACE_DIRECTION.c_str());
 		pugi::xml_node material_node = surface_node.append_child(C::XML_SURFACE_MATERIAL.c_str());
 
 		// append the surface direction and material
-		direction_node.append_child(pugi::node_pcdata).set_value(surface_it->first.c_str()); // direction ID
-		material_node.append_child(pugi::node_pcdata).set_value(surface_it->second.get_material_id().c_str()); // material ID
+		direction_node.append_child(pugi::node_pcdata).set_value(U::surface_to_string(surface).c_str()); // direction ID
+		material_node.append_child(pugi::node_pcdata).set_value((*surface_it)->get_material_id().c_str()); // material ID
 
 		// conditionally create a node for a door
-		if (surface_it->second.has_door())
+		if ((*surface_it)->has_door())
 		{
 			// create a node to hold the door
 			pugi::xml_node door_node = surface_node.append_child(C::XML_DOOR.c_str());
 
 			// retrive the door
-			std::shared_ptr<Door> door = surface_it->second.get_door();
+			std::shared_ptr<Door> door = (*surface_it)->get_door();
 
 			// add three attributes for health, material, and faction
 

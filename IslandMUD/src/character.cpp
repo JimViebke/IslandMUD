@@ -297,9 +297,13 @@ std::string Character::get_inventory() const // debugging
 }
 
 // actions
-Update_Messages Character::move(const std::string & direction_ID, std::unique_ptr<World> & world)
+Update_Messages Character::move(const std::string & direction, std::unique_ptr<World> & world)
 {
-	const Coordinate destination = location.get_after_move(direction_ID);
+	return move(U::to_direction(direction), world);
+}
+Update_Messages Character::move(const C::direction & direction, std::unique_ptr<World> & world)
+{
+	const Coordinate destination = location.get_after_move(direction);
 
 	const int x = location.get_x(), y = location.get_y();
 
@@ -308,9 +312,9 @@ Update_Messages Character::move(const std::string & direction_ID, std::unique_pt
 	{
 		return Update_Messages("You can't go there.");
 	}
-	
+
 	// test if the environment (structures) allow the player to move in a given direction
-	const std::string validate_movement = this->validate_movement(location, direction_ID, destination, world);
+	const std::string validate_movement = this->validate_movement(location, direction, destination, world);
 
 	// if the validation failed for any reason
 	if (validate_movement != C::GOOD_SIGNAL)
@@ -324,13 +328,13 @@ Update_Messages Character::move(const std::string & direction_ID, std::unique_pt
 
 	// maintain a list of users that are falling out of view that will also need a map update
 	std::vector<std::string> additional_users_to_notify;
-	
+
 	// remove viewing ID from rooms leaving view
-	if (direction_ID == C::NORTH || direction_ID == C::SOUTH)
+	if (direction == C::direction::north || direction == C::direction::south)
 	{
 		// if the character is moving north, add the view distance to x to get the x of the row being removed
 		// otherwise (moving south) remove the distance from x
-		int rx = (direction_ID == C::NORTH) ? x + C::VIEW_DISTANCE : x - C::VIEW_DISTANCE;
+		int rx = (direction == C::direction::north) ? x + C::VIEW_DISTANCE : x - C::VIEW_DISTANCE;
 		// each room to try unload from from x,(y-view) to (x,y+view)
 		for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
 		{
@@ -345,10 +349,10 @@ Update_Messages Character::move(const std::string & direction_ID, std::unique_pt
 			world->remove_viewer_and_attempt_unload(unload_location, this->name); // bounds checking takes place in here
 		}
 	}
-	else if (direction_ID == C::WEST || direction_ID == C::EAST)
+	else if (direction == C::direction::west || direction == C::direction::east)
 	{
 		// logic is the same as above, but in rotated axes (axes is plural of axis (themoreyouknow.gif))
-		const int ry = (direction_ID == C::WEST) ? y + C::VIEW_DISTANCE : y - C::VIEW_DISTANCE;
+		const int ry = (direction == C::direction::west) ? y + C::VIEW_DISTANCE : y - C::VIEW_DISTANCE;
 		for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 		{
 			Coordinate unload_location(rx, ry);
@@ -363,7 +367,7 @@ Update_Messages Character::move(const std::string & direction_ID, std::unique_pt
 		This means execution will alwways enter two of the four below blocks.
 		Functionality here is the same as above. For documentation, scroll up. */
 
-		if (direction_ID == C::NORTH_WEST || direction_ID == C::NORTH_EAST) // moving north, parse south row
+		if (direction == C::direction::north_west || direction == C::direction::north_east) // moving north, parse south row
 		{
 			const int rx = x + C::VIEW_DISTANCE;
 			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
@@ -375,7 +379,7 @@ Update_Messages Character::move(const std::string & direction_ID, std::unique_pt
 			}
 		}
 
-		if (direction_ID == C::NORTH_EAST || direction_ID == C::SOUTH_EAST) // moving east, parse west row
+		if (direction == C::direction::north_east || direction == C::direction::south_east) // moving east, parse west row
 		{
 			const int ry = y - C::VIEW_DISTANCE;
 			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
@@ -387,7 +391,7 @@ Update_Messages Character::move(const std::string & direction_ID, std::unique_pt
 			}
 		}
 
-		if (direction_ID == C::SOUTH_EAST || direction_ID == C::SOUTH_WEST) // moving south, parse north row
+		if (direction == C::direction::south_east || direction == C::direction::south_west) // moving south, parse north row
 		{
 			const int rx = x - C::VIEW_DISTANCE;
 			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
@@ -399,7 +403,7 @@ Update_Messages Character::move(const std::string & direction_ID, std::unique_pt
 			}
 		}
 
-		if (direction_ID == C::SOUTH_WEST || direction_ID == C::NORTH_WEST) // moving west, parse east row
+		if (direction == C::direction::south_west || direction == C::direction::north_west) // moving west, parse east row
 		{
 			const int ry = y + C::VIEW_DISTANCE;
 			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
@@ -422,10 +426,10 @@ Update_Messages Character::move(const std::string & direction_ID, std::unique_pt
 	world->room_at(location)->add_actor(this->name);
 
 	// prepare responses
-	Update_Messages updates("You move " + direction_ID + ".",
+	Update_Messages updates("You move " + U::direction_to_string(direction) + ".",
 
 		// "[name] arrives from the [direction] wielding an [item]."
-		this->name + " arrives from the " + C::opposite_direction_id.find(direction_ID)->second +
+		this->name + " arrives from the " + U::direction_to_string(U::opposite_direction(direction)) +
 		((this->equipped_item == nullptr) ? "." : (" wielding " + U::get_article_for(equipped_item->get_name()) + " " + equipped_item->get_name() + ".")),
 
 		true); // update required for all users in sight range
@@ -803,7 +807,7 @@ Update_Messages Character::look_at_table(const std::unique_ptr<World> & world) c
 	// validation within
 	return world->room_at(location)->table_contents(this->name);
 }
-Update_Messages Character::construct_surface(const std::string & material_id, const std::string & surface_id, std::unique_ptr<World> & world)
+Update_Messages Character::construct_surface(const std::string & material_id, const C::surface & surface, std::unique_ptr<World> & world)
 {
 	if (world->room_at(location)->is_forest())
 	{
@@ -817,29 +821,29 @@ Update_Messages Character::construct_surface(const std::string & material_id, co
 	}
 
 	// check if the surface already exists
-	if (world->room_at(location)->has_surface(surface_id)) // bounds checking not necissary because the player is standing here
+	if (world->room_at(location)->has_surface(surface)) // bounds checking not necissary because the player is standing here
 	{
 		// test if construction is prevented by an intact wall or a pile of rubble
-		if (world->room_at(location)->get_room_sides().find(surface_id)->second.is_rubble())
+		if (world->room_at(location)->get_room_sides()[(size_t)surface]->is_rubble())
 		{
 			return Update_Messages("A pile of rubble prevents construction.");
 		}
 		else // the surface is intact
 		{
-			return Update_Messages((surface_id == C::CEILING || surface_id == C::FLOOR) ?
-				"A " + surface_id + " already exists here." : // ceiling or floor
-				U::capitalize(U::get_article_for(surface_id)) + " " + surface_id + " wall already exists here."); // any wall
+			return Update_Messages((surface == C::surface::ceiling || surface == C::surface::floor) ?
+				"A " + U::surface_to_string(surface) + " already exists here." : // ceiling or floor
+				U::capitalize(U::get_article_for(U::surface_to_string(surface))) + " " + U::surface_to_string(surface) + " wall already exists here."); // any wall
 		}
 	}
 
 	// check that the surface to construct is a wall, ceiling, or floor
-	if (!U::contains(C::surface_ids, surface_id))
+	if (surface == C::surface::not_a_surface)
 	{
 		return Update_Messages("Construct a wall, ceiling or floor.");
 	}
 
 	// if the surface is a ceiling, check that any intact wall exists
-	if (surface_id == C::CEILING && // the user is constructing a ceiling
+	if (surface == C::surface::ceiling && // the user is constructing a ceiling
 		!world->room_at(location)->has_standing_wall()) // the room does not have a wall
 	{
 		return Update_Messages("You need at least one standing wall to support a ceiling.");
@@ -862,22 +866,22 @@ Update_Messages Character::construct_surface(const std::string & material_id, co
 	this->erase(material_id, C::SURFACE_REQUIREMENTS.find(material_id)->second);
 
 	// create a Room_Side and add it to Room::room_side using the surface ID
-	world->room_at(location)->add_surface(surface_id, material_id);
+	world->room_at(location)->add_surface(surface, material_id);
 
 	// "You construct a stone floor/ceiling." OR "You construct a stone wall to your north."
 	return Update_Messages("You construct a " + material_id + // you construct a [material]
-		((surface_id != C::CEILING && surface_id != C::FLOOR) ?
-			" wall to your " + surface_id : // wall to your [direction]
-			" " + surface_id), // ceiling/floor
+		((surface != C::surface::ceiling && surface != C::surface::floor) ?
+			" wall to your " + U::surface_to_string(surface) : // wall to your [direction]
+			" " + U::surface_to_string(surface)), // ceiling/floor
 
 		this->name + " constructs a " + material_id + // [name] constructs a [material]
-		((surface_id != C::CEILING && surface_id != C::FLOOR) ?
-			" wall to your " + surface_id : // wall to your [direction]
-			" " + surface_id), // ceiling/floor
+		((surface != C::surface::ceiling && surface != C::surface::floor) ?
+			" wall to your " + U::surface_to_string(surface) : // wall to your [direction]
+			" " + U::surface_to_string(surface)), // ceiling/floor
 
 		true);
 }
-Update_Messages Character::construct_surface_with_door(const std::string & surface_material_id, const std::string & surface_id, const std::string & door_material_id, std::unique_ptr<World> & world)
+Update_Messages Character::construct_surface_with_door(const std::string & surface_material_id, const C::surface & surface, const std::string & door_material_id, std::unique_ptr<World> & world)
 {
 	// Part 1: validate that a surface can be constructed
 
@@ -895,29 +899,30 @@ Update_Messages Character::construct_surface_with_door(const std::string & surfa
 	}
 
 	// check if the surface already exists
-	if (world->room_at(location)->has_surface(surface_id)) // bounds checking not necissary because the player is standing here
+	if (world->room_at(location)->has_surface(surface)) // bounds checking not necissary because the player is standing here
 	{
 		// test if construction is prevented by an intact wall or a pile of rubble
-		if (world->room_at(location)->get_room_sides().find(surface_id)->second.is_rubble())
+		if (world->room_at(location)->get_room_sides()[(size_t)surface]->is_rubble())
+
 		{
 			return Update_Messages("A pile of rubble prevents construction.");
 		}
 		else // the surface is intact
 		{
-			return Update_Messages((surface_id == C::CEILING || surface_id == C::FLOOR) ?
-				"A " + surface_id + " already exists here." : // ceiling or floor
-				U::capitalize(U::get_article_for(surface_id)) + " " + surface_id + " wall already exists here."); // any wall
+			return Update_Messages((surface == C::surface::ceiling || surface == C::surface::floor) ?
+				"A " + U::surface_to_string(surface) + " already exists here." : // ceiling or floor
+				U::capitalize(U::get_article_for(U::surface_to_string(surface))) + " " + U::surface_to_string(surface) + " wall already exists here."); // any wall
 		}
 	}
 
 	// check that the surface to construct is a wall, ceiling, or floor
-	if (!U::contains(C::surface_ids, surface_id))
+	if (surface == C::surface::not_a_surface)
 	{
 		return Update_Messages("Construct a wall, ceiling or floor.");
 	}
 
 	// if the surface is a ceiling, check that any intact wall exists
-	if (surface_id == C::CEILING && // the user is construction a ceiling
+	if (surface == C::surface::ceiling && // the user is construction a ceiling
 		!world->room_at(location)->has_standing_wall()) // the room does not have a wall
 	{
 		return Update_Messages("You need at least one standing wall to support a ceiling.");
@@ -974,7 +979,7 @@ Update_Messages Character::construct_surface_with_door(const std::string & surfa
 	this->erase(surface_material_id, C::SURFACE_REQUIREMENTS.find(surface_material_id)->second);
 
 	// add the surface to the room
-	world->room_at(location)->add_surface(surface_id, surface_material_id);
+	world->room_at(location)->add_surface(surface, surface_material_id);
 
 
 
@@ -986,7 +991,7 @@ Update_Messages Character::construct_surface_with_door(const std::string & surfa
 	this->erase(door_material_id, C::DOOR_REQUIREMENTS.find(door_material_id)->second);
 
 	// add a door to the surface in the room
-	world->room_at(location)->add_door(surface_id, C::MAX_SURFACE_HEALTH, door_material_id, this->faction_ID);
+	world->room_at(location)->add_door(surface, C::MAX_SURFACE_HEALTH, door_material_id, this->faction_ID);
 
 
 
@@ -997,15 +1002,15 @@ Update_Messages Character::construct_surface_with_door(const std::string & surfa
 	to_player << "You construct a " << surface_material_id; // you construct a [material]
 	to_room << this->name << " constructs a " << surface_material_id; // you construct a [material]
 
-	if (surface_id == C::CEILING || surface_id == C::FLOOR) // the player constructed a ceiling or floor
+	if (surface == C::surface::ceiling || surface == C::surface::floor) // the player constructed a ceiling or floor
 	{
-		to_player << " " << surface_id << " with a " << door_material_id << " hatch.";
-		to_room << " " << surface_id << " with a " << door_material_id << " hatch.";
+		to_player << " " << U::surface_to_string(surface) << " with a " << door_material_id << " hatch.";
+		to_room << " " << U::surface_to_string(surface) << " with a " << door_material_id << " hatch.";
 	}
 	else // constructing a wall rather than a ceiling or floor
 	{
-		to_player << " wall to your " << surface_id << " with a " << door_material_id << " door.";
-		to_room << " wall to your " << surface_id << " with a " << door_material_id << " door.";
+		to_player << " wall to your " << U::surface_to_string(surface) << " with a " << door_material_id << " door.";
+		to_room << " wall to your " << U::surface_to_string(surface) << " with a " << door_material_id << " door.";
 	}
 
 	// "You construct a stone floor with a stone hatch." OR "You construct a stone wall to your north with a branch door."
@@ -1036,7 +1041,7 @@ Update_Messages Character::attack_surface(const std::string & surface_ID, std::u
 	// this room does not have an intact surface, the neighboring room might
 
 	// find coordinates of neighboring room
-	const Coordinate target = location.get_after_move(surface_ID);
+	const Coordinate target = location.get_after_move((C::direction)U::to_surface(surface_ID));
 
 	// if the neighboring room has the opposite surface intact (our west wall borders next room's east wall)
 	if (world->room_at(target)->is_standing_wall(C::opposite_surface_id.find(surface_ID)->second)) // deliberately using just "z" throughout this block
@@ -1075,7 +1080,7 @@ Update_Messages Character::attack_door(const std::string & surface_ID, std::uniq
 	}
 
 	// if the current room has an intact surface with an intact door in it
-	if (world->room_at(location)->has_surface(surface_ID) && world->room_at(location)->get_room_sides().find(surface_ID)->second.has_intact_door())
+	if (world->room_at(location)->has_surface(surface_ID) && world->room_at(location)->get_room_sides()[(size_t)U::to_surface(surface_ID)]->has_intact_door())
 	{
 		// applied damage to the door
 		return world->room_at(location)->damage_door(surface_ID, this->equipped_item, this->name);
@@ -1085,7 +1090,7 @@ Update_Messages Character::attack_door(const std::string & surface_ID, std::uniq
 	// test if the next room has an intact door facing us.
 
 	// find coordinates of neighboring room
-	const Coordinate target = location.get_after_move(surface_ID);
+	const Coordinate target = location.get_after_move((C::direction)U::to_surface(surface_ID));
 
 	// if the neighboring room has the opposite surface intact
 	if (world->room_at(target)->is_standing_wall(C::opposite_surface_id.find(surface_ID)->second)) // deliberately using just "z" throughout this block
@@ -1288,19 +1293,19 @@ Update_Messages Character::die(std::unique_ptr<World> & world)
 }
 
 // movement info
-std::string Character::validate_movement(const Coordinate & current, const std::string & direction_ID, const Coordinate & destination, const std::unique_ptr<World> & world) const
+std::string Character::validate_movement(const Coordinate & current, const C::direction & direction, const Coordinate & destination, const std::unique_ptr<World> & world) const
 {
-	// determine if a character can move in a given direction (8 compass points, up, or down)
+	// determine if a character can move in a given direction (8 compass points)
 
-	// validate direction
-	if (!U::contains(C::direction_ids, direction_ID)) { return direction_ID + " is not a direction."; }
+	// validate direction (this is now a dumb error message)
+	if (direction == C::direction::not_a_direction) { return U::direction_to_string(direction) + " is not a direction."; }
 
 	// if the player wants to move in a primary direction (n/e/s/w)
-	if (direction_ID == C::NORTH || direction_ID == C::EAST ||
-		direction_ID == C::SOUTH || direction_ID == C::WEST)
+	if (direction == C::direction::north || direction == C::direction::east ||
+		direction == C::direction::south || direction == C::direction::west)
 	{
 		// save the value of an attempt to move out of the current room
-		std::string move_attempt = world->room_at(current)->can_move_in_direction(direction_ID, faction_ID);
+		std::string move_attempt = world->room_at(current)->can_move_in_direction(direction, faction_ID);
 
 		if (move_attempt != C::GOOD_SIGNAL)
 		{
@@ -1309,7 +1314,7 @@ std::string Character::validate_movement(const Coordinate & current, const std::
 		}
 
 		// save the value of an attempt to move into the destination room
-		move_attempt = world->room_at(destination)->can_move_in_direction(C::opposite_surface_id.find(direction_ID)->second, faction_ID);
+		move_attempt = world->room_at(destination)->can_move_in_direction(U::opposite_direction(direction), faction_ID);
 
 		if (move_attempt != C::GOOD_SIGNAL)
 		{
@@ -1320,50 +1325,62 @@ std::string Character::validate_movement(const Coordinate & current, const std::
 	// if the player wants to move in a secondary direction (nw/ne/se/sw), condition is
 	// none of four possible walls obstruct path AND an obstructing corner is not formed by adjacent rooms
 	else if (
-		direction_ID == C::NORTH_WEST || direction_ID == C::NORTH_EAST ||
-		direction_ID == C::SOUTH_EAST || direction_ID == C::SOUTH_WEST)
+		direction == C::direction::north_west || direction == C::direction::north_east ||
+		direction == C::direction::south_east || direction == C::direction::south_west)
 	{
 		const std::unique_ptr<Room>::pointer current_room = world->room_at(current);
 		const std::unique_ptr<Room>::pointer destination_room = world->room_at(destination);
 
-		if (direction_ID == C::NORTH_WEST)
+		if (direction == C::direction::north_west)
 		{
-			if (current_room->has_surface(C::NORTH) || current_room->has_surface(C::WEST) ||
-				destination_room->has_surface(C::SOUTH) || destination_room->has_surface(C::EAST) ||
-				(world->room_has_surface(current.get_after_move(C::WEST), C::WEST) && world->room_has_surface(current.get_after_move(C::NORTH), C::NORTH)) ||
-				(world->room_has_surface(current.get_after_move(C::SOUTH), C::SOUTH) && world->room_has_surface(current.get_after_move(C::EAST), C::EAST)))
+			const auto north_room = world->room_at(current.get_after_move(C::direction::north));
+			const auto west_room = world->room_at(current.get_after_move(C::direction::west));
+
+			if (current_room->has_surface(C::surface::north) || current_room->has_surface(C::surface::west) ||
+				destination_room->has_surface(C::surface::south) || destination_room->has_surface(C::surface::east) ||
+				((north_room->has_surface(C::surface::south) || north_room->has_surface(C::surface::west)) &&
+				(west_room->has_surface(C::surface::north) || west_room->has_surface(C::surface::east))))
 			{
-				return "There are walls in your way to the " + direction_ID + ".";
+				return "There are walls in your way to the " + U::direction_to_string(direction) + ".";
 			}
 		}
-		else if (direction_ID == C::NORTH_EAST)
+		else if (direction == C::direction::north_east)
 		{
-			if (current_room->has_surface(C::NORTH) || current_room->has_surface(C::EAST) ||
-				destination_room->has_surface(C::SOUTH) || destination_room->has_surface(C::WEST) ||
-				(world->room_has_surface(current.get_after_move(C::EAST), C::EAST) && world->room_has_surface(current.get_after_move(C::NORTH), C::NORTH)) ||
-				(world->room_has_surface(current.get_after_move(C::SOUTH), C::SOUTH) && world->room_has_surface(current.get_after_move(C::WEST), C::WEST)))
+			const auto north_room = world->room_at(current.get_after_move(C::direction::north));
+			const auto east_room = world->room_at(current.get_after_move(C::direction::east));
+
+			if (current_room->has_surface(C::surface::north) || current_room->has_surface(C::surface::east) ||
+				destination_room->has_surface(C::surface::south) || destination_room->has_surface(C::surface::west) ||
+				((north_room->has_surface(C::surface::south) || north_room->has_surface(C::surface::east)) &&
+				(east_room->has_surface(C::surface::north) || east_room->has_surface(C::surface::west))))
 			{
-				return "There are walls in your way to the " + direction_ID + ".";
+				return "There are walls in your way to the " + U::direction_to_string(direction) + ".";
 			}
 		}
-		else if (direction_ID == C::SOUTH_EAST)
+		else if (direction == C::direction::south_east)
 		{
-			if (current_room->has_surface(C::SOUTH) || current_room->has_surface(C::EAST) ||
-				destination_room->has_surface(C::NORTH) || destination_room->has_surface(C::WEST) ||
-				(world->room_has_surface(current.get_after_move(C::EAST), C::EAST) && world->room_has_surface(current.get_after_move(C::SOUTH), C::SOUTH)) ||
-				(world->room_has_surface(current.get_after_move(C::NORTH), C::NORTH) && world->room_has_surface(current.get_after_move(C::WEST), C::WEST)))
+			const auto south_room = world->room_at(current.get_after_move(C::direction::south));
+			const auto east_room = world->room_at(current.get_after_move(C::direction::east));
+
+			if (current_room->has_surface(C::surface::south) || current_room->has_surface(C::surface::east) ||
+				destination_room->has_surface(C::surface::north) || destination_room->has_surface(C::surface::west) ||
+				((south_room->has_surface(C::surface::north) || south_room->has_surface(C::surface::east)) &&
+				(east_room->has_surface(C::surface::south) || east_room->has_surface(C::surface::west))))
 			{
-				return "There are walls in your way to the " + direction_ID + ".";
+				return "There are walls in your way to the " + U::direction_to_string(direction) + ".";
 			}
 		}
-		else if (direction_ID == C::SOUTH_WEST)
+		else if (direction == C::direction::south_west)
 		{
-			if (current_room->has_surface(C::SOUTH) || current_room->has_surface(C::WEST) ||
-				destination_room->has_surface(C::NORTH) || destination_room->has_surface(C::EAST) ||
-				(world->room_has_surface(current.get_after_move(C::WEST), C::WEST) && world->room_has_surface(current.get_after_move(C::SOUTH), C::SOUTH)) ||
-				(world->room_has_surface(current.get_after_move(C::NORTH), C::NORTH) && world->room_has_surface(current.get_after_move(C::EAST), C::EAST)))
+			const auto south_room = world->room_at(current.get_after_move(C::direction::south));
+			const auto west_room = world->room_at(current.get_after_move(C::direction::west));
+
+			if (current_room->has_surface(C::surface::south) || current_room->has_surface(C::surface::west) ||
+				destination_room->has_surface(C::surface::north) || destination_room->has_surface(C::surface::east) ||
+				((south_room->has_surface(C::surface::north) || south_room->has_surface(C::surface::west)) &&
+				(west_room->has_surface(C::surface::south) || west_room->has_surface(C::surface::east))))
 			{
-				return "There are walls in your way to the " + direction_ID + ".";
+				return "There are walls in your way to the " + U::direction_to_string(direction) + ".";
 			}
 		}
 	}

@@ -31,11 +31,12 @@ protected:
 		// "get [] [] axe", "construct north stone surface", "construct north stone door"
 		Coordinate objective_location;
 		bool modifier, already_planning_to_craft = false;
-		std::string verb, direction, material, noun, purpose; // purpose is the reason this objective was added
+		std::string verb, material, noun, purpose; // purpose is the reason this objective was added
+		C::direction direction;
 
 		Objective(const std::string & verb, const std::string & noun, const std::string & purpose);
 		Objective(const std::string & verb, const std::string & noun, const Coordinate & objective_location);
-		Objective(const std::string & verb, const std::string & noun, const std::string & material, const std::string & direction, const Coordinate & objective_location, const bool & modifier);
+		Objective(const std::string & verb, const std::string & noun, const std::string & material, const C::direction & direction, const Coordinate & objective_location, const bool & modifier);
 	};
 
 	enum class Objective_Priority { low_priority, high_priority };
@@ -124,10 +125,10 @@ private:
 	public:
 		Coordinate location, parent_location;
 		int h = 0, g = 0, f = 0;
-		std::string direction_from_parent;
+		C::direction direction_from_parent;
 
 		Node();
-		Node(const Coordinate & set_location, const std::string & dir);
+		Node(const Coordinate & set_location, const C::direction & set_direction);
 
 		void set_g_h_f(const int & set_g, const int & set_h);
 		void set_g(const int & set_g);

@@ -160,27 +160,27 @@ std::string PC::generate_area_map(const std::unique_ptr<World> & world, const st
 				*/
 				if (n)
 				{
-					nd = world->room_at(current)->get_room_sides().find(C::NORTH)->second.has_door();
+					nd = world->room_at(current)->get_room_sides()[(size_t)C::surface::north]->has_door();
 					nr = (!world->room_at(current)->is_standing_wall(C::NORTH) ||
-						(nd && world->room_at(current)->get_room_sides().find(C::NORTH)->second.get_door()->is_rubble()));
+						(nd && world->room_at(current)->get_room_sides()[(size_t)C::surface::north]->get_door()->is_rubble()));
 				}
 				if (e)
 				{
-					ed = world->room_at(current)->get_room_sides().find(C::EAST)->second.has_door();
+					ed = world->room_at(current)->get_room_sides()[(size_t)C::surface::east]->has_door();
 					er = (!world->room_at(current)->is_standing_wall(C::EAST) ||
-						(ed && world->room_at(current)->get_room_sides().find(C::EAST)->second.get_door()->is_rubble()));
+						(ed && world->room_at(current)->get_room_sides()[(size_t)C::surface::east]->get_door()->is_rubble()));
 				}
 				if (s)
 				{
-					sd = world->room_at(current)->get_room_sides().find(C::SOUTH)->second.has_door();
+					sd = world->room_at(current)->get_room_sides()[(size_t)C::surface::south]->has_door();
 					sr = (!world->room_at(current)->is_standing_wall(C::SOUTH) ||
-						(sd && world->room_at(current)->get_room_sides().find(C::SOUTH)->second.get_door()->is_rubble()));
+						(sd && world->room_at(current)->get_room_sides()[(size_t)C::surface::south]->get_door()->is_rubble()));
 				}
 				if (w)
 				{
-					wd = world->room_at(current)->get_room_sides().find(C::WEST)->second.has_door();
+					wd = world->room_at(current)->get_room_sides()[(size_t)C::surface::west]->has_door();
 					wr = (!world->room_at(current)->is_standing_wall(C::WEST) ||
-						(wd && world->room_at(current)->get_room_sides().find(C::WEST)->second.get_door()->is_rubble()));
+						(wd && world->room_at(current)->get_room_sides()[(size_t)C::surface::west]->get_door()->is_rubble()));
 				}
 
 				// count the enemies standing at a coordinate

@@ -139,17 +139,17 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 	// making ceiling/floor: "construct stone floor/ceiling"
 	else if (command.size() == 3 && command[0] == C::CONSTRUCT_COMMAND)
 	{
-		return actors.find(actor_id)->second->construct_surface(command[1], command[2], world); // material, direction, world
+		return actors.find(actor_id)->second->construct_surface(command[1], U::to_surface(command[2]), world); // material, direction, world
 	}
 	// making walls: "construct west stone wall"
 	else if (command.size() == 4 && command[0] == C::CONSTRUCT_COMMAND && command[3] == C::WALL)
 	{
-		return actors.find(actor_id)->second->construct_surface(command[2], command[1], world); // material, direction, world
+		return actors.find(actor_id)->second->construct_surface(command[2], U::to_surface(command[1]), world); // material, direction, world
 	}
 	// "construct west stone wall with stick door"
 	else if (command.size() == 7 && command[0] == C::CONSTRUCT_COMMAND && command[3] == C::WALL && command[4] == C::WITH_COMMAND && command[6] == C::DOOR)
 	{
-		return actors.find(actor_id)->second->construct_surface_with_door(command[2], command[1], command[5], world); // material, direction, world
+		return actors.find(actor_id)->second->construct_surface_with_door(command[2], U::to_surface(command[1]), command[5], world); // material, direction, world
 	}
 	// printing out the full library of recipes: "recipes"
 	else if (command.size() == 1 && command[0] == C::PRINT_RECIPES_COMMAND)
@@ -527,23 +527,70 @@ void Game::client_map_thread(network::connection_ptr map_connection)
 
 void Game::NPC_thread()
 {
+	// perform a one-time spawning of some NPCs for debugging purposes
+	NPC_spawn_startup_logic();
+
+	std::this_thread::sleep_for(std::chrono::seconds(15)); // put a delay between server startup and NPCs' first action
+
+	std::cout << std::endl;
+
+	auto next_tick = U::current_time_in_ms();
+
+	for (;;)
+	{
+		const auto tick_start = U::current_time_in_ms();
+
+		std::cout << "NPC thread starting tick at " << tick_start << ".\n";
+		std::unique_lock<std::mutex> lock(game_state);
+		//std::cout << "NPC thread running.\n";
+
+		const auto update_start = U::current_time_in_ms();
+		NPC_update_logic();
+		const auto update_end = U::current_time_in_ms();
+
+		const auto spawn_start = U::current_time_in_ms();
+		// NPC_spawn_logic();
+		const auto spawn_end = U::current_time_in_ms();
+
+		// lock
+		lock.unlock();
+
+		const auto tick_end = U::current_time_in_ms();
+		next_tick += C::MS_PER_TICK;
+
+		std::cout << "NPC tick: " << tick_end - tick_start << " ms (logic " <<
+			update_end - update_start << " ms, spawn "<<
+			spawn_end - spawn_start << " ms)\n";
+
+		// if the start of the next tick is in the future, that is,
+		// if this tick finished on time
+		if (tick_end < next_tick)
+		{
+			const auto sleep_for = next_tick - tick_end;
+			std::cout << "Sleeping " << sleep_for << " ms.\n";
+			std::this_thread::sleep_for(std::chrono::milliseconds(sleep_for));
+		}
+	}
+}
+
+void Game::NPC_spawn_startup_logic()
+{
 	// use booleans to toggle spawning of certain NPCs for debugging purposes
 
-	// create three workers, each with a bodyguard
-	if (false)
+	// create four corporals, each with a bodyguard
+	if (true)
 	{
-		const std::vector<std::string> workers = { "Jeb", "Bill", "Bob" };
-		const std::vector<std::string> bodyguards = { "Alpha", "Beta", "Gamma" };
+		const std::vector<std::string> corporals = { "Jeb", "Bill", "Bob", "Gene", "Val" };
+		const std::vector<std::string> bodyguards = { "Alpha", "Beta", "Gamma", "Delta", "Epsilon" };
 
-		// create worker NPCs with bodyguards
-		for (unsigned i = 0; i < std::min(workers.size(), bodyguards.size()); ++i)
+		for (unsigned i = 0; i < corporals.size(); ++i)
 		{
 			std::lock_guard<std::mutex> lock(game_state);
 
-			std::shared_ptr<Hostile_NPC_Worker> worker = std::make_shared<Hostile_NPC_Worker>(workers[i], world);
-			actors.insert(make_pair(worker->name, worker));
+			std::shared_ptr<Hostile_NPC_Corporal> corporal = std::make_shared<Hostile_NPC_Corporal>(corporals[i], world);
+			actors.insert(make_pair(corporal->name, corporal));
 
-			std::shared_ptr<Hostile_NPC_Bodyguard> bodyguard = std::make_shared<Hostile_NPC_Bodyguard>(bodyguards[i], workers[i], world);
+			std::shared_ptr<Hostile_NPC_Bodyguard> bodyguard = std::make_shared<Hostile_NPC_Bodyguard>(bodyguards[i], corporals[i], world);
 			actors.insert(make_pair(bodyguard->name, bodyguard));
 		}
 	}
@@ -576,43 +623,16 @@ void Game::NPC_thread()
 		}
 	}
 
-	std::this_thread::sleep_for(std::chrono::seconds(15)); // put a delay between server startup and NPCs' first action
-
-	std::cout << std::endl;
-
-	auto next_tick = U::current_time_in_ms();
-
-	for (;;)
+	if (false)
 	{
-		std::cout << "NPC thread starting tick at " << U::current_time_in_ms() << ".\n";
-		std::unique_lock<std::mutex> lock(game_state);
-		std::cout << "NPC thread running.\n";
-
-		NPC_update_logic();
-
-		NPC_spawn_logic();
-
-		lock.unlock();
-		std::cout << "Done NPC loop.\n";
-		
-		// advance the tick forward
-		next_tick += C::MS_PER_TICK;
-
-		// if the start of the next tick is in the future, that is,
-		// if this tick finished on time
-		const auto now = U::current_time_in_ms();
-		if (now < next_tick)
-		{
-			const auto sleep_for = next_tick - now;
-			std::cout << "NPC thread sleeping for " << sleep_for << " ms.\n";
-			std::this_thread::sleep_for(std::chrono::milliseconds(sleep_for));
-		}
+		std::shared_ptr<Hostile_NPC_Worker> worker = std::make_shared<Hostile_NPC_Worker>("Rupert", world);
+		actors.insert(make_pair(worker->name, worker));
 	}
 }
 
 void Game::NPC_spawn_logic()
 {
-	std::cout << "Running NPC spawn logic...\n";
+	// std::cout << "Running NPC spawn logic...\n";
 
 	int player_count = 0;
 	int NPC_corporal_count = 0;
@@ -709,11 +729,11 @@ void Game::NPC_update_logic()
 
 			const Update_Messages update_messages = npc->update(world, actors); // call update, passing in the world and actors
 
-			std::cout << "Done NPC::update(). Generating outbound messages...\n";
+			//std::cout << "Done NPC::update(). Generating outbound messages...\n";
 
 			generate_outbound_messages(npc->name, update_messages);
 
-			std::cout << "Done generating outbound messages.\n";
+			//std::cout << "Done generating outbound messages.\n";
 		}
 	}
 }

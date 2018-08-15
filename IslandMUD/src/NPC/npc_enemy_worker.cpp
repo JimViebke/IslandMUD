@@ -196,7 +196,7 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 			if (objective_it->objective_location == location)
 			{
 				// if the surface already exists, erase the objective and continue
-				if (world->room_at(location)->has_surface(objective_it->direction))
+				if (world->room_at(location)->has_surface((C::surface)objective_it->direction))
 				{
 					// erase() returns the next iterator
 					objective_it = objectives.erase(objective_it);
@@ -223,7 +223,7 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 				const Coordinate adjacent = location.get_after_move(objective_it->direction);
 
 				// if an opposing surface exists, don't construct a surface here.
-				if (world->room_at(adjacent)->has_surface(C::opposite_surface_id.find(objective_it->direction)->second))
+				if (world->room_at(adjacent)->has_surface(U::opposite_surface((C::surface)objective_it->direction)))
 				{
 					// If the NPC was about to build a surface with a door, move the door elsewhere.
 					// It is possible that this will move the door to another structure.
@@ -261,8 +261,8 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 
 				// construct the surface, with a door if the modifier is true				
 				update_messages = ((objective_it->modifier)
-					? construct_surface_with_door(objective_it->material, objective_it->direction, objective_it->material, world)
-					: construct_surface(objective_it->material, objective_it->direction, world));
+					? construct_surface_with_door(objective_it->material, (C::surface)objective_it->direction, objective_it->material, world)
+					: construct_surface(objective_it->material, (C::surface)objective_it->direction, world));
 
 				if (update_messages.to_user.find("You construct ") != std::string::npos) // find a better way to do this
 				{
@@ -368,7 +368,7 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 			if (objective_it->objective_location == location)
 			{
 				// if the surface already exists, erase the objective and continue
-				if (world->room_at(location)->has_surface(objective_it->direction))
+				if (world->room_at(location)->has_surface((C::surface)objective_it->direction))
 				{
 					// erase() returns the next iterator
 					objective_it = structure_it->structure_surface_objectives.erase(objective_it);
@@ -393,8 +393,8 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 
 				// construct the surface, with a door if the modifier is true				
 				update_messages = ((objective_it->modifier)
-					? construct_surface_with_door(objective_it->material, objective_it->direction, objective_it->material, world)
-					: construct_surface(objective_it->material, objective_it->direction, world));
+					? construct_surface_with_door(objective_it->material, (C::surface)objective_it->direction, objective_it->material, world)
+					: construct_surface(objective_it->material, (C::surface)objective_it->direction, world));
 
 				if (update_messages.to_user.find("You construct ") != std::string::npos) // find a better way to do this
 				{
@@ -685,25 +685,25 @@ void Hostile_NPC_Worker::plan_fortress()
 		// iterate over the west side of the structure
 		for (int x_coord = structure._x; x_coord <= (structure._x + structure.height) - 1; ++x_coord)
 		{
-			structure_objectives.add(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::WEST, Coordinate(x_coord, structure._y), false));
+			structure_objectives.add(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::direction::west, Coordinate(x_coord, structure._y), false));
 		}
 
 		// iterate over the south side of the structure
 		for (int y_coord = structure._y; y_coord <= (structure._y + structure.width) - 1; ++y_coord)
 		{
-			structure_objectives.add(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::SOUTH, Coordinate((structure._x + structure.height) - 1, y_coord), false));
+			structure_objectives.add(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::direction::south, Coordinate((structure._x + structure.height) - 1, y_coord), false));
 		}
 
 		// iterate over the north side of the structure
 		for (int y_coord = structure._y; y_coord <= (structure._y + structure.width) - 1; ++y_coord)
 		{
-			structure_objectives.add(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::NORTH, Coordinate(structure._x, y_coord), false));
+			structure_objectives.add(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::direction::north, Coordinate(structure._x, y_coord), false));
 		}
 
 		// iterate over the east side of the structure
 		for (int x_coord = structure._x; x_coord <= (structure._x + structure.height) - 1; ++x_coord)
 		{
-			structure_objectives.add(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::EAST, Coordinate(x_coord, (structure._y + structure.width) - 1), false));
+			structure_objectives.add(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::direction::east, Coordinate(x_coord, (structure._y + structure.width) - 1), false));
 		}
 
 		// save the object containing the objectives
@@ -807,7 +807,7 @@ void Hostile_NPC_Worker::plan_fortress_outer_wall(const int & fortress_x, const 
 				else // the adjacent node is within the fortress
 				{
 					// add an objective to construct an outer wall here
-					objectives.push_front(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::NORTH,
+					objectives.push_front(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::direction::north,
 						Coordinate(fortress_x + node.get_x() - 2, fortress_y + node.get_y() - 2),
 						U::random_int_from(1, 6) == 1));
 				}
@@ -821,7 +821,7 @@ void Hostile_NPC_Worker::plan_fortress_outer_wall(const int & fortress_x, const 
 				}
 				else
 				{
-					objectives.push_front(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::SOUTH,
+					objectives.push_front(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::direction::south,
 						Coordinate(fortress_x + node.get_x() - 2, fortress_y + node.get_y() - 2),
 						U::random_int_from(1, 6) == 1));
 				}
@@ -835,7 +835,7 @@ void Hostile_NPC_Worker::plan_fortress_outer_wall(const int & fortress_x, const 
 				}
 				else
 				{
-					objectives.push_front(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::WEST,
+					objectives.push_front(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::direction::west,
 						Coordinate(fortress_x + node.get_x() - 2, fortress_y + node.get_y() - 2),
 						U::random_int_from(1, 6) == 1));
 				}
@@ -849,7 +849,7 @@ void Hostile_NPC_Worker::plan_fortress_outer_wall(const int & fortress_x, const 
 				}
 				else
 				{
-					objectives.push_front(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::EAST,
+					objectives.push_front(Objective(C::AI_OBJECTIVE_CONSTRUCT, C::SURFACE, C::STONE_ID, C::direction::east,
 						Coordinate(fortress_x + node.get_x() - 2, fortress_y + node.get_y() - 2),
 						U::random_int_from(1, 6) == 1));
 				}
@@ -878,7 +878,7 @@ void Hostile_NPC_Worker::Structure_Objectives::plan_doors(const std::unique_ptr<
 		const Coordinate current = structure_surface_objectives[i].objective_location.get_after_move(structure_surface_objectives[i].direction);
 
 		// determine if the adjacent room has an opposing wall
-		if (world->room_at(current)->has_surface(C::opposite_surface_id.find(structure_surface_objectives[i].direction)->second))
+		if (world->room_at(current)->has_surface((C::surface)U::opposite_direction(structure_surface_objectives[i].direction)))
 		{
 			// if the adjacent room has an opposing wall, this wall will never be constructed; remove it
 			structure_surface_objectives.erase(structure_surface_objectives.begin() + i);

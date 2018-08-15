@@ -17,7 +17,7 @@ std::string NPC::get_objectives() const
 		// objective_x, objective_y, objective_z;
 
 		result << "[" << objectives[i].verb
-			<< "][" << objectives[i].direction
+			<< "][" << U::direction_to_string(objectives[i].direction)
 			<< "][" << objectives[i].material
 			<< "][" << objectives[i].noun
 			<< "][" << objectives[i].purpose
@@ -33,7 +33,7 @@ NPC::Objective::Objective(const std::string & verb, const std::string & noun, co
 	verb(verb), noun(noun), purpose(purpose), objective_location(-1, -1) {}
 NPC::Objective::Objective(const std::string & verb, const std::string & noun, const Coordinate & coordinate) :
 	verb(verb), noun(noun), objective_location(coordinate) {}
-NPC::Objective::Objective(const std::string & verb, const std::string & noun, const std::string & material, const std::string & direction, const Coordinate & coordinate, const bool & modifier) :
+NPC::Objective::Objective(const std::string & verb, const std::string & noun, const std::string & material, const C::direction & direction, const Coordinate & coordinate, const bool & modifier) :
 	verb(verb), noun(noun), material(material), direction(direction), objective_location(coordinate), modifier(modifier) {}
 
 // objective creating and deletion
@@ -267,7 +267,7 @@ bool NPC::pathfind(const Coordinate & destination, std::unique_ptr<World> & worl
 	std::vector<Node> open_list, closed_list;
 
 	// Add current room to open list.
-	open_list.push_back(Node(location, ""));
+	open_list.push_back(Node(location, C::direction::not_a_direction));
 
 	// calculate current room's costs. G cost starts at 0.
 	open_list[0].set_g_h_f(0, diagonal_movement_cost(destination, location));
@@ -282,10 +282,12 @@ bool NPC::pathfind(const Coordinate & destination, std::unique_ptr<World> & worl
 		const Node current_room = move_and_get_lowest_g_cost(open_list, closed_list);
 
 		// for each room adjacent to current
-		for (const std::string & direction : C::direction_ids)
+		for (const std::string & direction_id : C::direction_ids)
 		{
+			const C::direction direction = U::to_direction(direction_id);
+
 			// calculate the location
-			Coordinate destination = current_room.location.get_after_move(direction);
+			const Coordinate destination = current_room.location.get_after_move(direction);
 
 			// skip if the room if it is out of bounds,
 			if (!destination.is_valid()) continue;
@@ -314,9 +316,9 @@ bool NPC::pathfind(const Coordinate & destination, std::unique_ptr<World> & worl
 					(world->room_at(adjacent_room.location)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
-					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
+					((U::is_primary_direction(direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
 					:
-					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
+					((U::is_primary_direction(direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
 					);
 
 				// use the g- and h-score to set the g-, h-, and f-score.
@@ -344,9 +346,9 @@ bool NPC::pathfind(const Coordinate & destination, std::unique_ptr<World> & worl
 					(world->room_at(adjacent_room.location)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
-					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
+					((U::is_primary_direction(direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
 					:
-					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
+					((U::is_primary_direction(direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
 					);
 
 				// if this way to the room is cheaper than the current best cost to the room
@@ -544,7 +546,7 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, std::unique_ptr<
 	std::vector<Node> open_list, closed_list;
 
 	// Add current room to open list.
-	open_list.push_back(Node(location, ""));
+	open_list.push_back(Node(location, C::direction::not_a_direction));
 
 	// cost to reach current room is of course 0
 	open_list[0].set_g(0);
@@ -559,10 +561,12 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, std::unique_ptr<
 		const Node current_room = move_and_get_lowest_g_cost(open_list, closed_list);
 
 		// for each room adjacent to current
-		for (const std::string & direction : C::direction_ids)
+		for (const std::string & direction_id : C::direction_ids)
 		{
+			const C::direction direction = U::to_direction(direction_id);
+
 			// calculate the location
-			Coordinate destination = current_room.location.get_after_move(direction);
+			const Coordinate destination = current_room.location.get_after_move(direction);
 
 			// skip if the room if it is out of bounds,
 			if (!destination.is_valid()) continue;
@@ -591,9 +595,9 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, std::unique_ptr<
 					(world->room_at(adjacent_room.location)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
-					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
+					((U::is_primary_direction(direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
 					:
-					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
+					((U::is_primary_direction(direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
 					);
 
 				// calculate the cost to this room
@@ -619,9 +623,9 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, std::unique_ptr<
 					(world->room_at(adjacent_room.location)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
-					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
+					((U::is_primary_direction(direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
 					:
-					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
+					((U::is_primary_direction(direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
 					);
 
 				// if this way to the room is cheaper than the current best cost to the room
@@ -723,7 +727,7 @@ bool NPC::save_path_to(const Coordinate & destination, std::unique_ptr<World> & 
 	std::vector<Node> open_list, closed_list;
 
 	// Add current room to open list.
-	open_list.push_back(Node(location, ""));
+	open_list.push_back(Node(location, C::direction::not_a_direction));
 
 	// calculate current room's costs. G cost starts at 0.
 	open_list[0].set_g_h_f(0, diagonal_movement_cost(location, destination));
@@ -738,8 +742,10 @@ bool NPC::save_path_to(const Coordinate & destination, std::unique_ptr<World> & 
 		const Node current_room = move_and_get_lowest_g_cost(open_list, closed_list);
 
 		// for each room adjacent to current
-		for (const std::string & direction : C::direction_ids)
+		for (const std::string & direction_id : C::direction_ids)
 		{
+			const C::direction direction = U::to_direction(direction_id);
+
 			// calculate the destination coordinates
 			Coordinate next_room = current_room.location.get_after_move(direction);
 
@@ -770,9 +776,9 @@ bool NPC::save_path_to(const Coordinate & destination, std::unique_ptr<World> & 
 					(world->room_at(adjacent_room.location)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
-					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
+					((U::is_primary_direction(direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
 					:
-					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
+					((U::is_primary_direction(direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
 					);
 
 				// use the g- and h-score to set the g-, h-, and f-score.
@@ -800,9 +806,9 @@ bool NPC::save_path_to(const Coordinate & destination, std::unique_ptr<World> & 
 					(world->room_at(adjacent_room.location)->contains(C::TREE_ID))
 					?
 					// determine if the movement is in a primary direction
-					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
+					((U::is_primary_direction(direction) ? C::AI_MOVEMENT_COST_FOREST : C::AI_MOVEMENT_COST_FOREST_DIAGONAL))
 					:
-					((U::contains(C::primary_direction_ids, direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
+					((U::is_primary_direction(direction) ? C::AI_MOVEMENT_COST : C::AI_MOVEMENT_COST_DIAGONAL))
 					);
 
 				// if this way to the room is cheaper than the current best cost to the room
@@ -922,7 +928,8 @@ bool NPC::coordinates_are_on_path(const Coordinate & find_coordinate) const
 
 // Node constructors
 NPC::Node::Node() : location(-1, -1), parent_location(-1, -1) {}
-NPC::Node::Node(const Coordinate & location, const std::string & dir) : location(location), parent_location(-1, -1), direction_from_parent(dir) {}
+NPC::Node::Node(const Coordinate & set_location, const C::direction & set_direction) :
+	location(set_location), parent_location(-1, -1), direction_from_parent(set_direction) {}
 
 // Node member setter
 void NPC::Node::set_g_h_f(const int & set_g, const int & set_h)

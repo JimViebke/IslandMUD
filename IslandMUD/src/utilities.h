@@ -92,6 +92,23 @@ namespace Utilities
 	std::string capitalize(std::string & word);
 	std::string capitalize(const std::string & word);
 
+	C::surface to_surface(const std::string & surface);
+	std::string surface_to_string(const C::surface surface);
+	C::direction to_direction(const std::string & direction);
+	std::string direction_to_string(const C::direction directions);
+
+	C::surface opposite_surface(const C::surface surface);
+	C::direction opposite_direction(const C::direction direction);
+
+	inline bool is_primary_direction(const C::direction direction)
+	{
+		return
+			direction == C::direction::north ||
+			direction == C::direction::east ||
+			direction == C::direction::south ||
+			direction == C::direction::west;
+	}
+
 	// grammar
 	std::string get_article_for(const std::string & noun);
 	std::string get_plural_for(const std::string & noun);

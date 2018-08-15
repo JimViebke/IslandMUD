@@ -7,10 +7,11 @@ class Coordinate
 {
 private:
 	int x, y;
+
 public:
 	Coordinate(const int x, const int y);
 	
-	Coordinate get_after_move(const std::string & direction) const;
+	Coordinate get_after_move(const C::direction & direction) const;
 
 	inline int get_x() const { return x; }
 	inline int get_y() const { return y; }
@@ -44,7 +45,7 @@ public:
 	inline bool is_southwest_of(const Coordinate & start) const { return x > start.x && y < start.y; }
 	inline bool is_southeast_of(const Coordinate & start) const { return x > start.x && y > start.y; }
 	
-	std::string get_movement_direction_to(const Coordinate & adjacent) const;
+	C::direction get_movement_direction_to(const Coordinate & adjacent) const;
 	
 	void reset() { x = y = -1; } // reset the coordinate, leaving it in an invalid state
 

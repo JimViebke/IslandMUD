@@ -4,6 +4,8 @@ Oct 21, 2015 */
 
 #include "utilities.h"
 
+#include <array>
+
 // string utilities
 unsigned U::to_unsigned(const std::string & word)
 {
@@ -52,6 +54,96 @@ std::string U::capitalize(const std::string & word)
 		result[0] -= 32;
 
 	return result;
+}
+
+C::surface U::to_surface(const std::string & surface)
+{
+	if (surface == C::NORTH) return C::surface::north;
+	else if (surface == C::EAST) return C::surface::east;
+	else if (surface == C::SOUTH) return C::surface::south;
+	else if (surface == C::WEST) return C::surface::west;
+
+	return C::surface::not_a_surface;
+}
+std::string U::surface_to_string(const C::surface surface)
+{
+	const static std::array<std::string, 7> surfaces = {
+		C::NORTH, C::EAST, C::SOUTH, C::WEST,
+		C::CEILING, C::FLOOR, "not a surface" };
+
+	return surfaces[(size_t)surface];
+}
+C::direction U::to_direction(const std::string & direction)
+{
+	if (direction == C::NORTH) return C::direction::north;
+	else if (direction == C::EAST) return C::direction::east;
+	else if (direction == C::SOUTH) return C::direction::south;
+	else if (direction == C::WEST) return C::direction::west;
+	else if (direction == C::NORTH_EAST) return C::direction::north_east;
+	else if (direction == C::SOUTH_EAST) return C::direction::south_east;
+	else if (direction == C::SOUTH_WEST) return C::direction::south_west;
+	else if (direction == C::NORTH_WEST) return C::direction::north_west;
+
+	return C::direction::not_a_direction;
+}
+std::string U::direction_to_string(const C::direction direction)
+{
+	const static std::array<std::string, 9> directions = {
+		C::NORTH, C::EAST, C::SOUTH, C::WEST,
+		C::NORTH_EAST, C::SOUTH_EAST, C::SOUTH_WEST, C::NORTH_WEST,
+		"not_a_direction" };
+
+	return directions[(size_t)direction];
+}
+
+C::surface U::opposite_surface(const C::surface surface)
+{
+	/* flipping:
+	
+	enum class surface
+	{
+		north,
+		east,
+		south,
+		west,
+
+		ceiling,
+		floor,
+
+		not_a_surface,
+	}; */
+
+	const static std::array<C::surface, 9> opposite_surfaces = {
+		C::surface::south, C::surface::west, C::surface::north, C::surface::east,
+		C::surface::floor, C::surface::ceiling, C::surface::not_a_surface };
+
+	return opposite_surfaces[(size_t)surface];
+}
+C::direction U::opposite_direction(const C::direction direction)
+{
+	/* flipping:
+
+	enum class direction
+	{
+		north,
+		east,
+		south,
+		west,
+
+		north_east,
+		south_east,
+		south_west,
+		north_west,
+
+		not_a_direction
+	}; */
+
+	const static std::array<C::direction, 9> opposite_surfaces = {
+		C::direction::south, C::direction::west, C::direction::north, C::direction::east,
+		C::direction::south_west, C::direction::north_west, C::direction::north_east, C::direction::south_east,
+		C::direction::not_a_direction };
+
+	return opposite_surfaces[(size_t)direction];
 }
 
 // grammar

@@ -62,10 +62,14 @@ bool Room_Side::has_intact_door() const
 	return this->has_door() && !door->is_rubble();
 }
 
-std::string Room_Side::can_move_through_wall(const std::string & player_faction_ID) const
+std::string Room_Side::is_traversable(const std::string & player_faction_ID) const
 {
+	if (this->is_rubble())
+	{
+		return C::GOOD_SIGNAL;
+	}	
 	// if the surface has a door
-	if (this->has_door())
+	else if (this->has_door())
 	{
 		// the character can move through the door if it is rubble, or owned by the player's faction
 		if (door->is_rubble())

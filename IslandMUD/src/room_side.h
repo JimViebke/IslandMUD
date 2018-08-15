@@ -35,7 +35,7 @@ public:
 	bool has_door() const;
 	bool has_intact_door() const;
 
-	std::string can_move_through_wall(const std::string & player_faction_ID) const;
+	std::string is_traversable(const std::string & player_faction_ID) const;
 
 	std::shared_ptr<Door> get_door() const;
 

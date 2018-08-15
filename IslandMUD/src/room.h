@@ -6,6 +6,8 @@ Feb 14, 2015 */
 
 #include <map> // for room contents multimap
 #include <set> // playerlist
+#include <optional>
+#include <array>
 
 #include "utilities.h"
 #include "constants.h"
@@ -20,7 +22,7 @@ private:
 	bool water = false; // is the room dry land or water?
 	std::shared_ptr<Chest> chest = nullptr; // nullptr if the room does not have a chest
 	std::shared_ptr<Table> table = nullptr; // nullptr if the room does not have a table
-	std::map<std::string, Room_Side> room_sides = {}; // the floor, walls, and ceiling in the room (present surfaces only)
+	std::array<std::optional<Room_Side>, 6> room_sides;
 	std::vector<std::string> viewing_actor_ids = {}; // the PCs and NPCs who can see this room
 	std::vector<std::string> actor_ids = {}; // the PCs and NPCs in a room
 	Coordinate coordinate;
@@ -36,7 +38,7 @@ public:
 	// room contents
 	const std::multimap<std::string, std::shared_ptr<Item>> get_contents() const { return contents; }
 	std::multimap<std::string, std::shared_ptr<Item>> & get_contents() { return contents; }
-	const std::map<std::string, Room_Side> get_room_sides() const { return room_sides; }
+	const auto& get_room_sides() const { return room_sides; }
 	const std::vector<std::string> get_actor_ids() const { return actor_ids; }
 
 	// room information
@@ -44,7 +46,8 @@ public:
 	bool has_standing_wall() const;
 	bool is_standing_wall(const std::string & surface_ID) const;
 	bool has_surface(const std::string & direction_id) const;
-	std::string can_move_in_direction(const std::string & direction_ID, const std::string & faction_ID);
+	bool has_surface(const C::surface surface) const;
+	std::string can_move_in_direction(const C::direction direction, const std::string & faction_ID);
 	bool contains_no_items() const;
 	bool is_unloadable() const;
 	bool is_occupied_by(const std::string & actor_id) const;
@@ -54,6 +57,8 @@ public:
 	bool has_non_mineral_deposit_item() const;
 	bool has_mineral_deposit() const;
 	Coordinate get_coordinates() const;
+
+	void remove(const C::surface surface);
 
 	// chests
 	void add_chest(const std::string & set_faction_id);
@@ -84,9 +89,8 @@ public:
 	bool damage_item(const std::string & item_id, const int & amount);
 
 	// add surfaces and doors
-	void add_surface(const std::string & surface_ID, const std::string & material_ID);
-	void add_surface(const std::string & surface_ID, const std::string & material_ID, const int & surface_health);
-	void add_door(const std::string & directon_ID, const int & health, const std::string & material_ID, const std::string & faction_ID);
+	void add_surface(const C::surface surface, const std::string & material_ID, const int & surface_health = C::MAX_SURFACE_HEALTH);
+	void add_door(const C::surface surface, const int & health, const std::string & material_ID, const std::string & faction_ID);
 
 	// damage surface
 	Update_Messages damage_surface(const std::string & surface_ID, const std::shared_ptr<Item> & equipped_item, const std::string & username);

@@ -66,7 +66,7 @@ Update_Messages Hostile_NPC_Corporal::wander(std::unique_ptr<World> & world)
 			wander_location = Coordinate(U::random_int_from(0, C::WORLD_X_DIMENSION - 1), U::random_int_from(0, C::WORLD_Y_DIMENSION - 1));
 		}
 
-		// test if the destinatino is within range or requires a best attempt pathfind
+		// test if the destination is within range or requires a best attempt pathfind
 		if (location.diagonal_distance_to(wander_location) > C::VIEW_DISTANCE)
 		{
 			if (best_attempt_pathfind(wander_location, world, results))

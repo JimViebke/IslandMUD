@@ -64,6 +64,36 @@ public:
 		WALL_CHAR,
 		DOOR_CHAR;
 
+	// DO NOT REORDER - utilities are order-dependent
+	enum class surface
+	{
+		north,
+		east,
+		south,
+		west,
+
+		ceiling,
+		floor,
+
+		not_a_surface,
+	};
+
+	// DO NOT REORDER - utilities are order-dependent
+	enum class direction
+	{
+		north,
+		east,
+		south,
+		west,
+
+		north_east,
+		south_east,
+		south_west,
+		north_west,
+
+		not_a_direction
+	};
+
 	static const std::string
 		// engine signals
 		GOOD_SIGNAL,

@@ -6,90 +6,42 @@ Mar 19 2015 */
 // room information
 bool Room::has_wall() const // used to determine if a ceiling can be placed
 {
-	// first do an easy check to see if there are any surfaces
-	if (room_sides.size() == 0)
-	{
-		return false;
-	}
-
-	// for each surface
-	for (std::map<std::string, Room_Side>::const_iterator it = room_sides.begin();
-		it != room_sides.cend(); ++it)
-	{
-		// if the surface is a wall
-		if (it->first == C::NORTH || it->first == C::EAST ||
-			it->first == C::SOUTH || it->first == C::WEST)
-		{
-			return true;
-		}
-	}
-
-	// the room does not have a wall
-	return false;
+	return room_sides[(size_t)C::surface::north] ||
+		room_sides[(size_t)C::surface::east] ||
+		room_sides[(size_t)C::surface::south] ||
+		room_sides[(size_t)C::surface::west];
 }
 bool Room::has_standing_wall() const
 {
-	// first do an easy check to see if there are any surfaces
-	if (room_sides.size() == 0)
-	{
-		return false;
-	}
-
-	// for each surface
-	for (std::map<std::string, Room_Side>::const_iterator it = room_sides.begin();
-		it != room_sides.cend(); ++it)
-	{
-		// if the surface is an intact wall
-		if (it->second.is_intact() && (
-			it->first == C::NORTH || it->first == C::EAST ||
-			it->first == C::SOUTH || it->first == C::WEST))
-		{
-			return true;
-		}
-	}
-
-	// the room does not have a wall
-	return false;
+	return
+		(room_sides[(size_t)C::surface::north] && room_sides[(size_t)C::surface::north]->is_intact()) ||
+		(room_sides[(size_t)C::surface::east] && room_sides[(size_t)C::surface::east]->is_intact()) ||
+		(room_sides[(size_t)C::surface::south] && room_sides[(size_t)C::surface::south]->is_intact()) ||
+		(room_sides[(size_t)C::surface::west] && room_sides[(size_t)C::surface::west]->is_intact());
 }
 bool Room::is_standing_wall(const std::string & surface_ID) const
 {
-	// check if there are no sides OR surface_ID is not a room side
-	if (room_sides.size() == 0 ||
-		!(surface_ID == C::NORTH || surface_ID == C::SOUTH || surface_ID == C::WEST || surface_ID == C::EAST))
-	{
-		return false;
-	}
+	const C::surface surface = U::to_surface(surface_ID);
 
-	// check if the surface exists
-	if (!this->has_surface(surface_ID))
-	{
-		return false;
-	}
-
-	// return "is the surface intact?"
-	return (room_sides.find(surface_ID)->second.is_intact());
+	return room_sides[(size_t)surface] && room_sides[(size_t)surface]->is_intact();
 }
 bool Room::has_surface(const std::string & direction_id) const
 {
-	return room_sides.find(direction_id) != room_sides.cend();
+	return has_surface(U::to_surface(direction_id));
 }
-std::string Room::can_move_in_direction(const std::string & direction_ID, const std::string & faction_ID)
+bool Room::has_surface(const C::surface surface) const
 {
-	// if a surface is present
-	if (has_surface(direction_ID))
+	return room_sides[(size_t)surface].has_value();
+}
+std::string Room::can_move_in_direction(const C::direction direction, const std::string & faction_ID)
+{
+	// if a surface is present, it must be traversable
+	if (has_surface((C::surface)direction))
 	{
-		// a player can move through the surface if it is rubble
-
-		if (room_sides.find(direction_ID)->second.is_rubble())
-		{
-			return C::GOOD_SIGNAL;
-		}
-
-		return room_sides.find(direction_ID)->second.can_move_through_wall(faction_ID);
+		return room_sides[(size_t)direction]->is_traversable(faction_ID);
 	}
-	else // a surface does not exist...
+	else
 	{
-		// ...so the player is free to move
 		return C::GOOD_SIGNAL;
 	}
 }
@@ -142,6 +94,11 @@ bool Room::has_mineral_deposit() const
 Coordinate Room::get_coordinates() const
 {
 	return coordinate;
+}
+
+void Room::remove(const C::surface surface)
+{
+	if (has_surface(surface)) room_sides[(size_t)surface].reset();
 }
 
 // chests
@@ -307,37 +264,24 @@ bool Room::damage_item(const std::string & item_id, const int & amount)
 }
 
 // add surfaces and doors
-void Room::add_surface(const std::string & surface_ID, const std::string & material_ID)
-{
-	// if the surface ID is valid
-	if (U::contains(C::surface_ids, surface_ID))
-	{
-		// create a new Room_Side and add it to room_sides
-		room_sides.insert(std::pair<std::string, Room_Side>(surface_ID, Room_Side(material_ID)));
-	}
-}
-void Room::add_surface(const std::string & surface_ID, const std::string & material_ID, const int & surface_health)
+void Room::add_surface(const C::surface surface, const std::string & material_ID, const int & surface_health)
 {
 	// create a surface with a given health (used for loading rooms from disk that may be damaged)
 
-	// if the surface ID is valid
-	if (U::contains(C::surface_ids, surface_ID))
-	{
-		// create a new Room_Side and add it to room_sides
-		room_sides.insert(std::pair<std::string, Room_Side>(surface_ID, Room_Side(material_ID)));
+	// This fails silently.
+	if (surface == C::surface::not_a_surface) return;
 
-		// select the surface and set its health to the passed value
-		room_sides.find(surface_ID)->second.set_health(surface_health);
-	}
+	room_sides[(size_t)surface].emplace(material_ID);
+	room_sides[(size_t)surface]->set_health(surface_health);
 }
-void Room::add_door(const std::string & directon_ID, const int & health, const std::string & material_ID, const std::string & faction_ID)
+void Room::add_door(const C::surface surface, const int & health, const std::string & material_ID, const std::string & faction_ID)
 {
-	if (!this->has_surface(directon_ID))
+	if (!this->has_surface(surface))
 	{
 		std::stringstream ss;
 
 		ss << "\nAttempted to add a door to a surface that doesn't exist."
-			<< "\ndirection_ID=" << directon_ID
+			<< "\nsurface_ID=" << U::surface_to_string(surface)
 			<< " health=" << health
 			<< " material_ID=" << material_ID
 			<< " faction_ID=" << faction_ID << std::endl;
@@ -345,11 +289,11 @@ void Room::add_door(const std::string & directon_ID, const int & health, const s
 		return;
 	}
 
-	if (room_sides.find(directon_ID)->second.get_door() != nullptr)
+	if (room_sides[(size_t)surface]->has_door())
 	{
 		std::stringstream ss;
 		ss << "\nAttempted to add a door to a surface that already has a door."
-			<< "\ndirection_ID=" << directon_ID
+			<< "\ndirection_ID=" << U::surface_to_string(surface)
 			<< " health=" << health
 			<< " material_ID=" << material_ID
 			<< " faction_ID=" << faction_ID << std::endl;
@@ -357,15 +301,15 @@ void Room::add_door(const std::string & directon_ID, const int & health, const s
 		return;
 	}
 
-	// delegate the work to the room's surface
-	room_sides.find(directon_ID)->second.add_door(health, material_ID, faction_ID);
+	room_sides[(size_t)surface]->add_door(health, material_ID, faction_ID);
 }
 
 // damage surface
 Update_Messages Room::damage_surface(const std::string & surface_ID, const std::shared_ptr<Item> & equipped_item, const std::string & username)
 {
-	// test if the surface is valid
-	if (!U::contains(C::surface_ids, surface_ID))
+	const auto surface = U::to_surface(surface_ID);
+
+	if (surface == C::surface::not_a_surface)
 	{
 		return Update_Messages(surface_ID + " is not a valid surface.");
 	}
@@ -384,7 +328,7 @@ Update_Messages Room::damage_surface(const std::string & surface_ID, const std::
 	}
 
 	// the surface exists, test if the surface is rubble
-	if (room_sides.find(surface_ID)->second.is_rubble())
+	if (room_sides[(size_t)surface]->is_rubble())
 	{
 		return Update_Messages("There is only rubble where a wall once was.");
 	}
@@ -402,7 +346,7 @@ Update_Messages Room::damage_surface(const std::string & surface_ID, const std::
 	const std::map<std::string, int> item_damage_table = C::damage_tables.find(equipped_item_id)->second;
 
 	// copy the surface's material_ID
-	const std::string surface_material_ID = this->room_sides.find(surface_ID)->second.get_material_id();
+	const std::string surface_material_ID = room_sides[(size_t)surface]->get_material_id();
 
 	// check if the material of the wall being attacked exists in the damage table for the implement
 	if (item_damage_table.find(surface_material_ID) == item_damage_table.cend())
@@ -416,18 +360,18 @@ Update_Messages Room::damage_surface(const std::string & surface_ID, const std::
 	// surface exists, inflict damage*-1
 	{
 		std::stringstream ss;
-		ss << "surface health before attack: " << room_sides.find(surface_ID)->second.get_health() << std::endl;
+		ss << "surface health before attack: " << room_sides[(size_t)surface]->get_health() << std::endl;
 		std::cout << ss.str();
 	}
-	room_sides.find(surface_ID)->second.change_health(item_damage_table.find(surface_material_ID)->second*-1);
+	room_sides[(size_t)surface]->change_health(item_damage_table.find(surface_material_ID)->second*-1);
 	{
 		std::stringstream ss;
-		ss << "surface health after attack:  " << room_sides.find(surface_ID)->second.get_health() << std::endl;
+		ss << "surface health after attack:  " << room_sides[(size_t)surface]->get_health() << std::endl;
 		std::cout << ss.str();
 	}
 
 	// after applying damage, test again to see if the surface is rubble
-	if (room_sides.find(surface_ID)->second.is_intact())
+	if (room_sides[(size_t)surface]->is_intact())
 	{
 		// the surface holds
 
@@ -452,13 +396,12 @@ Update_Messages Room::damage_surface(const std::string & surface_ID, const std::
 	// the surface collapses
 
 	// ensure the surface no longer has a door
-	room_sides.find(surface_ID)->second.remove_door();
+	room_sides[(size_t)surface]->remove_door();
 
 	// if the collapsing surface is a ceiling
-	if (surface_ID == C::CEILING)
+	if (surface == C::surface::ceiling)
 	{
-		// remove the ceiling object completely
-		room_sides.erase(surface_ID);
+		remove(surface);
 
 		// add a debris object to the room
 		this->insert(Craft::make(C::DEBRIS_ID));
@@ -480,14 +423,15 @@ Update_Messages Room::damage_surface(const std::string & surface_ID, const std::
 }
 Update_Messages Room::damage_door(const std::string & surface_ID, const std::shared_ptr<Item> & equipped_item, const std::string & username)
 {
-	// test if the surface is valid
-	if (!U::contains(C::surface_ids, surface_ID))
+	const auto surface = U::to_surface(surface_ID);
+
+	if (surface == C::surface::not_a_surface)
 	{
 		return Update_Messages(surface_ID + " is not a valid surface.");
 	}
 
 	// test if this room has the surface
-	if (!this->has_surface(surface_ID))
+	if (!this->has_surface(surface))
 	{
 		if (surface_ID == C::CEILING || surface_ID == C::FLOOR)
 		{
@@ -500,7 +444,7 @@ Update_Messages Room::damage_door(const std::string & surface_ID, const std::sha
 	}
 
 	// test if the surface has the door
-	if (!this->room_sides.find(surface_ID)->second.has_door())
+	if (!room_sides[(size_t)surface]->has_door())
 	{
 		return Update_Messages("There is no door here.");
 	}
@@ -518,7 +462,7 @@ Update_Messages Room::damage_door(const std::string & surface_ID, const std::sha
 	const std::map<std::string, int> item_damage_table = C::damage_tables.find(equipped_item_id)->second;
 
 	// a wall exists; check if the wall does not have an intact door
-	if (!this->room_sides.find(surface_ID)->second.has_intact_door())
+	if (!room_sides[(size_t)surface]->has_intact_door())
 	{
 		return Update_Messages("There is only a pile of rubble where a door once was.");
 	}
@@ -526,7 +470,7 @@ Update_Messages Room::damage_door(const std::string & surface_ID, const std::sha
 	// a door exists AND it is intact
 
 	// copy the material of the door
-	const std::string door_material_ID = this->room_sides.find(surface_ID)->second.get_door()->get_material_ID();
+	const std::string door_material_ID = room_sides[(size_t)surface]->get_door()->get_material_ID();
 
 	// check if the material of the door being attacked exists in the damage table for the attacking implement
 	if (item_damage_table.find(door_material_ID) == item_damage_table.cend())
@@ -540,18 +484,18 @@ Update_Messages Room::damage_door(const std::string & surface_ID, const std::sha
 	// door and damage table entry exist, inflict damage*-1
 	{
 		std::stringstream ss;
-		ss << "door health before attack: " << room_sides.find(surface_ID)->second.get_door()->get_health() << std::endl; // debugging
+		ss << "door health before attack: " << room_sides[(size_t)surface]->get_door()->get_health() << std::endl; // debugging
 		std::cout << ss.str();
 	}
-	room_sides.find(surface_ID)->second.get_door()->update_health_by(item_damage_table.find(door_material_ID)->second * -1);
+	room_sides[(size_t)surface]->get_door()->update_health_by(item_damage_table.find(door_material_ID)->second * -1);
 	{
 		std::stringstream ss;
-		ss << "door health after attack:  " << room_sides.find(surface_ID)->second.get_door()->get_health() << std::endl; // debugging
+		ss << "door health after attack:  " << room_sides[(size_t)surface]->get_health() << std::endl; // debugging
 		std::cout << ss.str();
 	}
 
 	// if the door has 0 health
-	if (room_sides.find(surface_ID)->second.get_door()->is_rubble())
+	if (room_sides[(size_t)surface]->is_rubble())
 	{
 		// the door collapses
 		return Update_Messages("The door breaks and collapses.", username + " breaks the door.", true);
@@ -612,46 +556,59 @@ std::string Room::summary(const std::string & player_ID) const
 {
 	std::stringstream summary_stream;
 
-	// report on the sides of the room (walls, ceiling, floor)
-	if (room_sides.size() > 0)
+	decltype(room_sides.cbegin()) last_surface_it;
+	unsigned surface_count = 0;
+
+	for (auto surface_it = room_sides.cbegin();
+		surface_it != room_sides.cend(); ++surface_it)
+	{
+		if (surface_it->has_value())
+		{
+			last_surface_it = surface_it;
+			++surface_count;
+		}
+	}
+
+	// if the room has any surfaces
+	if (surface_count > 0)
 	{
 		summary_stream << " This room consists of";
 
-		// create a pointer pointing to the last side in the room
-		std::map<std::string, Room_Side>::const_iterator last_side_it = room_sides.cend(); // one past the actual last item
-		--last_side_it; // the last item
-
 		// for each room side
-		for (std::map<std::string, Room_Side>::const_iterator it = room_sides.cbegin();
-			it != room_sides.cend(); ++it)
+		C::surface surface = (C::surface)0;
+		for (auto surface_it = room_sides.cbegin();
+			surface_it != room_sides.cend(); ++surface_it, surface = C::surface((size_t)surface + 1))
 		{
-			// if there are more than one sides, append " and"
-			if (it == last_side_it && room_sides.size() > 1) // "and" precedes last surface
+			// skip nonexistent walls
+			if (!surface_it->has_value()) continue;
+
+			// if this is the last valid surface, print "and"
+			if (surface_it == last_surface_it)
 			{
 				summary_stream << " and";
 			}
 
 			// if the surface is not rubble
-			if (!it->second.is_rubble())
+			if ((*surface_it)->is_intact())
 			{
 				// "a(n) stone ceiling" or "a stone wall to the west"
-				summary_stream << " " << U::get_article_for(it->second.get_material_id()) << " " << it->second.get_material_id()
-					<< ((it->first == C::CEILING || it->first == C::FLOOR) ? " " : " wall to the ")
-					<< it->first; // direction_ID
+				summary_stream << ' ' << U::get_article_for((*surface_it)->get_material_id()) << ' ' << (*surface_it)->get_material_id()
+					<< ((surface == C::surface::ceiling || surface == C::surface::floor) ? " " : " wall to the ")
+					<< U::surface_to_string(surface); // direction_ID
 			}
 			else // the surface is rubble
 			{
 				summary_stream << " a pile of rubble"
 					// "on the floor" or " to your north"
-					<< ((it->first == C::CEILING || it->first == C::FLOOR) ? " on the " : " to your ")
-					<< it->first;
+					<< ((surface == C::surface::ceiling || surface == C::surface::floor) ? " on the " : " to your ")
+					<< U::surface_to_string(surface);
 			}
 
 			// add text to the surface's description if it has a door
-			if (it->second.has_door())
+			if ((*surface_it)->has_door())
 			{
 				// test if the door is rubble
-				if (it->second.get_door()->is_rubble())
+				if ((*surface_it)->get_door()->is_rubble())
 				{
 					// "a stone wall to the west..."
 					summary_stream << " with a pile of rubble where a door once was";
@@ -660,18 +617,18 @@ std::string Room::summary(const std::string & player_ID) const
 				{
 					// "a stone wall to the west" becomes
 					// "a stone wall to the west with a wood door"
-					summary_stream << " with a " << it->second.get_door()->get_material_ID() << " door";
+					summary_stream << " with a " << (*surface_it)->get_door()->get_material_ID() << " door";
 				}
 			}
 
 			// if the current surface is not the last AND there are more than 2 sides, append a comma
-			if (it != last_side_it && room_sides.size() > 2)
+			if (surface_it != last_surface_it && surface_count > 2)
 			{
-				summary_stream << ",";
+				summary_stream << ',';
 			}
 		}
 
-		summary_stream << "."; // end with a period
+		summary_stream << '.'; // end with a period
 	}
 
 	// report on the items in the room

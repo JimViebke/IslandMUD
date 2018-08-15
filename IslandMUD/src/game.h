@@ -60,6 +60,7 @@ private:
 
 	// handle everything to do with NPCs
 	void NPC_thread();
+	void NPC_spawn_startup_logic();
 	void NPC_spawn_logic();
 	void NPC_update_logic();
 

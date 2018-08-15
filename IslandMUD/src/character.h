@@ -69,6 +69,7 @@ public:
 	// actions
 	Update_Messages craft(const std::string & craft_item_id, std::unique_ptr<World> & world);
 	Update_Messages move(const std::string & direction, std::unique_ptr<World> & world);
+	Update_Messages move(const C::direction & direction, std::unique_ptr<World> & world);
 	Update_Messages take(const std::string & item_id, std::unique_ptr<World> & world, const std::string & count = "1");
 	Update_Messages drop(const std::string & drop_item_id, std::unique_ptr<World> & world, const std::string & count = "1");
 	Update_Messages equip(const std::string & item_ID);
@@ -79,8 +80,8 @@ public:
 	Update_Messages add_to_table(const std::string & add_item_ID, std::unique_ptr<World> & world, const std::string & count = "1");
 	Update_Messages take_from_table(const std::string take_item_ID, std::unique_ptr<World> & world, const std::string & count = "1");
 	Update_Messages look_at_table(const std::unique_ptr<World> & world) const;
-	Update_Messages construct_surface(const std::string & material_id, const std::string & surface_id, std::unique_ptr<World> & world);
-	Update_Messages construct_surface_with_door(const std::string & material_id, const std::string & surface_id, const std::string & door_material_id, std::unique_ptr<World> & world);
+	Update_Messages construct_surface(const std::string & material_id, const C::surface & surface, std::unique_ptr<World> & world);
+	Update_Messages construct_surface_with_door(const std::string & material_id, const C::surface & surface, const std::string & door_material_id, std::unique_ptr<World> & world);
 	Update_Messages attack_surface(const std::string & surface_ID, std::unique_ptr<World> & world);
 	Update_Messages attack_door(const std::string & surface_ID, std::unique_ptr<World> & world);
 	Update_Messages attack_item(const std::string & target_ID, std::unique_ptr<World> & world);
@@ -89,7 +90,7 @@ public:
 	Update_Messages die(std::unique_ptr<World> & world);
 
 	// movement info
-	std::string validate_movement(const Coordinate & current, const std::string & direction_ID, const Coordinate & destination, const std::unique_ptr<World> & world) const;
+	std::string validate_movement(const Coordinate & current, const C::direction & direction, const Coordinate & destination, const std::unique_ptr<World> & world) const;
 
 	static unsigned move_items(Container & source, Container & destination, const std::string & item_ID, const std::string & count);
 
