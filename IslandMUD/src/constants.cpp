@@ -8,7 +8,7 @@ Feb 14, 2015 */
 // general
 const unsigned C::MS_PER_TICK = 1000;
 
-const int C::VIEW_DISTANCE = 9; // 5+1+5 to a side == 11*11 total area
+const int C::VIEW_DISTANCE = 9; // 9+1+9 to a side == 19*19 total area
 
 const int C::WORLD_X_DIMENSION = 1000;
 const int C::WORLD_Y_DIMENSION = 1000;
