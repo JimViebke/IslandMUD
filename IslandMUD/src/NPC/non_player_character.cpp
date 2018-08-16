@@ -754,7 +754,7 @@ bool NPC::save_path_to(const Coordinate & destination, std::unique_ptr<World> & 
 			// or it is not loaded,
 			if (world->room_at(next_room) == nullptr) continue;
 			// or it is not within view distance,
-			if (!world->room_at(next_room)->is_observed_by(this->name)) continue;
+			if (location.diagonal_distance_to(next_room) > C::VIEW_DISTANCE) continue;
 			// or we can not travel to it from the current room
 			if (validate_movement(current_room.location, direction, next_room, world) != C::GOOD_SIGNAL) continue;
 
