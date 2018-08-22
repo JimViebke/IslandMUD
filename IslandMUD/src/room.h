@@ -47,7 +47,7 @@ public:
 	bool is_standing_wall(const std::string & surface_ID) const;
 	bool has_surface(const std::string & direction_id) const;
 	bool has_surface(const C::surface surface) const;
-	std::string can_move_in_direction(const C::direction direction, const std::string & faction_ID);
+	C::move_attempt can_move_in_direction(const C::direction direction, const std::string & faction_ID);
 	bool contains_no_items() const;
 	bool is_unloadable() const;
 	bool is_occupied_by(const std::string & actor_id) const;

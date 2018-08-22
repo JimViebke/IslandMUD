@@ -880,15 +880,10 @@ void World::unload_room(const std::unique_ptr<Room> & room)
 	// ensure the path exists up to x/x-y.xml
 	path += (U::to_string(room->get_coordinates().get_x()) + "-" + U::to_string(room->get_coordinates().get_y()) + ".xml");
 
-	// load the room to XML
-	pugi::xml_document room_document;
-	load_room_to_XML(room->get_coordinates(), room_document); // Why is this being done? Why not overwrite? Try remove this and benchmark.
-
 	// process the room into the XML
+	pugi::xml_document room_document;
 	save_room_to_XML(room, room_document);
 
 	// save the XML document to disk
-	room_document.save_file(path.c_str()); // returns an unused boolean indicated success or failure
-
-
+	room_document.save_file(path.c_str()); // returns an unused boolean indicating success or failure
 }

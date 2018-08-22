@@ -94,6 +94,15 @@ public:
 		not_a_direction
 	};
 
+	enum class move_attempt
+	{
+		traversable,
+		not_a_direction,
+		unfamiliar_lock,
+		blocked_by_wall,
+		indirectly_blocked_by_wall
+	};
+
 	static const std::string
 		// engine signals
 		GOOD_SIGNAL,

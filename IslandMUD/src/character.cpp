@@ -314,13 +314,24 @@ Update_Messages Character::move(const C::direction & direction, std::unique_ptr<
 	}
 
 	// test if the environment (structures) allow the player to move in a given direction
-	const std::string validate_movement = this->validate_movement(location, direction, destination, world);
+	const C::move_attempt validate_movement = this->validate_movement(location, direction, destination, world);
 
 	// if the validation failed for any reason
-	if (validate_movement != C::GOOD_SIGNAL)
+	if (validate_movement != C::move_attempt::traversable)
 	{
-		// return that reason movement validation failed
-		return Update_Messages(validate_movement);
+		switch (validate_movement)
+		{
+		case C::move_attempt::not_a_direction:
+			return Update_Messages(U::direction_to_string(direction) + " is not a direction.");
+		case C::move_attempt::unfamiliar_lock:
+			return Update_Messages("This door has an unfamiliar lock.");
+		case C::move_attempt::blocked_by_wall:
+			return Update_Messages("There is a wall in the way to your " + U::direction_to_string(direction) + ".");
+		case C::move_attempt::indirectly_blocked_by_wall:
+			return Update_Messages("There are walls in the way to your " + U::direction_to_string(direction) + ".");
+		default:
+			return Update_Messages("Could not move " + U::direction_to_string(direction) + " for an unkown reason.");
+		}
 	}
 
 	// the movement validated, load the radius for the destination
@@ -1293,21 +1304,21 @@ Update_Messages Character::die(std::unique_ptr<World> & world)
 }
 
 // movement info
-std::string Character::validate_movement(const Coordinate & current, const C::direction & direction, const Coordinate & destination, const std::unique_ptr<World> & world) const
+C::move_attempt Character::validate_movement(const Coordinate & current, const C::direction & direction, const Coordinate & destination, const std::unique_ptr<World> & world) const
 {
 	// determine if a character can move in a given direction (8 compass points)
 
 	// validate direction (this is now a dumb error message)
-	if (direction == C::direction::not_a_direction) { return U::direction_to_string(direction) + " is not a direction."; }
+	if (direction == C::direction::not_a_direction) { return C::move_attempt::not_a_direction; }
 
 	// if the player wants to move in a primary direction (n/e/s/w)
 	if (direction == C::direction::north || direction == C::direction::east ||
 		direction == C::direction::south || direction == C::direction::west)
 	{
 		// save the value of an attempt to move out of the current room
-		std::string move_attempt = world->room_at(current)->can_move_in_direction(direction, faction_ID);
+		C::move_attempt move_attempt = world->room_at(current)->can_move_in_direction(direction, faction_ID);
 
-		if (move_attempt != C::GOOD_SIGNAL)
+		if (move_attempt != C::move_attempt::traversable)
 		{
 			// the player can't move out of the current room
 			return move_attempt;
@@ -1316,7 +1327,7 @@ std::string Character::validate_movement(const Coordinate & current, const C::di
 		// save the value of an attempt to move into the destination room
 		move_attempt = world->room_at(destination)->can_move_in_direction(U::opposite_direction(direction), faction_ID);
 
-		if (move_attempt != C::GOOD_SIGNAL)
+		if (move_attempt != C::move_attempt::traversable)
 		{
 			// the player can't move into the destination
 			return move_attempt;
@@ -1341,7 +1352,7 @@ std::string Character::validate_movement(const Coordinate & current, const C::di
 				((north_room->has_surface(C::surface::south) || north_room->has_surface(C::surface::west)) &&
 				(west_room->has_surface(C::surface::north) || west_room->has_surface(C::surface::east))))
 			{
-				return "There are walls in your way to the " + U::direction_to_string(direction) + ".";
+				return C::move_attempt::indirectly_blocked_by_wall;
 			}
 		}
 		else if (direction == C::direction::north_east)
@@ -1354,7 +1365,7 @@ std::string Character::validate_movement(const Coordinate & current, const C::di
 				((north_room->has_surface(C::surface::south) || north_room->has_surface(C::surface::east)) &&
 				(east_room->has_surface(C::surface::north) || east_room->has_surface(C::surface::west))))
 			{
-				return "There are walls in your way to the " + U::direction_to_string(direction) + ".";
+				return C::move_attempt::indirectly_blocked_by_wall;
 			}
 		}
 		else if (direction == C::direction::south_east)
@@ -1367,7 +1378,7 @@ std::string Character::validate_movement(const Coordinate & current, const C::di
 				((south_room->has_surface(C::surface::north) || south_room->has_surface(C::surface::east)) &&
 				(east_room->has_surface(C::surface::south) || east_room->has_surface(C::surface::west))))
 			{
-				return "There are walls in your way to the " + U::direction_to_string(direction) + ".";
+				return C::move_attempt::indirectly_blocked_by_wall;
 			}
 		}
 		else if (direction == C::direction::south_west)
@@ -1380,13 +1391,13 @@ std::string Character::validate_movement(const Coordinate & current, const C::di
 				((south_room->has_surface(C::surface::north) || south_room->has_surface(C::surface::west)) &&
 				(west_room->has_surface(C::surface::south) || west_room->has_surface(C::surface::east))))
 			{
-				return "There are walls in your way to the " + U::direction_to_string(direction) + ".";
+				return C::move_attempt::indirectly_blocked_by_wall;
 			}
 		}
 	}
 
 	// no issues were detected
-	return C::GOOD_SIGNAL;
+	return C::move_attempt::traversable;
 }
 
 unsigned Character::move_items(Container & source, Container & destination, const std::string & item_ID, const std::string & count)

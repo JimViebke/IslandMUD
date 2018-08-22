@@ -296,7 +296,7 @@ bool NPC::pathfind(const Coordinate & destination, std::unique_ptr<World> & worl
 			// or it is not within view distance,
 			if (!world->room_at(destination)->is_observed_by(this->name)) continue;
 			// or we can not travel to it from the current room
-			if (validate_movement(current_room.location, direction, destination, world) != C::GOOD_SIGNAL) { continue; }
+			if (validate_movement(current_room.location, direction, destination, world) != C::move_attempt::traversable) continue;
 
 			// create a node to select the next adjacent room
 			Node adjacent_room(destination, direction);
@@ -575,7 +575,7 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, std::unique_ptr<
 			// or it is not within view distance,
 			if (!world->room_at(destination)->is_observed_by(this->name)) continue;
 			// or we can not travel to it from the current room
-			if (validate_movement(current_room.location, direction, destination, world) != C::GOOD_SIGNAL) continue;
+			if (validate_movement(current_room.location, direction, destination, world) != C::move_attempt::traversable) continue;
 
 			// create a node to select the next adjacent room
 			Node adjacent_room(destination, direction);
@@ -756,7 +756,7 @@ bool NPC::save_path_to(const Coordinate & destination, std::unique_ptr<World> & 
 			// or it is not within view distance,
 			if (location.diagonal_distance_to(next_room) > C::VIEW_DISTANCE) continue;
 			// or we can not travel to it from the current room
-			if (validate_movement(current_room.location, direction, next_room, world) != C::GOOD_SIGNAL) continue;
+			if (validate_movement(current_room.location, direction, next_room, world) != C::move_attempt::traversable) continue;
 
 			// create a node to select the next adjacent room
 			Node adjacent_room(next_room, direction);

@@ -90,7 +90,7 @@ public:
 	Update_Messages die(std::unique_ptr<World> & world);
 
 	// movement info
-	std::string validate_movement(const Coordinate & current, const C::direction & direction, const Coordinate & destination, const std::unique_ptr<World> & world) const;
+	C::move_attempt validate_movement(const Coordinate & current, const C::direction & direction, const Coordinate & destination, const std::unique_ptr<World> & world) const;
 
 	static unsigned move_items(Container & source, Container & destination, const std::string & item_ID, const std::string & count);
 
