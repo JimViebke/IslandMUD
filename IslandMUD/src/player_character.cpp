@@ -30,7 +30,7 @@ std::string PC::get_equipped_item_info() const
 }
 
 // Build and return a top-down area map around a given coordinate
-std::string PC::generate_area_map(const std::unique_ptr<World> & world, const std::map<std::string, std::shared_ptr<Character>> & actors) const
+std::string PC::generate_area_map(const std::unique_ptr<World> & world, const std::map<character_id, std::shared_ptr<Character>> & actors) const
 {
 	std::vector<std::vector<char>> user_map; // three vectors feed into one vector
 
@@ -186,7 +186,7 @@ std::string PC::generate_area_map(const std::unique_ptr<World> & world, const st
 				// count the enemies standing at a coordinate
 				unsigned enemy_count = 0, neutral_count = 0, friendly_count = 0;
 				// for each actor in the room
-				for (const std::string & actor_ID : world->room_at(current)->get_actor_ids())
+				for (const auto & actor_ID : world->room_at(current)->get_actor_ids())
 				{
 					// if the actor is a hostile NPC
 					if (U::is<Hostile_NPC>(actors.find(actor_ID)->second))

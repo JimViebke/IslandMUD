@@ -19,7 +19,7 @@ public:
 
 	std::string get_equipped_item_info() const;
 
-	std::string generate_area_map(const std::unique_ptr<World> & world, const std::map<std::string, std::shared_ptr<Character>> & actors) const;
+	std::string generate_area_map(const std::unique_ptr<World> & world, const std::map<character_id, std::shared_ptr<Character>> & actors) const;
 };
 
 #endif

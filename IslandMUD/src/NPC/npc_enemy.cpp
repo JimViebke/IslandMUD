@@ -5,9 +5,9 @@ Jun 3 2015 */
 
 Hostile_NPC::Hostile_NPC(const std::string & name, std::unique_ptr<World> & world) : Non_Player_Character(name, C::NPC_HOSTILE_FACTION_ID, world) {}
 
-std::string Hostile_NPC::get_new_hostile_id(const std::unique_ptr<World> & world, const std::map<std::string, std::shared_ptr<Character>> & actors) const
+character_id Hostile_NPC::get_new_hostile_id(const std::unique_ptr<World> & world, const std::map<character_id, std::shared_ptr<Character>> & actors) const
 {
-	std::vector<std::string> hostile_ids;
+	std::vector<character_id> hostile_ids;
 
 	// extract location coordinates
 	const int x = location.get_x(), y = location.get_y();
@@ -23,7 +23,7 @@ std::string Hostile_NPC::get_new_hostile_id(const std::unique_ptr<World> & world
 			if (!current.is_valid()) continue;
 
 			// for each actor in the room
-			for (const std::string & actor_ID : world->room_at(current)->get_actor_ids())
+			for (const auto & actor_ID : world->room_at(current)->get_actor_ids())
 			{
 				// if the actor is a player character
 				if (U::is<PC>(actors.find(actor_ID)->second))
@@ -36,7 +36,7 @@ std::string Hostile_NPC::get_new_hostile_id(const std::unique_ptr<World> & world
 	}
 
 	// no players are visible, no target was found
-	if (hostile_ids.size() == 0) { return ""; }
+	if (hostile_ids.size() == 0) return -1;
 
 	// at least one player character is in range
 

@@ -6,7 +6,7 @@ Aug 15 2015 */
 
 #include "npc_enemy_worker.h"
 
-Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors)
 {
 	if (!fortress_planned)
 	{

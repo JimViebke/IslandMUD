@@ -53,11 +53,11 @@ bool Room::is_unloadable() const
 {
 	return actor_ids.size() == 0 && viewing_actor_ids.size() == 0;
 }
-bool Room::is_occupied_by(const std::string & actor_id) const
+bool Room::is_occupied_by(const character_id & actor_id) const
 {
 	return U::contains(actor_ids, actor_id);
 }
-bool Room::is_observed_by(const std::string & actor_id) const
+bool Room::is_observed_by(const character_id & actor_id) const
 {
 	return U::contains(viewing_actor_ids, actor_id);
 }
@@ -517,21 +517,21 @@ Update_Messages Room::damage_door(const std::string & surface_ID, const std::sha
 }
 
 // add and remove actors
-void Room::add_actor(const std::string & actor_id)
+void Room::add_actor(const character_id & actor_id)
 {
 	if (!U::contains(actor_ids, actor_id)) // if the actor is not already in the list of actors
 	{
 		actor_ids.push_back(actor_id); // add the actor
 	}
 }
-void Room::remove_actor(const std::string & actor_id)
+void Room::remove_actor(const character_id & actor_id)
 {
 	if (U::contains(actor_ids, actor_id)) // if the character exists here
 	{
 		U::erase_element_from_vector(actor_ids, actor_id);
 	}
 }
-void Room::add_viewing_actor(const std::string & actor_id)
+void Room::add_viewing_actor(const character_id & actor_id)
 {
 	// if the passed actor_ID is not already able to view the room
 	if (!U::contains(viewing_actor_ids, actor_id))
@@ -540,7 +540,7 @@ void Room::add_viewing_actor(const std::string & actor_id)
 		viewing_actor_ids.push_back(actor_id);
 	}
 }
-void Room::remove_viewing_actor(const std::string & actor_id)
+void Room::remove_viewing_actor(const character_id & actor_id)
 {
 	// A room is unloaded when no player can see the room.
 	// To this end, a list of PCs and NPCs who can see this room is maintained.
@@ -552,7 +552,7 @@ void Room::remove_viewing_actor(const std::string & actor_id)
 }
 
 // printing
-std::string Room::summary(const std::string & player_ID) const
+std::string Room::summary(const character_id & player_ID) const
 {
 	std::stringstream summary_stream;
 
@@ -654,9 +654,9 @@ std::string Room::summary(const std::string & player_ID) const
 	if (actor_ids.size() > 1) // there will always be at least one, because of the player
 	{
 		summary_stream << " ";
-		for (const std::string & actor_ID : actor_ids)
+		for (const character_id& actor_ID : actor_ids)
 		{
-			if (actor_ID == player_ID) { continue; } // don't report a player's own presence to that player
+			if (actor_ID == player_ID) continue; // don't report a player's own presence to that player
 			summary_stream << actor_ID << " is here.";
 		}
 	}

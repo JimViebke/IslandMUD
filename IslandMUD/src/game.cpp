@@ -27,7 +27,7 @@ Game::Game()
 	std::thread(&Game::NPC_thread, this).detach();
 }
 
-Update_Messages Game::execute_command(const std::string & actor_id, const std::vector<std::string> & command)
+Update_Messages Game::execute_command(const Character::ID & actor_id, const std::vector<std::string> & command)
 {
 	// "help"
 	if (command.size() == 1 && command[0] == C::SHOW_HELP_COMMAND)
@@ -86,7 +86,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		// if the actor is a Player_Character
 		if (const std::shared_ptr<PC> & player = U::convert_to<PC>(actors.find(actor_id)->second))
 		{
-			return Update_Messages(world->room_at(player->get_location())->summary(player->name));
+			return Update_Messages(world->room_at(player->get_location())->summary(player->get_ID()));
 		}
 	}
 	// moving: "move northeast" OR "northeast"
@@ -102,7 +102,7 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		// if the acting character is a player character
 		if (const std::shared_ptr<PC> player = U::convert_to<PC>(character))
 			// append a summary of the new area
-			result.to_user += world->room_at(player->get_location())->summary(player->name);
+			result.to_user += world->room_at(player->get_location())->summary(player->get_ID());
 
 		return result;
 	}
@@ -179,18 +179,23 @@ Update_Messages Game::execute_command(const std::string & actor_id, const std::v
 		// extract a shared pointer to the player
 		const auto & player = actors.find(actor_id)->second;
 
-		// if the target is another player or NPC in the room
-		if (world->room_at(player->get_location())->is_occupied_by(command[1]))
+		// if the target exists
+		const auto target_iterator = actor_ids.find(command[1]);
+		if (target_iterator != actor_ids.cend())
 		{
-			// if the target is not a friendly player character
-			auto & target = actors.find(command[1])->second;
-			if (U::is<NPC>(target)) // the player exists, and can be attacked
+			std::shared_ptr<Character> target = actors.find(target_iterator->second)->second;
+
+			// if the target is in this room
+			if (world->room_at(player->get_location())->is_occupied_by(target->get_ID()))
 			{
-				return player->attack_character(target, world);
-			}
-			else // the player exists, but is a human
-			{
-				return Update_Messages(command[1] + " is friendly.");
+				if (U::is<NPC>(target)) // the player exists, and can be attacked
+				{
+					return player->attack_character(target, world);
+				}
+				else // the player exists, but is a human
+				{
+					return Update_Messages(command[1] + " is friendly.");
+				}
 			}
 		}
 		else // the second argument is not a nearby NPC
@@ -310,16 +315,25 @@ void Game::processing_thread()
 		const Message inbound_message = inbound_queue.get(); // blocking
 
 		// get the user ID for the inbound socket
-		const std::string user_ID = this->players.get_user_ID(inbound_message.connection);
+		const character_id user_ID = this->players.get_user_ID(inbound_message.connection);
 
 		// don't allow the actors structure to be modified
 		std::unique_lock<std::mutex> lock(game_state);
 
-		// execute the user's parsed command against the world
-		const Update_Messages update_messages = execute_command(user_ID, Parse::tokenize(inbound_message.data));
+		// if the target is another player or NPC in the room
+		const auto actor_it = actors.find(user_ID);
+		if (actor_it == actors.cend())
+		{
+			// This player is no longer online. Drop the command.
+		}
+		else
+		{
+			// execute the user's parsed command against the world
+			const Update_Messages update_messages = execute_command(user_ID, Parse::tokenize(inbound_message.data));
 
-		// generate_outbound_messages uses an Update_Messages object to generate all 
-		generate_outbound_messages(user_ID, update_messages);
+			// generate_outbound_messages uses an Update_Messages object to generate all 
+			generate_outbound_messages(actor_it->second->get_ID(), update_messages);
+		}
 	}
 }
 
@@ -361,23 +375,27 @@ void Game::client_thread(network::connection_ptr connection)
 {
 	outbound_queue.put(Message(connection, "Welcome to IslandMUD!\n\n"));
 
-	const std::string user_ID = login_or_signup(connection); // execution stays in here until the user is signed in
-	if (user_ID == "") return; // the user disconnected before signing in, the function above already cleaned up
-
-	// finish other login/connection details
-
-	// add user to the lookup
-	players.set_connection(user_ID, connection);
-
 	{
+		const std::string user_ID = login_or_signup(connection); // execution stays in here until the user is signed in
+		if (user_ID == "") return; // the user disconnected before signing in, the function above already cleaned up
+
+		// finish other login/connection details
+
+		// add user to the lookup
+		players.set_connection(actor_ids.find(user_ID)->second, connection);
+
 		// log the player in
 		std::lock_guard<std::mutex> lock(game_state); // lock the actors structure while we modify it
 		std::shared_ptr<PC> player = std::make_shared<PC>(user_ID, world);
-		actors.insert(std::make_pair(user_ID, player));
-	}
 
-	// send a welcome message through the outbound queue
-	outbound_queue.put(Message(connection, "Welcome to IslandMUD! You are playing as \"" + user_ID + "\".\n\n"));
+		// save the player
+		actors[player->get_ID()] = player;
+		// save the player's ID lookup
+		actor_ids[user_ID] = player->get_ID();
+
+		// send a welcome message through the outbound queue
+		outbound_queue.put(Message(connection, "Welcome to IslandMUD! You are playing as \"" + user_ID + "\".\n\n"));
+	}
 
 	// continuously read data from the client until the client disconnects
 	for (;;)
@@ -398,8 +416,8 @@ void Game::client_thread(network::connection_ptr connection)
 			std::lock_guard<std::mutex> lock(game_state);
 
 			// get the user's ID
-			const std::string user_ID = players.get_user_ID(connection); // find username
-			if (user_ID == "") return; // should never happen
+			const character_id user_ID = players.get_user_ID(connection); // find username
+			if (user_ID == -1) return; // should never happen
 
 			// create a reference to the user's Character object
 			std::shared_ptr<Character> user = actors.find(user_ID)->second; // save the user's data
@@ -409,7 +427,8 @@ void Game::client_thread(network::connection_ptr connection)
 
 			// clean up the user
 			user->save(); // save the user's data
-			actors.erase(user_ID); // erase the user from the actor's map
+			actors.erase(user->get_ID()); // erase the user from the actor's map
+			actor_ids.erase(user->name); // erase the user from the ID lookup
 
 			// clean up networking stuff
 			players.erase(user_ID); // erase the client record
@@ -459,7 +478,7 @@ void Game::client_map_thread(network::connection_ptr map_connection)
 		{
 			{ // temporary scope to destroy mutex as soon as possible
 				std::lock_guard<std::mutex> lock(game_state);
-				if (actors.find(commands[0]) == actors.cend()) continue; // repeat message if the user is not logged in
+				if (actor_ids.find(commands[0]) == actor_ids.cend()) continue; // repeat message if the user is not logged in
 			}
 
 			const std::string user_file = C::user_data_directory + "/" + commands[0] + ".xml";
@@ -493,11 +512,11 @@ void Game::client_map_thread(network::connection_ptr map_connection)
 	// finish other login/connection details
 	{
 		// add user to the lookup
-		players.set_map_connection(user_ID, map_connection);
+		players.set_map_connection(actor_ids.find(user_ID)->second, map_connection);
 
 		// generate an area map from the current player's perspective, send it to the newly connect map socket
 		std::lock_guard<std::mutex> lock(game_state);
-		if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(user_ID)->second))
+		if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(actor_ids.find(user_ID)->second)->second))
 		{
 			outbound_queue.put(Message(map_connection, "\n\n" + player->generate_area_map(world, actors)));
 		}
@@ -519,7 +538,7 @@ void Game::client_map_thread(network::connection_ptr map_connection)
 			// close the connection
 			map_connection->close();
 			// reset the player's map connection
-			players.set_map_connection(user_ID, nullptr);
+			players.set_map_connection(actor_ids.find(user_ID)->second, nullptr);
 			return; // destroy this thread
 		}
 	}
@@ -559,7 +578,7 @@ void Game::NPC_thread()
 		next_tick += C::MS_PER_TICK;
 
 		std::cout << "NPC tick: " << tick_end - tick_start << " ms (logic " <<
-			update_end - update_start << " ms, spawn "<<
+			update_end - update_start << " ms, spawn " <<
 			spawn_end - spawn_start << " ms)\n";
 
 		// if the start of the next tick is in the future, that is,
@@ -588,45 +607,45 @@ void Game::NPC_spawn_startup_logic()
 			std::lock_guard<std::mutex> lock(game_state);
 
 			std::shared_ptr<Hostile_NPC_Corporal> corporal = std::make_shared<Hostile_NPC_Corporal>(corporals[i], world);
-			actors.insert(make_pair(corporal->name, corporal));
+			actors[corporal->get_ID()] = corporal;
+			actor_ids[corporal->name] = corporal->get_ID();
 
-			std::shared_ptr<Hostile_NPC_Bodyguard> bodyguard = std::make_shared<Hostile_NPC_Bodyguard>(bodyguards[i], corporals[i], world);
-			actors.insert(make_pair(bodyguard->name, bodyguard));
+			std::shared_ptr<Hostile_NPC_Bodyguard> bodyguard = std::make_shared<Hostile_NPC_Bodyguard>(bodyguards[i], corporal->get_ID(), world);
+			actors[bodyguard->get_ID()] = bodyguard;
+			actor_ids[bodyguard->name] = bodyguard->get_ID();
 		}
 	}
 
-	// add a corporal
+	// add a corporal and a bodyguard
 	if (false)
 	{
 		std::lock_guard<std::mutex> lock(game_state);
 
 		std::shared_ptr<Hostile_NPC_Corporal> hunter = std::make_shared<Hostile_NPC_Corporal>("Hunter", world);
-		actors.insert(make_pair(hunter->name, hunter));
-	}
+		actors[hunter->get_ID()] = hunter;
+		actor_ids[hunter->name] = hunter->get_ID();
 
-	// add a bodyguard
-	if (false)
-	{
-		std::lock_guard<std::mutex> lock(game_state);
-
-		std::shared_ptr<Hostile_NPC_Bodyguard> guardian = std::make_shared<Hostile_NPC_Bodyguard>("Guardian", "Hunter", world);
-		actors.insert(make_pair(guardian->name, guardian));
+		std::shared_ptr<Hostile_NPC_Bodyguard> guardian = std::make_shared<Hostile_NPC_Bodyguard>("Guardian", hunter->get_ID(), world);
+		actors[guardian->get_ID()] = guardian;
+		actor_ids[guardian->name] = guardian->get_ID();
 	}
 
 	// add a bunch more corporals
-	if (false)
+	if (true)
 	{
-		for (char name = 'A'; name < 'z'; ++name) // test code
+		for (char name = 'A'; name <= 'z'; ++name) // test code
 		{
 			std::shared_ptr<Hostile_NPC_Corporal> corporal = std::make_shared<Hostile_NPC_Corporal>(std::string() + name, world);
-			actors.insert(make_pair(corporal->name, corporal));
+			actors[corporal->get_ID()] = corporal;
+			actor_ids[corporal->name] = corporal->get_ID();
 		}
 	}
 
 	if (false)
 	{
 		std::shared_ptr<Hostile_NPC_Worker> worker = std::make_shared<Hostile_NPC_Worker>("Rupert", world);
-		actors.insert(make_pair(worker->name, worker));
+		actors[worker->get_ID()] = worker;
+		actor_ids[worker->name] = worker->get_ID();
 	}
 }
 
@@ -665,10 +684,9 @@ void Game::NPC_spawn_logic()
 			// generate an ID
 			const std::string corporal_ID = U::to_string(U::random_int_from(0u, (unsigned)-2));
 
-			{ // temporary scope to erase the local reference after creation
-				auto NPC = std::make_shared<Hostile_NPC_Corporal>(corporal_ID, world);
-				actors.insert(make_pair(corporal_ID, NPC));
-			}
+			auto corporal = std::make_shared<Hostile_NPC_Corporal>(corporal_ID, world);
+			actors[corporal->get_ID()] = corporal;
+			actor_ids[corporal->name] = corporal->get_ID();
 
 			// spawn and assigned 1-4 followers
 			const unsigned number_of_followers = U::random_int_from(1u, 4u);
@@ -676,8 +694,9 @@ void Game::NPC_spawn_logic()
 			{
 				const std::string follower_ID = U::to_string(U::random_int_from(0u, (unsigned)-2));
 
-				auto NPC = std::make_shared<Hostile_NPC_Bodyguard>(follower_ID, corporal_ID, world);
-				actors.insert(make_pair(follower_ID, NPC));
+				auto NPC = std::make_shared<Hostile_NPC_Bodyguard>(follower_ID, corporal->get_ID(), world);
+				actors[NPC->get_ID()] = NPC;
+				actor_ids[NPC->name] = NPC->get_ID();
 			}
 		}
 	}
@@ -698,17 +717,17 @@ void Game::NPC_spawn_logic()
 			// generate an ID
 			const std::string worker_ID = U::to_string(U::random_int_from(0u, (unsigned)-2));
 
-			{ // temporary scope to erase the local reference after creation
-				auto NPC = std::make_shared<Hostile_NPC_Worker>(worker_ID, world);
-				actors.insert(make_pair(worker_ID, NPC));
-			}
+			auto worker = std::make_shared<Hostile_NPC_Worker>(worker_ID, world);
+			actors[worker->get_ID()] = worker;
+			actor_ids[worker->name] = worker->get_ID();
 
 			// spawn a bodyguard
 			{ // temporary scope to erase the local reference after creation
 				const std::string follower_ID = U::to_string(U::random_int_from(0u, (unsigned)-2));
 
-				auto NPC = std::make_shared<Hostile_NPC_Bodyguard>(follower_ID, worker_ID, world);
-				actors.insert(make_pair(follower_ID, NPC));
+				auto NPC = std::make_shared<Hostile_NPC_Bodyguard>(follower_ID, worker->get_ID(), world);
+				actors[NPC->get_ID()] = NPC;
+				actor_ids[NPC->name] = NPC->get_ID();
 			}
 		}
 	}
@@ -722,7 +741,7 @@ void Game::NPC_update_logic()
 		{
 			{
 				std::stringstream ss;
-				ss << "Calling NPC::update() on " << actor.first << ", located at "
+				ss << "Calling NPC::update() on " << npc->name << ", located at "
 					<< npc->get_location().to_string() << "...\n";
 				std::cout << ss.str();
 			}
@@ -731,7 +750,7 @@ void Game::NPC_update_logic()
 
 			//std::cout << "Done NPC::update(). Generating outbound messages...\n";
 
-			generate_outbound_messages(npc->name, update_messages);
+			generate_outbound_messages(npc->get_ID(), update_messages);
 
 			//std::cout << "Done generating outbound messages.\n";
 		}
@@ -822,7 +841,7 @@ std::string Game::login_or_signup(const network::connection_ptr & connection)
 			// check if the user is already logged in
 			{ // temporary scope to delete mutex lock
 				std::lock_guard<std::mutex> lock(game_state);
-				if (actors.find(input[0]) != actors.cend())
+				if (actor_ids.find(input[0]) != actor_ids.cend())
 				{
 					outbound_queue.put(Message(connection, "User \"" + input[0] + "\" already logged in.\n"));
 					continue; // try again
@@ -849,7 +868,7 @@ std::string Game::login_or_signup(const network::connection_ptr & connection)
 	}
 }
 
-void Game::generate_outbound_messages(const std::string & user_ID, const Update_Messages & update_messages)
+void Game::generate_outbound_messages(const character_id & user_ID, const Update_Messages & update_messages)
 {
 	// Make sure the calling function has a lock on the actors_mutex, because this function does not acquire it.
 
@@ -879,10 +898,8 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 				// skip if the room is out of bounds
 				if (!current.is_valid()) continue;
 
-				// get a list of the users in the room
-				const std::vector<std::string> users_in_range = world->room_at(current)->get_actor_ids();
 				// for each user in the room
-				for (const std::string & user : users_in_range)
+				for (const character_id & user : world->room_at(current)->get_actor_ids())
 				{
 					// if the user is a player character
 					if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(user)->second))
@@ -932,9 +949,7 @@ void Game::generate_outbound_messages(const std::string & user_ID, const Update_
 	if (update_messages.to_room != nullptr)
 	{
 		// get a list of all players in the room
-		const std::vector<std::string> area_actor_ids = world->room_at(character->get_location())->get_actor_ids();
-
-		for (const std::string & actor_id : area_actor_ids) // for each player in the room
+		for (const auto & actor_id : world->room_at(character->get_location())->get_actor_ids()) // for each player in the room
 		{
 			// if the player is not "self" and the player is a human
 			if (actor_id != user_ID && U::is<PC>(actors.find(actor_id)->second))

@@ -30,10 +30,14 @@ public:
 
 	std::string name;
 
+	using ID = size_t;
+
 	// Item dragging_item; // a character can drag an item if they don't want to carry it.	
 	static std::unique_ptr<Recipes> recipes; // exists in memory once for all PCs and NPCs
 
 protected:
+
+	character_id id;
 
 	Coordinate location;
 
@@ -49,6 +53,8 @@ protected:
 public:
 
 	virtual ~Character(); // make Character into a polymorphic type
+
+	ID get_ID() const;
 
 	Update_Messages save();
 

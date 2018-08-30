@@ -184,3 +184,11 @@ unsigned U::random_int_from(const unsigned & min, const unsigned & max)
 {
 	return min + (rand() % (max - min + 1));
 }
+size_t U::next_int()
+{
+	static size_t value = 0;
+	static std::mutex mutex;
+
+	std::lock_guard<std::mutex> lock(mutex);
+	return ++value;
+}

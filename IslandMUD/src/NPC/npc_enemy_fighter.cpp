@@ -4,7 +4,7 @@ Aug 15 2015 */
 
 #include "npc_enemy_fighter.h"
 
-Update_Messages Hostile_NPC_Fighter::update(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Fighter::update(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors)
 {
 	if (i_dont_have(C::AXE_ID) && !im_planning_to_acquire(C::AXE_ID))
 	{
@@ -143,7 +143,7 @@ Update_Messages Hostile_NPC_Fighter::update(std::unique_ptr<World> & world, std:
 				if (!current.is_valid()) continue;
 
 				// for each actor in the room
-				for (const std::string & actor_ID : world->room_at(current)->get_actor_ids())
+				for (const auto& actor_ID : world->room_at(current)->get_actor_ids())
 				{
 					// if the character is a player character
 					if (U::is<PC>(actors.find(actor_ID)->second))

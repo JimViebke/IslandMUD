@@ -32,7 +32,13 @@ Character::Character(const std::string & name, const std::string & set_faction_I
 		std::cout << ss.str();
 	}
 
+	id = U::next_int();
+
 	login(world);
+
+	std::stringstream ss;
+	ss << "Signed in " << name << " with ID=" << get_ID() << std::endl;
+	std::cout << ss.str();
 }
 Character::~Character() {}
 
@@ -72,10 +78,10 @@ void Character::login(std::unique_ptr<World> & world)
 	}
 
 	// load the rooms around the player's spawn
-	world->load_view_radius_around(location, name);
+	world->load_view_radius_around(location, id);
 
 	// spawn in the player
-	world->room_at(location)->add_actor(name);
+	world->room_at(location)->add_actor(id);
 
 	// select the level node
 	const pugi::xml_node level_node = user_data_xml.child(C::XML_USER_LEVELS.c_str());
@@ -142,6 +148,12 @@ void Character::login(std::unique_ptr<World> & world)
 		this->insert(item);
 	}
 }
+
+Character::ID Character::get_ID() const
+{
+	return id;
+}
+
 Update_Messages Character::save()
 {
 	// if an item is equipped, move it back to the player's inventory
@@ -335,10 +347,10 @@ Update_Messages Character::move(const C::direction & direction, std::unique_ptr<
 	}
 
 	// the movement validated, load the radius for the destination
-	world->load_view_radius_around(destination, this->name);
+	world->load_view_radius_around(destination, id);
 
 	// maintain a list of users that are falling out of view that will also need a map update
-	std::vector<std::string> additional_users_to_notify;
+	std::vector<character_id> additional_users_to_notify;
 
 	// remove viewing ID from rooms leaving view
 	if (direction == C::direction::north || direction == C::direction::south)
@@ -357,7 +369,7 @@ Update_Messages Character::move(const C::direction & direction, std::unique_ptr<
 			U::append_b_to_a(additional_users_to_notify, world->room_at(unload_location)->get_actor_ids()); // save any users in the room
 
 			// remove the character from the room's viewer list, trying to unload the room in the process
-			world->remove_viewer_and_attempt_unload(unload_location, this->name); // bounds checking takes place in here
+			world->remove_viewer_and_attempt_unload(unload_location, id); // bounds checking takes place in here
 		}
 	}
 	else if (direction == C::direction::west || direction == C::direction::east)
@@ -369,7 +381,7 @@ Update_Messages Character::move(const C::direction & direction, std::unique_ptr<
 			Coordinate unload_location(rx, ry);
 			if (world->room_at(unload_location) == nullptr) continue;
 			U::append_b_to_a(additional_users_to_notify, world->room_at(unload_location)->get_actor_ids());
-			world->remove_viewer_and_attempt_unload(unload_location, this->name);
+			world->remove_viewer_and_attempt_unload(unload_location, id);
 		}
 	}
 	else
@@ -386,7 +398,7 @@ Update_Messages Character::move(const C::direction & direction, std::unique_ptr<
 				Coordinate unload_location(rx, ry);
 				if (world->room_at(unload_location) == nullptr) continue;
 				U::append_b_to_a(additional_users_to_notify, world->room_at(unload_location)->get_actor_ids());
-				world->remove_viewer_and_attempt_unload(unload_location, this->name);
+				world->remove_viewer_and_attempt_unload(unload_location, id);
 			}
 		}
 
@@ -398,7 +410,7 @@ Update_Messages Character::move(const C::direction & direction, std::unique_ptr<
 				Coordinate unload_location(rx, ry);
 				if (world->room_at(unload_location) == nullptr) continue;
 				U::append_b_to_a(additional_users_to_notify, world->room_at(unload_location)->get_actor_ids());
-				world->remove_viewer_and_attempt_unload(unload_location, this->name);
+				world->remove_viewer_and_attempt_unload(unload_location, id);
 			}
 		}
 
@@ -410,7 +422,7 @@ Update_Messages Character::move(const C::direction & direction, std::unique_ptr<
 				Coordinate unload_location(rx, ry);
 				if (world->room_at(unload_location) == nullptr) continue;
 				U::append_b_to_a(additional_users_to_notify, world->room_at(unload_location)->get_actor_ids());
-				world->remove_viewer_and_attempt_unload(unload_location, this->name);
+				world->remove_viewer_and_attempt_unload(unload_location, id);
 			}
 		}
 
@@ -422,19 +434,19 @@ Update_Messages Character::move(const C::direction & direction, std::unique_ptr<
 				Coordinate unload_location(rx, ry);
 				if (world->room_at(unload_location) == nullptr) continue;
 				U::append_b_to_a(additional_users_to_notify, world->room_at(unload_location)->get_actor_ids());
-				world->remove_viewer_and_attempt_unload(unload_location, this->name);
+				world->remove_viewer_and_attempt_unload(unload_location, id);
 			}
 		}
 	}
 
 	// the movement validated, remove character id from area
-	world->room_at(location)->remove_actor(this->name);
+	world->room_at(location)->remove_actor(id);
 
 	// actually move the character
 	location = destination;
 
 	// add character id to new area using the new coordinates
-	world->room_at(location)->add_actor(this->name);
+	world->room_at(location)->add_actor(id);
 
 	// prepare responses
 	Update_Messages updates("You move " + U::direction_to_string(direction) + ".",
@@ -446,7 +458,7 @@ Update_Messages Character::move(const C::direction & direction, std::unique_ptr<
 		true); // update required for all users in sight range
 
 	// users that have fallen out of view won't recieve a map update unless we send one to them explicitly
-	updates.additional_map_update_users = std::make_shared<std::vector<std::string>>(std::move(additional_users_to_notify));
+	updates.additional_map_update_users = std::make_shared<std::vector<character_id>>(std::move(additional_users_to_notify));
 
 	return updates;
 }
@@ -910,7 +922,7 @@ Update_Messages Character::construct_surface_with_door(const std::string & surfa
 	}
 
 	// check if the surface already exists
-	if (world->room_at(location)->has_surface(surface)) // bounds checking not necissary because the player is standing here
+	if (world->room_at(location)->has_surface(surface)) // bounds checking not necessary because the player is standing here
 	{
 		// test if construction is prevented by an intact wall or a pile of rubble
 		if (world->room_at(location)->get_room_sides()[(size_t)surface]->is_rubble())
@@ -1241,14 +1253,14 @@ Update_Messages Character::attack_character(std::shared_ptr<Character> & target,
 		Update_Messages update_messages = target->die(world);
 
 		// remove the target from their current destination
-		world->room_at(location)->remove_actor(target->name);
+		world->room_at(location)->remove_actor(target->get_ID());
 
 		// attempt to unload the rooms around the player
-		world->attempt_unload_radius(target->location, target->name);
+		world->attempt_unload_radius(target->location, target->get_ID());
 
 		// move the dead player to the spawn location
 		const Coordinate spawn(C::DEFAULT_SPAWN_X, C::DEFAULT_SPAWN_Y); // this should be defined in the constant class because we use it elsewhere
-		world->load_view_radius_around(spawn, target->name);
+		world->load_view_radius_around(spawn, target->get_ID());
 		target->location = spawn;
 
 		// restore the player's health
@@ -1300,7 +1312,7 @@ Update_Messages Character::die(std::unique_ptr<World> & world)
 		}
 	}
 
-	return Update_Messages(name + " dies.", name + " dies.", std::make_pair(name, "You die."));
+	return Update_Messages(name + " dies.", name + " dies.", std::make_pair(id, "You die."));
 }
 
 // movement info

@@ -6,7 +6,7 @@ Jan 11 2016 */
 
 Hostile_NPC_Corporal::Hostile_NPC_Corporal(const std::string & name, std::unique_ptr<World> & world) : Hostile_NPC(name, world), wander_location(-1, -1) {}
 
-Update_Messages Hostile_NPC_Corporal::update(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Corporal::update(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors)
 {
 	Update_Messages update_messages("");
 
@@ -21,7 +21,7 @@ Update_Messages Hostile_NPC_Corporal::update(std::unique_ptr<World> & world, std
 	this->acquire_new_hunt_target(world, actors);
 
 	// if the NPC still has no hunt target
-	if (hunt_target_id == "")
+	if (hunt_target_id == -1)
 	{
 		return wander(world);
 	}
@@ -33,7 +33,7 @@ Update_Messages Hostile_NPC_Corporal::update(std::unique_ptr<World> & world, std
 		}
 		else // I have no hunt target or my hunt target is not visible
 		{
-			hunt_target_id = "";
+			hunt_target_id = -1;
 			return wander(world);
 		}
 	}
@@ -43,7 +43,7 @@ Update_Messages Hostile_NPC_Corporal::update(std::unique_ptr<World> & world, std
 
 
 
-void Hostile_NPC_Corporal::acquire_new_hunt_target(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors)
+void Hostile_NPC_Corporal::acquire_new_hunt_target(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors)
 {
 	// get a new hunt target. Will reset the hunter target ID if one cannot be found.
 
@@ -105,16 +105,16 @@ Update_Messages Hostile_NPC_Corporal::wander(std::unique_ptr<World> & world)
 	// nothing happens
 	return results;
 }
-bool Hostile_NPC_Corporal::hunt(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors, Update_Messages & update_messages)
+bool Hostile_NPC_Corporal::hunt(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors, Update_Messages & update_messages)
 {
 	// if no hunt target is saved
-	if (hunt_target_id == "")
+	if (hunt_target_id == -1)
 	{
 		acquire_new_hunt_target(world, actors);
 	}
 
 	// if no hunt target is saved still
-	if (hunt_target_id == "")
+	if (hunt_target_id == -1)
 	{
 		return false;
 	}
@@ -125,7 +125,7 @@ bool Hostile_NPC_Corporal::hunt(std::unique_ptr<World> & world, std::map<std::st
 	// reset hunt target ID and return failure if the target is no longer online
 	if (target_it == actors.cend())
 	{
-		hunt_target_id = "";
+		hunt_target_id = -1;
 		return false;
 	}
 

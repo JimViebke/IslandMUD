@@ -27,7 +27,8 @@ private:
 
 	connection_lookup players;
 
-	std::map<std::string, std::shared_ptr<Character>> actors; // active/online PC and NPC ids
+	std::map<Character::ID, std::shared_ptr<Character>> actors; // signed in PCs and NPCs
+	std::map<std::string, Character::ID> actor_ids; // map a character's name back to their ID
 	std::unique_ptr<World> world; // the game world object
 
 	std::mutex game_state; // provides safe access and modification of the above two structures
@@ -39,7 +40,7 @@ public:
 	Game();
 
 	// execute a command against the game world
-	Update_Messages execute_command(const std::string & actor_id, const std::vector<std::string> & command);
+	Update_Messages execute_command(const Character::ID & actor_id, const std::vector<std::string> & command);
 
 	void run();
 
@@ -73,7 +74,7 @@ private:
 	std::string login_or_signup(const network::connection_ptr & connection);
 
 	// use an Update_Messages object to generate outbound messages to players
-	void generate_outbound_messages(const std::string & user_ID, const Update_Messages & message_updates);
+	void generate_outbound_messages(const character_id & user_ID, const Update_Messages & message_updates);
 
 	// when the server shutdown is triggered, this will save all game data and destroy the game object
 	void shutdown_listener();

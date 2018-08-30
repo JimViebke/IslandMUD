@@ -12,13 +12,13 @@ class Hostile_NPC_Corporal : public Hostile_NPC
 public:
 	Hostile_NPC_Corporal(const std::string & name, std::unique_ptr<World> & world);
 
-	Update_Messages update(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors);
+	Update_Messages update(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors);
 
 	// AI subroutines
 
-	void acquire_new_hunt_target(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors);
+	void acquire_new_hunt_target(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors);
 	Update_Messages wander(std::unique_ptr<World> & world);
-	bool hunt(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors, Update_Messages & update_messages);
+	bool hunt(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors, Update_Messages & update_messages);
 
 private:
 
@@ -32,7 +32,7 @@ private:
 	Stored_Path_Type stored_path_type;
 	Coordinate wander_location;
 	std::shared_ptr<Coordinate> destination;
-	std::string hunt_target_id = "";
+	character_id hunt_target_id = -1;
 };
 
 #endif

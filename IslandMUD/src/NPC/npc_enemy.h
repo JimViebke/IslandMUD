@@ -12,9 +12,9 @@ class Hostile_NPC : public Non_Player_Character
 protected:
 	Hostile_NPC(const std::string & name, std::unique_ptr<World> & world);
 
-	virtual Update_Messages update(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors) = 0;
+	virtual Update_Messages update(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors) = 0;
 
-	std::string get_new_hostile_id(const std::unique_ptr<World> & world, const std::map<std::string, std::shared_ptr<Character>> & actors) const;
+	character_id get_new_hostile_id(const std::unique_ptr<World> & world, const std::map<character_id, std::shared_ptr<Character>> & actors) const;
 
 	class Structure
 	{

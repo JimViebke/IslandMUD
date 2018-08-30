@@ -15,6 +15,7 @@ Feb 14, 2015 */
 #include "room_side.h" // walls, floor, or ceiling
 #include "message.h"
 #include "coordinate.h"
+#include "types.hpp"
 
 class Room : public Container
 {
@@ -23,8 +24,8 @@ private:
 	std::shared_ptr<Chest> chest = nullptr; // nullptr if the room does not have a chest
 	std::shared_ptr<Table> table = nullptr; // nullptr if the room does not have a table
 	std::array<std::optional<Room_Side>, 6> room_sides;
-	std::vector<std::string> viewing_actor_ids = {}; // the PCs and NPCs who can see this room
-	std::vector<std::string> actor_ids = {}; // the PCs and NPCs in a room
+	std::vector<character_id> viewing_actor_ids = {}; // the PCs and NPCs who can see this room
+	std::vector<character_id> actor_ids = {}; // the PCs and NPCs in a room
 	Coordinate coordinate;
 
 public:
@@ -39,7 +40,7 @@ public:
 	const std::multimap<std::string, std::shared_ptr<Item>> get_contents() const { return contents; }
 	std::multimap<std::string, std::shared_ptr<Item>> & get_contents() { return contents; }
 	const auto& get_room_sides() const { return room_sides; }
-	const std::vector<std::string> get_actor_ids() const { return actor_ids; }
+	const std::vector<character_id>& get_actor_ids() const { return actor_ids; }
 
 	// room information
 	bool has_wall() const;
@@ -50,8 +51,8 @@ public:
 	C::move_attempt can_move_in_direction(const C::direction direction, const std::string & faction_ID);
 	bool contains_no_items() const;
 	bool is_unloadable() const;
-	bool is_occupied_by(const std::string & actor_id) const;
-	bool is_observed_by(const std::string & actor_id) const;
+	bool is_occupied_by(const character_id & actor_id) const;
+	bool is_observed_by(const character_id & actor_id) const;
 	bool is_water() const;
 	bool is_forest() const;
 	bool has_non_mineral_deposit_item() const;
@@ -97,13 +98,13 @@ public:
 	Update_Messages damage_door(const std::string & surface_ID, const std::shared_ptr<Item> & equipped_item, const std::string & username);
 
 	// add and remove actors
-	void add_actor(const std::string & actor_id);
-	void remove_actor(const std::string & actor_id);
-	void add_viewing_actor(const std::string & actor_id);
-	void remove_viewing_actor(const std::string & actor_id);
+	void add_actor(const character_id & actor_id);
+	void remove_actor(const character_id & actor_id);
+	void add_viewing_actor(const character_id & actor_id);
+	void remove_viewing_actor(const character_id & actor_id);
 
 	// printing
-	std::string summary(const std::string & player_ID) const;
+	std::string summary(const character_id & player_ID) const;
 
 	friend bool operator==(std::unique_ptr<Room> & lhs, std::unique_ptr<Room> & rhs);
 };

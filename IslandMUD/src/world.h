@@ -57,14 +57,14 @@ public:
 	unsigned count_loaded_rooms() const;
 
 	// load rooms around a player spawning in
-	void load_view_radius_around(const Coordinate & coordinate, const std::string & character_ID);
+	void load_view_radius_around(const Coordinate & coordinate, const character_id & character_ID);
 
 	// loading and unloading rooms at the edge of vision
-	void remove_viewer_and_attempt_unload(const Coordinate & coordinate, const std::string & viewer_ID);
-	void remove_viewer_and_attempt_unload(const std::vector<Coordinate> & coordinates, const std::string & viewer_ID); // wrapper for multiple rooms
+	void remove_viewer_and_attempt_unload(const Coordinate & coordinate, const character_id & viewer_ID);
+	void remove_viewer_and_attempt_unload(const std::vector<Coordinate> & coordinates, const character_id & viewer_ID); // wrapper for multiple rooms
 
 	// unloading of all rooms in view distance (for logging out or dying)
-	void attempt_unload_radius(const Coordinate & coordinate, const std::string & player_ID);
+	void attempt_unload_radius(const Coordinate & coordinate, const character_id & player_ID);
 
 	// test if a room can be removed from memory
 	bool is_unloadable(const Coordinate & coordinate) const;
@@ -93,6 +93,9 @@ private:
 
 	// build a room given an XML node, add to world at x,y
 	void add_room_to_world(pugi::xml_node & room_document, const Coordinate & coordinate);
+
+	// see if the room we want to load is waiting in the unload queue
+	bool pull_from_unload_queue(const Coordinate & coordinate);
 
 	// move specific room into memory
 	void load_room_to_world(const Coordinate & coordinate);

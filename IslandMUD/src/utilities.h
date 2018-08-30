@@ -12,6 +12,7 @@ Feb 14, 2015 */
 #include <fstream> // file IO
 #include <sys/stat.h> // check for file presence
 #include <chrono> // time
+#include <mutex>
 
 #ifdef _WIN32
 #include <direct.h>
@@ -125,6 +126,7 @@ namespace Utilities
 		// this will crash if v is empty
 		return v[U::random_int_from(0u, unsigned(v.size() - 1))];
 	}
+	size_t next_int();
 
 	// time
 	inline auto current_time_in_ms()

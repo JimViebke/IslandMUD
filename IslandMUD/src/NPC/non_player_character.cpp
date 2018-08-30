@@ -294,7 +294,7 @@ bool NPC::pathfind(const Coordinate & destination, std::unique_ptr<World> & worl
 			// or it is not loaded,
 			if (world->room_at(destination) == nullptr) continue;
 			// or it is not within view distance,
-			if (!world->room_at(destination)->is_observed_by(this->name)) continue;
+			if (!world->room_at(destination)->is_observed_by(id)) continue;
 			// or we can not travel to it from the current room
 			if (validate_movement(current_room.location, direction, destination, world) != C::move_attempt::traversable) continue;
 
@@ -573,7 +573,7 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, std::unique_ptr<
 			// or it is not loaded,
 			if (world->room_at(destination) == nullptr) continue;
 			// or it is not within view distance,
-			if (!world->room_at(destination)->is_observed_by(this->name)) continue;
+			if (!world->room_at(destination)->is_observed_by(id)) continue;
 			// or we can not travel to it from the current room
 			if (validate_movement(current_room.location, direction, destination, world) != C::move_attempt::traversable) continue;
 

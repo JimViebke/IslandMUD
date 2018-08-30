@@ -19,7 +19,7 @@ class Non_Player_Character : public Character
 {
 public:
 	// hostile and neutral NPCs override this in their child classes
-	virtual Update_Messages update(std::unique_ptr<World> & world, std::map<std::string, std::shared_ptr<Character>> & actors) = 0;
+	virtual Update_Messages update(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors) = 0;
 
 	// objective debugging
 	std::string get_objectives() const;

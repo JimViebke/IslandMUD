@@ -80,7 +80,7 @@ unsigned World::count_loaded_rooms() const
 }
 
 // load rooms around a player spawning in
-void World::load_view_radius_around(const Coordinate & coordinate, const std::string & character_ID)
+void World::load_view_radius_around(const Coordinate & coordinate, const character_id & character_ID)
 {
 	const int x = coordinate.get_x(), y = coordinate.get_y();
 
@@ -113,7 +113,7 @@ void World::load_view_radius_around(const Coordinate & coordinate, const std::st
 }
 
 // loading and unloading rooms at the edge of vision
-void World::remove_viewer_and_attempt_unload(const Coordinate & coordinate, const std::string & viewer_ID)
+void World::remove_viewer_and_attempt_unload(const Coordinate & coordinate, const character_id & viewer_ID)
 {
 	// if the referenced room is out of bounds or not loaded
 	if (!coordinate.is_valid() || room_at(coordinate) == nullptr) return; // nothing to remove or unload
@@ -132,7 +132,7 @@ void World::remove_viewer_and_attempt_unload(const Coordinate & coordinate, cons
 		unload_queue_cv.notify_one();
 	}
 }
-void World::remove_viewer_and_attempt_unload(const std::vector<Coordinate> & coordinates, const std::string & viewer_ID)
+void World::remove_viewer_and_attempt_unload(const std::vector<Coordinate> & coordinates, const character_id & viewer_ID)
 {
 	// Lock the queue. Using this function offers an optomization to the calling thread because it only locks the unload queue
 	// once for many writes into the queue.
@@ -143,7 +143,7 @@ void World::remove_viewer_and_attempt_unload(const std::vector<Coordinate> & coo
 }
 
 // unloading of all rooms in view distance (for logging out or dying)
-void World::attempt_unload_radius(const Coordinate & coordinate, const std::string & player_ID)
+void World::attempt_unload_radius(const Coordinate & coordinate, const character_id & player_ID)
 {
 	// remove the player from the room
 	if (coordinate.is_valid())
@@ -460,7 +460,7 @@ void World::add_room_to_world(pugi::xml_node & room_document, const Coordinate &
 			(!health_attribute.empty()) // if the health attribute exists
 			? health_attribute.as_int() // set the surface health to the attribute's value
 			: C::MAX_SURFACE_HEALTH // else set the room to full health
-			);
+		);
 
 		// select the door node
 		const pugi::xml_node door_node = surface.child(C::XML_DOOR.c_str());
@@ -557,43 +557,66 @@ void World::add_room_to_world(pugi::xml_node & room_document, const Coordinate &
 	reference_room_at(coordinate) = std::move(room);
 }
 
+bool World::pull_from_unload_queue(const Coordinate & coordinate)
+{
+	std::unique_lock<std::recursive_mutex> lock(unload_queue_mutex);
+	// for each room in the queue
+	for (auto it = unload_queue.begin(); it != unload_queue.end(); ++it)
+	{
+		// if the room we want to load is about to be unloaded
+		if ((*it)->get_coordinates() == coordinate)
+		{
+			// move the room back to the world
+			reference_room_at(coordinate) = std::move(*it);
+			// erase the entry in the unload queue
+			unload_queue.erase(it);
+			// our work here is done; the room is loaded
+			return true;
+		}
+	}
+
+	return false;
+}
+
 // move specific room into memory
 void World::load_room_to_world(const Coordinate & coordinate)
 {
 	// If the room is already loaded, return. This should never happen.
 	if (room_at(coordinate) != nullptr) return;
 
-	// check if the room is in the unload queue
 	{
-		std::unique_lock<std::recursive_mutex> lock(unload_queue_mutex);
-		// for each room in the queue
-		for (auto it = unload_queue.begin(); it != unload_queue.end(); ++it)
-		{
-			// if the room we want to load is about to be unloaded
-			if ((**it).get_coordinates() == coordinate) // dereference twice, because we have an iterator to a unique pointer
-			{
-				// move the room back to the world
-				reference_room_at(coordinate) = std::move(*it);
-				// erase the entry in the unload queue
-				unload_queue.erase(it);
-				// our work here is done; the room is loaded
-				return;
-			}
-		}
-	} // release mutex
+		/* Our previous model was:
+		1. Lock the unload_queue_mutex
+		2. Check the queue
+		3. Release the unload_queue_mutex
+		4. Lock the writing_to_disk_mutex
+		5. Check the room being written to disk
+		6. Release the writing_to_disk_mutex
+		
+		Could a room move through the queue to the unload slot, in the time between 3 and 4?
+		It's not possible for this thread to move a room right now, but we're going to hold
+		on to the unload_queue_mutex to make sure that another thread can not trigger this
+		at some later point. */
 
-	// check if the room is currently being written to the disk
-	{
-		std::unique_lock<std::mutex> lock(writing_to_disk_mutex);
-		// if the room is being written to the disk
-		while (writing_to_disk != nullptr && *writing_to_disk == coordinate) // important to verify that the pointer is non-null
-			// sleep until the 
-			writing_to_disk_cv.wait(lock);
-	} // release the disk mutex
+		std::unique_lock<std::recursive_mutex> lock(unload_queue_mutex);
+
+		// try pull from the unload queue, return if it worked
+		if (pull_from_unload_queue(coordinate)) return;
+
+		// check if the room is currently being written to the disk
+		{
+			std::unique_lock<std::mutex> lock(writing_to_disk_mutex);
+			// if the room is being written to the disk
+			while (writing_to_disk != nullptr && *writing_to_disk == coordinate) // important to verify that the pointer is non-null
+				// sleep until the 
+				writing_to_disk_cv.wait(lock);
+		} // release the disk mutex
+
+	} // release the unload mutex
 
 	// the room is not in the unload queue, either load it from the disk or create it fresh
 
-	// get the path to the room's save file'
+	// get the path to the room's save file
 	const std::string str_x = U::to_string(coordinate.get_x());
 	const std::string str_y = U::to_string(coordinate.get_y());
 	const std::string path = C::room_directory + "/" + str_x + "/" + str_x + "-" + str_y + ".xml";
@@ -632,7 +655,7 @@ void World::save_room_to_XML(const std::unique_ptr<Room> & room, pugi::xml_docum
 	// for each item in the room
 	const std::multimap<std::string, std::shared_ptr<Item>> room_item_contents = room->get_contents();
 	for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = room_item_contents.cbegin();
-	item_it != room_item_contents.cend(); ++item_it)
+		item_it != room_item_contents.cend(); ++item_it)
 	{
 		// create a node for the item, append it to the items node
 		pugi::xml_node item_node = items_node.append_child(C::XML_ITEM.c_str());
@@ -654,7 +677,7 @@ void World::save_room_to_XML(const std::unique_ptr<Room> & room, pugi::xml_docum
 	// for each side of the room
 	C::surface surface = (C::surface)0;
 	for (auto surface_it = room->get_room_sides().cbegin();
-	surface_it != room->get_room_sides().cend(); ++surface_it, surface = C::surface((size_t)surface + 1))
+		surface_it != room->get_room_sides().cend(); ++surface_it, surface = C::surface((size_t)surface + 1))
 	{
 		if (!surface_it->has_value()) continue;
 
@@ -714,7 +737,7 @@ void World::save_room_to_XML(const std::unique_ptr<Room> & room, pugi::xml_docum
 		// for each equipment item
 		const std::multimap<std::string, std::shared_ptr<Item>> chest_contents = chest->get_contents(); // extract contents
 		for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = chest_contents.cbegin();
-		item_it != chest_contents.cend(); ++item_it)
+			item_it != chest_contents.cend(); ++item_it)
 		{
 			pugi::xml_node item_node = items_node.append_child(item_it->second->get_name().c_str());
 
@@ -749,7 +772,7 @@ void World::save_room_to_XML(const std::unique_ptr<Room> & room, pugi::xml_docum
 		// for each equipment item
 		const std::multimap<std::string, std::shared_ptr<Item>> table_contents = table->get_contents(); // extract contents
 		for (std::multimap<std::string, std::shared_ptr<Item>>::const_iterator item_it = table_contents.cbegin();
-		item_it != table_contents.cend(); ++item_it)
+			item_it != table_contents.cend(); ++item_it)
 		{
 			pugi::xml_node item_node = items_node.append_child(item_it->second->get_name().c_str());
 
