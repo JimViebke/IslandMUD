@@ -40,9 +40,7 @@ namespace Utilities
 	// string construction
 	template <typename T> inline std::string to_string(const T & val)
 	{
-		std::stringstream output;
-		output << val;
-		return output.str();
+		return std::to_string(val);
 	}
 	inline char to_char(const unsigned & val)
 	{
