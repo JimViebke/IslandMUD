@@ -742,9 +742,9 @@ bool NPC::save_path_to(const Coordinate & destination, std::unique_ptr<World> & 
 		const Node current_room = move_and_get_lowest_g_cost(open_list, closed_list);
 
 		// for each room adjacent to current
-		for (const std::string & direction_id : C::direction_ids)
+		for (size_t it = 0; it != (size_t)C::direction::not_a_direction; ++it)
 		{
-			const C::direction direction = U::to_direction(direction_id);
+			const C::direction direction = (C::direction)it;
 
 			// calculate the destination coordinates
 			Coordinate next_room = current_room.location.get_after_move(direction);
