@@ -53,9 +53,10 @@ namespace Utilities
 	{
 		return std::find(v.cbegin(), v.cend(), element) != v.cend();
 	}
-	template <typename T> inline void erase_element_from_vector(std::vector<T> & vec, const T & erase_element)
+	template <typename T> inline void erase_element_from_vector(std::vector<T> & vec, const T & element)
 	{
-		vec.erase(find(vec.begin(), vec.end(), erase_element));
+		const auto it = find(vec.cbegin(), vec.cend(), element);
+		if (it != vec.cend()) vec.erase(it);
 	}
 	template <typename T> inline void append_b_to_a(std::vector<T> & dest, const std::vector<T> & source)
 	{

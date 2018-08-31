@@ -526,10 +526,7 @@ void Room::add_actor(const character_id & actor_id)
 }
 void Room::remove_actor(const character_id & actor_id)
 {
-	if (U::contains(actor_ids, actor_id)) // if the character exists here
-	{
-		U::erase_element_from_vector(actor_ids, actor_id);
-	}
+	U::erase_element_from_vector(actor_ids, actor_id);
 }
 void Room::add_viewing_actor(const character_id & actor_id)
 {
@@ -545,10 +542,7 @@ void Room::remove_viewing_actor(const character_id & actor_id)
 	// A room is unloaded when no player can see the room.
 	// To this end, a list of PCs and NPCs who can see this room is maintained.
 
-	if (U::contains(viewing_actor_ids, actor_id)) // if the character can see this room
-	{
-		U::erase_element_from_vector(viewing_actor_ids, actor_id); // remove the character
-	}
+	U::erase_element_from_vector(viewing_actor_ids, actor_id); // remove the character
 }
 
 // printing
