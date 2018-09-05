@@ -381,16 +381,18 @@ void Game::client_thread(network::connection_ptr connection)
 
 		// finish other login/connection details
 
-		// add user to the lookup
-		players.set_connection(actor_ids.find(user_ID)->second, connection);
-
-		// log the player in
 		std::lock_guard<std::mutex> lock(game_state); // lock the actors structure while we modify it
+
+		// create the player
 		std::shared_ptr<PC> player = std::make_shared<PC>(user_ID, world);
 
-		// save the player
+		// save the player's connection
+		players.set_connection(player->get_ID(), connection);
+
+		// add the player to the actor list
 		actors[player->get_ID()] = player;
-		// save the player's ID lookup
+
+		// save the player's ID to the lookup
 		actor_ids[user_ID] = player->get_ID();
 
 		// send a welcome message through the outbound queue
@@ -560,7 +562,7 @@ void Game::NPC_thread()
 		const auto tick_start = U::current_time_in_ms();
 
 		std::cout << "NPC thread starting tick at " << tick_start << ".\n";
-		std::unique_lock<std::mutex> lock(game_state);
+		
 		//std::cout << "NPC thread running.\n";
 
 		const auto update_start = U::current_time_in_ms();
@@ -568,11 +570,8 @@ void Game::NPC_thread()
 		const auto update_end = U::current_time_in_ms();
 
 		const auto spawn_start = U::current_time_in_ms();
-		// NPC_spawn_logic();
+		NPC_spawn_logic();
 		const auto spawn_end = U::current_time_in_ms();
-
-		// lock
-		lock.unlock();
 
 		const auto tick_end = U::current_time_in_ms();
 		next_tick += C::MS_PER_TICK;
@@ -652,6 +651,8 @@ void Game::NPC_spawn_startup_logic()
 void Game::NPC_spawn_logic()
 {
 	// std::cout << "Running NPC spawn logic...\n";
+
+	std::unique_lock<std::mutex> lock(game_state);
 
 	int player_count = 0;
 	int NPC_corporal_count = 0;
@@ -735,9 +736,34 @@ void Game::NPC_spawn_logic()
 
 void Game::NPC_update_logic()
 {
-	for (auto & actor : actors) // for each actor
+	std::unique_lock<std::mutex> lock(game_state);
+
+	std::vector<character_id> npc_ids;
+	npc_ids.reserve(actors.size());
+
+	for (const auto & actor : actors) // for each actor
 	{
-		if (std::shared_ptr<NPC> npc = U::convert_to<NPC>(actor.second)) // if the actor is an NPC
+		if (const std::shared_ptr<NPC> npc = U::convert_to<NPC>(actor.second)) // if the actor is an NPC
+		{
+			npc_ids.push_back(npc->get_ID());
+		}
+	}
+
+	while (npc_ids.size() > 0)
+	{
+		lock.unlock();
+		// here other threads are given a chance to claim the mutex
+		std::this_thread::sleep_for(std::chrono::milliseconds(1)); // hacky hack because mutexes are unfair
+		lock.lock();
+
+		const auto next_id = npc_ids.back();
+		npc_ids.pop_back();
+
+		const auto next_actor = actors.find(next_id);
+
+		if (next_actor == actors.cend()) continue;
+
+		if (std::shared_ptr<NPC> npc = U::convert_to<NPC>(next_actor->second)) // if the actor is an NPC
 		{
 			{
 				std::stringstream ss;
