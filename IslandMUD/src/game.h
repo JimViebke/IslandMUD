@@ -8,6 +8,7 @@ Feb 14, 2015 */
 #include <queue>
 #include <thread>
 #include <mutex>
+#include <shared_mutex>
 
 #include "server.h"
 #include "constants.h"
@@ -16,15 +17,42 @@ Feb 14, 2015 */
 #include "parse.h"
 #include "world.h"
 #include "threadsafe/threadsafe_queue.h"
+#include "threadsafe/thread_pool.hpp"
 #include "connection_lookup.h"
 #include "message.h"
+
+namespace std
+{
+	template<typename T>
+	using observer_ptr = T * ;
+}
+
+class Game;
+
+class Execute_User_Command : public thread_pool::task
+{
+public:
+	Execute_User_Command(std::observer_ptr<Game> game,
+		const network::connection_ptr & connection,
+		const std::string & data) :
+		task(), game(game), connection(connection), data(data) {}
+
+	void run();
+
+private:
+	std::observer_ptr<Game> game;
+	network::connection_ptr connection;
+	std::string data;
+};
 
 class Game
 {
 private:
-	threadsafe::queue<Message> inbound_queue; // <socket_ID, message>
 	threadsafe::queue<Message> outbound_queue; // <socket_ID, message>
 
+	// Manages NPC logic and all commands executed against the game world.
+	// Nonblocking tasks are run in parallel.
+	thread_pool::thread_pool thread_pool;
 
 	// Maps between a character ID and up to two connection pointers
 	connection_lookup players;
@@ -33,7 +61,7 @@ private:
 	// Maps a player name back to a character ID
 	std::map<std::string, Character::ID> actor_ids;
 	// The state of the world
-	std::unique_ptr<World> world; 
+	std::unique_ptr<World> world;
 
 	// Covers the above structures. Tasks in the thread pool shall gain exclusive or shared
 	// lock
@@ -51,9 +79,6 @@ public:
 	void run();
 
 private:
-
-	// process data, moving it from the input queue to the output queue
-	void processing_thread();
 
 	// Listen on port [listening_port].
 	// When a user connects, start a thread using [client_thread_pointer], passing in the user's unique socket ID
@@ -84,6 +109,8 @@ private:
 
 	// when the server shutdown is triggered, this will save all game data and destroy the game object
 	void shutdown_listener();
+
+	friend class Execute_User_Command;
 };
 
 #endif

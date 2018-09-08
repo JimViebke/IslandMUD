@@ -6,9 +6,28 @@ May 15 2015 */
 
 #include "game.h"
 
+void Execute_User_Command::run()
+{
+	std::unique_lock<std::shared_mutex> lock(game->game_state);
+
+	// get the user ID for the inbound socket
+	const character_id user_ID = game->players.get_user_ID(connection);
+
+	// execute the command if the player is still online
+	const auto actor_it = game->actors.find(user_ID);
+	if (actor_it != game->actors.cend())
+	{
+		// execute the user's parsed command against the world
+		const Update_Messages update_messages = game->execute_command(user_ID, Parse::tokenize(data));
+
+		// generate_outbound_messages uses an Update_Messages object to generate all 
+		game->generate_outbound_messages(actor_it->second->get_ID(), update_messages);
+	}
+}
 
 
-Game::Game()
+
+Game::Game() : thread_pool(8)
 {
 	// Calling start() makes sure the "running" flag is set to true.
 	// Other threads periodically check this flag, and will cleanly terminate themselves if the flag is ever disabled.
@@ -300,41 +319,7 @@ Update_Messages Game::execute_command(const Character::ID & actor_id, const std:
 
 void Game::run()
 {
-	std::thread(&Game::processing_thread, this).detach();
-
 	shutdown_listener();
-}
-
-void Game::processing_thread()
-{
-	// the processing thread handles input from users who are already logged in
-
-	for (;;)
-	{
-		// destructively get the next inbound message
-		const Message inbound_message = inbound_queue.get(); // blocking
-
-		// don't allow the actors structure to be modified
-		std::unique_lock<std::mutex> lock(game_state);
-
-		// get the user ID for the inbound socket
-		const character_id user_ID = this->players.get_user_ID(inbound_message.connection);
-
-		// if the target is another player or NPC in the room
-		const auto actor_it = actors.find(user_ID);
-		if (actor_it == actors.cend())
-		{
-			// This player is no longer online. Drop the command.
-		}
-		else
-		{
-			// execute the user's parsed command against the world
-			const Update_Messages update_messages = execute_command(user_ID, Parse::tokenize(inbound_message.data));
-
-			// generate_outbound_messages uses an Update_Messages object to generate all 
-			generate_outbound_messages(actor_it->second->get_ID(), update_messages);
-		}
-	}
 }
 
 // private member functions
@@ -381,7 +366,7 @@ void Game::client_thread(network::connection_ptr connection)
 
 		// finish other login/connection details
 
-		std::lock_guard<std::mutex> lock(game_state); // lock the actors structure while we modify it
+		std::lock_guard<std::shared_mutex> lock(game_state); // lock the actors structure while we modify it
 
 		// create the player
 		std::shared_ptr<PC> player = std::make_shared<PC>(user_ID, world);
@@ -415,7 +400,7 @@ void Game::client_thread(network::connection_ptr connection)
 			connection->close();
 
 			// lock the game state so we can clean up
-			std::lock_guard<std::mutex> lock(game_state);
+			std::lock_guard<std::shared_mutex> lock(game_state);
 
 			// get the user's ID
 			const character_id user_ID = players.get_user_ID(connection); // find username
@@ -439,7 +424,7 @@ void Game::client_thread(network::connection_ptr connection)
 			return;
 		}
 
-		inbound_queue.put(Message(connection, data));
+		thread_pool.add_task(std::make_shared<Execute_User_Command>(this, connection, data));
 	}
 }
 
@@ -479,7 +464,7 @@ void Game::client_map_thread(network::connection_ptr map_connection)
 		if (commands.size() == 2) // only valid input size
 		{
 			{ // temporary scope to destroy mutex as soon as possible
-				std::lock_guard<std::mutex> lock(game_state);
+				std::lock_guard<std::shared_mutex> lock(game_state);
 				if (actor_ids.find(commands[0]) == actor_ids.cend()) continue; // repeat message if the user is not logged in
 			}
 
@@ -517,7 +502,7 @@ void Game::client_map_thread(network::connection_ptr map_connection)
 		players.set_map_connection(actor_ids.find(user_ID)->second, map_connection);
 
 		// generate an area map from the current player's perspective, send it to the newly connect map socket
-		std::lock_guard<std::mutex> lock(game_state);
+		std::lock_guard<std::shared_mutex> lock(game_state);
 		if (const std::shared_ptr<PC> player = U::convert_to<PC>(actors.find(actor_ids.find(user_ID)->second)->second))
 		{
 			outbound_queue.put(Message(map_connection, "\n\n" + player->generate_area_map(world, actors)));
@@ -603,7 +588,7 @@ void Game::NPC_spawn_startup_logic()
 
 		for (unsigned i = 0; i < corporals.size(); ++i)
 		{
-			std::lock_guard<std::mutex> lock(game_state);
+			std::lock_guard<std::shared_mutex> lock(game_state);
 
 			std::shared_ptr<Hostile_NPC_Corporal> corporal = std::make_shared<Hostile_NPC_Corporal>(corporals[i], world);
 			actors[corporal->get_ID()] = corporal;
@@ -618,7 +603,7 @@ void Game::NPC_spawn_startup_logic()
 	// add a corporal and a bodyguard
 	if (false)
 	{
-		std::lock_guard<std::mutex> lock(game_state);
+		std::lock_guard<std::shared_mutex> lock(game_state);
 
 		std::shared_ptr<Hostile_NPC_Corporal> hunter = std::make_shared<Hostile_NPC_Corporal>("Hunter", world);
 		actors[hunter->get_ID()] = hunter;
@@ -652,7 +637,7 @@ void Game::NPC_spawn_logic()
 {
 	// std::cout << "Running NPC spawn logic...\n";
 
-	std::unique_lock<std::mutex> lock(game_state);
+	std::unique_lock<std::shared_mutex> lock(game_state);
 
 	int player_count = 0;
 	int NPC_corporal_count = 0;
@@ -736,7 +721,7 @@ void Game::NPC_spawn_logic()
 
 void Game::NPC_update_logic()
 {
-	std::unique_lock<std::mutex> lock(game_state);
+	std::unique_lock<std::shared_mutex> lock(game_state);
 
 	std::vector<character_id> npc_ids;
 	npc_ids.reserve(actors.size());
@@ -866,7 +851,7 @@ std::string Game::login_or_signup(const network::connection_ptr & connection)
 
 			// check if the user is already logged in
 			{ // temporary scope to delete mutex lock
-				std::lock_guard<std::mutex> lock(game_state);
+				std::lock_guard<std::shared_mutex> lock(game_state);
 				if (actor_ids.find(input[0]) != actor_ids.cend())
 				{
 					outbound_queue.put(Message(connection, "User \"" + input[0] + "\" already logged in.\n"));
@@ -1000,7 +985,7 @@ void Game::shutdown_listener()
 	Server::wait_for_shutdown();
 
 	// lock game state
-	std::unique_lock<std::mutex> lock(game_state);
+	std::unique_lock<std::shared_mutex> lock(game_state);
 
 	// for each actor, remove the room around them
 	for (auto & actor : actors) world->attempt_unload_radius(actor.second->get_location(), actor.first);
