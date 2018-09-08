@@ -25,13 +25,19 @@ private:
 	threadsafe::queue<Message> inbound_queue; // <socket_ID, message>
 	threadsafe::queue<Message> outbound_queue; // <socket_ID, message>
 
+
+	// Maps between a character ID and up to two connection pointers
 	connection_lookup players;
-
+	// Maps a character ID to a Character object (all players and NPCs)
 	std::map<Character::ID, std::shared_ptr<Character>> actors; // signed in PCs and NPCs
-	std::map<std::string, Character::ID> actor_ids; // map a character's name back to their ID
-	std::unique_ptr<World> world; // the game world object
+	// Maps a player name back to a character ID
+	std::map<std::string, Character::ID> actor_ids;
+	// The state of the world
+	std::unique_ptr<World> world; 
 
-	std::mutex game_state; // provides safe access and modification of the above two structures
+	// Covers the above structures. Tasks in the thread pool shall gain exclusive or shared
+	// lock
+	std::shared_mutex game_state;
 
 public:
 
