@@ -314,11 +314,11 @@ void Game::processing_thread()
 		// destructively get the next inbound message
 		const Message inbound_message = inbound_queue.get(); // blocking
 
-		// get the user ID for the inbound socket
-		const character_id user_ID = this->players.get_user_ID(inbound_message.connection);
-
 		// don't allow the actors structure to be modified
 		std::unique_lock<std::mutex> lock(game_state);
+
+		// get the user ID for the inbound socket
+		const character_id user_ID = this->players.get_user_ID(inbound_message.connection);
 
 		// if the target is another player or NPC in the room
 		const auto actor_it = actors.find(user_ID);
