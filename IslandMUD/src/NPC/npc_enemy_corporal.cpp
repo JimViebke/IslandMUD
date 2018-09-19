@@ -56,14 +56,19 @@ Update_Messages Hostile_NPC_Corporal::wander(std::unique_ptr<World> & world)
 {
 	Update_Messages results("");
 
+	// if we're already in the wander location, generate a new one
+	if (wander_location == location)
+	{
+		generate_new_wander_location();
+	}
+
 	// if no path is saved
 	if (path.size() == 0)
 	{
 		// generate and store coordinates if none exist
 		if (!wander_location.is_valid())
 		{
-			// generate and store new wander coordinates
-			wander_location = Coordinate(U::random_int_from(0, C::WORLD_X_DIMENSION - 1), U::random_int_from(0, C::WORLD_Y_DIMENSION - 1));
+			generate_new_wander_location();
 		}
 
 		// test if the destination is within range or requires a best attempt pathfind
@@ -199,4 +204,11 @@ bool Hostile_NPC_Corporal::hunt(std::unique_ptr<World> & world, std::map<charact
 	//{
 	//	return wander(world, actors);
 	//}
+}
+
+void Hostile_NPC_Corporal::generate_new_wander_location()
+{
+	wander_location = Coordinate(
+		U::random_int_from(0, C::WORLD_X_DIMENSION - 1),
+		U::random_int_from(0, C::WORLD_Y_DIMENSION - 1));
 }

@@ -22,6 +22,8 @@ public:
 
 private:
 
+	void generate_new_wander_location();
+
 	enum class Stored_Path_Type { to_hunt_target, to_hunt_target_last_known_location, to_wander_target };
 
 	// The NPC selects a random x,y coordinate within the world to wander to.

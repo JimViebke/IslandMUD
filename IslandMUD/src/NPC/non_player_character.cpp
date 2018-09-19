@@ -425,7 +425,7 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 	// extra location coordinates
 	const int x = location.get_x(), y = location.get_y(), x_dest = destination.get_x(), y_dest = destination.get_y();
 
-	if (location.is_northwest_of(destination)) // northwest
+	if (destination.is_northwest_of(location)) // northwest
 	{
 		// if the target is out of view but inline with any part of the current visible area,
 		// don't pathfind to corner; pathfind to the edge of the visible area that
@@ -440,7 +440,7 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 		}
 	}
 
-	if (x > x_dest && y < y_dest) // northeast
+	if (destination.is_northeast_of(location)) // northeast
 	{
 		if (save_path_to(Coordinate(
 			(((x - x_dest) <= C::VIEW_DISTANCE) ? (x_dest) : (x - C::VIEW_DISTANCE)),
@@ -450,7 +450,7 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 		}
 	}
 
-	if (x < x_dest && y > y_dest) // southwest
+	if (destination.is_southwest_of(location)) // southwest
 	{
 		if (save_path_to(Coordinate(
 			(((x_dest - x) <= C::VIEW_DISTANCE) ? (x_dest) : (x + C::VIEW_DISTANCE)),
@@ -460,7 +460,7 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 		}
 	}
 
-	if (x < x_dest && y < y_dest) // southeast
+	if (destination.is_southeast_of(location)) // southeast
 	{
 		if (save_path_to(Coordinate(
 			(((x_dest - x) <= C::VIEW_DISTANCE) ? (x_dest) : (x + C::VIEW_DISTANCE)),
@@ -473,7 +473,7 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 	// execution reaches here if a diagonal movement failed or the target is directly n/e/s/w or
 	// the target is visible but unreachable
 
-	if (x > x_dest) // north
+	if (destination.is_north_of(location)) // north
 	{
 		// starting at the edge of view and working toward the player
 		for (int i = C::VIEW_DISTANCE; i > 0; --i)
@@ -488,7 +488,7 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 		}
 	}
 
-	if (x < x_dest) // south
+	if (destination.is_south_of(location)) // south
 	{
 		for (int i = C::VIEW_DISTANCE; i > 0; --i)
 		{
@@ -500,7 +500,7 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 		}
 	}
 
-	if (y > y_dest) // west
+	if (destination.is_west_of(location)) // west
 	{
 		for (int i = C::VIEW_DISTANCE; i > 0; --i)
 		{
@@ -512,7 +512,7 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 		}
 	}
 
-	if (y < y_dest) // east
+	if (destination.is_east_of(location)) // east
 	{
 		for (int i = C::VIEW_DISTANCE; i > 0; --i)
 		{
@@ -720,6 +720,16 @@ bool NPC::save_path_to(const Coordinate & destination, std::unique_ptr<World> & 
 	G : actual cost to reach a certain room
 	H : estimated cost to reach destination from a certain room
 	F-cost = G + H */
+
+	if (destination == location)
+	{
+		std::stringstream ss;
+		ss << "Error: " << this->name << " is attempting to pathfind to its current location.\n";
+		ss << "Location: " << location.to_string() << '\n';
+
+		std::cout << ss.str() << std::endl;
+		throw std::logic_error(ss.str());
+	}
 
 	// start by removing any existing planned path
 	path.clear();
