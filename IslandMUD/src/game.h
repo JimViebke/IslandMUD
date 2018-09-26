@@ -21,12 +21,6 @@ Feb 14, 2015 */
 #include "connection_lookup.h"
 #include "message.h"
 
-namespace std
-{
-	template<typename T>
-	using observer_ptr = T * ;
-}
-
 class Game;
 
 class Execute_User_Command : public thread_pool::task
