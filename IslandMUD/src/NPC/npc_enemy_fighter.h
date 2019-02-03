@@ -10,9 +10,9 @@ Aug 15 2015 */
 class Hostile_NPC_Fighter : public Hostile_NPC
 {
 public:
-	Hostile_NPC_Fighter(const std::string & name, std::unique_ptr<World> & world) : Hostile_NPC(name, world) {}
+	Hostile_NPC_Fighter(const std::string & name, std::observer_ptr<Game> game) : Hostile_NPC(name, game) {}
 
-	Update_Messages update(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors);
+	Update_Messages update();
 };
 
 #endif

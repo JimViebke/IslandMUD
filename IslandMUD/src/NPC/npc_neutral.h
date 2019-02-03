@@ -9,8 +9,7 @@ Jun 3 2015 */
 class Neutral_NPC : public Non_Player_Character
 {
 public:
-	
-	Neutral_NPC(const std::string & name, std::unique_ptr<World> & world) : Non_Player_Character(name, C::NPC_NEUTRAL_FACTION_ID, world) {}
+	Neutral_NPC(const std::string & name, std::observer_ptr<Game> game) : Non_Player_Character(name, C::NPC_NEUTRAL_FACTION_ID, game) {}
 };
 
 #endif

@@ -115,7 +115,6 @@
     <ClCompile Include="src\recipes.cpp" />
     <ClCompile Include="src\room.cpp" />
     <ClCompile Include="src\room_side.cpp" />
-    <ClCompile Include="src\threadsafe\thread_pool.cpp" />
     <ClCompile Include="src\utilities.cpp" />
     <ClCompile Include="src\world.cpp" />
   </ItemGroup>
@@ -163,7 +162,6 @@
     <ClInclude Include="src\room_side.h" />
     <ClInclude Include="src\connection_lookup.h" />
     <ClInclude Include="src\threadsafe\threadsafe_queue.h" />
-    <ClInclude Include="src\threadsafe\thread_pool.hpp" />
     <ClInclude Include="src\types.hpp" />
     <ClInclude Include="src\utilities.h" />
     <ClInclude Include="src\world.h" />

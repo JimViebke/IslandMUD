@@ -5,11 +5,12 @@ Jeb 16 2015 */
 
 #include "constants.h"
 #include "character.h"
+#include "game.h"
 #include "world.h"
 
 std::unique_ptr<Recipes> Character::recipes;
 
-Character::Character(const std::string & name, const std::string & set_faction_ID, std::unique_ptr<World> & world) : name(name), location(C::DEFAULT_SPAWN_X, C::DEFAULT_SPAWN_Y)
+Character::Character(const std::string & name, const std::string & set_faction_ID, std::observer_ptr<Game> game) : name(name), location(C::DEFAULT_SPAWN_X, C::DEFAULT_SPAWN_Y), game(game), world(game->world.get()), actors(&game->actors)
 {
 	if (Character::recipes == nullptr)
 	{
@@ -34,7 +35,7 @@ Character::Character(const std::string & name, const std::string & set_faction_I
 
 	id = U::next_int();
 
-	login(world);
+	login();
 
 	std::stringstream ss;
 	ss << "Signed in " << name << " with ID=" << get_ID() << std::endl;
@@ -42,7 +43,7 @@ Character::Character(const std::string & name, const std::string & set_faction_I
 }
 Character::~Character() {}
 
-void Character::login(std::unique_ptr<World> & world)
+void Character::login()
 {
 	// create a document to load the player's data
 	pugi::xml_document user_data_xml;
@@ -309,11 +310,11 @@ std::string Character::get_inventory() const // debugging
 }
 
 // actions
-Update_Messages Character::move(const std::string & direction, std::unique_ptr<World> & world)
+Update_Messages Character::move(const std::string & direction)
 {
-	return move(U::to_direction(direction), world);
+	return move(U::to_direction(direction));
 }
-Update_Messages Character::move(const C::direction & direction, std::unique_ptr<World> & world)
+Update_Messages Character::move(const C::direction & direction)
 {
 	const Coordinate destination = location.get_after_move(direction);
 
@@ -326,7 +327,7 @@ Update_Messages Character::move(const C::direction & direction, std::unique_ptr<
 	}
 
 	// test if the environment (structures) allow the player to move in a given direction
-	const C::move_attempt validate_movement = this->validate_movement(location, direction, destination, world);
+	const C::move_attempt validate_movement = this->validate_movement(location, direction, destination);
 
 	// if the validation failed for any reason
 	if (validate_movement != C::move_attempt::traversable)
@@ -462,7 +463,7 @@ Update_Messages Character::move(const C::direction & direction, std::unique_ptr<
 
 	return updates;
 }
-Update_Messages Character::craft(const std::string & craft_item_id, std::unique_ptr<World> & world)
+Update_Messages Character::craft(const std::string & craft_item_id)
 {
 	// check for special cases
 	if (craft_item_id == C::CHEST_ID)
@@ -571,7 +572,7 @@ Update_Messages Character::craft(const std::string & craft_item_id, std::unique_
 
 	return Update_Messages(player_update.str(), room_update.str());
 }
-Update_Messages Character::take(const std::string & take_item_id, std::unique_ptr<World> & world, const std::string & count)
+Update_Messages Character::take(const std::string & take_item_id, const std::string & count)
 {
 	if (!Craft::make(take_item_id)->is_takable())
 	{
@@ -596,7 +597,7 @@ Update_Messages Character::take(const std::string & take_item_id, std::unique_pt
 			this->name + " takes " + U::get_article_for(take_item_id) + " " + take_item_id + ".");
 	}
 }
-Update_Messages Character::drop(const std::string & drop_item_id, std::unique_ptr<World> & world, const std::string & count)
+Update_Messages Character::drop(const std::string & drop_item_id, const std::string & count)
 {
 	// create a counter to determine how many items are actually dropped
 	const unsigned drop_count = Character::move_items(*this, *world->room_at(location), drop_item_id, count);
@@ -696,7 +697,7 @@ Update_Messages Character::unequip()
 
 	return Update_Messages("You put your " + item_ID + " away.", this->name + " lowers the " + item_ID + ".");
 }
-Update_Messages Character::add_to_chest(std::string insert_item_id, std::unique_ptr<World> & world, const std::string & count)
+Update_Messages Character::add_to_chest(std::string insert_item_id, const std::string & count)
 {
 	const std::unique_ptr<Room>::pointer room = world->room_at(location);
 
@@ -730,7 +731,7 @@ Update_Messages Character::add_to_chest(std::string insert_item_id, std::unique_
 			this->name + " places " + U::get_article_for(insert_item_id) + " " + insert_item_id + " into the chest.");
 	}
 }
-Update_Messages Character::take_from_chest(const std::string & take_item_id, std::unique_ptr<World> & world, const std::string & count)
+Update_Messages Character::take_from_chest(const std::string & take_item_id, const std::string & count)
 {
 	const std::unique_ptr<Room>::pointer room = world->room_at(location);
 
@@ -764,12 +765,12 @@ Update_Messages Character::take_from_chest(const std::string & take_item_id, std
 			this->name + " takes " + U::get_article_for(take_item_id) + " " + take_item_id + " from the chest.");
 	}
 }
-Update_Messages Character::look_inside_chest(const std::unique_ptr<World> & world) const
+Update_Messages Character::look_inside_chest() const
 {
 	// validation within
 	return world->room_at(location)->chest_contents(faction_ID, this->name);
 }
-Update_Messages Character::add_to_table(const std::string & add_item_ID, std::unique_ptr<World> & world, const std::string & count)
+Update_Messages Character::add_to_table(const std::string & add_item_ID, const std::string & count)
 {
 	const std::unique_ptr<Room>::pointer room = world->room_at(location);
 
@@ -797,7 +798,7 @@ Update_Messages Character::add_to_table(const std::string & add_item_ID, std::un
 			this->name + " drops " + U::get_article_for(add_item_ID) + " " + add_item_ID + " on the table.");
 	}
 }
-Update_Messages Character::take_from_table(const std::string take_item_ID, std::unique_ptr<World> & world, const std::string & count)
+Update_Messages Character::take_from_table(const std::string take_item_ID, const std::string & count)
 {
 	const std::unique_ptr<Room>::pointer room = world->room_at(location);
 
@@ -825,12 +826,12 @@ Update_Messages Character::take_from_table(const std::string take_item_ID, std::
 			this->name + " takes " + U::get_article_for(take_item_ID) + " " + take_item_ID + " from the table.");
 	}
 }
-Update_Messages Character::look_at_table(const std::unique_ptr<World> & world) const
+Update_Messages Character::look_at_table() const
 {
 	// validation within
 	return world->room_at(location)->table_contents(this->name);
 }
-Update_Messages Character::construct_surface(const std::string & material_id, const C::surface & surface, std::unique_ptr<World> & world)
+Update_Messages Character::construct_surface(const std::string & material_id, const C::surface & surface)
 {
 	if (world->room_at(location)->is_forest())
 	{
@@ -904,7 +905,7 @@ Update_Messages Character::construct_surface(const std::string & material_id, co
 
 		true);
 }
-Update_Messages Character::construct_surface_with_door(const std::string & surface_material_id, const C::surface & surface, const std::string & door_material_id, std::unique_ptr<World> & world)
+Update_Messages Character::construct_surface_with_door(const std::string & surface_material_id, const C::surface & surface, const std::string & door_material_id)
 {
 	// Part 1: validate that a surface can be constructed
 
@@ -1039,7 +1040,7 @@ Update_Messages Character::construct_surface_with_door(const std::string & surfa
 	// "You construct a stone floor with a stone hatch." OR "You construct a stone wall to your north with a branch door."
 	return Update_Messages(to_player.str(), to_room.str(), true); // send messages to user and room, and require map update for players in view distance
 }
-Update_Messages Character::attack_surface(const std::string & surface_ID, std::unique_ptr<World> & world)
+Update_Messages Character::attack_surface(const std::string & surface_ID)
 {
 	// get this check out of the way
 	if (surface_ID == C::CEILING || surface_ID == C::FLOOR)
@@ -1087,7 +1088,7 @@ Update_Messages Character::attack_surface(const std::string & surface_ID, std::u
 		return Update_Messages("There is only rubble where a wall once was.");
 	}
 }
-Update_Messages Character::attack_door(const std::string & surface_ID, std::unique_ptr<World> & world)
+Update_Messages Character::attack_door(const std::string & surface_ID)
 {
 	// get this check out of the way
 	if (surface_ID == C::CEILING || surface_ID == C::FLOOR)
@@ -1125,7 +1126,7 @@ Update_Messages Character::attack_door(const std::string & surface_ID, std::uniq
 	// this feedback might not be correct for all cases
 	return Update_Messages("There is no door to your " + surface_ID + ".");
 }
-Update_Messages Character::attack_item(const std::string & target_ID, std::unique_ptr<World> & world)
+Update_Messages Character::attack_item(const std::string & target_ID)
 {
 	// if the target isn't here
 	if (!world->room_at(location)->contains(target_ID))
@@ -1189,7 +1190,7 @@ Update_Messages Character::attack_item(const std::string & target_ID, std::uniqu
 		}
 	}
 }
-Update_Messages Character::add_to_bloomery(const std::string & item_ID, const unsigned & count, std::unique_ptr<World> & world)
+Update_Messages Character::add_to_bloomery(const std::string & item_ID, const unsigned & count)
 {
 	// ****** here
 
@@ -1204,7 +1205,7 @@ Update_Messages Character::add_to_bloomery(const std::string & item_ID, const un
 
 	return Update_Messages("Character::add_to_bloomery() is incomplete.");
 }
-Update_Messages Character::attack_character(std::shared_ptr<Character> & target, std::unique_ptr<World> & world)
+Update_Messages Character::attack_character(std::shared_ptr<Character> & target)
 {
 	/*
 
@@ -1250,7 +1251,7 @@ Update_Messages Character::attack_character(std::shared_ptr<Character> & target,
 	if (target->current_health == 0)
 	{
 		// die() handles the dying target's inventory
-		Update_Messages update_messages = target->die(world);
+		Update_Messages update_messages = target->die();
 
 		// remove the target from their current destination
 		world->room_at(location)->remove_actor(target->get_ID());
@@ -1275,7 +1276,7 @@ Update_Messages Character::attack_character(std::shared_ptr<Character> & target,
 		name + " attacks " + target->name + " with " +
 		((equipped_item == nullptr) ? "their bare hands.\n" : (U::get_article_for(equipped_item->get_name() + " " + equipped_item->get_name() + ".\n"))));
 }
-Update_Messages Character::die(std::unique_ptr<World> & world)
+Update_Messages Character::die()
 {
 	// The player drops the item they are holding, all equipment from their inventory, a random amount of each stackable type from their inventory (at least one of each), and keeps any other item.
 
@@ -1316,7 +1317,7 @@ Update_Messages Character::die(std::unique_ptr<World> & world)
 }
 
 // movement info
-C::move_attempt Character::validate_movement(const Coordinate & current, const C::direction & direction, const Coordinate & destination, const std::unique_ptr<World> & world) const
+C::move_attempt Character::validate_movement(const Coordinate & current, const C::direction & direction, const Coordinate & destination) const
 {
 	// determine if a character can move in a given direction (8 compass points)
 

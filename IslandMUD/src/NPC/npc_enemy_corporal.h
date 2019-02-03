@@ -10,15 +10,15 @@ Jan 11 2015 */
 class Hostile_NPC_Corporal : public Hostile_NPC
 {
 public:
-	Hostile_NPC_Corporal(const std::string & name, std::unique_ptr<World> & world);
+	Hostile_NPC_Corporal(const std::string & name, std::observer_ptr<Game> game);
 
-	Update_Messages update(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors);
+	Update_Messages update();
 
 	// AI subroutines
 
-	void acquire_new_hunt_target(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors);
-	Update_Messages wander(std::unique_ptr<World> & world);
-	bool hunt(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors, Update_Messages & update_messages);
+	void acquire_new_hunt_target();
+	Update_Messages wander();
+	bool hunt(Update_Messages & update_messages);
 
 private:
 

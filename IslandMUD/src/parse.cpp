@@ -13,7 +13,7 @@ void Parse::initialize()
 
 	if (dict.size() == 0)
 	{
-		std::cout << "\nLoading parse dictionary...";
+		std::cout << "Loading parse dictionary...\n";
 
 		// test commands
 		P::dict["recipe"] = P::dict["recipes"] = C::PRINT_RECIPES_COMMAND;

@@ -4,55 +4,41 @@ Jan 11 2016 */
 
 #include "npc_enemy_corporal.h"
 
-Hostile_NPC_Corporal::Hostile_NPC_Corporal(const std::string & name, std::unique_ptr<World> & world) : Hostile_NPC(name, world), wander_location(-1, -1) {}
+Hostile_NPC_Corporal::Hostile_NPC_Corporal(const std::string & name, std::observer_ptr<Game> game) : Hostile_NPC(name, game), wander_location(-1, -1) {}
 
-Update_Messages Hostile_NPC_Corporal::update(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Corporal::update()
 {
 	Update_Messages update_messages("");
 
-	if (hunt(world, actors, update_messages))
-	{
-		return update_messages;
-	}
+	// try hunt
+	if (hunt(update_messages)) return update_messages;
 
-	// else, I have no hunt target or my hunt target is not visible
-
-	// get new hunt target
-	this->acquire_new_hunt_target(world, actors);
+	// Hunting failed, get a new hunt target.
+	// This function is bad because it could return a visible but unreachable target,
+	// resulting in a "hunt step, wander step, hunt step" loop until the target
+	// becomes non-visible or reachable.
+	acquire_new_hunt_target();
 
 	// if the NPC still has no hunt target
-	if (hunt_target_id == -1)
-	{
-		return wander(world);
-	}
-	else // I now have a hunt target
-	{
-		if (hunt(world, actors, update_messages))
-		{
-			return update_messages;
-		}
-		else // I have no hunt target or my hunt target is not visible
-		{
-			hunt_target_id = -1;
-			return wander(world);
-		}
-	}
+	if (hunt_target_id == -1) return wander();
 
-	return Update_Messages("");
+	// try hunt again
+	if (hunt(update_messages)) return update_messages;
+
+	// hunting failed with a new target, probably because the target is visible but unreachable
+
+	hunt_target_id = -1;
+	return wander();
 }
 
 
 
-void Hostile_NPC_Corporal::acquire_new_hunt_target(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors)
+void Hostile_NPC_Corporal::acquire_new_hunt_target()
 {
-	// get a new hunt target. Will reset the hunter target ID if one cannot be found.
-
-	// get a new hostile (player)
-	hunt_target_id = get_new_hostile_id(world, actors);
-
-	// this->hunt_target_id
+	// Get a new hunt target ID, or 1 if one cannot be found.
+	hunt_target_id = get_new_hostile_id();
 }
-Update_Messages Hostile_NPC_Corporal::wander(std::unique_ptr<World> & world)
+Update_Messages Hostile_NPC_Corporal::wander()
 {
 	Update_Messages results("");
 
@@ -74,7 +60,7 @@ Update_Messages Hostile_NPC_Corporal::wander(std::unique_ptr<World> & world)
 		// test if the destination is within range or requires a best attempt pathfind
 		if (location.diagonal_distance_to(wander_location) > C::VIEW_DISTANCE)
 		{
-			if (best_attempt_pathfind(wander_location, world, results))
+			if (best_attempt_pathfind(wander_location, results))
 			{
 				return results;
 			}
@@ -84,9 +70,9 @@ Update_Messages Hostile_NPC_Corporal::wander(std::unique_ptr<World> & world)
 			}
 		}
 		// the destination is visible, save a path to it
-		else if (save_path_to(wander_location, world))
+		else if (save_path_to(wander_location))
 		{
-			make_path_movement(world, results);
+			make_path_movement(results);
 			return results;
 		}
 		else
@@ -97,7 +83,7 @@ Update_Messages Hostile_NPC_Corporal::wander(std::unique_ptr<World> & world)
 	// use the stored path
 	else
 	{
-		if (make_path_movement(world, results))
+		if (make_path_movement(results))
 		{
 			return results;
 		}
@@ -110,12 +96,12 @@ Update_Messages Hostile_NPC_Corporal::wander(std::unique_ptr<World> & world)
 	// nothing happens
 	return results;
 }
-bool Hostile_NPC_Corporal::hunt(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors, Update_Messages & update_messages)
+bool Hostile_NPC_Corporal::hunt(Update_Messages & update_messages)
 {
 	// if no hunt target is saved
 	if (hunt_target_id == -1)
 	{
-		acquire_new_hunt_target(world, actors);
+		acquire_new_hunt_target();
 	}
 
 	// if no hunt target is saved still
@@ -125,10 +111,10 @@ bool Hostile_NPC_Corporal::hunt(std::unique_ptr<World> & world, std::map<charact
 	}
 
 	// extract a const iterator to the target
-	const auto target_it = actors.find(hunt_target_id);
+	const auto target_it = actors->find(hunt_target_id);
 
 	// reset hunt target ID and return failure if the target is no longer online
-	if (target_it == actors.cend())
+	if (target_it == actors->cend())
 	{
 		hunt_target_id = -1;
 		return false;
@@ -140,7 +126,7 @@ bool Hostile_NPC_Corporal::hunt(std::unique_ptr<World> & world, std::map<charact
 	if (location == target->get_location())
 	{
 		// do combat logic
-		update_messages = attack_character(target, world);
+		update_messages = attack_character(target);
 		return true;
 	}
 	// else, I have a path AND the target is on the path in view or out of view
@@ -148,62 +134,25 @@ bool Hostile_NPC_Corporal::hunt(std::unique_ptr<World> & world, std::map<charact
 		((location.diagonal_distance_to(target->get_location()) <= C::VIEW_DISTANCE && coordinates_are_on_path(target->get_location()))
 			|| location.diagonal_distance_to(target->get_location()) > C::VIEW_DISTANCE))
 	{
-		if (make_path_movement(world, update_messages)) return true;
+		if (make_path_movement(update_messages)) return true;
 
 		// the path failed, generate a new path and try again
-		save_path_to(target->get_location(), world);
+		save_path_to(target->get_location());
 
-		if (make_path_movement(world, update_messages)) return true;
+		if (make_path_movement(update_messages)) return true;
 	}
 	// hunt target is visible
 	else if (location.diagonal_distance_to(target->get_location()) <= C::VIEW_DISTANCE)
 	{
 		// any planned path is no longer good, plan a new path
 
-		save_path_to(target->get_location(), world);
+		save_path_to(target->get_location());
 
-		if (make_path_movement(world, update_messages)) return true;
+		if (make_path_movement(update_messages)) return true;
 	}
 
 	// unable to hunt target
 	return false;
-
-
-
-	// below is copy/pasted hunt logic
-
-
-
-	//// if no hunt target could be found, return failure
-	//if (hunt_target_id == "") return Update_Messages("");
-
-	//// extract the target
-	//const std::shared_ptr<Character> target = actors.find(hunt_target_id)->second;
-
-	//// if the NPC is at the target's location
-	//if (x == target->x && y == target->y)
-	//{
-	//	// do combat logic
-	//}
-
-	//// if a path can be found to the target
-	//if (save_path_to(target->x, target->y, world))
-	//{
-	//	// update the stored path type
-	//	stored_path_type = Stored_Path_Type::to_hunt_target_last_known_location;
-
-	//	// move toward the target
-	//	Update_Messages result("");
-	//	if (make_path_movement(world, result))
-	//	{
-	//		// if the NPC was able to move to the target
-	//		return result;
-	//	}
-	//}
-	//else
-	//{
-	//	return wander(world, actors);
-	//}
 }
 
 void Hostile_NPC_Corporal::generate_new_wander_location()

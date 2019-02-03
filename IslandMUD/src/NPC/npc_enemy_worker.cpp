@@ -6,7 +6,7 @@ Aug 15 2015 */
 
 #include "npc_enemy_worker.h"
 
-Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Worker::update()
 {
 	if (!fortress_planned)
 	{
@@ -27,7 +27,7 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 
 	// attempt to move to the destination, return if successful
 	Update_Messages update_messages("");
-	if (make_path_movement(world, update_messages)) { return update_messages; }
+	if (make_path_movement(update_messages)) { return update_messages; }
 
 	// as an optimizations, only enter the next block if the AI doesn't have an axe
 	if (i_dont_have(C::AXE_ID))
@@ -44,7 +44,7 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 				if (world->room_at(location)->contains(objective_iterator->noun))
 				{
 					// remove the item from the room
-					update_messages = take(objective_iterator->noun, world);
+					update_messages = take(objective_iterator->noun);
 
 					if (objective_iterator->noun == objective_iterator->purpose)
 					{
@@ -61,7 +61,7 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 				}
 
 				// see if the item is reachable
-				if (pathfind_to_closest_item(objective_iterator->noun, world, update_messages))
+				if (pathfind_to_closest_item(objective_iterator->noun, update_messages))
 				{
 					std::stringstream ss;
 					ss << "Found a path to " << objective_iterator->noun << std::endl; // debugging
@@ -88,10 +88,10 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 			if (objective_iterator->verb == C::AI_OBJECTIVE_GOTO)
 			{
 				// if the item is craftable and the NPC has the materials needed
-				if (one_can_craft(objective_iterator->purpose) && crafting_requirements_met(objective_iterator->purpose, world))
+				if (one_can_craft(objective_iterator->purpose) && crafting_requirements_met(objective_iterator->purpose))
 				{
 					// try to craft the item, using obj->purpose if the (obj->verb == GOTO), else use obj->noun (most cases)
-					update_messages = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
+					update_messages = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun));
 
 					if (update_messages.to_room != nullptr) // find a better way to determine if crafting was successful
 					{
@@ -126,7 +126,7 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 				}
 				// the item is not craftable, or it is not craftable at this time. Continue to
 				// pathfind to the nearest instance of the item
-				else if (pathfind_to_closest_item(objective_iterator->noun, world, update_messages))
+				else if (pathfind_to_closest_item(objective_iterator->noun, update_messages))
 				{
 					return update_messages;
 				}
@@ -141,7 +141,7 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 			objective_iterator != objectives.end(); ++objective_iterator)
 		{
 			// try to craft the item, using obj->purpose if the (obj->verb == GOTO), else use obj->noun (most cases)
-			update_messages = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
+			update_messages = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun));
 
 			if (update_messages.to_room != nullptr) // find a better way to determine if crafting was successful
 			{
@@ -216,7 +216,7 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 					}
 
 					// chop the tree
-					return attack_item(C::TREE_ID, world); // finished
+					return attack_item(C::TREE_ID); // finished
 				}
 
 				// determine whether the adjacent room has an opposite wall with a door. Neither needs to be intact.
@@ -261,8 +261,8 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 
 				// construct the surface, with a door if the modifier is true				
 				update_messages = ((objective_it->modifier)
-					? construct_surface_with_door(objective_it->material, (C::surface)objective_it->direction, objective_it->material, world)
-					: construct_surface(objective_it->material, (C::surface)objective_it->direction, world));
+					? construct_surface_with_door(objective_it->material, (C::surface)objective_it->direction, objective_it->material)
+					: construct_surface(objective_it->material, (C::surface)objective_it->direction));
 
 				if (update_messages.to_user.find("You construct ") != std::string::npos) // find a better way to do this
 				{
@@ -272,15 +272,15 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 				}
 			}
 			// the NPC is not at the destination, attempt to pathfind to it
-			else if (save_path_to(objective_it->objective_location, world))
+			else if (save_path_to(objective_it->objective_location))
 			{
 				// make the first move then return
-				make_path_movement(world, update_messages);
+				make_path_movement(update_messages);
 				return update_messages;
 			}
 
 			// the NPC could not pathfind to the destination, try to move in the direction of the destination.
-			if (best_attempt_pathfind(objective_it->objective_location, world, update_messages))
+			if (best_attempt_pathfind(objective_it->objective_location, update_messages))
 			{
 				return update_messages;
 			}
@@ -388,13 +388,13 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 					}
 
 					// chop the tree
-					return attack_item(C::TREE_ID, world); // finished
+					return attack_item(C::TREE_ID); // finished
 				}
 
 				// construct the surface, with a door if the modifier is true				
 				update_messages = ((objective_it->modifier)
-					? construct_surface_with_door(objective_it->material, (C::surface)objective_it->direction, objective_it->material, world)
-					: construct_surface(objective_it->material, (C::surface)objective_it->direction, world));
+					? construct_surface_with_door(objective_it->material, (C::surface)objective_it->direction, objective_it->material)
+					: construct_surface(objective_it->material, (C::surface)objective_it->direction));
 
 				if (update_messages.to_user.find("You construct ") != std::string::npos) // find a better way to do this
 				{
@@ -411,10 +411,10 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 				}
 			}
 			// the NPC is not at the destination, attempt to pathfind to it
-			else if (save_path_to(objective_it->objective_location, world))
+			else if (save_path_to(objective_it->objective_location))
 			{
 				// make the first move then return
-				make_path_movement(world, update_messages);
+				make_path_movement(update_messages);
 				return update_messages;
 			}
 
@@ -430,10 +430,10 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 
 				if (save_path_to(Coordinate(
 					(((location.get_x() - objective_it->objective_location.get_x()) <= C::VIEW_DISTANCE) ? (objective_it->objective_location.get_x()) : (location.get_x() - C::VIEW_DISTANCE)),
-					(((location.get_y() - objective_it->objective_location.get_y()) <= C::VIEW_DISTANCE) ? (objective_it->objective_location.get_y()) : (location.get_y() - C::VIEW_DISTANCE))), world))
+					(((location.get_y() - objective_it->objective_location.get_y()) <= C::VIEW_DISTANCE) ? (objective_it->objective_location.get_y()) : (location.get_y() - C::VIEW_DISTANCE)))))
 				{
 					// attempt to move to the destination, return if successful
-					if (make_path_movement(world, update_messages)) { return update_messages; }
+					if (make_path_movement(update_messages)) { return update_messages; }
 				}
 			}
 
@@ -441,9 +441,9 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 			{
 				if (save_path_to(Coordinate(
 					(((location.get_x() - objective_it->objective_location.get_x()) <= C::VIEW_DISTANCE) ? (objective_it->objective_location.get_x()) : (location.get_x() - C::VIEW_DISTANCE)),
-					(((objective_it->objective_location.get_y() - location.get_y()) <= C::VIEW_DISTANCE) ? (objective_it->objective_location.get_y()) : (location.get_y() + C::VIEW_DISTANCE))), world))
+					(((objective_it->objective_location.get_y() - location.get_y()) <= C::VIEW_DISTANCE) ? (objective_it->objective_location.get_y()) : (location.get_y() + C::VIEW_DISTANCE)))))
 				{
-					if (make_path_movement(world, update_messages)) { return update_messages; }
+					if (make_path_movement(update_messages)) { return update_messages; }
 				}
 			}
 
@@ -451,9 +451,9 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 			{
 				if (save_path_to(Coordinate(
 					(((objective_it->objective_location.get_x() - location.get_x()) <= C::VIEW_DISTANCE) ? (objective_it->objective_location.get_x()) : (location.get_x() + C::VIEW_DISTANCE)),
-					(((location.get_y() - objective_it->objective_location.get_y()) <= C::VIEW_DISTANCE) ? (objective_it->objective_location.get_y()) : (location.get_y() - C::VIEW_DISTANCE))), world))
+					(((location.get_y() - objective_it->objective_location.get_y()) <= C::VIEW_DISTANCE) ? (objective_it->objective_location.get_y()) : (location.get_y() - C::VIEW_DISTANCE)))))
 				{
-					if (make_path_movement(world, update_messages)) { return update_messages; }
+					if (make_path_movement(update_messages)) { return update_messages; }
 				}
 			}
 
@@ -461,9 +461,9 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 			{
 				if (save_path_to(Coordinate(
 					(((objective_it->objective_location.get_x() - location.get_x()) <= C::VIEW_DISTANCE) ? (objective_it->objective_location.get_x()) : (location.get_x() + C::VIEW_DISTANCE)),
-					(((objective_it->objective_location.get_y() - location.get_y()) <= C::VIEW_DISTANCE) ? (objective_it->objective_location.get_y()) : (location.get_y() + C::VIEW_DISTANCE))), world))
+					(((objective_it->objective_location.get_y() - location.get_y()) <= C::VIEW_DISTANCE) ? (objective_it->objective_location.get_y()) : (location.get_y() + C::VIEW_DISTANCE)))))
 				{
-					if (make_path_movement(world, update_messages)) { return update_messages; }
+					if (make_path_movement(update_messages)) { return update_messages; }
 				}
 			}
 
@@ -476,10 +476,10 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 				for (int i = C::VIEW_DISTANCE; i > 0; --i)
 				{
 					// if a path can be found
-					if (save_path_to(Coordinate(location.get_x() - i, location.get_y()), world))
+					if (save_path_to(Coordinate(location.get_x() - i, location.get_y())))
 					{
 						// make the first move
-						make_path_movement(world, update_messages);
+						make_path_movement(update_messages);
 
 						if (location.get_x() == objective_it->objective_location.get_x()) // if the NPC is parallel with the destination, don't over shoot
 						{
@@ -495,9 +495,9 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 			{
 				for (int i = C::VIEW_DISTANCE; i > 0; --i)
 				{
-					if (save_path_to(Coordinate(location.get_x() + i, location.get_y()), world))
+					if (save_path_to(Coordinate(location.get_x() + i, location.get_y())))
 					{
-						make_path_movement(world, update_messages);
+						make_path_movement(update_messages);
 
 						if (location.get_x() == objective_it->objective_location.get_x())
 						{
@@ -513,9 +513,9 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 			{
 				for (int i = C::VIEW_DISTANCE; i > 0; --i)
 				{
-					if (save_path_to(Coordinate(location.get_x(), location.get_y() - i), world))
+					if (save_path_to(Coordinate(location.get_x(), location.get_y() - i)))
 					{
-						make_path_movement(world, update_messages);
+						make_path_movement(update_messages);
 
 						if (location.get_y() == objective_it->objective_location.get_y())
 						{
@@ -531,9 +531,9 @@ Update_Messages Hostile_NPC_Worker::update(std::unique_ptr<World> & world, std::
 			{
 				for (int i = C::VIEW_DISTANCE; i > 0; --i)
 				{
-					if (save_path_to(Coordinate(location.get_x(), location.get_y() + i), world))
+					if (save_path_to(Coordinate(location.get_x(), location.get_y() + i)))
 					{
-						make_path_movement(world, update_messages);
+						make_path_movement(update_messages);
 
 						if (location.get_y() == objective_it->objective_location.get_y())
 						{
@@ -865,7 +865,7 @@ void Hostile_NPC_Worker::Structure_Objectives::add(const Objective & obj)
 	structure_surface_objectives.push_back(obj);
 }
 
-void Hostile_NPC_Worker::Structure_Objectives::plan_doors(const std::unique_ptr<World> & world)
+void Hostile_NPC_Worker::Structure_Objectives::plan_doors(const std::observer_ptr<World> world)
 {
 	// this function only runs once
 	if (doors_planned) { return; }

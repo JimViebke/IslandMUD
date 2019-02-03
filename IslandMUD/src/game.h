@@ -17,49 +17,28 @@ Feb 14, 2015 */
 #include "parse.h"
 #include "world.h"
 #include "threadsafe/threadsafe_queue.h"
-#include "threadsafe/thread_pool.hpp"
 #include "connection_lookup.h"
 #include "message.h"
 
-class Game;
-
-class Execute_User_Command : public thread_pool::task
-{
-public:
-	Execute_User_Command(std::observer_ptr<Game> game,
-		const network::connection_ptr & connection,
-		const std::string & data) :
-		task(), game(game), connection(connection), data(data) {}
-
-	void run();
-
-private:
-	std::observer_ptr<Game> game;
-	network::connection_ptr connection;
-	std::string data;
-};
-
 class Game
 {
-private:
-	threadsafe::queue<Message> outbound_queue; // <socket_ID, message>
+	friend class Character;
 
-	// Manages NPC logic and all commands executed against the game world.
-	// Nonblocking tasks are run in parallel.
-	thread_pool::thread_pool thread_pool;
+private:
+	threadsafe::queue<Message> inbound_queue; // <socket_ID, message>
+	threadsafe::queue<Message> outbound_queue; // <socket_ID, message>
 
 	// Maps between a character ID and up to two connection pointers
 	connection_lookup players;
 	// Maps a character ID to a Character object (all players and NPCs)
-	std::map<Character::ID, std::shared_ptr<Character>> actors; // signed in PCs and NPCs
+	Actor_Map actors; // signed in PCs and NPCs
 	// Maps a player name back to a character ID
 	std::map<std::string, Character::ID> actor_ids;
 	// The state of the world
 	std::unique_ptr<World> world;
 
-	// Covers the above structures. Tasks in the thread pool shall gain exclusive or shared
-	// lock
-	std::shared_mutex game_state;
+	// Covers the above structures.
+	mutable std::mutex game_state;
 
 public:
 
@@ -71,6 +50,9 @@ public:
 	Update_Messages execute_command(const Character::ID & actor_id, const std::vector<std::string> & command);
 
 	void run();
+
+	// use an Update_Messages object to generate outbound messages to players
+	void generate_outbound_messages(const character_id & user_ID, const Update_Messages & message_updates);
 
 private:
 
@@ -93,13 +75,12 @@ private:
 	// remove data from the outbound queue and send it the to specified client
 	void outbound_thread();
 
+	void processing_thread();
+
 	// helper functions
 
 	// return the user_ID of a user after they log in or sign up
 	std::string login_or_signup(const network::connection_ptr & connection);
-
-	// use an Update_Messages object to generate outbound messages to players
-	void generate_outbound_messages(const character_id & user_ID, const Update_Messages & message_updates);
 
 	// when the server shutdown is triggered, this will save all game data and destroy the game object
 	void shutdown_listener();

@@ -12,6 +12,13 @@ Feb 14, 2015 */
 #include "recipes.h"
 #include "message.h"
 
+class Character;
+using Character_ID = size_t;
+
+class Game;
+class World;
+using Actor_Map = std::map<Character_ID, std::shared_ptr<Character>>;
+
 class Character : public Container
 {
 private:
@@ -37,6 +44,12 @@ public:
 
 protected:
 
+	Character(const std::string & name, const std::string & set_faction_ID, std::observer_ptr<Game> game);
+
+	std::observer_ptr<Game> game;
+	std::observer_ptr<World> world;
+	std::observer_ptr<Actor_Map> actors;
+
 	character_id id;
 
 	Coordinate location;
@@ -47,8 +60,6 @@ protected:
 
 	std::string leader_ID;
 	std::vector<std::string> follower_IDs;
-
-	Character(const std::string & name, const std::string & set_faction_ID, std::unique_ptr<World> & world);
 
 public:
 
@@ -73,41 +84,41 @@ public:
 	std::string get_inventory() const; // debugging
 
 	// actions
-	Update_Messages craft(const std::string & craft_item_id, std::unique_ptr<World> & world);
-	Update_Messages move(const std::string & direction, std::unique_ptr<World> & world);
-	Update_Messages move(const C::direction & direction, std::unique_ptr<World> & world);
-	Update_Messages take(const std::string & item_id, std::unique_ptr<World> & world, const std::string & count = "1");
-	Update_Messages drop(const std::string & drop_item_id, std::unique_ptr<World> & world, const std::string & count = "1");
+	Update_Messages craft(const std::string & craft_item_id);
+	Update_Messages move(const std::string & direction);
+	Update_Messages move(const C::direction & direction);
+	Update_Messages take(const std::string & item_id, const std::string & count = "1");
+	Update_Messages drop(const std::string & drop_item_id, const std::string & count = "1");
 	Update_Messages equip(const std::string & item_ID);
 	Update_Messages unequip();
-	Update_Messages add_to_chest(std::string insert_item_id, std::unique_ptr<World> & world, const std::string & count = "1");
-	Update_Messages take_from_chest(const std::string & take_item_id, std::unique_ptr<World> & world, const std::string & count = "1");
-	Update_Messages look_inside_chest(const std::unique_ptr<World> & world) const;
-	Update_Messages add_to_table(const std::string & add_item_ID, std::unique_ptr<World> & world, const std::string & count = "1");
-	Update_Messages take_from_table(const std::string take_item_ID, std::unique_ptr<World> & world, const std::string & count = "1");
-	Update_Messages look_at_table(const std::unique_ptr<World> & world) const;
-	Update_Messages construct_surface(const std::string & material_id, const C::surface & surface, std::unique_ptr<World> & world);
-	Update_Messages construct_surface_with_door(const std::string & material_id, const C::surface & surface, const std::string & door_material_id, std::unique_ptr<World> & world);
-	Update_Messages attack_surface(const std::string & surface_ID, std::unique_ptr<World> & world);
-	Update_Messages attack_door(const std::string & surface_ID, std::unique_ptr<World> & world);
-	Update_Messages attack_item(const std::string & target_ID, std::unique_ptr<World> & world);
-	Update_Messages add_to_bloomery(const std::string & item_ID, const unsigned & count, std::unique_ptr<World> & world);
-	Update_Messages attack_character(std::shared_ptr<Character> & target, std::unique_ptr<World> & world);
-	Update_Messages die(std::unique_ptr<World> & world);
+	Update_Messages add_to_chest(std::string insert_item_id, const std::string & count = "1");
+	Update_Messages take_from_chest(const std::string & take_item_id, const std::string & count = "1");
+	Update_Messages look_inside_chest() const;
+	Update_Messages add_to_table(const std::string & add_item_ID, const std::string & count = "1");
+	Update_Messages take_from_table(const std::string take_item_ID, const std::string & count = "1");
+	Update_Messages look_at_table() const;
+	Update_Messages construct_surface(const std::string & material_id, const C::surface & surface);
+	Update_Messages construct_surface_with_door(const std::string & material_id, const C::surface & surface, const std::string & door_material_id);
+	Update_Messages attack_surface(const std::string & surface_ID);
+	Update_Messages attack_door(const std::string & surface_ID);
+	Update_Messages attack_item(const std::string & target_ID);
+	Update_Messages add_to_bloomery(const std::string & item_ID, const unsigned & count);
+	Update_Messages attack_character(std::shared_ptr<Character> & target);
+	Update_Messages die();
 
 	// movement info
-	C::move_attempt validate_movement(const Coordinate & current, const C::direction & direction, const Coordinate & destination, const std::unique_ptr<World> & world) const;
+	C::move_attempt validate_movement(const Coordinate & current, const C::direction & direction, const Coordinate & destination) const;
 
 	static unsigned move_items(Container & source, Container & destination, const std::string & item_ID, const std::string & count);
 
 	// combat helper functions
 	unsigned get_defense() const;
-	
+
 	Coordinate get_location() const { return location; }
 
 private:
 
-	void login(std::unique_ptr<World> & world); // called from constructor
+	void login(); // called from constructor
 };
 
 #endif

@@ -3,9 +3,9 @@ Jun 3 2015 */
 
 #include "npc_enemy.h"
 
-Hostile_NPC::Hostile_NPC(const std::string & name, std::unique_ptr<World> & world) : Non_Player_Character(name, C::NPC_HOSTILE_FACTION_ID, world) {}
+Hostile_NPC::Hostile_NPC(const std::string & name, std::observer_ptr<Game> game) : Non_Player_Character(name, C::NPC_HOSTILE_FACTION_ID, game) {}
 
-character_id Hostile_NPC::get_new_hostile_id(const std::unique_ptr<World> & world, const std::map<character_id, std::shared_ptr<Character>> & actors) const
+character_id Hostile_NPC::get_new_hostile_id() const
 {
 	std::vector<character_id> hostile_ids;
 
@@ -26,7 +26,7 @@ character_id Hostile_NPC::get_new_hostile_id(const std::unique_ptr<World> & worl
 			for (const auto & actor_ID : world->room_at(current)->get_actor_ids())
 			{
 				// if the actor is a player character
-				if (U::is<PC>(actors.find(actor_ID)->second))
+				if (U::is<PC>(actors->find(actor_ID)->second))
 				{
 					// save the player character's ID
 					hostile_ids.push_back(actor_ID);

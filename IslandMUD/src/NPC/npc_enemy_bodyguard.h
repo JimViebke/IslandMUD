@@ -10,10 +10,10 @@ Aug 15 2015 */
 class Hostile_NPC_Bodyguard : public Hostile_NPC
 {
 public:
-	Hostile_NPC_Bodyguard(const std::string & name, const character_id & set_protect_target_id, std::unique_ptr<World> & world) : Hostile_NPC(name, world),
+	Hostile_NPC_Bodyguard(const std::string & name, const character_id & set_protect_target_id, std::observer_ptr<Game> game) : Hostile_NPC(name, game),
 		protect_target_id(set_protect_target_id), hunt_target_last_known_location(-1, -1), guard_radius(C::VIEW_DISTANCE), hunt_radius(15) {}
 
-	Update_Messages update(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors);
+	Update_Messages update();
 
 	void set_protect_target(const character_id & set_protect_target_id);
 
@@ -29,7 +29,7 @@ private:
 	character_id hunt_target_id = -1, protect_target_id = -1;
 
 	// returns a boolean indicating if a new target was found and set
-	bool attempt_set_new_hunt_target(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors);
+	bool attempt_set_new_hunt_target();
 	// returns a boolean indicating if the hunt target's last known location was updated
 	bool attempt_update_hunt_target_last_known_location(const std::shared_ptr<Character> & hunt_target);
 
@@ -37,14 +37,11 @@ private:
 
 	void check_maximum_hunt_radius(const std::shared_ptr<Character> & protect_target);
 
-	Update_Messages hunt_target(std::shared_ptr<Character> & hunt_target, const std::shared_ptr<Character> & protect_target,
-		std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors);
+	Update_Messages hunt_target(std::shared_ptr<Character> & hunt_target, const std::shared_ptr<Character> & protect_target);
 
-	bool move_toward_protect_target(const std::shared_ptr<Character> & protect_target,
-		std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors,
-		Update_Messages & update_messages);
+	bool move_toward_protect_target(const std::shared_ptr<Character> & protect_target, Update_Messages & update_messages);
 
-	Update_Messages approach_new_hunt_target(std::unique_ptr<World> & world);
+	Update_Messages approach_new_hunt_target();
 };
 
 #endif

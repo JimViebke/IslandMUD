@@ -4,7 +4,7 @@ Aug 15 2015 */
 
 #include "npc_enemy_fighter.h"
 
-Update_Messages Hostile_NPC_Fighter::update(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors)
+Update_Messages Hostile_NPC_Fighter::update()
 {
 	if (i_dont_have(C::AXE_ID) && !im_planning_to_acquire(C::AXE_ID))
 	{
@@ -26,7 +26,7 @@ Update_Messages Hostile_NPC_Fighter::update(std::unique_ptr<World> & world, std:
 			// if the item is here, take it, remove the current objective, and return
 			if (world->room_at(location)->contains(objective_iterator->noun))
 			{
-				Update_Messages update_messages = take(objective_iterator->noun, world);
+				Update_Messages update_messages = take(objective_iterator->noun);
 
 				if (objective_iterator->noun == objective_iterator->purpose)
 				{
@@ -44,7 +44,7 @@ Update_Messages Hostile_NPC_Fighter::update(std::unique_ptr<World> & world, std:
 
 			// see if the item is reachable
 			Update_Messages update_messages("");
-			if (pathfind_to_closest_item(objective_iterator->noun, world, update_messages))
+			if (pathfind_to_closest_item(objective_iterator->noun, update_messages))
 			{
 				return update_messages;
 			}
@@ -67,10 +67,10 @@ Update_Messages Hostile_NPC_Fighter::update(std::unique_ptr<World> & world, std:
 		// if I am planning on moving to an instance 
 		if (objective_iterator->verb == C::AI_OBJECTIVE_GOTO)
 		{
-			if (one_can_craft(objective_iterator->purpose) && crafting_requirements_met(objective_iterator->purpose, world))
+			if (one_can_craft(objective_iterator->purpose) && crafting_requirements_met(objective_iterator->purpose))
 			{
 				Update_Messages update_messages("");
-				if (pathfind_to_closest_item(objective_iterator->noun, world, update_messages))
+				if (pathfind_to_closest_item(objective_iterator->noun, update_messages))
 				{
 					// delete extra objectives here
 					// or maybe not; perhaps the objective should be cleared when the item is taken/crafted
@@ -91,7 +91,7 @@ Update_Messages Hostile_NPC_Fighter::update(std::unique_ptr<World> & world, std:
 		objective_iterator != objectives.end(); ++objective_iterator)
 	{
 		// try to craft the item, using obj->purpose if the (obj->verb == GOTO), else use obj->noun (most cases)
-		const Update_Messages update_messages = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun), world);
+		const Update_Messages update_messages = craft(((objective_iterator->verb == C::AI_OBJECTIVE_GOTO) ? objective_iterator->purpose : objective_iterator->noun));
 		
 		if (update_messages.to_room != nullptr) // find a better way to determine if crafting was successful
 		{
@@ -146,11 +146,11 @@ Update_Messages Hostile_NPC_Fighter::update(std::unique_ptr<World> & world, std:
 				for (const auto& actor_ID : world->room_at(current)->get_actor_ids())
 				{
 					// if the character is a player character
-					if (U::is<PC>(actors.find(actor_ID)->second))
+					if (U::is<PC>(actors->find(actor_ID)->second))
 					{
 						// [target acquired]
 						Update_Messages update_messages("");
-						pathfind(current, world, update_messages);
+						pathfind(current, update_messages);
 						return update_messages;
 					}
 				}

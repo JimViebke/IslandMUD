@@ -2,9 +2,10 @@
 Jun 3 2015 */
 
 #include "non_player_character.h"
+#include "../game.h"
 
 // this can only be instantiated by its children, hostile and neutral. No NPC of this type "NPC" exists or should be instantiated
-NPC::Non_Player_Character(const std::string & name, const std::string & faction_ID, std::unique_ptr<World> & world) : Character(name, faction_ID, world) {}
+NPC::Non_Player_Character(const std::string & name, const std::string & faction_ID, std::observer_ptr<Game> game) : Character(name, faction_ID, game) {}
 
 // objective debugging
 std::string NPC::get_objectives() const
@@ -80,7 +81,7 @@ void NPC::erase_goto_objective_matching(const std::string & purpose)
 
 	// for each objective
 	for (std::deque<Objective>::iterator objective_iterator = objectives.begin();
-	objective_iterator != objectives.end(); ++objective_iterator)
+		objective_iterator != objectives.end(); ++objective_iterator)
 	{
 		// if the objective is a go-to objective matching the passed purpose
 		if (objective_iterator->verb == C::AI_OBJECTIVE_GOTO && objective_iterator->purpose == purpose)
@@ -97,7 +98,7 @@ void NPC::erase_acquire_objective_matching(const std::string & noun)
 
 	// for each objective
 	for (std::deque<Objective>::iterator objective_iterator = objectives.begin();
-	objective_iterator != objectives.end(); ++objective_iterator)
+		objective_iterator != objectives.end(); ++objective_iterator)
 	{
 		// if the objective is an acquire objective matching the passed noun
 		if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE && objective_iterator->noun == noun)
@@ -137,7 +138,7 @@ bool NPC::im_planning_to_acquire(const std::string & item_ID) const
 	}
 	return false;
 }
-bool NPC::crafting_requirements_met(const std::string & item_ID, const std::unique_ptr<World> & world) const
+bool NPC::crafting_requirements_met(const std::string & item_ID) const
 {
 	// WARNING: this assumes item_ID is craftable
 
@@ -149,7 +150,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const std::uniq
 
 	// check both types of inventory requirements
 	for (std::map<std::string, int>::const_iterator inventory_need = recipe.inventory_need.cbegin();
-	inventory_need != recipe.inventory_need.cend(); ++inventory_need)
+		inventory_need != recipe.inventory_need.cend(); ++inventory_need)
 	{
 		if (!this->contains(inventory_need->first, inventory_need->second))
 		{
@@ -157,7 +158,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const std::uniq
 		}
 	}
 	for (std::map<std::string, int>::const_iterator inventory_remove = recipe.inventory_remove.cbegin();
-	inventory_remove != recipe.inventory_remove.cend(); ++inventory_remove)
+		inventory_remove != recipe.inventory_remove.cend(); ++inventory_remove)
 	{
 		if (!this->contains(inventory_remove->first, inventory_remove->second))
 		{
@@ -167,7 +168,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const std::uniq
 
 	// check both types of local requirements
 	for (std::map<std::string, int>::const_iterator local_need = recipe.local_need.cbegin();
-	local_need != recipe.local_need.cend(); ++local_need)
+		local_need != recipe.local_need.cend(); ++local_need)
 	{
 		if (!world->room_at(location)->contains(local_need->first, local_need->second))
 		{
@@ -175,7 +176,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const std::uniq
 		}
 	}
 	for (std::map<std::string, int>::const_iterator local_remove = recipe.local_remove.cbegin();
-	local_remove != recipe.local_remove.cend(); ++local_remove)
+		local_remove != recipe.local_remove.cend(); ++local_remove)
 	{
 		if (!world->room_at(location)->contains(local_remove->first, local_remove->second))
 		{
@@ -185,7 +186,7 @@ bool NPC::crafting_requirements_met(const std::string & item_ID, const std::uniq
 
 	// for each objective
 	for (std::deque<Objective>::const_iterator objective_iterator = objectives.cbegin();
-	objective_iterator != objectives.cend(); ++objective_iterator)
+		objective_iterator != objectives.cend(); ++objective_iterator)
 	{
 		// if I am still planning on acquiring an item for the purpose of crafting item_ID
 		if (objective_iterator->verb == C::AI_OBJECTIVE_ACQUIRE && objective_iterator->purpose == item_ID)
@@ -247,7 +248,7 @@ void NPC::plan_to_craft(const std::string & item_id)
 }
 
 // returns true if successful
-bool NPC::pathfind(const Coordinate & destination, std::unique_ptr<World> & world, Update_Messages & update_messages)
+bool NPC::pathfind(const Coordinate & destination, Update_Messages & update_messages)
 {
 	// leave this for debugging
 	// cout << "\nSearching for path from " << x << "," << y << " to " << x_dest << "," << y_dest << ".\n";
@@ -296,7 +297,7 @@ bool NPC::pathfind(const Coordinate & destination, std::unique_ptr<World> & worl
 			// or it is not within view distance,
 			if (!world->room_at(destination)->is_observed_by(id)) continue;
 			// or we can not travel to it from the current room
-			if (validate_movement(current_room.location, direction, destination, world) != C::move_attempt::traversable) continue;
+			if (validate_movement(current_room.location, direction, destination) != C::move_attempt::traversable) continue;
 
 			// create a node to select the next adjacent room
 			Node adjacent_room(destination, direction);
@@ -394,7 +395,7 @@ bool NPC::pathfind(const Coordinate & destination, std::unique_ptr<World> & worl
 		if (parent_room.location == location)
 		{
 			// move to current_room
-			update_messages = move(current_room.direction_from_parent, world);
+			update_messages = move(current_room.direction_from_parent);
 
 			/* leave this here for debugging
 			cout << endl;
@@ -416,7 +417,7 @@ bool NPC::pathfind(const Coordinate & destination, std::unique_ptr<World> & worl
 
 	} while (true);
 }
-bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<World> & world, Update_Messages & update_messages)
+bool NPC::best_attempt_pathfind(const Coordinate & destination, Update_Messages & update_messages)
 {
 	// the NPC could not pathfind to the destination, try to move in the direction of the destination.
 
@@ -433,10 +434,10 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 
 		if (save_path_to(Coordinate(
 			(((x - x_dest) <= C::VIEW_DISTANCE) ? (x_dest) : (x - C::VIEW_DISTANCE)),
-			(((y - y_dest) <= C::VIEW_DISTANCE) ? (y_dest) : (y - C::VIEW_DISTANCE))), world))
+			(((y - y_dest) <= C::VIEW_DISTANCE) ? (y_dest) : (y - C::VIEW_DISTANCE)))))
 		{
 			// attempt to move to the destination, return if successful
-			if (make_path_movement(world, update_messages)) return true;
+			if (make_path_movement(update_messages)) return true;
 		}
 	}
 
@@ -444,9 +445,9 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 	{
 		if (save_path_to(Coordinate(
 			(((x - x_dest) <= C::VIEW_DISTANCE) ? (x_dest) : (x - C::VIEW_DISTANCE)),
-			(((y_dest - y) <= C::VIEW_DISTANCE) ? (y_dest) : (y + C::VIEW_DISTANCE))), world))
+			(((y_dest - y) <= C::VIEW_DISTANCE) ? (y_dest) : (y + C::VIEW_DISTANCE)))))
 		{
-			if (make_path_movement(world, update_messages)) return true;
+			if (make_path_movement(update_messages)) return true;
 		}
 	}
 
@@ -454,9 +455,9 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 	{
 		if (save_path_to(Coordinate(
 			(((x_dest - x) <= C::VIEW_DISTANCE) ? (x_dest) : (x + C::VIEW_DISTANCE)),
-			(((y - y_dest) <= C::VIEW_DISTANCE) ? (y_dest) : (y - C::VIEW_DISTANCE))), world))
+			(((y - y_dest) <= C::VIEW_DISTANCE) ? (y_dest) : (y - C::VIEW_DISTANCE)))))
 		{
-			if (make_path_movement(world, update_messages)) return true;
+			if (make_path_movement(update_messages)) return true;
 		}
 	}
 
@@ -464,9 +465,9 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 	{
 		if (save_path_to(Coordinate(
 			(((x_dest - x) <= C::VIEW_DISTANCE) ? (x_dest) : (x + C::VIEW_DISTANCE)),
-			(((y_dest - y) <= C::VIEW_DISTANCE) ? (y_dest) : (y + C::VIEW_DISTANCE))), world))
+			(((y_dest - y) <= C::VIEW_DISTANCE) ? (y_dest) : (y + C::VIEW_DISTANCE)))))
 		{
-			if (make_path_movement(world, update_messages)) return true;
+			if (make_path_movement(update_messages)) return true;
 		}
 	}
 
@@ -479,10 +480,10 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 		for (int i = C::VIEW_DISTANCE; i > 0; --i)
 		{
 			// if a path can be found
-			if (save_path_to(Coordinate(x - i, y), world))
+			if (save_path_to(Coordinate(x - i, y)))
 			{
 				// make the first move
-				make_path_movement(world, update_messages);
+				make_path_movement(update_messages);
 				return true;
 			}
 		}
@@ -492,9 +493,9 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 	{
 		for (int i = C::VIEW_DISTANCE; i > 0; --i)
 		{
-			if (save_path_to(Coordinate(x + i, y), world))
+			if (save_path_to(Coordinate(x + i, y)))
 			{
-				make_path_movement(world, update_messages);
+				make_path_movement(update_messages);
 				return true;
 			}
 		}
@@ -504,9 +505,9 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 	{
 		for (int i = C::VIEW_DISTANCE; i > 0; --i)
 		{
-			if (save_path_to(Coordinate(x, y - i), world))
+			if (save_path_to(Coordinate(x, y - i)))
 			{
-				make_path_movement(world, update_messages);
+				make_path_movement(update_messages);
 				return true;
 			}
 		}
@@ -516,9 +517,9 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 	{
 		for (int i = C::VIEW_DISTANCE; i > 0; --i)
 		{
-			if (save_path_to(Coordinate(x, y + i), world))
+			if (save_path_to(Coordinate(x, y + i)))
 			{
-				make_path_movement(world, update_messages);
+				make_path_movement(update_messages);
 				return true;
 			}
 		}
@@ -526,7 +527,7 @@ bool NPC::best_attempt_pathfind(const Coordinate & destination, std::unique_ptr<
 
 	return false;
 }
-bool NPC::pathfind_to_closest_item(const std::string & item_id, std::unique_ptr<World> & world, Update_Messages & update_messages)
+bool NPC::pathfind_to_closest_item(const std::string & item_id, Update_Messages & update_messages)
 {
 	// leave this for debugging
 	// cout << "\nSearching for path from " << x << "," << y << " to any " << item_id << ".\n";
@@ -575,7 +576,7 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, std::unique_ptr<
 			// or it is not within view distance,
 			if (!world->room_at(destination)->is_observed_by(id)) continue;
 			// or we can not travel to it from the current room
-			if (validate_movement(current_room.location, direction, destination, world) != C::move_attempt::traversable) continue;
+			if (validate_movement(current_room.location, direction, destination) != C::move_attempt::traversable) continue;
 
 			// create a node to select the next adjacent room
 			Node adjacent_room(destination, direction);
@@ -681,7 +682,7 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, std::unique_ptr<
 		if (parent_room.location == location)
 		{
 			// move to current_room
-			update_messages = move(current_room.direction_from_parent, world);
+			update_messages = move(current_room.direction_from_parent);
 
 			/* leave this here for debugging
 			cout << endl;
@@ -703,7 +704,7 @@ bool NPC::pathfind_to_closest_item(const std::string & item_id, std::unique_ptr<
 
 	} while (true);
 }
-bool NPC::save_path_to(const Coordinate & destination, std::unique_ptr<World> & world)
+bool NPC::save_path_to(const Coordinate & destination)
 {
 	// Returns a boolean indicating if a path was found. If a path was found,
 	// the path is now saved.
@@ -766,7 +767,7 @@ bool NPC::save_path_to(const Coordinate & destination, std::unique_ptr<World> & 
 			// or it is not within view distance,
 			if (location.diagonal_distance_to(next_room) > C::VIEW_DISTANCE) continue;
 			// or we can not travel to it from the current room
-			if (validate_movement(current_room.location, direction, next_room, world) != C::move_attempt::traversable) continue;
+			if (validate_movement(current_room.location, direction, next_room) != C::move_attempt::traversable) continue;
 
 			// create a node to select the next adjacent room
 			Node adjacent_room(next_room, direction);
@@ -888,7 +889,7 @@ bool NPC::save_path_to(const Coordinate & destination, std::unique_ptr<World> & 
 
 	} while (true);
 }
-bool NPC::make_path_movement(std::unique_ptr<World> & world, Update_Messages & update_messages)
+bool NPC::make_path_movement(Update_Messages & update_messages)
 {
 	// if the NPC is currently pathfinding to a destination
 	if (!path.empty())
@@ -897,7 +898,7 @@ bool NPC::make_path_movement(std::unique_ptr<World> & world, Update_Messages & u
 		const Coordinate copy = location;
 
 		// attempt to move
-		update_messages = this->move(location.get_movement_direction_to(path.front()), world);
+		update_messages = this->move(location.get_movement_direction_to(path.front()));
 
 		// check to see if the NPC's coordinates have changed
 		if (copy != location)

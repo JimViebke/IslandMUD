@@ -10,9 +10,9 @@ Aug 15 2015 */
 class Hostile_NPC_Worker : public Hostile_NPC
 {
 public:
-	Hostile_NPC_Worker(const std::string & name, std::unique_ptr<World> & world) : Hostile_NPC(name, world) {}
+	Hostile_NPC_Worker(const std::string & name, std::observer_ptr<Game> game) : Hostile_NPC(name, game) {}
 
-	Update_Messages update(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors);
+	Update_Messages update();
 
 	void plan_fortress();
 
@@ -29,7 +29,7 @@ private:
 	public:
 		std::vector<Objective> structure_surface_objectives;
 		void add(const Objective & obj);
-		void plan_doors(const std::unique_ptr<World> & world);
+		void plan_doors(const std::observer_ptr<World> world);
 		bool already_planned_doors() const;
 	};
 

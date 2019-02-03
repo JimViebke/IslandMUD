@@ -10,11 +10,11 @@ Jun 3 2015 */
 class Hostile_NPC : public Non_Player_Character
 {
 protected:
-	Hostile_NPC(const std::string & name, std::unique_ptr<World> & world);
+	Hostile_NPC(const std::string & name, std::observer_ptr<Game> game);
 
-	virtual Update_Messages update(std::unique_ptr<World> & world, std::map<character_id, std::shared_ptr<Character>> & actors) = 0;
+	virtual Update_Messages update() = 0;
 
-	character_id get_new_hostile_id(const std::unique_ptr<World> & world, const std::map<character_id, std::shared_ptr<Character>> & actors) const;
+	character_id get_new_hostile_id() const;
 
 	class Structure
 	{
