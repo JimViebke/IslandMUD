@@ -365,7 +365,7 @@ Update_Messages Character::move(const C::direction & direction)
 			Coordinate unload_location(rx, ry);
 
 			// Skip this room if it is not loaded. This occurs when a player moves diagonally, and both room unload passes overlap at the corner of the map.
-			if (world->room_at(unload_location) == nullptr) continue;
+			if (!unload_location.is_valid() || world->room_at(unload_location) == nullptr) continue;
 
 			U::append_b_to_a(additional_users_to_notify, world->room_at(unload_location)->get_actor_ids()); // save any users in the room
 
@@ -380,7 +380,7 @@ Update_Messages Character::move(const C::direction & direction)
 		for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 		{
 			Coordinate unload_location(rx, ry);
-			if (world->room_at(unload_location) == nullptr) continue;
+			if (!unload_location.is_valid() || world->room_at(unload_location) == nullptr) continue;
 			U::append_b_to_a(additional_users_to_notify, world->room_at(unload_location)->get_actor_ids());
 			world->remove_viewer_and_attempt_unload(unload_location, id);
 		}
@@ -397,7 +397,7 @@ Update_Messages Character::move(const C::direction & direction)
 			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
 			{
 				Coordinate unload_location(rx, ry);
-				if (world->room_at(unload_location) == nullptr) continue;
+				if (!unload_location.is_valid() || world->room_at(unload_location) == nullptr) continue;
 				U::append_b_to_a(additional_users_to_notify, world->room_at(unload_location)->get_actor_ids());
 				world->remove_viewer_and_attempt_unload(unload_location, id);
 			}
@@ -409,7 +409,7 @@ Update_Messages Character::move(const C::direction & direction)
 			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 			{
 				Coordinate unload_location(rx, ry);
-				if (world->room_at(unload_location) == nullptr) continue;
+				if (!unload_location.is_valid() || world->room_at(unload_location) == nullptr) continue;
 				U::append_b_to_a(additional_users_to_notify, world->room_at(unload_location)->get_actor_ids());
 				world->remove_viewer_and_attempt_unload(unload_location, id);
 			}
@@ -421,7 +421,7 @@ Update_Messages Character::move(const C::direction & direction)
 			for (int ry = y - C::VIEW_DISTANCE; ry <= y + C::VIEW_DISTANCE; ++ry)
 			{
 				Coordinate unload_location(rx, ry);
-				if (world->room_at(unload_location) == nullptr) continue;
+				if (!unload_location.is_valid() || world->room_at(unload_location) == nullptr) continue;
 				U::append_b_to_a(additional_users_to_notify, world->room_at(unload_location)->get_actor_ids());
 				world->remove_viewer_and_attempt_unload(unload_location, id);
 			}
@@ -433,7 +433,7 @@ Update_Messages Character::move(const C::direction & direction)
 			for (int rx = x - C::VIEW_DISTANCE; rx <= x + C::VIEW_DISTANCE; ++rx)
 			{
 				Coordinate unload_location(rx, ry);
-				if (world->room_at(unload_location) == nullptr) continue;
+				if (!unload_location.is_valid() || world->room_at(unload_location) == nullptr) continue;
 				U::append_b_to_a(additional_users_to_notify, world->room_at(unload_location)->get_actor_ids());
 				world->remove_viewer_and_attempt_unload(unload_location, id);
 			}
