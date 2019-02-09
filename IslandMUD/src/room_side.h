@@ -13,7 +13,7 @@ Floors, walls, and ceilings. */
 class Room_Side
 {
 private:
-	int integrity = C::MAX_SURFACE_HEALTH;
+	int health = C::MAX_SURFACE_HEALTH;
 	std::string material_id;
 	std::shared_ptr<Door> door = nullptr;
 
@@ -23,7 +23,7 @@ public:
 
 	// health retrieval and modification
 	int get_health() const;
-	void set_health(const int & health);
+	void set_health(const int & set_health);
 	void change_health(const int & change);
 
 	// the surface's material

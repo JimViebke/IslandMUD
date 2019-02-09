@@ -6,35 +6,31 @@ Jun 23 2015 */
 // health retrieval and modification
 int Room_Side::get_health() const
 {
-	return integrity;
+	return health;
 }
-void Room_Side::set_health(const int & health)
+void Room_Side::set_health(const int & set_health)
 {
-	// if the passed value is within acceptable bounds
-	if (health <= C::MAX_SURFACE_HEALTH &&
-		health >= C::MIN_SURFACE_HEALTH)
-	{
-		// set the surface's integry to what was passed
-		integrity = health;
-	}
-	// else, integrity remains unchanged
+	if (set_health > C::MAX_SURFACE_HEALTH ||
+		set_health < C::MIN_SURFACE_HEALTH) return;
+
+	health = set_health;
 }
 void Room_Side::change_health(const int & change)
 {
 	// modify this surface's integrity
-	integrity += change;
+	health += change;
 
 	// if the current integrity is below bounds
-	if (integrity < C::MIN_SURFACE_HEALTH)
+	if (health < C::MIN_SURFACE_HEALTH)
 	{
 		// set it to min
-		integrity = C::MIN_SURFACE_HEALTH;
+		health = C::MIN_SURFACE_HEALTH;
 	}
 	// if the current integrity is above bounds
-	else if (integrity > C::MAX_SURFACE_HEALTH)
+	else if (health > C::MAX_SURFACE_HEALTH)
 	{
 		// set it to max
-		integrity = C::MAX_SURFACE_HEALTH;
+		health = C::MAX_SURFACE_HEALTH;
 	}
 }
 
@@ -47,15 +43,15 @@ std::string Room_Side::get_material_id() const
 // surface information
 bool Room_Side::is_intact() const
 {
-	return integrity > 0;
+	return health > 0;
 }
 bool Room_Side::is_rubble() const
 {
-	return (integrity == 0);
+	return health == 0;
 }
 bool Room_Side::has_door() const
 {
-	return (door != nullptr);
+	return door != nullptr;
 }
 bool Room_Side::has_intact_door() const
 {
@@ -67,7 +63,7 @@ C::move_attempt Room_Side::is_traversable(const std::string & player_faction_ID)
 	if (this->is_rubble())
 	{
 		return C::move_attempt::traversable;
-	}	
+	}
 	// if the surface has a door
 	else if (this->has_door())
 	{

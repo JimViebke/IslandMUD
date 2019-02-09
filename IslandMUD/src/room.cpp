@@ -33,7 +33,7 @@ bool Room::has_surface(const C::surface surface) const
 {
 	return room_sides[(size_t)surface].has_value();
 }
-C::move_attempt Room::can_move_in_direction(const C::direction direction, const std::string & faction_ID)
+C::move_attempt Room::can_move_in_direction(const C::direction direction, const std::string & faction_ID) const
 {
 	// if a surface is present, it must be traversable
 	if (has_surface((C::surface)direction))
