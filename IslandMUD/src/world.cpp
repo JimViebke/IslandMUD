@@ -58,24 +58,17 @@ std::unique_ptr<Room> & World::reference_room_at(const Coordinate & coordinate)
 }
 
 // debugging
-unsigned World::count_loaded_rooms() const
+size_t World::count_loaded_rooms() const
 {
 	/* This function is only used for debugging/development, to verify rooms are loading in and out as required.
 
 	If only one player is playing (IE, the dev) there should be (2d+1)^2 rooms loaded, where d == view distance.
 	For a view distance of 5, (5+1+5)*(5+1+5) (121) rooms should be in memory. */
 
-	unsigned loaded_rooms = 0;
-	for (int x = 0; x < C::WORLD_X_DIMENSION; ++x)
-	{
-		for (int y = 0; y < C::WORLD_Y_DIMENSION; ++y)
-		{
-			if (room_at(Coordinate(x, y)) != nullptr)
-			{
-				++loaded_rooms;
-			}
-		}
-	}
+	size_t loaded_rooms = 0;
+
+	for (const auto& room : world) if (room) ++loaded_rooms;
+
 	return loaded_rooms;
 }
 
@@ -592,7 +585,7 @@ void World::load_room_to_world(const Coordinate & coordinate)
 		4. Lock the writing_to_disk_mutex
 		5. Check the room being written to disk
 		6. Release the writing_to_disk_mutex
-		
+
 		Could a room move through the queue to the unload slot, in the time between 3 and 4?
 		It's not possible for this thread to move a room right now, but we're going to hold
 		on to the unload_queue_mutex to make sure that another thread can not trigger this

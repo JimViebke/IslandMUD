@@ -54,7 +54,7 @@ public:
 	std::unique_ptr<Room> & reference_room_at(const Coordinate & coordinate);
 
 	// debugging
-	unsigned count_loaded_rooms() const;
+	size_t count_loaded_rooms() const;
 
 	// load rooms around a player spawning in
 	void load_view_radius_around(const Coordinate & coordinate, const character_id & character_ID);
