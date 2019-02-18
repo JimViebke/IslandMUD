@@ -97,8 +97,6 @@ unsigned Container::size() const
 }
 bool Container::is_empty() const
 {
-	// Convention says this should be called "empty". I say "empty" is ambiguous as being either a noun or a verb.
-
 	return contents.empty();
 }
 
@@ -118,6 +116,8 @@ bool Container::insert(const std::shared_ptr<Item> & item)
 		contents.insert(make_pair(item->get_name(), item));
 	}
 
+	dirty = true;
+
 	return true;
 }
 std::shared_ptr<Item> Container::erase(const std::string & item_id)
@@ -127,6 +127,8 @@ std::shared_ptr<Item> Container::erase(const std::string & item_id)
 
 	// if the item does not exist to take, return a null pointer
 	if (item_it == contents.cend()) return nullptr;
+
+	dirty = true;
 
 	// if the item is a stackable type
 	if (auto stackable = U::convert_to<Stackable>(item_it->second))
@@ -164,6 +166,8 @@ void Container::erase(const std::string & item_id, const unsigned & count)
 	// if the item is not present in the container, remove the item
 	if (item_it == contents.cend()) return;
 
+	dirty = true;
+
 	// if the item is stackable
 	if (std::shared_ptr<Stackable> stackable = U::convert_to<Stackable>(item_it->second))
 	{
@@ -187,16 +191,20 @@ void Container::erase(const std::string & item_id, const unsigned & count)
 
 			// if the iterator is valid, erase the item
 			if (erase_item_it != contents.cend())
+			{
 				contents.erase(erase_item_it);
+			}
 			else
+			{
 				break; // the first time an iterator is not valid, break out of the loop
+			}
 		}
 	}
 }
 
 // protected
 
-Container::Container() {}
+Container::Container() : dirty(false) {}
 
 void Container::set_contents(const std::multimap<std::string, std::shared_ptr<Item>> & set_contents)
 {

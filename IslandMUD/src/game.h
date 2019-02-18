@@ -85,6 +85,8 @@ private:
 	// when the server shutdown is triggered, this will save all game data and destroy the game object
 	void shutdown_listener();
 
+	void audit_world_data();
+
 	friend class Execute_User_Command;
 };
 

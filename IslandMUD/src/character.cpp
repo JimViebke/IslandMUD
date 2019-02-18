@@ -714,7 +714,7 @@ Update_Messages Character::add_to_chest(std::string insert_item_id, const std::s
 	}
 
 	// move the items
-	const unsigned add_count = Character::move_items(*this, *room->get_chest(), insert_item_id, count);
+	const unsigned add_count = Character::move_items(*this, *room, insert_item_id, count);
 
 	if (add_count == 0)
 	{

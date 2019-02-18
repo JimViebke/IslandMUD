@@ -55,6 +55,7 @@ public:
 
 	// debugging
 	size_t count_loaded_rooms() const;
+	void audit_loaded_rooms() const;
 
 	// load rooms around a player spawning in
 	void load_view_radius_around(const Coordinate & coordinate, const character_id & character_ID);

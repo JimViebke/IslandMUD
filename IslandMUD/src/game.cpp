@@ -676,13 +676,33 @@ void Game::NPC_thread()
 		NPC_spawn_logic();
 		const auto spawn_end = U::current_time_in_ms();
 
+		const auto count_start = U::current_time_in_ms();
+		size_t loaded_rooms;
+		{
+			std::unique_lock<std::mutex> lock(game_state);
+			loaded_rooms = world->count_loaded_rooms();
+		}
+		const auto count_end = U::current_time_in_ms();
+
+		const auto audit_start = U::current_time_in_ms();
+		{
+			std::unique_lock<std::mutex> lock(game_state);
+			audit_world_data();
+		}
+		const auto audit_end = U::current_time_in_ms();
+
+
+
 		const auto tick_end = U::current_time_in_ms();
 		next_tick += C::MS_PER_TICK;
 
 		std::stringstream ss;
 		ss << "NPC tick: " << tick_end - tick_start << " ms (logic " <<
 			update_end - update_start << " ms, spawn " <<
-			spawn_end - spawn_start << " ms)\n";
+			spawn_end - spawn_start << " ms, counted "
+			<< loaded_rooms << " rooms in " <<
+			count_end - count_start << " ms, audit " <<
+			audit_end - audit_start << " ms)\n";
 		std::cout << ss.str();
 
 		// if the start of the next tick is in the future, that is,
@@ -1019,4 +1039,46 @@ void Game::shutdown_listener()
 
 	// this is on the main thread, so "return;" destroys the game object
 	return;
+}
+
+void Game::audit_world_data()
+{
+	std::stringstream ss;
+
+	std::vector<Coordinate> player_coordinates;
+	player_coordinates.reserve(actors.size());
+
+	for (auto actor : actors)
+		player_coordinates.push_back(actor.second->get_location());
+
+	for (int x = 0; x < C::WORLD_X_DIMENSION; ++x)
+	{
+		for (int y = 0; y < C::WORLD_Y_DIMENSION; ++y)
+		{
+			if (world->room_at(Coordinate(x, y)) == nullptr) continue;
+			
+			// else, the room is loaded
+
+			for (Coordinate coordinate : player_coordinates)
+			{
+				if (coordinate.diagonal_distance_to(Coordinate(x, y)) <= C::VIEW_DISTANCE)
+					goto next_room;
+			}
+
+			ss << x << ", " << y << " is loaded, but no players are within view distance.\n";
+
+		next_room: ;
+		}
+	}
+
+	if (ss.str().empty())
+	{
+		std::cout << "World audit passed.\n";
+	}
+	else
+	{
+		std::cout << "World audit failed:\n";
+		std::cout << ss.str();
+		std::cout.flush();
+	}
 }

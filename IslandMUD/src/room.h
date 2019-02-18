@@ -20,25 +20,28 @@ Feb 14, 2015 */
 class Room : public Container
 {
 private:
+	bool dirty = false;
+
 	bool water = false; // is the room dry land or water?
 	std::shared_ptr<Chest> chest = nullptr; // nullptr if the room does not have a chest
 	std::shared_ptr<Table> table = nullptr; // nullptr if the room does not have a table
 	std::array<std::optional<Room_Side>, 6> room_sides;
-	std::vector<character_id> viewing_actor_ids = {}; // the PCs and NPCs who can see this room
-	std::vector<character_id> actor_ids = {}; // the PCs and NPCs in a room
+	mutable std::vector<character_id> viewing_actor_ids = {}; // the PCs and NPCs who can see this room
+	mutable std::vector<character_id> actor_ids = {}; // the PCs and NPCs in a room
 	Coordinate coordinate;
 
 public:
 
-	Room(const int x, const int y) : Room(Coordinate(x, y)) {} // delegate
-	Room(const Coordinate & coordinate) : Container(), coordinate(coordinate) {}
+	Room(const Coordinate & coordinate) : Container(), coordinate(coordinate), dirty(false) {}
+
+	void make_clean();
+	bool is_dirty() const;
 
 	// configuration
-	void set_water_status(const bool & is_water) { water = is_water; }
+	void set_water_status(const bool & is_water) { water = is_water; dirty = true; }
 
 	// room contents
-	const std::multimap<std::string, std::shared_ptr<Item>> get_contents() const { return contents; }
-	std::multimap<std::string, std::shared_ptr<Item>> & get_contents() { return contents; }
+	const std::multimap<std::string, std::shared_ptr<Item>> & get_contents() const { return contents; }
 	const auto& get_room_sides() const { return room_sides; }
 	const std::vector<character_id>& get_actor_ids() const { return actor_ids; }
 
@@ -70,7 +73,8 @@ public:
 	Update_Messages chest_contents(const std::string & faction_ID, const std::string & username) const;
 	void damage_chest();
 	bool chest_has(const std::string & item_id) const;
-	std::shared_ptr<Chest> get_chest() const;
+	std::shared_ptr<Chest> get_chest();
+	const std::shared_ptr<const Chest> get_chest() const;
 	void set_chest(const std::shared_ptr<Chest> & set_chest);
 
 	// tables
@@ -98,10 +102,10 @@ public:
 	Update_Messages damage_door(const std::string & surface_ID, const std::shared_ptr<Item> & equipped_item, const std::string & username);
 
 	// add and remove actors
-	void add_actor(const character_id & actor_id);
-	void remove_actor(const character_id & actor_id);
-	void add_viewing_actor(const character_id & actor_id);
-	void remove_viewing_actor(const character_id & actor_id);
+	void add_actor(const character_id & actor_id) const;
+	void remove_actor(const character_id & actor_id) const;
+	void add_viewing_actor(const character_id & actor_id) const;
+	void remove_viewing_actor(const character_id & actor_id) const;
 
 	// printing
 	std::string summary(const character_id & player_ID) const;

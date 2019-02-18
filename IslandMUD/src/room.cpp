@@ -3,6 +3,21 @@ Mar 19 2015 */
 
 #include "room.h"
 
+void Room::make_clean()
+{
+	dirty = false;
+	make_container_clean(); // the room's container itself
+	if (chest) chest->make_container_clean();
+	if (table) table->make_container_clean();
+}
+bool Room::is_dirty() const
+{
+	return dirty
+		|| is_container_dirty()
+		|| (chest && chest->is_container_dirty())
+		|| (table && table->is_container_dirty());
+}
+
 // room information
 bool Room::has_wall() const // used to determine if a ceiling can be placed
 {
@@ -98,13 +113,18 @@ Coordinate Room::get_coordinates() const
 
 void Room::remove(const C::surface surface)
 {
-	if (has_surface(surface)) room_sides[(size_t)surface].reset();
+	if (has_surface(surface))
+	{
+		room_sides[(size_t)surface].reset();
+		dirty = true;
+	}
 }
 
 // chests
 void Room::add_chest(const std::string & set_faction_id)
 {
 	chest = std::make_shared<Chest>(set_faction_id);
+	dirty = true;
 }
 bool Room::has_chest() const
 {
@@ -122,6 +142,7 @@ int Room::chest_health() const
 }
 bool Room::add_item_to_chest(const std::shared_ptr<Item> & item)
 {
+	dirty = true;
 	return chest->insert(item);
 }
 Update_Messages Room::chest_contents(const std::string & faction_ID, const std::string & username) const
@@ -151,7 +172,7 @@ void Room::damage_chest()
 {
 	// use equipped weapon and damage tables
 
-
+	dirty = true;
 }
 bool Room::chest_has(const std::string & item_id) const
 {
@@ -163,19 +184,25 @@ bool Room::chest_has(const std::string & item_id) const
 
 	return chest->contains(item_id);
 }
-std::shared_ptr<Chest> Room::get_chest() const
+std::shared_ptr<Chest> Room::get_chest()
+{
+	return chest;
+}
+const std::shared_ptr<const Chest> Room::get_chest() const
 {
 	return chest;
 }
 void Room::set_chest(const std::shared_ptr<Chest> & set_chest)
 {
 	this->chest = set_chest;
+	dirty = true;
 }
 
 // tables
 void Room::add_table()
 {
 	this->table = std::make_shared<Table>();
+	dirty = true;
 }
 bool Room::has_table() const
 {
@@ -240,6 +267,8 @@ bool Room::damage_item(const std::string & item_id, const int & amount)
 {
 	// return a boolean indicating if the target item was destroyed
 
+	dirty = true;
+
 	// if the item will be destroyed
 	if (contents.find(item_id)->second->get_health() - amount <= C::DEFAULT_ITEM_MIN_HEALTH)
 	{
@@ -273,6 +302,8 @@ void Room::add_surface(const C::surface surface, const std::string & material_ID
 
 	room_sides[(size_t)surface].emplace(material_ID);
 	room_sides[(size_t)surface]->set_health(surface_health);
+
+	dirty = true;
 }
 void Room::add_door(const C::surface surface, const int & health, const std::string & material_ID, const std::string & faction_ID)
 {
@@ -302,6 +333,8 @@ void Room::add_door(const C::surface surface, const int & health, const std::str
 	}
 
 	room_sides[(size_t)surface]->add_door(health, material_ID, faction_ID);
+
+	dirty = true;
 }
 
 // damage surface
@@ -369,6 +402,8 @@ Update_Messages Room::damage_surface(const std::string & surface_ID, const std::
 		ss << "surface health after attack:  " << room_sides[(size_t)surface]->get_health() << std::endl;
 		std::cout << ss.str();
 	}
+
+	dirty = true;
 
 	// after applying damage, test again to see if the surface is rubble
 	if (room_sides[(size_t)surface]->is_intact())
@@ -494,6 +529,8 @@ Update_Messages Room::damage_door(const std::string & surface_ID, const std::sha
 		std::cout << ss.str();
 	}
 
+	dirty = true;
+
 	// if the door has 0 health
 	if (room_sides[(size_t)surface]->is_rubble())
 	{
@@ -517,18 +554,18 @@ Update_Messages Room::damage_door(const std::string & surface_ID, const std::sha
 }
 
 // add and remove actors
-void Room::add_actor(const character_id & actor_id)
+void Room::add_actor(const character_id & actor_id) const
 {
 	if (!U::contains(actor_ids, actor_id)) // if the actor is not already in the list of actors
 	{
 		actor_ids.push_back(actor_id); // add the actor
 	}
 }
-void Room::remove_actor(const character_id & actor_id)
+void Room::remove_actor(const character_id & actor_id) const
 {
 	U::erase_element_from_vector(actor_ids, actor_id);
 }
-void Room::add_viewing_actor(const character_id & actor_id)
+void Room::add_viewing_actor(const character_id & actor_id) const
 {
 	// if the passed actor_ID is not already able to view the room
 	if (!U::contains(viewing_actor_ids, actor_id))
@@ -537,7 +574,7 @@ void Room::add_viewing_actor(const character_id & actor_id)
 		viewing_actor_ids.push_back(actor_id);
 	}
 }
-void Room::remove_viewing_actor(const character_id & actor_id)
+void Room::remove_viewing_actor(const character_id & actor_id) const
 {
 	// A room is unloaded when no player can see the room.
 	// To this end, a list of PCs and NPCs who can see this room is maintained.

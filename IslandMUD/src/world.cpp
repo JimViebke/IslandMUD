@@ -67,7 +67,13 @@ size_t World::count_loaded_rooms() const
 
 	size_t loaded_rooms = 0;
 
-	for (const auto& room : world) if (room) ++loaded_rooms;
+	for (const auto& room : world)
+	{
+		if (room != nullptr)
+		{
+			++loaded_rooms;
+		}
+	}
 
 	return loaded_rooms;
 }
@@ -117,12 +123,19 @@ void World::remove_viewer_and_attempt_unload(const Coordinate & coordinate, cons
 	// if there is no one in the room or able to see it, move the room into the unload queue
 	if (room_at(coordinate)->is_unloadable())
 	{
-		// lock the queue
-		std::unique_lock<std::recursive_mutex> lock(unload_queue_mutex);
-		// move the room into the queue, leaving the unique_ptr as nullptr
-		unload_queue.push_back(std::move(reference_room_at(coordinate)));
-		// wake the unload thread
-		unload_queue_cv.notify_one();
+		if (room_at(coordinate)->is_dirty())
+		{
+			// lock the queue
+			std::unique_lock<std::recursive_mutex> lock(unload_queue_mutex);
+			// move the room into the queue, leaving the unique_ptr as nullptr
+			unload_queue.push_back(std::move(reference_room_at(coordinate)));
+			// wake the unload thread
+			unload_queue_cv.notify_one();
+		}
+		else // the room has not been modified
+		{
+			erase_room_from_memory(coordinate);
+		}
 	}
 }
 void World::remove_viewer_and_attempt_unload(const std::vector<Coordinate> & coordinates, const character_id & viewer_ID)
@@ -546,6 +559,8 @@ void World::add_room_to_world(pugi::xml_node & room_document, const Coordinate &
 			));
 	}
 
+	room->make_clean();
+
 	// add room to world
 	reference_room_at(coordinate) = std::move(room);
 }
@@ -811,6 +826,8 @@ std::unique_ptr<Room> World::create_room(const Coordinate & coordinate) const
 	{
 		room->insert(Craft::make(C::LIMESTONE_DEPOSIT_ID)); // add a limestone item
 	}
+
+	room->make_clean();
 
 	return room;
 }
