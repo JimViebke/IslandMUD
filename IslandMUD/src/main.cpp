@@ -6,7 +6,11 @@ Feb 14, 2015 */
 
 int main()
 {
-	srand((unsigned)time(NULL)); // seed rand
+	// seed rand
+	srand((unsigned)time(NULL));
+
+	// disable syncing with printf
+	std::ios_base::sync_with_stdio(false);
 
 	// write game directories to disk
 	U::create_path_if_not_exists(C::game_directory);
