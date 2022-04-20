@@ -53,10 +53,6 @@ const char C::RUBBLE_CHAR = '!';
 const char C::WALL_CHAR = '#';
 const char C::DOOR_CHAR = '/';
 
-// engine signals
-const std::string C::GOOD_SIGNAL = "good";
-const std::string C::BAD_SIGNAL = "bad";
-
 // item IDs
 
 const std::string C::BLOOMERY_ID = "bloomery";

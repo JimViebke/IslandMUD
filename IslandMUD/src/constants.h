@@ -104,10 +104,6 @@ public:
 	};
 
 	static const std::string
-		// engine signals
-		GOOD_SIGNAL,
-		BAD_SIGNAL,
-
 		// item IDs
 
 		BLOOMERY_ID,
